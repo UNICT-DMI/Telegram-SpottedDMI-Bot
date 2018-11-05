@@ -19,3 +19,6 @@ TOKEN = tokenconf
 #Send message with bot's information
 def start_cmd(bot, update):
     bot.sendMessage(chat_id = update.message.chat_id, text="Informazioni bot")
+
+def help_cmd(bot, update):
+    bot.sendMessage(chat_id = update.message.chat_id, text="Utilizza il comando /spot per raccontarci qualcosa.")

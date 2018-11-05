@@ -10,7 +10,9 @@ def main():
     updater = Updater(TOKEN)
     dp = updater.dispatcher
 
+    #Bot commands
     dp.add_handler(CommandHandler('start', start_cmd))
+    dp.add_handler(CommandHandler('help', help_cmd))
 
     updater.start_polling()
     updater.idle()
