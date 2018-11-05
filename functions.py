@@ -23,6 +23,8 @@ def start_cmd(bot, update):
 #Function: spot_cmd
 #Send the user a request for a spotted message
 def spot_cmd(bot, update):
-
     # bot.sendMessage(chat_id = update.message.chat_id, text="Invia un messaggio da spottare ", reply_markup = types.ForceReply())
     update.message.reply_text("Invia il messaggio che vuoi spottare")
+
+def help_cmd(bot, update):
+    bot.sendMessage(chat_id = update.message.chat_id, text="Utilizza il comando /spot per raccontarci qualcosa.")
