@@ -11,6 +11,7 @@ def main():
     dp = updater.dispatcher
 
     dp.add_handler(CommandHandler('start', start_cmd))
+    dp.add_handler(CommandHandler('spot', spot_cmd))
 
     updater.start_polling()
     updater.idle()
