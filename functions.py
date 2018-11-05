@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-from evaluate import *
 
 # Telegram
 import telegram
@@ -12,3 +11,11 @@ tokenconf = tokenconf.replace("\n", "")
 
 # Token of your telegram bot that you created from @BotFather, write it on token.conf
 TOKEN = tokenconf
+
+
+#Bot functions
+
+#Function: start_cmd
+#Send message with bot's information
+def start_cmd(bot, update):
+    bot.sendMessage(chat_id = update.message.chat_id, text="Informazioni bot")
