@@ -15,7 +15,7 @@ def main():
     dp.add_handler(CommandHandler('spot', spot_cmd))
     dp.add_handler(CommandHandler('help', help_cmd))
     dp.add_handler(MessageHandler(Filters.reply , spot_get))
-    # dp.add_handler(MessageHandler((Filters.reply & Filters.photo), spot_photo))
+    dp.add_handler(CallbackQueryHandler( callback_spot))
 
     updater.start_polling()
     updater.idle()

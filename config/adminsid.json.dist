@@ -1,0 +1,7 @@
+#copy this file and rename into adminsid.json
+
+{
+	"admin_chat_id" : "xxxxxxxx",
+	"channel_chat_id" : "@yyyyyyyyyyy"	
+}
+
