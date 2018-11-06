@@ -14,7 +14,7 @@ def main():
     dp.add_handler(CommandHandler('start', start_cmd))
     dp.add_handler(CommandHandler('spot', spot_cmd))
     dp.add_handler(CommandHandler('help', help_cmd))
-
+    dp.add_handler(MessageHandler(Filters.reply, spot_get))
 
     updater.start_polling()
     updater.idle()
