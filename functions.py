@@ -43,85 +43,77 @@ def spot_cmd(bot, update):
 #Function: spot_get
 #Get the user text or media response to spot_cmd and forward it to the Admin chat
 def spot_get(bot, update):
-    try:
-        if update.message.reply_to_message.text == "Invia un messaggio da spottare.":
-            available = handle_type(bot,update.message,ADMINS_ID)
-            if available:
-                reply_markup = InlineKeyboardMarkup([[InlineKeyboardButton("Si", callback_data = '0$'+str(update.message.message_id)+"$"+str(update.message.chat_id) ),\
-                                                    InlineKeyboardButton("No", callback_data = '1$'+str(update.message.message_id)+"$"+str(update.message.chat_id))]])
-                print
-                bot.sendMessage(chat_id = ADMINS_ID,\
-                                    text = "Pubblicare il messaggio di @%s?" % update.message.from_user.username,\
-                                    reply_markup = reply_markup )
-            else:
-                bot.sendMessage(chat_id = update.message.chat_id, text = "È possibile solo inviare messaggi di testo,"+\
-                " immagini, audio o video")
-    except Exception as e:
-        print(str(e))
 
-#Function: handle_type
+    if update.message.reply_to_message.text == "Invia un messaggio da spottare.":
+        available, message_reply = handle_type(bot,update.message,ADMINS_ID)
+        if available:
+            reply_markup = InlineKeyboardMarkup([[InlineKeyboardButton("Si", callback_data = "0"),\
+                                                InlineKeyboardButton("No", callback_data = "1" )]])
+            print
+            bot.sendMessage(chat_id = ADMINS_ID,\
+                                text = "Pubblicare il messaggio di @%s?" % update.message.from_user.username,\
+                                reply_markup = reply_markup, reply_to_message_id = message_reply.message_id)
+        else:
+            bot.sendMessage(chat_id = update.message.chat_id, text = "È possibile solo inviare messaggi di testo,"+\
+            " immagini, audio o video")
+    handle_type
 #Return True if the message is a text a photo, a voice, an audio or a video; False otherwise
 def handle_type(bot, message, chat_id):
-    try:
-        text = message.text
-        photo = message.photo
-        voice = message.voice
-        audio = message.audio
-        video = message.video
-        caption = message.caption
 
-        if text:
-            bot.sendMessage(chat_id = chat_id, text = text)
-        elif photo:
-            bot.sendPhoto(chat_id = chat_id, photo = photo[-1], caption = caption)
-        elif voice:
-            bot.sendVoice(chat_id = chat_id, voice = voice)
-        elif audio:
-            bot.sendAudio(chat_id = chat_id, audio = audio)
-        elif video:
-            bot.sendVideo(chat_id = chat_id, video = video, caption = caption)
-        else:
-            return False
-        return True
-    except Exception as e:
-        print("handle: "+str(e))
+    text = message.text
+    photo = message.photo
+    voice = message.voice
+    audio = message.audio
+    video = message.video
+    caption = message.caption
 
+    if text:
+        _message = bot.sendMessage(chat_id = chat_id, text = text)
+    elif photo:
+        _message = bot.sendPhoto(chat_id = chat_id, photo = photo[-1], caption = caption)
+    elif voice:
+        _message = bot.sendVoice(chat_id = chat_id, voice = voice)
+    elif audio:
+        _message = bot.sendAudio(chat_id = chat_id, audio = audio)
+    elif video:
+        _message = bot.sendVideo(chat_id = chat_id, video = video, caption = caption)
+    else:
+        return False, None
+    return True, _message
 
 #Function: publish
 #Publish the spotted message on the channel and send the user an acknowledgement
-def publish(bot, update, message_id, chat_id):
-    try:
-        message = bot.sendMessage(chat_id = int(chat_id),\
-                text = "Il tuo messaggio è stato accettato e pubblicato!\nCorri a guardare le reazioni su @channel." ,\
-                reply_to_message_id = int(message_id))
-        handle_type(bot, message.reply_to_message, CHANNEL_ID)
-    except Exception as e:
-        print("publish: "+str(e))
+def publish(bot, message_id, chat_id):
+
+    message = bot.sendMessage(chat_id = chat_id,\
+            text = "Il tuo messaggio è stato accettato e pubblicato!\nCorri a guardare le reazioni su %s." % (CHANNEL_ID) ,\
+            reply_to_message_id = message_id)
+    handle_type(bot, message.reply_to_message, CHANNEL_ID)
 
 #Function: refuse
 #Acknowledge the user that the message has been refused
-def refuse(bot, update, message_id, chat_id):
-    try:
-        bot.sendMessage(chat_id = int(chat_id), text = "Il tuo messaggio é stato rifiutato.",\
-                        reply_to_message_id = int(message_id))
-    except Exception as e:
-        print("refuse: "+str(e))
+def refuse(bot, message_id, chat_id):
 
-#Function: callback_spot
+    bot.sendMessage(chat_id = chat_id, text = "Il tuo messaggio è stato rifiutato.",\
+                    reply_to_message_id = message_id)
+    #Function: callback_spot
 #Handle the callback according to the Admin choise
 def callback_spot(bot, update):
-    try:
-        query = update.callback_query
-        data = query.data
-        split = data.split("$")
-        pr = split[0]
-        message_id = split[1]
-        chat_id = split[2]
-        if data[0] == '0':
-            publish(bot, update, message_id, chat_id)
-            bot.answer_callback_query(query.id)
-        else:
-            refuse(bot, update, message_id, chat_id)
-            bot.answer_callback_query(query.id)
-    except Exception as e:
-        print("callback: "+str(e))
+
+    query = update.callback_query
+    data = query.data
+
+    message_id = update.callback_query.message.message_id
+    chat_id = update.callback_query.message.chat.id
+
+    message_id_answ = update.callback_query.message.reply_to_message.message_id
+    chat_id_answ = update.callback_query.message.reply_to_message.chat.id
+
+    if data == '0':
+        publish(bot, message_id_answ, chat_id_answ)
+        bot.answer_callback_query(query.id)
+        bot.editMessageText(chat_id = chat_id, message_id = message_id, text="Pubblicato")
+    else:
+        refuse(bot, message_id_answ, chat_id_answ)
+        bot.answer_callback_query(query.id)
+        bot.editMessageText(chat_id = chat_id, message_id = message_id, text="Rifiutato")
