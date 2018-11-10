@@ -4,3 +4,11 @@ CREATE TABLE IF NOT EXISTS 'Spot_list'(
   'message' text NOT NULL,
   'date' datetime
 );
+
+CREATE TABLE user_reactions (
+message_id int NOT NULL ,
+user_id int NOT NULL,
+thumbsup int,
+thumbsdown int,
+PRIMARY KEY (message_id,user_id)
+);
