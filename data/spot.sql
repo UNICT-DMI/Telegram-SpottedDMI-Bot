@@ -1,8 +1,9 @@
 CREATE TABLE IF NOT EXISTS 'Spot_list'(
-  'chat_id' int(11) NOT NULL,
-  'username' varchar(255),
-  'message' text NOT NULL,
-  'date' datetime
+message_id NOT NULL,
+chat_id int NOT NULL,
+published int,
+PRIMARY KEY (message_id,user_id)
+  
 );
 
 CREATE TABLE user_reactions (
