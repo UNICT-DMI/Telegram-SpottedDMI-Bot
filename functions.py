@@ -8,10 +8,8 @@ from telegram.ext import Updater, MessageHandler, CommandHandler, CallbackQueryH
 
 #Utils
 import json
-import emoji
 import sqlite3
 import sys
-import os
 
 # Token
 tokenconf = open("config/token.conf", "r").read()
@@ -31,12 +29,13 @@ TOKEN = tokenconf
 #Function: start_cmd
 #Send message with bot's information
 def start_cmd(bot, update):
-    bot.sendMessage(chat_id = update.message.chat_id, text = "Informazioni bot")
+    bot.sendMessage(chat_id = update.message.chat_id, text = "Questo bot permette agli studenti di pubblicare\
+                    un messaggio una foto o un video nel canale @canale, in maniera totalmente anonima")
 
 #Function: help_cmd
 #Send help message
 def help_cmd(bot, update):
-    bot.sendMessage(chat_id = update.message.chat_id, text = "Utilizza il comando /spot per raccontarci qualcosa.")
+    bot.sendMessage(chat_id = update.message.chat_id, text = "Utilizza il comando /spot per spottare un messaggio.")
 
 #Function: spot_cmd
 #Send the user a request for a spotted message
