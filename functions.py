@@ -139,7 +139,8 @@ def publish(bot, message_id, chat_id):
         bot.editMessageText(chat_id = chat_id, message_id = message.message_id,\
                             text = "Il tuo messaggio è stato accettato e pubblicato!\
                                     \nCorri a guardare le reazioni su %s." % (CHANNEL_ID))
-
+        sql_execute("DELETE FROM pending_spot\
+                    WHERE message_id = %d AND user_id = %d" % (message_id, chat_id))
     except Exception as e:
         exc_type, exc_obj, exc_tb = sys.exc_info()
         fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
@@ -197,13 +198,14 @@ def spot_edit(bot,message,callback):
     try:
         message_id = message.message_id
         user_id = callback.from_user.id
+        connection = sqlite3.connect("./data/spot.db")
         result = sql_execute("SELECT * FROM user_reactions\
-                            WHERE message_id = %d AND user_id = %d" % (message_id, user_id))
+                            WHERE message_id = %d AND user_id = %d" % (message_id, user_id), connection)
 
         if callback.data == "u":
             if result == []:
                 sql_execute("INSERT INTO user_reactions (message_id, user_id, thumbsup, thumbsdown)\
-                            VALUES (%d,%d,1,0)" % (message_id,user_id))
+                            VALUES (%d,%d,1,0)" % (message_id,user_id), connection)
 
             else:
                 t_up = abs(result[0][2] - 1)
@@ -212,12 +214,12 @@ def spot_edit(bot,message,callback):
                     t_down = 0
                 sql_execute("UPDATE user_reactions \
                             SET thumbsup = %d, thumbsdown = %d\
-                            WHERE message_id = %d AND user_id = %d" % (t_up, t_down, message_id, user_id))
+                            WHERE message_id = %d AND user_id = %d" % (t_up, t_down, message_id, user_id), connection)
 
         else:
             if result == []:
                 sql_execute("INSERT INTO user_reactions (message_id, user_id, thumbsup, thumbsdown)\
-                            VALUES (%d,%d,0,1)" % (message_id, user_id))
+                            VALUES (%d,%d,0,1)" % (message_id, user_id), connection)
 
             else:
                 t_down = abs(result[0][3] - 1)
@@ -226,30 +228,38 @@ def spot_edit(bot,message,callback):
                     t_up = 0
                 sql_execute("UPDATE user_reactions \
                             SET thumbsdown = %d, thumbsup = %d\
-                            WHERE message_id = %d AND user_id = %d" % (t_down, t_up, message_id, user_id))
+                            WHERE message_id = %d AND user_id = %d" % (t_down, t_up, message_id, user_id), connection)
 
         count_u = sql_execute("SELECT COUNT (thumbsup) FROM user_reactions\
-                                WHERE thumbsup = 1 AND message_id = %d" % (message_id))[0][0]
+                                WHERE thumbsup = 1 AND message_id = %d" % (message_id), connection)[0][0]
         count_d = sql_execute("SELECT COUNT (thumbsdown) FROM user_reactions\
-                                WHERE thumbsdown = 1 AND message_id = %d" % (message_id))[0][0]
+                                WHERE thumbsdown = 1 AND message_id = %d" % (message_id), connection)[0][0]
+        connection.commit()
+        connection.close()
         reply_markup = InlineKeyboardMarkup([[InlineKeyboardButton("%s %d" % ("👍",count_u),\
                                             callback_data = "u"),\
                                             InlineKeyboardButton("%s %d" % ("👎",count_d),\
                                             callback_data = "d" )]])
-        bot.editMessageReplyMarkup(chat_id = message.chat_id, message_id = message_id, reply_markup = reply_markup)
+        bot.editMessageReplyMarkup(chat_id = message.chat_id, message_id = message_id, reply_markup = reply_markup, timeout = 500)
     except Exception as e:
         exc_type, exc_obj, exc_tb = sys.exc_info()
         fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
         print("edit ",str(e), fname, exc_tb.tb_lineno)
 
-def sql_execute(sql_query):
+def sql_execute(sql_query, connection = None):
     try:
-        connection = sqlite3.connect("./data/spot.db")
+        connected = True
+        if not connection:
+            connection = sqlite3.connect("./data/spot.db")
+            connected = False
+
         cursor = connection.cursor()
         cursor.execute(sql_query)
         result = cursor.fetchall()
-        connection.commit()
-        connection.close()
+        if connected == False:
+            connection.commit()
+            connection.close()
+
         return result
     except sqlite3.Error as e:
             print("Database error: %s" % e)
