@@ -8,7 +8,6 @@ from telegram.ext import Updater, MessageHandler, CommandHandler, CallbackQueryH
 
 #Utils
 import json
-import emoji
 import sqlite3
 import sys
 import os
