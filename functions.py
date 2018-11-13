@@ -239,7 +239,10 @@ def spot_edit(bot,message,callback):
                                             callback_data = "u"),\
                                             InlineKeyboardButton("%s %d" % ("👎",count_d),\
                                             callback_data = "d" )]])
-        bot.editMessageReplyMarkup(chat_id = message.chat_id, message_id = message_id, reply_markup = reply_markup, timeout = 500)
+        import time
+        start_time = time.time()
+        bot.editMessageReplyMarkup(chat_id = message.chat_id, message_id = message_id, reply_markup = reply_markup, timeout = 0.001)
+        print("--- %s seconds —-" % (time.time() - start_time))
     except Exception as e:
         exc_type, exc_obj, exc_tb = sys.exc_info()
         fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
