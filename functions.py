@@ -29,13 +29,22 @@ TOKEN = tokenconf
 #Function: start_cmd
 #Send message with bot's information
 def start_cmd(bot, update):
-    bot.sendMessage(chat_id = update.message.chat_id, text = "Questo bot permette agli studenti di pubblicare\
-                    un messaggio una foto o un video nel canale @canale, in maniera totalmente anonima")
+    bot.sendMessage(chat_id = update.message.chat_id, text = "Questo bot permette agli studenti di pubblicare un messaggio una foto o un video nel canale @canale, in maniera totalmente anonima")
 
 #Function: help_cmd
 #Send help message
 def help_cmd(bot, update):
     bot.sendMessage(chat_id = update.message.chat_id, text = "Utilizza il comando /spot per spottare un messaggio.")
+
+#Funcion = rules_cmd
+#Send message with bot rules
+def rules_cmd(bot, update):
+    rule = "**SPOTTED DMI BOT RULES**\n"
+    rule1 = "1. Non è possibile utilizzare il bot per pubblicare messaggi offensivi.\n"
+    rule2 = "2. Non è possibile utilizzare il bot utilizzando un linguaggio scorretto e oltraggioso.\n"
+    rule3 = "3. Non è possibile utilizzare il bot per pubblicare foto/video in cui appaiono volti in assenza di un esplicito permesso della persona a cui esso appartiene.\n"
+    rule4 = "4. È fortemente sconsigliato l'uso di abbreviazioni, forme semplificate, sincopate ed apocopate."
+    bot.sendMessage(chat_id = update.message.chat_id, text = rule + rule1 + rule2 + rule3 + rule4)
 
 #Function: spot_cmd
 #Send the user a request for a spotted message
