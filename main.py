@@ -7,7 +7,7 @@ bot = telegram.Bot(TOKEN)
 #Function: main
 #Main function that run the bot.
 def main():
-    updater = Updater(TOKEN)
+    updater = Updater(TOKEN, request_kwargs={'read_timeout': 20, 'connect_timeout': 20})
     dp = updater.dispatcher
 
     #Bot commands

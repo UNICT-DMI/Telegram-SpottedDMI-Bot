@@ -97,11 +97,12 @@ def message_handle(bot, update):
             if update.message.text:
                 bot.sendMessage(chat_id = chat_id, reply_to_message_id = message_id, text = update.message.text)
                 bot.sendMessage(chat_id = update.message.chat_id, text = "Proposta inviata.")
+                bot.deleteMessage(chat_id = update.message.chat_id, message_id = update.message.message_id)
             else:
-                bot.editMessageText(chat_id = update.message.chat_id, message_id = update.message.message_id,\
+                bot.editMessageText(chat_id = update.message.chat_id, message_id = update.message.message_id,
                 text = "Invia la proposta come messaggio di testo!|\n\n\n|%d|%d" % (message_id, chat_id))
     except Exception as e:
-        print("spotget "+str(e))
+        print("message_handler "+str(e))
 
 #Function: handle_type
 #Return True if the message is a text a photo, a voice, an audio or a video; False otherwise
@@ -172,6 +173,10 @@ def refuse(bot, message_id, chat_id):
         bot.sendMessage(chat_id = chat_id,\
          text = "Il tuo messaggio è stato rifiutato. Controlla che rispetti gli standard del regolamento tramite il comando /rules .",\
                         reply_to_message_id = message_id)
+
+        sql_execute("DELETE FROM pending_spot\
+            WHERE message_id = %d AND user_id = %d" % (message_id, chat_id))
+
     except Exception as e:
         exc_type, exc_obj, exc_tb = sys.exc_info()
         fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
@@ -187,37 +192,38 @@ def callback_spot(bot, update):
         message_id = message.message_id
         chat_id = message.chat.id
 
-        result = sql_execute("SELECT message_id, user_id FROM pending_spot\
-                                WHERE published = 0")
+        result = sql_execute("SELECT message_id, user_id FROM pending_spot WHERE published = 0")
         if not result == []:
             message_id_answ = result[0][0]
             chat_id_answ = result[0][1]
 
-        if data == "0":
-            publish(bot, message_id_answ, chat_id_answ)
-            bot.editMessageText(chat_id = chat_id, message_id = message_id, text = "Pubblicato.")
-            bot.answer_callback_query(query.id)
+            if data == "0":
+                publish(bot, message_id_answ, chat_id_answ)
+                bot.editMessageText(chat_id = chat_id, message_id = message_id, text = "Pubblicato.")
+                bot.answer_callback_query(query.id)
 
-        elif data == "1":
-            reply_markup = InlineKeyboardMarkup([[InlineKeyboardButton("Proponi modifica", callback_data = "_p"),\
-                                            InlineKeyboardButton("Rifiuta", callback_data = "_r" )]])
-            bot.editMessageText(chat_id = chat_id, message_id = message_id,\
-                                text = "Vuoi proporre una modifica al messaggio?",\
-                                reply_markup = reply_markup)
-            bot.answer_callback_query(query.id)
+            elif data == "1":
+                reply_markup = InlineKeyboardMarkup([[InlineKeyboardButton("Proponi modifica", callback_data = "_p"),InlineKeyboardButton("Rifiuta", callback_data = "_r" )]])
+                bot.editMessageText(chat_id = chat_id, message_id = message_id, text = "Vuoi proporre una modifica al messaggio?", reply_markup = reply_markup)
+                bot.answer_callback_query(query.id)
 
-        elif data[0] == "_":
-            if data[1] == "r":
-                print("qui")
-                refuse(bot, message_id_answ, chat_id_answ)
-                bot.sendMessage(chat_id = chat_id, message_id = message_id, text = "Rifiutato.", reply_markup = reply_markup)
+            elif data[0] == "_":
+                if data[1] == "r":
+                    print("qui")
+                    refuse(bot, message_id_answ, chat_id_answ)
+                    bot.editMessageText(chat_id = chat_id, message_id = message_id, text = "Rifiutato.")
 
-            elif data[1] == "p":
-                bot.editMessageText(chat_id = chat_id, message_id = message_id, text = "Scrivi la modifica da proporre.|\n\n\n|%d|%d" % (message_id_answ, chat_id_answ), reply_markup = ForceReply())
-            sql_execute("DELETE FROM pending_spot\
-                        WHERE message_id = %d AND user_id = %d" % (message_id_answ, chat_id_answ))
-            bot.answer_callback_query(query.id)
-        else:
+                elif data[1] == "p":
+                    bot.deleteMessage(chat_id = chat_id, message_id = message_id)
+                    bot.sendMessage(chat_id = chat_id,
+                        message_id = message_id,
+                        text = "Scrivi la modifica da proporre.|\n\n\n|%d|%d" % (message_id_answ, chat_id_answ),
+                        reply_markup = ForceReply())
+                
+                sql_execute("DELETE FROM pending_spot WHERE message_id = %d AND user_id = %d" % (message_id_answ, chat_id_answ))
+                bot.answer_callback_query(query.id)
+
+        if data == "u" or data == "d":
             spot_edit(bot, message, query)
             bot.answer_callback_query(query.id)
     except Exception as e:
