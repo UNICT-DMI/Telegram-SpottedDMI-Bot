@@ -10,6 +10,7 @@ from telegram.ext import Updater, MessageHandler, CommandHandler, CallbackQueryH
 import json
 import sqlite3
 import sys
+import os
 
 # Token
 tokenconf = open("config/token.conf", "r").read()
@@ -47,7 +48,7 @@ def rules_cmd(bot, update):
     rule3 = "3. Non è possibile utilizzare il bot per pubblicare foto/video in cui appaiono volti non censurati o messaggi audio contenenti nome e cognome per intero.\n"
     rule4 = "4. È fortemente sconsigliato l'uso di abbreviazioni, forme semplificate, sincopate ed apocopate.\n"
     rule5 = "5. Ogni abuso sarà punito."
-    bot.sendMessage(chat_id = update.message.chat_id, text = rule + rule1 + rule2 + rule3 + rule4 + rule5)
+    bot.sendMessage(chat_id = update.message.chat_id, text = rule + rule1 + rule2 + rule3 + rule4 + rule5, parse_mode='Markdown')
 
 #Function: spot_cmd
 #Send the user a request for a spotted message
@@ -183,7 +184,6 @@ def callback_spot(bot, update):
         query = update.callback_query
         data = query.data
         message = query.message
-        reply = message.reply_to_message
         message_id = message.message_id
         chat_id = message.chat.id
 
