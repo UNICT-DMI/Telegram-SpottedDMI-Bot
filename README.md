@@ -1,9 +1,9 @@
 # Telegram-DMI-Bot
 
-**Telegram-SpottedDMI-Bot** is the platform that powers **@SpottedDMI_bot**, a Telegram bot aided at helping students find informations about professors, classes' schedules, administration's office hours and more.
+**Telegram-SpottedDMI-Bot** is the platform that powers **@Spotted_DMI_bot**, a Telegram bot that let students send an anonymous message to the channel community.
 
 ### Using the live version
-The bot is live on Telegram with the username [@SpottedDMI_Bot](https://telegram.me/SpottedDMI_Bot).
+The bot is live on Telegram with the username [@Spotted_DMI_Bot](https://telegram.me/Spotted_DMI_Bot).
 Send **'/start'** to start it, **'/help'** to see a list of commands.
 
 Please note that the commands and their answers are in Italian.

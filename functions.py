@@ -29,22 +29,25 @@ TOKEN = tokenconf
 #Function: start_cmd
 #Send message with bot's information
 def start_cmd(bot, update):
-    bot.sendMessage(chat_id = update.message.chat_id, text = "Questo bot permette agli studenti di pubblicare un messaggio una foto o un video nel canale @canale, in maniera totalmente anonima")
+    bot.sendMessage(chat_id = update.message.chat_id, text = "Questo bot permette agli studenti di pubblicare\
+     un messaggio una foto o un video nel canale @Spotted_DMI, in maniera anonima")
 
 #Function: help_cmd
 #Send help message
 def help_cmd(bot, update):
-    bot.sendMessage(chat_id = update.message.chat_id, text = "Utilizza il comando /spot per spottare un messaggio.")
+    bot.sendMessage(chat_id = update.message.chat_id, text = "/spot: rispondi al bot per inviare una richiesta di approvazione al messaggio che vuoi spottare.\
+                    /rules: un elenco di regole da rispettare nell'invio degli spot.")
 
 #Funcion = rules_cmd
 #Send message with bot rules
 def rules_cmd(bot, update):
     rule = "**SPOTTED DMI BOT RULES**\n"
     rule1 = "1. Non è possibile utilizzare il bot per pubblicare messaggi offensivi.\n"
-    rule2 = "2. Non è possibile utilizzare il bot utilizzando un linguaggio scorretto e oltraggioso.\n"
-    rule3 = "3. Non è possibile utilizzare il bot per pubblicare foto/video in cui appaiono volti in assenza di un esplicito permesso della persona a cui esso appartiene.\n"
-    rule4 = "4. È fortemente sconsigliato l'uso di abbreviazioni, forme semplificate, sincopate ed apocopate."
-    bot.sendMessage(chat_id = update.message.chat_id, text = rule + rule1 + rule2 + rule3 + rule4)
+    rule2 = "2. Non è possibile spoilerare, pubblicizzare o spammare.\n"
+    rule3 = "3. Non è possibile utilizzare il bot per pubblicare foto/video in cui appaiono volti non censurati o messaggi audio contenenti nome e cognome per intero.\n"
+    rule4 = "4. È fortemente sconsigliato l'uso di abbreviazioni, forme semplificate, sincopate ed apocopate.\n"
+    rule5 = "5. Ogni abuso sarà punito."
+    bot.sendMessage(chat_id = update.message.chat_id, text = rule + rule1 + rule2 + rule3 + rule4 + rule5)
 
 #Function: spot_cmd
 #Send the user a request for a spotted message
@@ -60,12 +63,12 @@ def spot_cmd(bot, update):
     except Exception as e:
         print("spotcmd "+str(e))
 
-#Function: spot_get
-#Get the user text or media response to spot_cmd and forward it to the Admin chat
-def spot_get(bot, update):
+#Function: message_handle
+#Handle the user text response to bot message
+def message_handle(bot, update):
     try:
-
-        if update.message.reply_to_message.text == "Invia un messaggio da spottare.":
+        text = update.message.reply_to_message.text
+        if text == "Invia un messaggio da spottare.":
             available, message_reply = handle_type(bot, update.message, ADMINS_ID)
 
             if available:
@@ -73,9 +76,6 @@ def spot_get(bot, update):
                 chat_id = update.message.chat_id
                 reply_markup = InlineKeyboardMarkup([[InlineKeyboardButton("Sì",callback_data = '0'),\
                                                     InlineKeyboardButton("No", callback_data = '1')]])
-                # reply_markup = InlineKeyboardMarkup([[InlineKeyboardButton("Sì",callback_data = '0 %s %s' % (str(update.message.message_id),str(update.message.chat_id)) ),\
-                #                                     InlineKeyboardButton("No", callback_data = '1 %s %s' % (str(update.message.message_id),str(update.message.chat_id)))]])
-
 
                 bot.sendMessage(chat_id = ADMINS_ID,\
                                     text = "Pubblicare il seguente messaggio?",\
@@ -89,6 +89,16 @@ def spot_get(bot, update):
             else:
                 bot.sendMessage(chat_id = chat_id, text = "È possibile solo inviare messaggi di testo,"+\
                 " immagini, audio o video")
+        elif text.split("|")[0] == "Scrivi la modifica da proporre." or text.split("|")[0] == "Invia la proposta come testo!":
+            data = text.split("|")
+            chat_id = int(data[-1])
+            message_id = int(data[-2])
+            if update.message.text:
+                bot.sendMessage(chat_id = chat_id, reply_to_message_id = message_id, text = update.message.text)
+                bot.sendMessage(chat_id = update.message.chat_id, text = "Proposta inviata.")
+            else:
+                bot.editMessageText(chat_id = update.message.chat_id, message_id = update.message.message_id,\
+                text = "Invia la proposta come messaggio di testo!|\n\n\n|%d|%d" % (message_id, chat_id))
     except Exception as e:
         print("spotget "+str(e))
 
@@ -158,10 +168,9 @@ def publish(bot, message_id, chat_id):
 #Acknowledge the user that the message has been refused
 def refuse(bot, message_id, chat_id):
     try:
-        bot.sendMessage(chat_id = chat_id, text = "Il tuo messaggio è stato rifiutato.",\
+        bot.sendMessage(chat_id = chat_id,\
+         text = "Il tuo messaggio è stato rifiutato. Controlla che rispetti gli standard del regolamento tramite il comando /rules .",\
                         reply_to_message_id = message_id)
-        sql_execute("DELETE FROM pending_spot\
-                    WHERE message_id = %d AND user_id = %d" % (message_id, chat_id))
     except Exception as e:
         exc_type, exc_obj, exc_tb = sys.exc_info()
         fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
@@ -186,22 +195,39 @@ def callback_spot(bot, update):
 
         if data == "0":
             publish(bot, message_id_answ, chat_id_answ)
-            bot.editMessageText(chat_id = chat_id, message_id = message_id, text = "Pubblicato")
+            bot.editMessageText(chat_id = chat_id, message_id = message_id, text = "Pubblicato.")
             bot.answer_callback_query(query.id)
 
         elif data == "1":
-            refuse(bot, message_id_answ, chat_id_answ)
-            bot.editMessageText(chat_id = chat_id, message_id = message_id, text = "Rifiutato")
+            reply_markup = InlineKeyboardMarkup([[InlineKeyboardButton("Proponi modifica", callback_data = "_p"),\
+                                            InlineKeyboardButton("Rifiuta", callback_data = "_r" )]])
+            bot.editMessageText(chat_id = chat_id, message_id = message_id,\
+                                text = "Vuoi proporre una modifica al messaggio?",\
+                                reply_markup = reply_markup)
+            bot.answer_callback_query(query.id)
+
+        elif data[0] == "_":
+            if data[1] == "r":
+                print("qui")
+                refuse(bot, message_id_answ, chat_id_answ)
+                bot.sendMessage(chat_id = chat_id, message_id = message_id, text = "Rifiutato.", reply_markup = reply_markup)
+
+            elif data[1] == "p":
+                bot.editMessageText(chat_id = chat_id, message_id = message_id, text = "Scrivi la modifica da proporre.|\n\n\n|%d|%d" % (message_id_answ, chat_id_answ), reply_markup = ForceReply())
+            sql_execute("DELETE FROM pending_spot\
+                        WHERE message_id = %d AND user_id = %d" % (message_id_answ, chat_id_answ))
             bot.answer_callback_query(query.id)
         else:
             spot_edit(bot, message, query)
             bot.answer_callback_query(query.id)
     except Exception as e:
-        exc_type, exc_obj, exc_tb = sys.exc_info()
-        fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
-        print("callback ",str(e), fname, exc_tb.tb_lineno)
+        print(str(e))
+        # exc_type, exc_obj, exc_tb = sys.exc_info()
+        # fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+        # print("callback ",str(e), fname, exc_tb.tb_lineno)
 
-
+#Function: spot_edit
+#Edit the reactions button of a sent message
 def spot_edit(bot,message,callback):
     try:
         message_id = message.message_id
@@ -248,15 +274,16 @@ def spot_edit(bot,message,callback):
                                             callback_data = "u"),\
                                             InlineKeyboardButton("%s %d" % ("👎",count_d),\
                                             callback_data = "d" )]])
-        import time
-        start_time = time.time()
         bot.editMessageReplyMarkup(chat_id = message.chat_id, message_id = message_id, reply_markup = reply_markup, timeout = 0.001)
-        print("--- %s seconds —-" % (time.time() - start_time))
+
     except Exception as e:
         exc_type, exc_obj, exc_tb = sys.exc_info()
         fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
         print("edit ",str(e), fname, exc_tb.tb_lineno)
 
+
+#Function: sql_execute
+#Exequte a sql query, given a text and optionally a connection
 def sql_execute(sql_query, connection = None):
     try:
         connected = True
