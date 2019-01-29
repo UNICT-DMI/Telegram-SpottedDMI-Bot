@@ -32,6 +32,28 @@ Run from shell:
 $ python main.py
 ```
 
+### Docker container
+
+#### How to use
+Build image dmibot with docker:
+
+```
+$ docker build ./ -t spotted --build-arg TOKEN=<token_API> --build-arg ADMIN_CHAT_ID=<admin_chat_id> --build-arg CHANNEL_CHAT_ID=<channel_chat_it>
+```
+
+Run the container dmibot:
+
+```
+$ docker run -it spotted
+```
+
+Now you can go to the dmibot directory and run the bot:
+
+```
+$ cd /usr/local/dmibot/
+$ python main.py
+```
+
 ### License
 This open-source software is published under the GNU General Public License (GNU GPL) version 3. Please refer to the "LICENSE" file of this project for the full text.
 
