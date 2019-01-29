@@ -15,6 +15,7 @@ def main():
     dp.add_handler(CommandHandler('spot', spot_cmd))
     dp.add_handler(CommandHandler('help', help_cmd))
     dp.add_handler(CommandHandler('rules', rules_cmd))
+    dp.add_handler(CommandHandler('ban', ban_cmd, pass_args = True))
     dp.add_handler(MessageHandler(Filters.reply , message_handle))
     dp.add_handler(CallbackQueryHandler( callback_spot))
 

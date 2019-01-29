@@ -54,8 +54,16 @@ def rules_cmd(bot, update):
 #Send the user a request for a spotted message
 def spot_cmd(bot, update):
     try:
+
         chat_id = update.message.chat_id
-        if update.message.chat.type == "group":
+        banned = False
+        f = open("./data/banned.lst", "r").read()
+        for i in f.strip().split("\n"):
+            if int(i) == chat_id:
+                banned = True
+        if banned:
+            bot.sendMessage(chat_id = chat_id, text = "Sei stato bannato.")
+        elif update.message.chat.type == "group":
             bot.sendMessage(chat_id = chat_id, text = "Questo comando non è utilizzabile in un gruppo. Chatta con @botprova in privato")
 
         else:
@@ -219,7 +227,7 @@ def callback_spot(bot, update):
                         message_id = message_id,
                         text = "Scrivi la modifica da proporre.|\n\n\n|%d|%d" % (message_id_answ, chat_id_answ),
                         reply_markup = ForceReply())
-                
+
                 sql_execute("DELETE FROM pending_spot WHERE message_id = %d AND user_id = %d" % (message_id_answ, chat_id_answ))
                 bot.answer_callback_query(query.id)
 
@@ -309,3 +317,15 @@ def sql_execute(sql_query, connection = None):
             print("Database error: %s" % e)
     except Exception as e:
         print("sql "+str(e))
+
+
+def ban_cmd(bot, update, args):
+    try:
+        if update.message.chat_id == int(ADMINS_ID):
+            user_id = args
+            message = bot.sendMessage(chat_id = int(user_id[0]), text = "Sei stato bannato.")
+            if message:
+                f = open("./data/banned.lst", "a+")
+                f.write(user_id[0]+"\n")
+    except Exception as e:
+        print("ban "+str(e))
