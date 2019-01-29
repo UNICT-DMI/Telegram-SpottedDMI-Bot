@@ -6,7 +6,7 @@ from telegram import InlineKeyboardButton, InlineKeyboardMarkup, ReplyKeyboardMa
                     ForceReply, PhotoSize, Video
 from telegram.ext import Updater, MessageHandler, CommandHandler, CallbackQueryHandler, Filters
 
-#Utils
+# Utils
 import json
 import sqlite3
 import sys
@@ -16,7 +16,7 @@ import os
 tokenconf = open("config/token.conf", "r").read()
 tokenconf = tokenconf.replace("\n", "")
 
-#Admins group chat_id
+# Admins group chat_id
 with open("config/adminsid.json") as j:
     ids = json.load(j)
 ADMINS_ID = ids["admins_chat_id"]
@@ -25,42 +25,45 @@ CHANNEL_ID = ids["channel_chat_id"]
 # Token of your telegram bot that you created from @BotFather, write it on token.conf
 TOKEN = tokenconf
 
-#Bot functions
+# Bot functions
 
-#Function: start_cmd
-#Send message with bot's information
+# Function: start_cmd
+# Send message with bot's information
 def start_cmd(bot, update):
     bot.sendMessage(chat_id = update.message.chat_id, text = "Questo bot permette agli studenti di pubblicare\
      un messaggio una foto o un video nel canale @Spotted_DMI, in maniera anonima")
 
-#Function: help_cmd
-#Send help message
+# Function: help_cmd
+# Send help message
 def help_cmd(bot, update):
     bot.sendMessage(chat_id = update.message.chat_id, text = "/spot: rispondi al bot per inviare una richiesta di approvazione al messaggio che vuoi spottare.\
-                    /rules: un elenco di regole da rispettare nell'invio degli spot.")
+                    \n\n/rules: un elenco di regole da rispettare nell'invio degli spot.")
 
-#Funcion = rules_cmd
-#Send message with bot rules
+# Function = rules_cmd
+# Send message with bot rules
 def rules_cmd(bot, update):
     rule = "**SPOTTED DMI BOT RULES**\n"
-    rule1 = "1. Non è possibile utilizzare il bot per pubblicare messaggi offensivi.\n"
-    rule2 = "2. Non è possibile spoilerare, pubblicizzare o spammare.\n"
-    rule3 = "3. Non è possibile utilizzare il bot per pubblicare foto/video in cui appaiono volti non censurati o messaggi audio contenenti nome e cognome per intero.\n"
-    rule4 = "4. È fortemente sconsigliato l'uso di abbreviazioni, forme semplificate, sincopate ed apocopate.\n"
-    rule5 = "5. Ogni abuso sarà punito."
+    rule1 = "**1.** Non è possibile utilizzare il bot per **pubblicare messaggi offensivi**.\n"
+    rule2 = "**2.** Non è possibile **spoilerare, pubblicizzare o spammare**.\n"
+    rule3 = "**3.** Non è possibile utilizzare il bot per pubblicare foto/video in cui appaiono **volti non censurati** o messaggi audio contenenti **nome e cognome** per intero.\n"
+    rule4 = "**4.** È fortemente sconsigliato l'uso di abbreviazioni, forme semplificate, sincopate ed apocopate.\n"
+    rule5 = "**5.** **Ogni abuso sarà punito.**"
     bot.sendMessage(chat_id = update.message.chat_id, text = rule + rule1 + rule2 + rule3 + rule4 + rule5, parse_mode='Markdown')
 
-#Function: spot_cmd
-#Send the user a request for a spotted message
+# Function: spot_cmd
+# Send the user a request for a spotted message
 def spot_cmd(bot, update):
     try:
-
         chat_id = update.message.chat_id
-        banned = False
+
         f = open("./data/banned.lst", "r").read()
-        for i in f.strip().split("\n"):
-            if int(i) == chat_id:
-                banned = True
+
+        banned = False
+        if f != "":
+            for i in f.strip().split("\n"):
+                if int(i) == chat_id:
+                    banned = True
+
         if banned:
             bot.sendMessage(chat_id = chat_id, text = "Sei stato bannato.")
         elif update.message.chat.type == "group":
@@ -71,9 +74,10 @@ def spot_cmd(bot, update):
                             reply_markup = ForceReply())
     except Exception as e:
         print("spotcmd "+str(e))
+        open("logs/errors.txt", "a+").write("spotcmd ",str(e)+"\n")        
 
-#Function: message_handle
-#Handle the user text response to bot message
+# Function: message_handle
+# Handle the user text response to bot message
 def message_handle(bot, update):
     try:
         text = update.message.reply_to_message.text
@@ -105,15 +109,16 @@ def message_handle(bot, update):
             if update.message.text:
                 bot.sendMessage(chat_id = chat_id, reply_to_message_id = message_id, text = update.message.text)
                 bot.sendMessage(chat_id = update.message.chat_id, text = "Proposta inviata.")
-                bot.deleteMessage(chat_id = update.message.chat_id, message_id = update.message.message_id)
+                # bot.deleteMessage(chat_id = update.message.chat_id, message_id = update.message.message_id)
             else:
                 bot.editMessageText(chat_id = update.message.chat_id, message_id = update.message.message_id,
                 text = "Invia la proposta come messaggio di testo!|\n\n\n|%d|%d" % (message_id, chat_id))
     except Exception as e:
         print("message_handler "+str(e))
+        open("logs/errors.txt", "a+").write("message_handler ",str(e)+"\n")        
 
-#Function: handle_type
-#Return True if the message is a text a photo, a voice, an audio or a video; False otherwise
+# Function: handle_type
+# Return True if the message is a text a photo, a voice, an audio or a video; False otherwise
 def handle_type(bot, message, chat_id):
     try:
         text = message.text
@@ -150,9 +155,10 @@ def handle_type(bot, message, chat_id):
         return True, _message
     except Exception as e:
         print("handle "+str(e))
+        open("logs/errors.txt", "a+").write("handle ",str(e)+"\n")        
 
-#Function: publish
-#Publish the spotted message on the channel and send the user an acknowledgement
+# Function: publish
+# Publish the spotted message on the channel and send the user an acknowledgement
 def publish(bot, message_id, chat_id):
     try:
         message = bot.sendMessage(chat_id = chat_id,\
@@ -173,9 +179,10 @@ def publish(bot, message_id, chat_id):
         exc_type, exc_obj, exc_tb = sys.exc_info()
         fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
         print("publish ",str(e), fname, exc_tb.tb_lineno)
+        open("logs/errors.txt", "a+").write("publish ",str(e)+"\n")        
 
-#Function: refuse
-#Acknowledge the user that the message has been refused
+# Function: refuse
+# Acknowledge the user that the message has been refused
 def refuse(bot, message_id, chat_id):
     try:
         bot.sendMessage(chat_id = chat_id,\
@@ -189,9 +196,10 @@ def refuse(bot, message_id, chat_id):
         exc_type, exc_obj, exc_tb = sys.exc_info()
         fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
         print("publish ",str(e), fname, exc_tb.tb_lineno)
+        open("logs/errors.txt", "a+").write("publish ",str(e)+"\n")        
 
-#Function: callback_spot
-#Handle the callback according to the Admin choise
+# Function: callback_spot
+# Handle the callback according to the Admin choise
 def callback_spot(bot, update):
     try:
         query = update.callback_query
@@ -217,7 +225,6 @@ def callback_spot(bot, update):
 
             elif data[0] == "_":
                 if data[1] == "r":
-                    print("qui")
                     refuse(bot, message_id_answ, chat_id_answ)
                     bot.editMessageText(chat_id = chat_id, message_id = message_id, text = "Rifiutato.")
 
@@ -235,13 +242,14 @@ def callback_spot(bot, update):
             spot_edit(bot, message, query)
             bot.answer_callback_query(query.id)
     except Exception as e:
-        print(str(e))
+        print("callback_spot ",str(e))
+        open("logs/errors.txt", "a+").write("callback_spot ",str(e)+"\n")
         # exc_type, exc_obj, exc_tb = sys.exc_info()
         # fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
         # print("callback ",str(e), fname, exc_tb.tb_lineno)
 
-#Function: spot_edit
-#Edit the reactions button of a sent message
+# Function: spot_edit
+# Edit the reactions button of a sent message
 def spot_edit(bot,message,callback):
     try:
         message_id = message.message_id
@@ -294,10 +302,11 @@ def spot_edit(bot,message,callback):
         exc_type, exc_obj, exc_tb = sys.exc_info()
         fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
         print("edit ",str(e), fname, exc_tb.tb_lineno)
+        open("logs/errors.txt", "a+").write("edit ",str(e)+"\n")
 
 
-#Function: sql_execute
-#Exequte a sql query, given a text and optionally a connection
+# Function: sql_execute
+# Exequte a sql query, given a text and optionally a connection
 def sql_execute(sql_query, connection = None):
     try:
         connected = True
@@ -317,7 +326,7 @@ def sql_execute(sql_query, connection = None):
             print("Database error: %s" % e)
     except Exception as e:
         print("sql "+str(e))
-
+        open("logs/errors.txt", "a+").write("sql ",str(e)+"\n")
 
 def ban_cmd(bot, update, args):
     try:
@@ -329,3 +338,4 @@ def ban_cmd(bot, update, args):
                 f.write(user_id[0]+"\n")
     except Exception as e:
         print("ban "+str(e))
+        open("logs/errors.txt", "a+").write("ban ",str(e)+"\n")        
