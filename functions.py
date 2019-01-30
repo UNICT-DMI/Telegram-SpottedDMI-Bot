@@ -67,7 +67,7 @@ def spot_cmd(bot, update):
         if banned:
             bot.sendMessage(chat_id = chat_id, text = "Sei stato bannato.")
         elif update.message.chat.type == "group":
-            bot.sendMessage(chat_id = chat_id, text = "Questo comando non è utilizzabile in un gruppo. Chatta con @botprova in privato")
+            bot.sendMessage(chat_id = chat_id, text = "Questo comando non è utilizzabile in un gruppo. Chatta con @Spotted_DMI_bot in privato")
 
         else:
             bot.sendMessage(chat_id = update.message.chat_id, text = "Invia un messaggio da spottare.",\

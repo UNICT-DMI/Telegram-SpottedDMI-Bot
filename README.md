@@ -1,6 +1,6 @@
 # Telegram-DMI-Bot
 
-**Telegram-SpottedDMI-Bot** is the platform that powers **@Spotted_DMI_bot**, a Telegram bot that let students send an anonymous message to the channel community.
+**Telegram-SpottedDMI-Bot** is the platform that powers **[@Spotted_DMI_Bot](https://telegram.me/Spotted_DMI_Bot)**, a Telegram bot that let students send an anonymous message to the channel community.
 
 ### Using the live version
 The bot is live on Telegram with the username [@Spotted_DMI_Bot](https://telegram.me/Spotted_DMI_Bot).
@@ -19,7 +19,7 @@ If you want to test the bot by creating your personal istance, follow this steps
 ### System requirements
 
 - Python 3
-- python-pip3
+- python3-pip
 
 #### To install with *pip3*
 
