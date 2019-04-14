@@ -8,9 +8,10 @@ from telegram.ext import Updater, MessageHandler, CommandHandler, CallbackQueryH
 
 # Utils
 import json
-import sqlite3
 import sys
 import os
+
+import data_functions as dataf
 
 # Token
 tokenconf = open("config/token.conf", "r").read()
@@ -81,21 +82,26 @@ def spot_cmd(bot, update):
 def message_handle(bot, update):
     try:
         text = update.message.reply_to_message.text
+
         if text == "Invia un messaggio da spottare.":
             available, message_reply = handle_type(bot, update.message, ADMINS_ID)
 
             if available:
                 message_id = update.message.message_id
                 chat_id = update.message.chat_id
+                candidate_msgid = message_reply.message_id
+
                 reply_markup = InlineKeyboardMarkup([[InlineKeyboardButton("Sì",callback_data = '0'),\
                                                     InlineKeyboardButton("No", callback_data = '1')]])
 
                 bot.sendMessage(chat_id = ADMINS_ID,\
                                     text = "Pubblicare il seguente messaggio?",\
-                                    reply_markup = reply_markup, reply_to_message_id = message_reply.message_id)
+                                    reply_markup = reply_markup, reply_to_message_id = candidate_msgid)
 
-                sql_execute("INSERT INTO pending_spot (message_id, user_id, published)\
-                            VALUES (%d,%d,0)" % (message_id, chat_id))
+                dataf.add_pending_spot(candidate_msgid, chat_id, message_id)
+
+                # sql_execute("INSERT INTO pending_spot (message_id, user_id, published)\
+                #            VALUES (%d,%d,0)" % (message_id, chat_id))
 
                 bot.sendMessage(chat_id = chat_id, text = "Il tuo messaggio è in fase di valutazione.\
                                                         \nTi informeremo non appena verrà analizzato.")
@@ -165,16 +171,17 @@ def publish(bot, message_id, chat_id):
                 text = "Messaggio in fase di pubblicazione." ,\
                 reply_to_message_id = message_id)
 
-
         handle_type(bot, message.reply_to_message, CHANNEL_ID)
-        sql_execute("UPDATE pending_spot\
-                    SET published = 1\
-                    WHERE message_id = %d AND user_id = %d" % (message_id, chat_id))
+
         bot.editMessageText(chat_id = chat_id, message_id = message.message_id,\
                             text = "Il tuo messaggio è stato accettato e pubblicato!\
                                     \nCorri a guardare le reazioni su %s." % (CHANNEL_ID))
-        sql_execute("DELETE FROM pending_spot\
-                    WHERE message_id = %d AND user_id = %d" % (message_id, chat_id))
+
+        # moved to "callback_spot"
+        # sql_execute("DELETE FROM pending_spot\
+        #             WHERE message_id = %d AND user_id = %d" % (message_id, chat_id))
+
+
     except Exception as e:
         exc_type, exc_obj, exc_tb = sys.exc_info()
         fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
@@ -189,8 +196,8 @@ def refuse(bot, message_id, chat_id):
          text = "Il tuo messaggio è stato rifiutato. Controlla che rispetti gli standard del regolamento tramite il comando /rules .",\
                         reply_to_message_id = message_id)
 
-        sql_execute("DELETE FROM pending_spot\
-            WHERE message_id = %d AND user_id = %d" % (message_id, chat_id))
+        # sql_execute("DELETE FROM pending_spot\
+        #    WHERE message_id = %d AND user_id = %d" % (message_id, chat_id))
 
     except Exception as e:
         exc_type, exc_obj, exc_tb = sys.exc_info()
@@ -208,15 +215,20 @@ def callback_spot(bot, update):
         message_id = message.message_id
         chat_id = message.chat.id
 
-        result = sql_execute("SELECT message_id, user_id FROM pending_spot WHERE published = 0")
-        if not result == []:
-            message_id_answ = result[0][0]
-            chat_id_answ = result[0][1]
+        candidate_message_id = message.reply_to_message.message_id
+
+        # result = sql_execute("SELECT message_id, user_id FROM pending_spot WHERE published = 0")
+        result = dataf.load_pending_spot(candidate_message_id)
+
+        if result:
+            message_id_answ = result["msgid"]
+            chat_id_answ = result["userid"]
 
             if data == "0":
                 publish(bot, message_id_answ, chat_id_answ)
                 bot.editMessageText(chat_id = chat_id, message_id = message_id, text = "Pubblicato.")
                 bot.answer_callback_query(query.id)
+                dataf.delete_pending_spot(candidate_message_id)
 
             elif data == "1":
                 reply_markup = InlineKeyboardMarkup([[InlineKeyboardButton("Proponi modifica", callback_data = "_p"),InlineKeyboardButton("Rifiuta", callback_data = "_r" )]])
@@ -235,8 +247,8 @@ def callback_spot(bot, update):
                         text = "Scrivi la modifica da proporre.|\n\n\n|%d|%d" % (message_id_answ, chat_id_answ),
                         reply_markup = ForceReply())
 
-                sql_execute("DELETE FROM pending_spot WHERE message_id = %d AND user_id = %d" % (message_id_answ, chat_id_answ))
-                bot.answer_callback_query(query.id)
+                # sql_execute("DELETE FROM pending_spot WHERE message_id = %d AND user_id = %d" % (message_id_answ, chat_id_answ))
+                # bot.answer_callback_query(query.id)
 
         if data == "u" or data == "d":
             spot_edit(bot, message, query)
@@ -260,36 +272,40 @@ def spot_edit(bot,message,callback):
 
         if callback.data == "u":
             if result == []:
-                sql_execute("INSERT INTO user_reactions (message_id, user_id, thumbsup, thumbsdown)\
-                            VALUES (%d,%d,1,0)" % (message_id,user_id), connection)
+                pass
+                # sql_execute("INSERT INTO user_reactions (message_id, user_id, thumbsup, thumbsdown)\
+                #             VALUES (%d,%d,1,0)" % (message_id,user_id), connection)
 
             else:
                 t_up = abs(result[0][2] - 1)
                 t_down = result[0][3]
                 if t_up == 1:
                     t_down = 0
-                sql_execute("UPDATE user_reactions \
-                            SET thumbsup = %d, thumbsdown = %d\
-                            WHERE message_id = %d AND user_id = %d" % (t_up, t_down, message_id, user_id), connection)
+                # sql_execute("UPDATE user_reactions \
+                #            SET thumbsup = %d, thumbsdown = %d\
+                #            WHERE message_id = %d AND user_id = %d" % (t_up, t_down, message_id, user_id), connection)
 
         else:
             if result == []:
-                sql_execute("INSERT INTO user_reactions (message_id, user_id, thumbsup, thumbsdown)\
-                            VALUES (%d,%d,0,1)" % (message_id, user_id), connection)
+                pass
+                # sql_execute("INSERT INTO user_reactions (message_id, user_id, thumbsup, thumbsdown)\
+                #             VALUES (%d,%d,0,1)" % (message_id, user_id), connection)
 
             else:
                 t_down = abs(result[0][3] - 1)
                 t_up = result[0][2]
                 if t_down == 1:
                     t_up = 0
-                sql_execute("UPDATE user_reactions \
-                            SET thumbsdown = %d, thumbsup = %d\
-                            WHERE message_id = %d AND user_id = %d" % (t_down, t_up, message_id, user_id), connection)
 
-        count_u = sql_execute("SELECT COUNT (thumbsup) FROM user_reactions\
-                                WHERE thumbsup = 1 AND message_id = %d" % (message_id), connection)[0][0]
-        count_d = sql_execute("SELECT COUNT (thumbsdown) FROM user_reactions\
-                                WHERE thumbsdown = 1 AND message_id = %d" % (message_id), connection)[0][0]
+                # sql_execute("UPDATE user_reactions \
+                #             SET thumbsdown = %d, thumbsup = %d\
+                #             WHERE message_id = %d AND user_id = %d" % (t_down, t_up, message_id, user_id), connection)
+
+        # count_u = sql_execute("SELECT COUNT (thumbsup) FROM user_reactions\
+        #                        WHERE thumbsup = 1 AND message_id = %d" % (message_id), connection)[0][0]
+        # count_d = sql_execute("SELECT COUNT (thumbsdown) FROM user_reactions\
+        #                        # WHERE thumbsdown = 1 AND message_id = %d" % (message_id), connection)[0][0]
+
         connection.commit()
         connection.close()
         reply_markup = InlineKeyboardMarkup([[InlineKeyboardButton("%s %d" % ("👍",count_u),\
@@ -303,30 +319,6 @@ def spot_edit(bot,message,callback):
         fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
         print("edit ",str(e), fname, exc_tb.tb_lineno)
         open("logs/errors.txt", "a+").write("edit ",str(e)+"\n")
-
-
-# Function: sql_execute
-# Exequte a sql query, given a text and optionally a connection
-def sql_execute(sql_query, connection = None):
-    try:
-        connected = True
-        if not connection:
-            connection = sqlite3.connect("./data/spot.db")
-            connected = False
-
-        cursor = connection.cursor()
-        cursor.execute(sql_query)
-        result = cursor.fetchall()
-        if connected == False:
-            connection.commit()
-            connection.close()
-
-        return result
-    except sqlite3.Error as e:
-            print("Database error: %s" % e)
-    except Exception as e:
-        print("sql "+str(e))
-        open("logs/errors.txt", "a+").write("sql ",str(e)+"\n")
 
 def ban_cmd(bot, update, args):
     try:
