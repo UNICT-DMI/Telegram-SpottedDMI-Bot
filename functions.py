@@ -26,6 +26,11 @@ CHANNEL_ID = ids["channel_chat_id"]
 # Token of your telegram bot that you created from @BotFather, write it on token.conf
 TOKEN = tokenconf
 
+# Log functions
+def log_error(component, ex):      
+    print("{}: {}".format(component, str(ex)))
+    open("logs/errors.txt", "a+").write("spotcmd {}\n".format(str(e)))
+
 # Bot functions
 
 # Function: start_cmd
@@ -74,8 +79,7 @@ def spot_cmd(bot, update):
             bot.sendMessage(chat_id = update.message.chat_id, text = "Invia un messaggio da spottare.",\
                             reply_markup = ForceReply())
     except Exception as e:
-        print("spotcmd "+str(e))
-        open("logs/errors.txt", "a+").write("spotcmd ",str(e)+"\n")        
+        log_error("spot cmd", e)
 
 # Function: message_handle
 # Handle the user text response to bot message
@@ -120,8 +124,7 @@ def message_handle(bot, update):
                 bot.editMessageText(chat_id = update.message.chat_id, message_id = update.message.message_id,
                 text = "Invia la proposta come messaggio di testo!|\n\n\n|%d|%d" % (message_id, chat_id))
     except Exception as e:
-        print("message_handler "+str(e))
-        open("logs/errors.txt", "a+").write("message_handler ",str(e)+"\n")        
+        log_error("message_handler", e)
 
 # Function: handle_type
 # Return True if the message is a text a photo, a voice, an audio or a video; False otherwise
@@ -160,8 +163,7 @@ def handle_type(bot, message, chat_id):
 
         return True, _message
     except Exception as e:
-        print("handle "+str(e))
-        open("logs/errors.txt", "a+").write("handle ",str(e)+"\n")        
+        log_error("handle", e)
 
 # Function: publish
 # Publish the spotted message on the channel and send the user an acknowledgement
@@ -179,17 +181,8 @@ def publish(bot, message_id, chat_id):
         bot.editMessageText(chat_id = chat_id, message_id = message.message_id,\
                             text = "Il tuo messaggio è stato accettato e pubblicato!\
                                     \nCorri a guardare le reazioni su %s." % (CHANNEL_ID))
-
-        # moved to "callback_spot"
-        # sql_execute("DELETE FROM pending_spot\
-        #             WHERE message_id = %d AND user_id = %d" % (message_id, chat_id))
-
-
     except Exception as e:
-        exc_type, exc_obj, exc_tb = sys.exc_info()
-        fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
-        print("publish ",str(e), fname, exc_tb.tb_lineno)
-        open("logs/errors.txt", "a+").write("publish ",str(e)+"\n")        
+        log_error("publish", e)
 
 # Function: refuse
 # Acknowledge the user that the message has been refused
@@ -199,14 +192,12 @@ def refuse(bot, message_id, chat_id):
          text = "Il tuo messaggio è stato rifiutato. Controlla che rispetti gli standard del regolamento tramite il comando /rules .",\
                         reply_to_message_id = message_id)
 
+        # moved to "callback spot"
         # sql_execute("DELETE FROM pending_spot\
         #    WHERE message_id = %d AND user_id = %d" % (message_id, chat_id))
 
     except Exception as e:
-        exc_type, exc_obj, exc_tb = sys.exc_info()
-        fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
-        print("publish ",str(e), fname, exc_tb.tb_lineno)
-        open("logs/errors.txt", "a+").write("publish ",str(e)+"\n")        
+        log_error("refuse", e)
 
 # Function: callback_spot
 # Handle the callback according to the Admin choise
@@ -221,11 +212,9 @@ def callback_spot(bot, update):
         if data == "u" or data == "d":
             spot_edit(bot, message, query)
             bot.answer_callback_query(query.id)
-
         else:
             candidate_message_id = message.reply_to_message.message_id
 
-            # result = sql_execute("SELECT message_id, user_id FROM pending_spot WHERE published = 0")
             result = dataf.load_pending_spot(candidate_message_id)
 
             if result:
@@ -239,33 +228,13 @@ def callback_spot(bot, update):
                     dataf.delete_pending_spot(candidate_message_id)
 
                 elif data == "1":
-                    reply_markup = InlineKeyboardMarkup([[InlineKeyboardButton("Proponi modifica", callback_data = "_p"),InlineKeyboardButton("Rifiuta", callback_data = "_r" )]])
-                    bot.editMessageText(chat_id = chat_id, message_id = message_id, text = "Vuoi proporre una modifica al messaggio?", reply_markup = reply_markup)
-                    bot.answer_callback_query(query.id)
-
-                elif data[0] == "_":
-                    if data[1] == "r":
-                        refuse(bot, message_id_answ, chat_id_answ)
-                        bot.editMessageText(chat_id = chat_id, message_id = message_id, text = "Rifiutato.")
-
-                    elif data[1] == "p":
-                        bot.deleteMessage(chat_id = chat_id, message_id = message_id)
-                        bot.sendMessage(chat_id = chat_id,
-                            message_id = message_id,
-                            text = "Scrivi la modifica da proporre.|\n\n\n|%d|%d" % (message_id_answ, chat_id_answ),
-                            reply_markup = ForceReply())
-
+                    refuse(bot, message_id_answ, chat_id_answ)
+                    bot.editMessageText(chat_id = chat_id, message_id = message_id, text = "Rifiutato.")
                     dataf.delete_pending_spot(candidate_message_id)
-                    # sql_execute("DELETE FROM pending_spot WHERE message_id = %d AND user_id = %d" % (message_id_answ, chat_id_answ))
-
                     bot.answer_callback_query(query.id)
 
     except Exception as e:
-        print("callback_spot ", str(e))
-        open("logs/errors.txt", "a+").write("callback_spot {}\n".format(str(e)))
-        # exc_type, exc_obj, exc_tb = sys.exc_info()
-        # fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
-        # print("callback ",str(e), fname, exc_tb.tb_lineno)
+        log_error("callback_spot", e)
 
 # Function: spot_edit
 # Edit the reactions button of a sent message
@@ -276,17 +245,18 @@ def spot_edit(bot, message, query):
 
         spot_data = dataf.load_spot_data(message_id)
 
-        if user_id in spot_data["voting_userids"].keys():
-            print("test")
+        user_id_s = str(user_id)
 
-            past_react = spot_data["voting_userids"][user_id]
-            print(past_react)
+        if user_id_s in spot_data["voting_userids"].keys():
+            past_react = spot_data["voting_userids"][user_id_s]
+
+            if past_react == query.data:
+                return
+
             spot_data["user_reactions"][past_react] = spot_data["user_reactions"][past_react] - 1
 
         spot_data["user_reactions"][query.data] = spot_data["user_reactions"][query.data] + 1
-        spot_data["voting_userids"][user_id] = query.data
-
-        print(spot_data)
+        spot_data["voting_userids"][user_id_s] = query.data
 
         dataf.save_spot_data(message_id, spot_data)
 
@@ -297,10 +267,7 @@ def spot_edit(bot, message, query):
         bot.editMessageReplyMarkup(chat_id = message.chat_id, message_id = message_id, reply_markup = reply_markup, timeout = 0.001)
 
     except Exception as e:
-        exc_type, exc_obj, exc_tb = sys.exc_info()
-        fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
-        print("edit {} {} {}".format(str(e), fname, exc_tb.tb_lineno))
-        open("logs/errors.txt", "a+").write("edit {}\n".format(str(e)))
+        log_error("edit", e)
 
 def ban_cmd(bot, update, args):
     try:
@@ -308,8 +275,7 @@ def ban_cmd(bot, update, args):
             user_id = args
             message = bot.sendMessage(chat_id = int(user_id[0]), text = "Sei stato bannato.")
             if message:
-                f = open("./data/banned.lst", "a+")
+                f = open("data/banned.lst", "a+")
                 f.write(user_id[0]+"\n")
     except Exception as e:
-        print("ban "+str(e))
-        open("logs/errors.txt", "a+").write("ban ",str(e)+"\n")        
+        log_error("ban", e)
