@@ -104,9 +104,6 @@ def message_handle(bot, update):
 
                 dataf.add_pending_spot(candidate_msgid, chat_id, message_id)
 
-                # sql_execute("INSERT INTO pending_spot (message_id, user_id, published)\
-                #            VALUES (%d,%d,0)" % (message_id, chat_id))
-
                 bot.sendMessage(chat_id = chat_id, text = "Il tuo messaggio è in fase di valutazione.\
                                                         \nTi informeremo non appena verrà analizzato.")
             else:
@@ -119,7 +116,6 @@ def message_handle(bot, update):
             if update.message.text:
                 bot.sendMessage(chat_id = chat_id, reply_to_message_id = message_id, text = update.message.text)
                 bot.sendMessage(chat_id = update.message.chat_id, text = "Proposta inviata.")
-                # bot.deleteMessage(chat_id = update.message.chat_id, message_id = update.message.message_id)
             else:
                 bot.editMessageText(chat_id = update.message.chat_id, message_id = update.message.message_id,
                 text = "Invia la proposta come messaggio di testo!|\n\n\n|%d|%d" % (message_id, chat_id))
@@ -191,10 +187,6 @@ def refuse(bot, message_id, chat_id):
         bot.sendMessage(chat_id = chat_id,\
          text = "Il tuo messaggio è stato rifiutato. Controlla che rispetti gli standard del regolamento tramite il comando /rules .",\
                         reply_to_message_id = message_id)
-
-        # moved to "callback spot"
-        # sql_execute("DELETE FROM pending_spot\
-        #    WHERE message_id = %d AND user_id = %d" % (message_id, chat_id))
 
     except Exception as e:
         log_error("refuse", e)
