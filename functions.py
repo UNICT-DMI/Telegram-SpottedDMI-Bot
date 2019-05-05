@@ -36,25 +36,23 @@ def log_error(component, ex):
 # Function: start_cmd
 # Send message with bot's information
 def start_cmd(bot, update):
-    bot.sendMessage(chat_id = update.message.chat_id, text = "Questo bot permette agli studenti di pubblicare\
-     un messaggio una foto o un video nel canale @Spotted_DMI, in maniera anonima")
+    welcome_msg = str(open("text/welcome.md", "r").read())
+
+    bot.sendMessage(chat_id = update.message.chat_id, text = welcome_msg, parse_mode=telegram.ParseMode.MARKDOWN, disable_web_page_preview=True)
 
 # Function: help_cmd
 # Send help message
 def help_cmd(bot, update):
-    bot.sendMessage(chat_id = update.message.chat_id, text = "/spot: rispondi al bot per inviare una richiesta di approvazione al messaggio che vuoi spottare.\
-                    \n\n/rules: un elenco di regole da rispettare nell'invio degli spot.")
+    help_msg = str(open("text/help.md", "r").read())
+
+    bot.sendMessage(chat_id = update.message.chat_id, text = help_msg, parse_mode=telegram.ParseMode.MARKDOWN, disable_web_page_preview=True)
 
 # Function = rules_cmd
 # Send message with bot rules
 def rules_cmd(bot, update):
-    rule = "**SPOTTED DMI BOT RULES**\n"
-    rule1 = "**1.** Non è possibile utilizzare il bot per **pubblicare messaggi offensivi**.\n"
-    rule2 = "**2.** Non è possibile **spoilerare, pubblicizzare o spammare**.\n"
-    rule3 = "**3.** Non è possibile utilizzare il bot per pubblicare foto/video in cui appaiono **volti non censurati** o messaggi audio contenenti **nome e cognome** per intero.\n"
-    rule4 = "**4.** È fortemente sconsigliato l'uso di abbreviazioni, forme semplificate, sincopate ed apocopate.\n"
-    rule5 = "**5.** **Ogni abuso sarà punito.**"
-    bot.sendMessage(chat_id = update.message.chat_id, text = rule + rule1 + rule2 + rule3 + rule4 + rule5, parse_mode='Markdown')
+    rules_msg = str(open("text/rules.md", "r").read())
+
+    bot.sendMessage(chat_id = update.message.chat_id, text = rules_msg, parse_mode=telegram.ParseMode.MARKDOWN, disable_web_page_preview=True)
 
 # Function: spot_cmd
 # Send the user a request for a spotted message
