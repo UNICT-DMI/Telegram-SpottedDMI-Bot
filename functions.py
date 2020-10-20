@@ -29,7 +29,7 @@ TOKEN = tokenconf
 # Log functions
 def log_error(component, ex):      
     print("{}: {}".format(component, str(ex)))
-    open("logs/errors.txt", "a+").write("spotcmd {}\n".format(str(e)))
+    open("logs/errors.txt", "a+").write("spotcmd {}\n".format(str(ex)))
 
 # Bot functions
 
@@ -199,7 +199,7 @@ def callback_spot(bot, update):
         message_id = message.message_id
         chat_id = message.chat.id
 
-        if data == "u" or data == "d":
+        if data == "u" or data == "d" or data == "r":
             spot_edit(bot, message, query)
             bot.answer_callback_query(query.id)
         else:
@@ -226,6 +226,18 @@ def callback_spot(bot, update):
     except Exception as e:
         log_error("callback_spot", e)
 
+# Function: update_spot
+# Update the reactions button of a sent message
+def update_spot(bot, message, spot_data):
+    message_id = message.message_id
+    dataf.save_spot_data(message_id, spot_data)
+    reply_markup = InlineKeyboardMarkup([[InlineKeyboardButton("%s %d" % ("👍", spot_data["user_reactions"]["u"]),\
+                                        callback_data = "u"),\
+                                        InlineKeyboardButton("%s %d" % ("👎", spot_data["user_reactions"]["d"]),\
+                                        callback_data = "d" )]])
+    bot.editMessageReplyMarkup(chat_id = message.chat_id, message_id = message_id, reply_markup = reply_markup, timeout = 0.001)
+
+
 # Function: spot_edit
 # Edit the reactions button of a sent message
 def spot_edit(bot, message, query):
@@ -240,21 +252,18 @@ def spot_edit(bot, message, query):
         if user_id_s in spot_data["voting_userids"].keys():
             past_react = spot_data["voting_userids"][user_id_s]
 
-            if past_react == query.data:
+            if past_react == query.data :
+                spot_data["user_reactions"][past_react] = spot_data["user_reactions"][past_react] - 1
+                spot_data["voting_userids"].pop(user_id_s) 
+                update_spot(bot, message, spot_data)               
                 return
 
             spot_data["user_reactions"][past_react] = spot_data["user_reactions"][past_react] - 1
-
+        
         spot_data["user_reactions"][query.data] = spot_data["user_reactions"][query.data] + 1
         spot_data["voting_userids"][user_id_s] = query.data
 
-        dataf.save_spot_data(message_id, spot_data)
-
-        reply_markup = InlineKeyboardMarkup([[InlineKeyboardButton("%s %d" % ("👍", spot_data["user_reactions"]["u"]),\
-                                            callback_data = "u"),\
-                                            InlineKeyboardButton("%s %d" % ("👎", spot_data["user_reactions"]["d"]),\
-                                            callback_data = "d" )]])
-        bot.editMessageReplyMarkup(chat_id = message.chat_id, message_id = message_id, reply_markup = reply_markup, timeout = 0.001)
+        update_spot(bot, message, spot_data)               
 
     except Exception as e:
         log_error("edit", e)
