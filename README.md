@@ -27,6 +27,7 @@ If you want to test the bot by creating your personal istance, follow this steps
 
 #### How to use
 Add the API TOKEN in /config/token.conf
+Add the numeric ids of the requested chats in /config/adminsid.json
 Run from shell:
 ```
 $ python main.py

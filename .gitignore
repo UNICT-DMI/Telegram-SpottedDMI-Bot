@@ -1,5 +1,12 @@
+#virtual enviroment
+.venv
+
+#vscode
+.vscode
+
 config/adminsid.json
 config/token.conf
 data/spot.db
 data/banned.lst
+data/*/*.json
 *pyc

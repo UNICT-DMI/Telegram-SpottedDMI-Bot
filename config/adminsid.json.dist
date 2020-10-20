@@ -1,4 +1,5 @@
 {
 	"admins_chat_id" : "xxxxxxxx",
-	"channel_chat_id" : "@yyyyyyyyyyy"	
+	"comments_chat_id" : "zzzzzzzz",
+	"channel_chat_id" : "yyyyyyyyyyy"	
 }

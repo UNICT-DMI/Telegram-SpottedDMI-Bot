@@ -22,14 +22,15 @@ with open("config/adminsid.json") as j:
     ids = json.load(j)
 ADMINS_ID = ids["admins_chat_id"]
 CHANNEL_ID = ids["channel_chat_id"]
+COMMENTS_ID = ids['comments_chat_id']
 
 # Token of your telegram bot that you created from @BotFather, write it on token.conf
 TOKEN = tokenconf
 
 # Log functions
-def log_error(component, ex):      
+def log_error(component, ex):
     print("{}: {}".format(component, str(ex)))
-    open("logs/errors.txt", "a+").write("spotcmd {}\n".format(str(e)))
+    open("logs/errors.txt", "a+").write("spotcmd {}\n".format(str(ex)))
 
 # Bot functions
 
@@ -132,9 +133,11 @@ def handle_type(bot, message, chat_id):
         animation = message.animation
         caption = message.caption
         reply_markup = None
-        if chat_id == CHANNEL_ID:
-            reply_markup = InlineKeyboardMarkup([[InlineKeyboardButton("👍", callback_data = "u"),\
-                                            InlineKeyboardButton("👎", callback_data = "d" )]])
+
+        # REMOVE COMMENTS if you want to return to the old mode (no comments in the channel)
+        # if chat_id == CHANNEL_ID:
+        #     reply_markup = InlineKeyboardMarkup([[InlineKeyboardButton("👍", callback_data = "u"),\
+        #                                     InlineKeyboardButton("👎", callback_data = "d" )]])
         if text:
             _message = bot.sendMessage(chat_id = chat_id, text = text, reply_markup = reply_markup)
 
@@ -169,12 +172,13 @@ def publish(bot, message_id, chat_id):
 
         success, spot_message = handle_type(bot, message.reply_to_message, CHANNEL_ID)
 
-        if success:
-            dataf.add_spot_data(spot_message.message_id)
+        # REMOVE COMMENTS if you want to return to the old mode (no comments in the channel)
+        # if success:
+        #     dataf.add_spot_data(spot_message.message_id)
 
         bot.editMessageText(chat_id = chat_id, message_id = message.message_id,\
                             text = "Il tuo messaggio è stato accettato e pubblicato!\
-                                    \nCorri a guardare le reazioni su %s." % (CHANNEL_ID))
+                                    \nCorri a guardare le reazioni su @%s." % bot.getChat(CHANNEL_ID).username)
     except Exception as e:
         log_error("publish", e)
 
@@ -254,7 +258,8 @@ def spot_edit(bot, message, query):
                                             callback_data = "u"),\
                                             InlineKeyboardButton("%s %d" % ("👎", spot_data["user_reactions"]["d"]),\
                                             callback_data = "d" )]])
-        bot.editMessageReplyMarkup(chat_id = message.chat_id, message_id = message_id, reply_markup = reply_markup, timeout = 0.001)
+        bot.editMessageReplyMarkup(chat_id = message.chat_id, message_id = message_id, reply_markup = reply_markup, timeout = 1)
+        bot.answerCallbackQuery(callback_query_id=query.id, text="Hai messo un %s" % ("👍" if query.data=="u" else "👎"))
 
     except Exception as e:
         log_error("edit", e)
@@ -269,3 +274,17 @@ def ban_cmd(bot, update, args):
                 f.write(user_id[0]+"\n")
     except Exception as e:
         log_error("ban", e)
+
+
+# Function: comment_msg
+# Makes a comment under the newly published spot to allow users to react to it
+def comment_msg(bot, update):
+    try:
+        message = update.message
+        if message.chat_id == int(COMMENTS_ID) and message.forward_from_chat.id == int(CHANNEL_ID):
+            reply_markup = InlineKeyboardMarkup([[InlineKeyboardButton("👍", callback_data = "u"),\
+                            InlineKeyboardButton("👎", callback_data = "d" )]])
+            vote_message = bot.send_message(chat_id=message.chat_id, text="Vota lo spot", reply_markup=reply_markup, reply_to_message_id=message.message_id)
+            dataf.add_spot_data(vote_message.message_id)
+    except Exception as e:
+        log_error("comment_msg", e)
