@@ -4,3 +4,4 @@ data/spot.db
 data/banned.lst
 *pyc
 .vscode
+data/spots/*
