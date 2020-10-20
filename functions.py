@@ -199,7 +199,7 @@ def callback_spot(bot, update):
         message_id = message.message_id
         chat_id = message.chat.id
 
-        if data == "u" or data == "d" or data == "r":
+        if data == "u" or data == "d":
             spot_edit(bot, message, query)
             bot.answer_callback_query(query.id)
         else:
