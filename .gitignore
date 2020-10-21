@@ -10,4 +10,4 @@ data/banned.lst
 data/*/*.json
 *pyc
 .vscode
-data/spots/*
+#data/spots/*
