@@ -32,7 +32,6 @@ def delete_pending_spot(candidate_msgid):
 # Create a data file for an already posted spot
 def add_spot_data(msgid):
     spotfile = open("data/spots/{}.json".format(msgid), "w") 
-
     spot_data = {
         "user_reactions": {
             "u": 0,
@@ -57,3 +56,4 @@ def load_spot_data(msgid):
 def save_spot_data(msgid, spotdata):
     spotfile = open("data/spots/{}.json".format(msgid), "w")
     json.dump(spotdata, spotfile)
+    spotfile.close()

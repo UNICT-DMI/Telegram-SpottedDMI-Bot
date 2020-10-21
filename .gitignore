@@ -1,7 +1,6 @@
 #virtual enviroment
 .venv
 
-#vscode
 .vscode
 
 config/adminsid.json
@@ -10,3 +9,5 @@ data/spot.db
 data/banned.lst
 data/*/*.json
 *pyc
+.vscode
+data/spots/*

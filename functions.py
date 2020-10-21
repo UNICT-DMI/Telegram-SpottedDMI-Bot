@@ -10,6 +10,7 @@ from telegram.ext import Updater, MessageHandler, CommandHandler, CallbackQueryH
 import json
 import sys
 import os
+import datetime
 
 import data_functions as dataf
 
@@ -29,8 +30,9 @@ TOKEN = tokenconf
 
 # Log functions
 def log_error(component, ex):
-    print("{}: {}".format(component, str(ex)))
-    open("logs/errors.txt", "a+").write("spotcmd {}\n".format(str(ex)))
+    time = datetime.datetime.now()
+    print("[{}] {}: {}".format(time, component, str(ex)))
+    open("logs/errors.txt", "a+").write("[{}] {}\n".format(time, str(ex)))
 
 # Bot functions
 
@@ -45,14 +47,12 @@ def start_cmd(bot, update):
 # Send help message
 def help_cmd(bot, update):
     help_msg = str(open("text/help.md", "r").read())
-
     bot.sendMessage(chat_id = update.message.chat_id, text = help_msg, parse_mode=telegram.ParseMode.MARKDOWN, disable_web_page_preview=True)
 
 # Function = rules_cmd
 # Send message with bot rules
 def rules_cmd(bot, update):
     rules_msg = str(open("text/rules.md", "r").read())
-
     bot.sendMessage(chat_id = update.message.chat_id, text = rules_msg, parse_mode=telegram.ParseMode.MARKDOWN, disable_web_page_preview=True)
 
 # Function: spot_cmd
@@ -123,7 +123,7 @@ def message_handle(bot, update):
 
 # Function: handle_type
 # Return True if the message is a text a photo, a voice, an audio or a video; False otherwise
-def handle_type(bot, message, chat_id):
+def handle_type(bot, message, chat_id) -> [bool, str]:
     try:
         text = message.text
         photo = message.photo
@@ -169,16 +169,15 @@ def publish(bot, message_id, chat_id):
         message = bot.sendMessage(chat_id = chat_id,\
                 text = "Messaggio in fase di pubblicazione." ,\
                 reply_to_message_id = message_id)
-
         success, spot_message = handle_type(bot, message.reply_to_message, CHANNEL_ID)
-
+        
         # REMOVE COMMENTS if you want to return to the old mode (no comments in the channel)
         # if success:
-        #     dataf.add_spot_data(spot_message.message_id)
-
+        #      dataf.add_spot_data(spot_message.message_id)
         bot.editMessageText(chat_id = chat_id, message_id = message.message_id,\
                             text = "Il tuo messaggio è stato accettato e pubblicato!\
                                     \nCorri a guardare le reazioni su @%s." % bot.getChat(CHANNEL_ID).username)
+
     except Exception as e:
         log_error("publish", e)
 
@@ -230,6 +229,18 @@ def callback_spot(bot, update):
     except Exception as e:
         log_error("callback_spot", e)
 
+# Function: update_spot
+# Update the reactions button of a sent message
+def update_spot(bot, message, spot_data):
+    message_id = message.message_id
+    dataf.save_spot_data(message_id, spot_data)
+    reply_markup = InlineKeyboardMarkup([[InlineKeyboardButton("%s %d" % ("👍", spot_data["user_reactions"]["u"]),\
+                                        callback_data = "u"),\
+                                        InlineKeyboardButton("%s %d" % ("👎", spot_data["user_reactions"]["d"]),\
+                                        callback_data = "d" )]])
+    bot.editMessageReplyMarkup(chat_id = message.chat_id, message_id = message_id, reply_markup = reply_markup, timeout = 1)
+
+
 # Function: spot_edit
 # Edit the reactions button of a sent message
 def spot_edit(bot, message, query):
@@ -244,21 +255,19 @@ def spot_edit(bot, message, query):
         if user_id_s in spot_data["voting_userids"].keys():
             past_react = spot_data["voting_userids"][user_id_s]
 
-            if past_react == query.data:
+            if past_react == query.data :
+                spot_data["user_reactions"][past_react] = spot_data["user_reactions"][past_react] - 1
+                spot_data["voting_userids"].pop(user_id_s) 
+                update_spot(bot, message, spot_data)     
+                bot.answerCallbackQuery(callback_query_id=query.id, text="Hai rimosso il tuo voto")          
                 return
 
             spot_data["user_reactions"][past_react] = spot_data["user_reactions"][past_react] - 1
-
+        
         spot_data["user_reactions"][query.data] = spot_data["user_reactions"][query.data] + 1
         spot_data["voting_userids"][user_id_s] = query.data
 
-        dataf.save_spot_data(message_id, spot_data)
-
-        reply_markup = InlineKeyboardMarkup([[InlineKeyboardButton("%s %d" % ("👍", spot_data["user_reactions"]["u"]),\
-                                            callback_data = "u"),\
-                                            InlineKeyboardButton("%s %d" % ("👎", spot_data["user_reactions"]["d"]),\
-                                            callback_data = "d" )]])
-        bot.editMessageReplyMarkup(chat_id = message.chat_id, message_id = message_id, reply_markup = reply_markup, timeout = 1)
+        update_spot(bot, message, spot_data)               
         bot.answerCallbackQuery(callback_query_id=query.id, text="Hai messo un %s" % ("👍" if query.data=="u" else "👎"))
 
     except Exception as e:
