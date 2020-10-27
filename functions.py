@@ -1,15 +1,11 @@
 # -*- coding: utf-8 -*-
 
 # Telegram
-import telegram
-from telegram import InlineKeyboardButton, InlineKeyboardMarkup, ReplyKeyboardMarkup, ReplyMarkup,\
-                    ForceReply, PhotoSize, Video
-from telegram.ext import Updater, MessageHandler, CommandHandler, CallbackQueryHandler, Filters
+from telegram.ext import CallbackContext
+from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup, ForceReply, ParseMode
 
 # Utils
 import json
-import sys
-import os
 import datetime
 
 import data_functions as dataf
@@ -38,26 +34,25 @@ def log_error(component, ex):
 
 # Function: start_cmd
 # Send message with bot's information
-def start_cmd(bot, update):
+def start_cmd(update: Update, context: CallbackContext):
     welcome_msg = str(open("text/welcome.md", "r").read())
-
-    bot.sendMessage(chat_id = update.message.chat_id, text = welcome_msg, parse_mode=telegram.ParseMode.MARKDOWN, disable_web_page_preview=True)
+    context.bot.sendMessage(chat_id = update.message.chat_id, text = welcome_msg, parse_mode=ParseMode.MARKDOWN, disable_web_page_preview=True)
 
 # Function: help_cmd
 # Send help message
-def help_cmd(bot, update):
+def help_cmd(update: Update, context: CallbackContext):
     help_msg = str(open("text/help.md", "r").read())
-    bot.sendMessage(chat_id = update.message.chat_id, text = help_msg, parse_mode=telegram.ParseMode.MARKDOWN, disable_web_page_preview=True)
+    context.bot.sendMessage(chat_id = update.message.chat_id, text = help_msg, parse_mode=ParseMode.MARKDOWN, disable_web_page_preview=True)
 
 # Function = rules_cmd
 # Send message with bot rules
-def rules_cmd(bot, update):
+def rules_cmd(update: Update, context: CallbackContext):
     rules_msg = str(open("text/rules.md", "r").read())
-    bot.sendMessage(chat_id = update.message.chat_id, text = rules_msg, parse_mode=telegram.ParseMode.MARKDOWN, disable_web_page_preview=True)
+    context.bot.sendMessage(chat_id = update.message.chat_id, text = rules_msg, parse_mode=ParseMode.MARKDOWN, disable_web_page_preview=True)
 
 # Function: spot_cmd
 # Send the user a request for a spotted message
-def spot_cmd(bot, update):
+def spot_cmd(update: Update, context: CallbackContext):
     try:
         chat_id = update.message.chat_id
 
@@ -70,18 +65,19 @@ def spot_cmd(bot, update):
                     banned = True
 
         if banned:
-            bot.sendMessage(chat_id = chat_id, text = "Sei stato bannato.")
+            context.bot.sendMessage(chat_id = chat_id, text = "Sei stato bannato.")
         elif update.message.chat.type == "group" or update.message.chat.type == "supergroup":
-            bot.sendMessage(chat_id = chat_id, text = "Questo comando non è utilizzabile in un gruppo. Chatta con @Spotted_DMI_bot in privato")
+            context.bot.sendMessage(chat_id = chat_id, text = "Questo comando non è utilizzabile in un gruppo. Chatta con @Spotted_DMI_bot in privato")
         else:
-            bot.sendMessage(chat_id = update.message.chat_id, text = "Invia un messaggio da spottare.",\
+            context.bot.sendMessage(chat_id = update.message.chat_id, text = "Invia un messaggio da spottare.",\
                             reply_markup = ForceReply())
     except Exception as e:
         log_error("spot cmd", e)
 
 # Function: message_handle
 # Handle the user text response to bot message
-def message_handle(bot, update):
+def message_handle(update: Update, context: CallbackContext):
+    bot = context.bot
     try:
         text = update.message.reply_to_message.text
 
@@ -193,7 +189,8 @@ def refuse(bot, message_id, chat_id):
 
 # Function: callback_spot
 # Handle the callback according to the Admin choise
-def callback_spot(bot, update):
+def callback_spot(update: Update, context: CallbackContext):
+    bot = context.bot
     try:
         query = update.callback_query
         data = query.data
@@ -272,11 +269,11 @@ def spot_edit(bot, message, query):
     except Exception as e:
         log_error("edit", e)
 
-def ban_cmd(bot, update, args):
+def ban_cmd(update: Update, context: CallbackContext):
     try:
-        if update.message.chat_id == int(ADMINS_ID):
-            user_id = args
-            message = bot.sendMessage(chat_id = int(user_id[0]), text = "Sei stato bannato.")
+        if update.message.chat_id == int(ADMINS_ID) and context.args:
+            user_id = context.args[0]
+            message = context.bot.sendMessage(chat_id = int(user_id), text = "Sei stato bannato.")
             if message:
                 f = open("data/banned.lst", "a+")
                 f.write(user_id[0]+"\n")
@@ -286,7 +283,8 @@ def ban_cmd(bot, update, args):
 
 # Function: comment_msg
 # Makes a comment under the newly published spot to allow users to react to it
-def comment_msg(bot, update):
+def comment_msg(update: Update, context: CallbackContext):
+    bot = context.bot
     try:
         message = update.message
         if message.chat_id == int(COMMENTS_ID) and message.forward_from_chat.id == int(CHANNEL_ID):
