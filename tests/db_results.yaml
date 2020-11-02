@@ -1,0 +1,21 @@
+select_from1:
+  - [2, Test2, t2]
+  - [3, Test3, t3]
+select_from2:
+  - [1, Test1]
+select_from3:
+  - [1]
+  - [2]
+  - [3]
+  - [4]
+  - [5]
+select_from_where:
+  - [2, Test2]
+  - [3, Test3]
+count_from1: 2
+count_from2: 1
+count_from3: 5
+
+insert_into:
+  - [10, test_insert1, none]
+  - [11, test_insert2, none]
