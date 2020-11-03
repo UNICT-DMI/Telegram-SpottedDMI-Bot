@@ -126,4 +126,4 @@ test:
 ## :books: Documentation
 Check the gh-pages branch
 
-[Link to the documentation](https://unict-dmi.github.io/Telegram-SpottedDMI-Bot2/)
+[Link to the documentation](https://unict-dmi.github.io/Telegram-SpottedDMI-Bot/)
