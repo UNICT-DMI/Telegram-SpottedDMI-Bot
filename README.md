@@ -1,10 +1,10 @@
-# Meme bot
+# Telegram-SpottedDMI-Bot
 
-**Meme bot** [**@tendTo_bot**](https://telegram.me/tendTo_bot) is a Telegram meme bot
+**Telegram-SpottedDMI-Bot** [**@Spotted_DMI_Bot**](https://telegram.me/Spotted_DMI_Bot) is a Telegram bot
 
 ### Using the live version
-The bot is live on Telegram with the username [**@tendTo_bot**](https://telegram.me/tendTo_bot).
-To see the posts, once published, check [**Meme channel di meme_bot**](https://t.me/memchannel_bot)
+The bot is live on Telegram with the username [**@Spotted_DMI_Bot**](https://telegram.me/Spotted_DMI_Bot).
+To see the posts, once published, check [**Spotted DMI**](https://t.me/Spotted_DMI)
 Send **'/start'** to start it, **'/help'** to see a list of commands.
 Please note that the commands and their answers are in Italian.
 
@@ -66,7 +66,7 @@ token: the token for your telegram bot
 ### Steps:
 - Clone this repository
 - In "config/settings.yaml.dist", edit the desired values. Be mindful that the one listed below will overwrite the ones in "config/settings.yaml.dist", even if they aren't used in the command line
-- **Run** `docker build --tag botimage --build-arg TOKEN=<token_arg> [...] .` 
+- **Run** `docker build --tag botimage --build-arg TOKEN=<token_arg> <...> .` 
 
 | In the command line <br>(after each --build-arg) | Type | Function | Optional |
 | --- | --- | --- | --- |
