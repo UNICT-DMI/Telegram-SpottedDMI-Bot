@@ -1,0 +1,33 @@
+Tests package
+=============
+
+**Description**
+
+.. automodule:: tests
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+tests.conftest
+---------------------
+
+.. automodule:: tests.conftest
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+tests.test\_bot
+----------------------
+
+.. automodule:: tests.test_bot
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+tests.test\_db
+---------------------
+
+.. automodule:: tests.test_db
+   :members:
+   :undoc-members:
+   :show-inheritance:
