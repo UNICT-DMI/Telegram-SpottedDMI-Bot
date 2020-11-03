@@ -35,8 +35,7 @@ def meme_callback(update: Update, context: CallbackContext) -> int:
         info['bot'].edit_message_text(chat_id=info['chat_id'],
                                       message_id=info['message_id'],
                                       text=message_text,
-                                      reply_markup=reply_markup,
-                                      parse_mode=ParseMode.MARKDOWN_V2)
+                                      reply_markup=reply_markup)
     elif reply_markup:  # if there is a valid reply_markup, edit the menu with the new reply_markup
         info['bot'].edit_message_reply_markup(chat_id=info['chat_id'],
                                               message_id=info['message_id'],
@@ -61,7 +60,7 @@ def confirm_yes_callback(update: Update, context: CallbackContext) -> Tuple[str,
     admin_message = send_post_to(message=user_message, bot=info['bot'], destination="admin")
     if admin_message:
         text = "Il tuo post è in fase di valutazione\n"\
-            f"Una volta pubblicato, lo potrai trovare sul [canale]({config_map['meme']['channel_id']})"
+            f"Una volta pubblicato, lo potrai trovare su @Spotted_DMI"
     else:
         text = "Si è verificato un problema\nAssicurati che il tipo di post sia fra quelli consentiti"
     return text, None, STATE['end']
@@ -127,7 +126,7 @@ def settings_credit_callback(update: Update, context: CallbackContext) -> Tuple[
     if username:  # the user has a valid username
         text += f"I tuoi post avranno come credit @{username}"
     else:
-        text += "**ATTENZIONE:**\nNon hai nessun username associato al tuo account telegram\n"\
+        text += "ATTENZIONE:\nNon hai nessun username associato al tuo account telegram\n"\
             "Se non lo aggiungi, non sarai creditato"
     return text, None, None
 
