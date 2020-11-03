@@ -1,5 +1,5 @@
 # Meme bot documentation
-[Documentation](https://unict-dmi.github.io/Telegram-SpottedDMI-Bot2/)
+[Documentation](https://unict-dmi.github.io/Telegram-SpottedDMI-Bot/)
 
 To see the actual source code, go to the master brach
 
