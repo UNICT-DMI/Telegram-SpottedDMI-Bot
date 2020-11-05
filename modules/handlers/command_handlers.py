@@ -207,7 +207,6 @@ def clean_pending_cmd(update: Update, context: CallbackContext):
     info = get_message_info(update, context)
     if info['chat_id'] == config_map['meme']['group_id']:  # you have to be in the admin group
         before_time = datetime.now(tz=timezone.utc) - timedelta(hours=config_map['meme']['remove_after_h'])
-        before_time = datetime.now(tz=timezone.utc) - timedelta(seconds=5)
         pending_meme_ids = MemeData.get_list_pending_memes(group_id=info['chat_id'], before=before_time)
 
         # For each pending meme older than before_time
