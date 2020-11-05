@@ -171,9 +171,8 @@ def approve_yes_callback(update: Update, context: CallbackContext) -> Tuple[str,
 
 
 def approve_no_callback(update: Update, context: CallbackContext) -> Tuple[str, InlineKeyboardMarkup, int]:
-    """Handles the approve_yes callback.
-    Approves the post, deleting it from the pending_post table, publishing it in the channel \
-    and putting it in the published post table
+    """Handles the approve_no callback.
+    Rejects the post, deleting it from the pending_post table
 
     Args:
         update (Update): update event

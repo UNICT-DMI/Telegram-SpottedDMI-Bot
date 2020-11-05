@@ -113,7 +113,8 @@ def send_helper_message(user_id: int,
 
 
 def show_admins_votes(chat_id: int, message_id: int, bot: Bot, approve: bool):
-    """After a post is been approved or rejected, shows the admins that aproved or rejected it
+    """After a post is been approved or rejected, shows the admins that aproved or rejected it \
+        and edit the message to delete the reply_markup
 
     Args:
         chat_id (int): id of the admin group
@@ -132,7 +133,7 @@ def show_admins_votes(chat_id: int, message_id: int, bot: Bot, approve: bool):
 
 
 def anonym_name() -> str:
-    """Generates a name for an anonym user
+    """Generates a random name for an anonym user
 
         Returns:
             str: a name among the ones proposed

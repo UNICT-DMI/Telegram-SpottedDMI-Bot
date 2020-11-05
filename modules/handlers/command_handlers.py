@@ -11,7 +11,8 @@ STATE = {'posting': 1, 'confirm': 2, 'end': -1}
 
 # region cmd
 def start_cmd(update: Update, context: CallbackContext):
-    """Handles the /start command
+    """Handles the /start command.
+    Sends a welcoming message
 
     Args:
         update (Update): update event
@@ -26,7 +27,8 @@ def start_cmd(update: Update, context: CallbackContext):
 
 
 def help_cmd(update: Update, context: CallbackContext):
-    """Handles the /help command
+    """Handles the /help command.
+    Sends an help message
 
     Args:
         update (Update): update event
@@ -44,7 +46,8 @@ def help_cmd(update: Update, context: CallbackContext):
 
 
 def rules_cmd(update: Update, context: CallbackContext):
-    """Handles the /rules command
+    """Handles the /rules command.
+    Sends a message containing the rules
 
     Args:
         update (Update): update event
@@ -59,7 +62,8 @@ def rules_cmd(update: Update, context: CallbackContext):
 
 
 def settings_cmd(update: Update, context: CallbackContext):
-    """Handles the /settings command
+    """Handles the /settings command.
+    Let's the user choose whether his posts will be credited or not
 
     Args:
         update (Update): update event
@@ -85,7 +89,7 @@ def settings_cmd(update: Update, context: CallbackContext):
 
 
 def post_cmd(update: Update, context: CallbackContext) -> int:
-    """Handles the /post command
+    """Handles the /post command.
     Checks that the user is in a private chat and it's not banned and start the post process
 
     Args:
@@ -117,7 +121,7 @@ def post_cmd(update: Update, context: CallbackContext) -> int:
 
 
 def ban_cmd(update: Update, context: CallbackContext):
-    """Handles the /ban command
+    """Handles the /ban command.
     Ban a user by replying to one of his pending posts with /ban
 
     Args:
@@ -140,7 +144,7 @@ def ban_cmd(update: Update, context: CallbackContext):
 
 
 def sban_cmd(update: Update, context: CallbackContext):
-    """Handles the /sban command
+    """Handles the /sban command.
     Sban a user by using this command and listing all the user_id to sban
 
     Args:
@@ -163,7 +167,7 @@ def sban_cmd(update: Update, context: CallbackContext):
 
 
 def reply_cmd(update: Update, context: CallbackContext):
-    """Handles the /reply command
+    """Handles the /reply command.
     Send a message to a user by replying to one of his pending posts with /reply + the message you want to send
 
     Args:

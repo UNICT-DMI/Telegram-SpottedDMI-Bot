@@ -5,9 +5,9 @@ name: tendTo_bot_deploy
 
 on:
   push:
-    branches: [master]
+    branches: [upgrade]
   pull_request:
-    branches: [master]
+    branches: [upgrade]
 
 jobs:
   build:
