@@ -422,22 +422,43 @@ Should not be used to select something</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="modules.data.meme_data.MemeData.get_admin_list_votes">
-<em class="property">static </em><code class="sig-name descname">get_admin_list_votes</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">g_message_id</span><span class="p">:</span> <span class="n">int</span></em>, <em class="sig-param"><span class="n">group_id</span><span class="p">:</span> <span class="n">int</span></em>, <em class="sig-param"><span class="n">approve</span><span class="p">:</span> <span class="n">bool</span></em><span class="sig-paren">)</span> &#x2192; Tuple<span class="p">[</span>str<span class="p">]</span><a class="headerlink" href="#modules.data.meme_data.MemeData.get_admin_list_votes" title="Permalink to this definition">¶</a></dt>
-<dd><p>Gets the vote of a specific admin on a pending post</p>
+<dt id="modules.data.meme_data.MemeData.get_list_admin_votes">
+<em class="property">static </em><code class="sig-name descname">get_list_admin_votes</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">g_message_id</span><span class="p">:</span> <span class="n">int</span></em>, <em class="sig-param"><span class="n">group_id</span><span class="p">:</span> <span class="n">int</span></em>, <em class="sig-param"><span class="n">vote</span><span class="p">:</span> <span class="n">bool</span></em><span class="sig-paren">)</span> &#x2192; Tuple<span class="p">[</span>str<span class="p">]</span><a class="headerlink" href="#modules.data.meme_data.MemeData.get_list_admin_votes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets the list of admins that approved or rejected a pending post</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>admin_id</strong> (<em>int</em>) – id of the admin that voted</p></li>
 <li><p><strong>g_message_id</strong> (<em>int</em>) – id of the post in question in the group</p></li>
 <li><p><strong>group_id</strong> (<em>int</em>) – id of the admin group</p></li>
+<li><p><strong>vote</strong> (<em>bool</em>) – whether you look for the approve or reject votes</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p>a bool representing the vote or None if a vote was not yet made</p>
+<dd class="field-even"><p>tuple of admins that approved or rejected a pending post</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>Optional[bool]</p>
+<dd class="field-odd"><p>Tuple[str]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="modules.data.meme_data.MemeData.get_list_pending_memes">
+<em class="property">static </em><code class="sig-name descname">get_list_pending_memes</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">group_id</span><span class="p">:</span> <span class="n">int</span></em>, <em class="sig-param"><span class="n">before</span><span class="p">:</span> <span class="n">datetime.datetime</span> <span class="o">=</span> <span class="default_value">None</span></em><span class="sig-paren">)</span> &#x2192; Tuple<span class="p">[</span>int<span class="p">]</span><a class="headerlink" href="#modules.data.meme_data.MemeData.get_list_pending_memes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets the list of pending memes in the specified admin group.
+If before is specified, returns only the one sent before that timestamp</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>group_id</strong> (<em>int</em>) – id of the admin group</p></li>
+<li><p><strong>before</strong> (<em>datetime</em><em>, </em><em>optional</em>) – timestamp before wich messages will be considered. Defaults to None.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>list of ids of pending memes</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>Tuple[str]</p>
 </dd>
 </dl>
 </dd></dl>
