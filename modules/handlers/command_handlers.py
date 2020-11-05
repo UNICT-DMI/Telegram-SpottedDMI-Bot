@@ -135,7 +135,7 @@ def ban_cmd(update: Update, context: CallbackContext):
 
         MemeData.ban_user(user_id=user_id)
         MemeData.remove_pending_meme(g_message_id=g_message_id, group_id=info['chat_id'])
-        info['bot'].delete_message(chat_id=info['chat_id'], message_id=g_message_id)
+        info['bot'].edit_message_reply_markup(chat_id=info['chat_id'], message_id=g_message_id)
         info['bot'].send_message(chat_id=info['chat_id'], text="L'utente è stato bannato")
 
 
