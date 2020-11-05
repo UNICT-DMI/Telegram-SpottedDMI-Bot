@@ -1,6 +1,6 @@
 """Commands for the meme bot"""
 from typing import Tuple
-from telegram import Update, InlineKeyboardMarkup, ParseMode
+from telegram import Update, InlineKeyboardMarkup
 from telegram.ext import CallbackContext
 from modules.data.data_reader import config_map
 from modules.data.meme_data import MemeData
@@ -60,7 +60,7 @@ def confirm_yes_callback(update: Update, context: CallbackContext) -> Tuple[str,
     admin_message = send_post_to(message=user_message, bot=info['bot'], destination="admin")
     if admin_message:
         text = "Il tuo post è in fase di valutazione\n"\
-            f"Una volta pubblicato, lo potrai trovare su @Spotted_DMI"
+            "Una volta pubblicato, lo potrai trovare su @Spotted_DMI"
     else:
         text = "Si è verificato un problema\nAssicurati che il tipo di post sia fra quelli consentiti"
     return text, None, STATE['end']
@@ -155,7 +155,8 @@ def approve_yes_callback(update: Update, context: CallbackContext) -> Tuple[str,
         if config_map['meme']['comments']:  # if comments are enabled, save the user_id, so the user can be credited
             context.bot_data[f"{published_post.chat_id},{published_post.message_id}"] = user_id
 
-        info['bot'].send_message(chat_id=user_id, text="Il tuo ultimo post è stato pubblicato su @Spotted_DMI")  # notify the user
+        info['bot'].send_message(chat_id=user_id,
+                                 text="Il tuo ultimo post è stato pubblicato su @Spotted_DMI")  # notify the user
 
         # Shows the list of admins who approved the pending post and removes it form the db
         show_admins_votes(chat_id=info['chat_id'], message_id=info['message_id'], bot=info['bot'], approve=True)
