@@ -5,6 +5,7 @@ CREATE TABLE IF NOT EXISTS pending_meme
   u_message_id BIGINT NOT NULL,
   g_message_id BIGINT NOT NULL,
   group_id BIGINT NOT NULL,
+  message_date TIMESTAMP,
   PRIMARY KEY (group_id, g_message_id)
 );
 -----

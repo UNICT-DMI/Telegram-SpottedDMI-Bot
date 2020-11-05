@@ -4,26 +4,16 @@
 import warnings
 # telegram
 from telegram.ext import Updater, CommandHandler, MessageHandler, CallbackQueryHandler, ConversationHandler,\
-     Filters, Dispatcher, DispatcherHandlerStop
+     Filters, Dispatcher
 # debug
 from modules.debug.log_manager import log_message
 # data
 from modules.data.data_reader import config_map
 # commands
 from modules.handlers.command_handlers import STATE, start_cmd, help_cmd, settings_cmd, post_cmd, ban_cmd, reply_cmd,\
-    post_msg, rules_cmd, sban_cmd, cancel_cmd, forwarded_post_msg
+    clean_pending_cmd, post_msg, rules_cmd, sban_cmd, cancel_cmd, forwarded_post_msg
 from modules.handlers.callback_handlers import meme_callback
 # endregion
-
-
-def stop():
-    """Stop any other handler (unused for now)
-
-    Raises:
-        DispatcherHandlerStop: stops any other handler
-    """
-    print("Stop other Handlers")
-    raise DispatcherHandlerStop
 
 
 def add_handlers(dp: Dispatcher):
@@ -41,6 +31,7 @@ def add_handlers(dp: Dispatcher):
     dp.add_handler(CommandHandler("rules", rules_cmd))
     dp.add_handler(CommandHandler("settings", settings_cmd))
     dp.add_handler(CommandHandler("sban", sban_cmd))
+    dp.add_handler(CommandHandler("clean_pending", clean_pending_cmd))
 
     # Conversation handler
     dp.add_handler(

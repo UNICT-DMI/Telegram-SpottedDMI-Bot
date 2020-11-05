@@ -122,7 +122,7 @@ def show_admins_votes(chat_id: int, message_id: int, bot: Bot, approve: bool):
         bot (Bot): bot
         approve (bool): whether the vote is approve or reject
     """
-    admins = MemeData.get_admin_list_votes(g_message_id=message_id, group_id=chat_id, approve=approve)
+    admins = MemeData.get_list_admin_votes(g_message_id=message_id, group_id=chat_id, vote=approve)
     text = "Approvato da:\n" if approve else "Rifiutato da:\n"
     for admin in admins:
         username = bot.get_chat(admin).username

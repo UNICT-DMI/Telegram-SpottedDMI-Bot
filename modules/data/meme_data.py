@@ -1,5 +1,6 @@
 """Data management for the meme bot"""
 from typing import Optional, Tuple
+from datetime import datetime
 from telegram import Message
 from modules.data.db_manager import DbManager
 from modules.data.data_reader import config_map
@@ -25,10 +26,11 @@ class MemeData():
         u_message_id = user_message.message_id
         g_message_id = admin_message.message_id
         group_id = admin_message.chat_id
+        date = admin_message.date
 
         DbManager.insert_into(table_name="pending_meme",
-                              columns=("user_id", "u_message_id", "g_message_id", "group_id"),
-                              values=(user_id, u_message_id, g_message_id, group_id))
+                              columns=("user_id", "u_message_id", "g_message_id", "group_id", "message_date"),
+                              values=(user_id, u_message_id, g_message_id, group_id, date))
 
     @staticmethod
     def set_admin_vote(admin_id: int, g_message_id: int, group_id: int, approval: bool) -> int:
@@ -82,21 +84,21 @@ class MemeData():
         return vote[0]['is_upvote']
 
     @staticmethod
-    def get_admin_list_votes(g_message_id: int, group_id: int, approve: bool) -> Tuple[str]:
-        """Gets the vote of a specific admin on a pending post
+    def get_list_admin_votes(g_message_id: int, group_id: int, vote: bool) -> Tuple[str]:
+        """Gets the list of admins that approved or rejected a pending post
 
         Args:
-            admin_id (int): id of the admin that voted
             g_message_id (int): id of the post in question in the group
             group_id (int): id of the admin group
+            vote (bool): whether you look for the approve or reject votes
 
         Returns:
-            Optional[bool]: a bool representing the vote or None if a vote was not yet made
+            Tuple[str]: tuple of admins that approved or rejected a pending post
         """
         votes = DbManager.select_from(select="admin_id",
-                                     table_name="admin_votes",
-                                     where="g_message_id = %s and group_id = %s and is_upvote = %s",
-                                     where_args=(g_message_id, group_id, approve))
+                                      table_name="admin_votes",
+                                      where="g_message_id = %s and group_id = %s and is_upvote = %s",
+                                      where_args=(g_message_id, group_id, vote))
 
         if len(votes) == 0:  # the vote is not present
             return None
@@ -118,6 +120,30 @@ class MemeData():
         return DbManager.count_from(table_name="admin_votes",
                                     where="g_message_id = %s and group_id = %s and is_upvote = %s",
                                     where_args=(g_message_id, group_id, vote))
+
+    @staticmethod
+    def get_list_pending_memes(group_id: int, before: datetime = None) -> Tuple[int]:
+        """Gets the list of pending memes in the specified admin group.
+        If before is specified, returns only the one sent before that timestamp
+
+        Args:
+            group_id (int): id of the admin group
+            before (datetime, optional): timestamp before wich messages will be considered. Defaults to None.
+
+        Returns:
+            Tuple[str]: list of ids of pending memes
+        """
+        if datetime:
+            list_pending_posts = DbManager.select_from(select="g_message_id",
+                                                       table_name="pending_meme",
+                                                       where="group_id = %s and (message_date < %s or message_date IS NULL)",
+                                                       where_args=(group_id, before))
+        else:
+            list_pending_posts = DbManager.select_from(select="g_message_id",
+                                                       table_name="pending_meme",
+                                                       where="group_id = %s",
+                                                       where_args=(group_id, ))
+        return tuple([int(post['g_message_id']) for post in list_pending_posts])
 
     @staticmethod
     def remove_pending_meme(g_message_id: int, group_id: int):

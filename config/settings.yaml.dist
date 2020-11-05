@@ -6,6 +6,7 @@ meme:
   comments: true
   group_id: 0
   n_votes: 1
+  remove_after_h: 12
   reset_on_load: false
 test:
   api_hash: ''

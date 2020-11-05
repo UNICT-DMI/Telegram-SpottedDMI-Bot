@@ -5,3 +5,4 @@
 \- è possibile mandare un messaggio all'utente che ha creato un post rispondendo con "/reply <messaggio\>" ad un suo post\. Può essere utile per spiegare perchè il suo post non è stato approvato, prima di rifiutare il post in questione
 \- per bannare un utente, rispondere al post che ha causato il ban con "/ban"
 \- per sbannare un utente, utilizzare il comando "/sban <id utente\>"
+\- utilizzare il comando "/clean\_pending" per rifiutare automaticamente tutti i post abbastanza vecchi
