@@ -183,6 +183,10 @@ def reply_cmd(update: Update, context: CallbackContext):
             return
         info['bot'].send_message(chat_id=user_id,
                                  text="COMUNICAZIONE DEGLI ADMIN SUL TUO ULTIMO POST:\n" + info['text'][7:].strip())
+        info['bot'].send_message(chat_id=info['chat_id'],
+                                 text="L'utente ha ricevuto il seguente messaggio:\n"\
+                                    "COMUNICAZIONE DEGLI ADMIN SUL TUO ULTIMO POST:\n" + info['text'][7:].strip(),
+                                 reply_to_message_id=g_message_id)
 
 
 def cancel_cmd(update: Update, context: CallbackContext) -> int:
