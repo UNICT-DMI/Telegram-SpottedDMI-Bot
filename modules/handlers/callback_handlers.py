@@ -2,7 +2,7 @@
 from typing import Tuple
 from telegram import Update, InlineKeyboardMarkup
 from telegram.ext import CallbackContext
-from telegram.error import BadRequest
+from telegram.error import BadRequest, Unauthorized
 from modules.debug.log_manager import logger
 from modules.data.data_reader import config_map
 from modules.data.meme_data import MemeData
@@ -160,7 +160,7 @@ def approve_yes_callback(update: Update, context: CallbackContext) -> Tuple[str,
         try:
             info['bot'].send_message(chat_id=user_id,
                                      text="Il tuo ultimo post è stato pubblicato su @Spotted_DMI")  # notify the user
-        except BadRequest as e:
+        except (BadRequest, Unauthorized) as e:
             logger.warning("Notifying the user on approve_yes: %s", e)
 
         # Shows the list of admins who approved the pending post and removes it form the db
@@ -197,7 +197,7 @@ def approve_no_callback(update: Update, context: CallbackContext) -> Tuple[str, 
             info['bot'].send_message(
                 chat_id=user_id,
                 text="Il tuo ultimo post è stato rifiutato\nPuoi controllare le regole con /rules")  # notify the user
-        except BadRequest as e:
+        except (BadRequest, Unauthorized) as e:
             logger.warning("Notifying the user on approve_no: %s", e)
 
         # Shows the list of admins who refused the pending post and removes it form the db
