@@ -188,12 +188,15 @@ def reply_cmd(update: Update, context: CallbackContext):
                 "Per mandare un messaggio ad un utente, rispondere al suo post con /reply seguito da ciò che gli si vuole dire"
             )
             return
-        info['bot'].send_message(chat_id=user_id,
+        try:
+            info['bot'].send_message(chat_id=user_id,
                                  text="COMUNICAZIONE DEGLI ADMIN SUL TUO ULTIMO POST:\n" + info['text'][7:].strip())
-        info['bot'].send_message(chat_id=info['chat_id'],
+            info['bot'].send_message(chat_id=info['chat_id'],
                                  text="L'utente ha ricevuto il seguente messaggio:\n"\
                                     "COMUNICAZIONE DEGLI ADMIN SUL TUO ULTIMO POST:\n" + info['text'][7:].strip(),
                                  reply_to_message_id=g_message_id)
+        except BadRequest as e:
+            logger.warning("Notifying the user on /reply: %s", e)
 
 
 def clean_pending_cmd(update: Update, context: CallbackContext):
@@ -215,9 +218,12 @@ def clean_pending_cmd(update: Update, context: CallbackContext):
             try:
                 info['bot'].delete_message(chat_id=info['chat_id'], message_id=meme_id)
                 user_id = MemeData.get_user_id(group_id=info['chat_id'], g_message_id=meme_id)
-                info['bot'].send_message(
+                try:
+                    info['bot'].send_message(
                     chat_id=user_id,
                     text="Gli admin erano impegnati in affari improrogabili, e non sono riusciti a valutare lo spot in tempo")
+                except BadRequest as e:
+                    logger.warning("Notifying the user on /clean_pending: %s", e)
                 removed += 1
             except BadRequest as e:
                 logger.error("Deleting old pending message: %s", e)

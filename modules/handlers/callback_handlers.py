@@ -2,6 +2,8 @@
 from typing import Tuple
 from telegram import Update, InlineKeyboardMarkup
 from telegram.ext import CallbackContext
+from telegram.error import BadRequest
+from modules.debug.log_manager import logger
 from modules.data.data_reader import config_map
 from modules.data.meme_data import MemeData
 from modules.utils.info_util import get_callback_info
@@ -155,8 +157,11 @@ def approve_yes_callback(update: Update, context: CallbackContext) -> Tuple[str,
         if config_map['meme']['comments']:  # if comments are enabled, save the user_id, so the user can be credited
             context.bot_data[f"{published_post.chat_id},{published_post.message_id}"] = user_id
 
-        info['bot'].send_message(chat_id=user_id,
-                                 text="Il tuo ultimo post è stato pubblicato su @Spotted_DMI")  # notify the user
+        try:
+            info['bot'].send_message(chat_id=user_id,
+                                     text="Il tuo ultimo post è stato pubblicato su @Spotted_DMI")  # notify the user
+        except BadRequest as e:
+            logger.warning("Notifying the user on approve_yes: %s", e)
 
         # Shows the list of admins who approved the pending post and removes it form the db
         show_admins_votes(chat_id=info['chat_id'], message_id=info['message_id'], bot=info['bot'], approve=True)
@@ -187,9 +192,13 @@ def approve_no_callback(update: Update, context: CallbackContext) -> Tuple[str, 
     # The post has been refused
     if n_reject >= config_map['meme']['n_votes']:
         user_id = MemeData.get_user_id(g_message_id=info['message_id'], group_id=info['chat_id'])
-        info['bot'].send_message(
-            chat_id=user_id,
-            text="Il tuo ultimo post è stato rifiutato\nPuoi controllare le regole con /rules")  # notify the user
+
+        try:
+            info['bot'].send_message(
+                chat_id=user_id,
+                text="Il tuo ultimo post è stato rifiutato\nPuoi controllare le regole con /rules")  # notify the user
+        except BadRequest as e:
+            logger.warning("Notifying the user on approve_no: %s", e)
 
         # Shows the list of admins who refused the pending post and removes it form the db
         show_admins_votes(chat_id=info['chat_id'], message_id=info['message_id'], bot=info['bot'], approve=False)
