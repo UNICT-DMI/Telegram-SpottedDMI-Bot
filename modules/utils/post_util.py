@@ -75,7 +75,6 @@ def send_post_to(message: Message, bot: Bot, destination: str, user_id: int = No
                 post_message = bot.send_poll(chat_id=chat_id,
                                              question=poll.question,
                                              options=[option.text for option in poll.options],
-                                             is_anonymous=poll.is_anonymous,
                                              type=poll.type,
                                              allows_multiple_answers=poll.allows_multiple_answers,
                                              correct_option_id=poll.correct_option_id,
