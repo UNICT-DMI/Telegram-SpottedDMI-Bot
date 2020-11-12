@@ -29,10 +29,10 @@ weeb
 anon
 geek
 Tomarchio
-xX\_O(n)DarkFaro\_Xx
+xX_O(n)DarkFaro_Xx
 DestroyerKatalano99
 M4ri0DiB0rg3s3
-\_-\_StancoApproves\_-\_
+_-_StancoApproves_-_
 Ironman
 Dimostrazione lasciata al lettore
 Mini batch
@@ -56,5 +56,3 @@ Are you winning son?
 Ah shit, here we go again
 nobody
 me and the boys
-
-
