@@ -55,4 +55,4 @@ def check_message_type(message: Message) -> bool:
         bool: whether its type is supported or not
     """
     return message.text or message.photo or message.voice or message.audio\
-    or message.video or message.animation or message.sticker
+    or message.video or message.animation or message.sticker or message.poll

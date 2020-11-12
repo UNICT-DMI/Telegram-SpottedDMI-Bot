@@ -1,6 +1,8 @@
 """Modules that handles how the post shall be sent according to the chat (adming group or channel)"""
 from random import choice
 from telegram import Message, Bot, InlineKeyboardMarkup
+from telegram.error import BadRequest, Unauthorized
+from modules.debug.log_manager import logger
 from modules.data.data_reader import config_map, read_md
 from modules.data.meme_data import MemeData
 from modules.utils.keyboard_util import get_approve_kb, get_vote_kb
@@ -31,6 +33,7 @@ def send_post_to(message: Message, bot: Bot, destination: str, user_id: int = No
     animation = message.animation
     sticker = message.sticker
     caption = message.caption
+    poll = message.poll
 
     reply_markup = None
     post_message = None
@@ -49,24 +52,38 @@ def send_post_to(message: Message, bot: Bot, destination: str, user_id: int = No
                                            bot=bot,
                                            reply_markup=get_vote_kb())
     else:
-        print("[error] send_message_to: unvalid destination")
+        logger.error("send_message_to: unvalid destination")
         return None
 
-    if post_message is None:
-        if text:
-            post_message = bot.sendMessage(chat_id=chat_id, text=text, reply_markup=reply_markup)
-        elif photo:
-            post_message = bot.sendPhoto(chat_id=chat_id, photo=photo[-1], caption=caption, reply_markup=reply_markup)
-        elif voice:
-            post_message = bot.sendVoice(chat_id=chat_id, voice=voice, reply_markup=reply_markup)
-        elif audio:
-            post_message = bot.sendAudio(chat_id=chat_id, audio=audio, reply_markup=reply_markup)
-        elif video:
-            post_message = bot.sendVideo(chat_id=chat_id, video=video, caption=caption, reply_markup=reply_markup)
-        elif animation:
-            post_message = bot.sendAnimation(chat_id=chat_id, animation=animation, reply_markup=reply_markup)
-        elif sticker:
-            post_message = bot.sendSticker(chat_id=chat_id, sticker=sticker, reply_markup=reply_markup)
+    try:
+        if post_message is None:
+            if text:
+                post_message = bot.sendMessage(chat_id=chat_id, text=text, reply_markup=reply_markup)
+            elif photo:
+                post_message = bot.sendPhoto(chat_id=chat_id, photo=photo[-1], caption=caption, reply_markup=reply_markup)
+            elif voice:
+                post_message = bot.sendVoice(chat_id=chat_id, voice=voice, reply_markup=reply_markup)
+            elif audio:
+                post_message = bot.sendAudio(chat_id=chat_id, audio=audio, reply_markup=reply_markup)
+            elif video:
+                post_message = bot.sendVideo(chat_id=chat_id, video=video, caption=caption, reply_markup=reply_markup)
+            elif animation:
+                post_message = bot.sendAnimation(chat_id=chat_id, animation=animation, reply_markup=reply_markup)
+            elif sticker:
+                post_message = bot.sendSticker(chat_id=chat_id, sticker=sticker, reply_markup=reply_markup)
+            elif poll:
+                post_message = bot.send_poll(chat_id=chat_id,
+                                             question=poll.question,
+                                             options=[option.text for option in poll.options],
+                                             is_anonymous=poll.is_anonymous,
+                                             type=poll.type,
+                                             allows_multiple_answers=poll.allows_multiple_answers,
+                                             correct_option_id=poll.correct_option_id,
+                                             reply_markup=reply_markup)
+    except (BadRequest, Unauthorized) as e:
+        logger.error("Sending the post on send_post_to: %s", e)
+        return None
+
 
     if destination == "admin":  # insert the post among the pending ones
         MemeData.insert_pending_post(user_message=message, admin_message=post_message)

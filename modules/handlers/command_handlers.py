@@ -270,7 +270,7 @@ def post_msg(update: Update, context: CallbackContext) -> int:
     if not check_message_type(update.message):  # the type is NOT supported
         info['bot'].send_message(
             chat_id=info['chat_id'],
-            text="Questo tipo di messaggio non è supportato\nÈ consentito solo testo, stikers, immagini, audio o video\n\
+            text="Questo tipo di messaggio non è supportato\nÈ consentito solo testo, stikers, immagini, audio, video o poll\n\
                 Invia il post che vuoi pubblicare\nPuoi annullare il processo con /cancel",
         )
         return STATE['posting']
