@@ -4,6 +4,18 @@ from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 from modules.data.meme_data import MemeData
 
 
+def get_confirm_kb() -> InlineKeyboardMarkup:
+    """Generates the InlineKeyboard to confirm the creation of the post
+
+    Returns:
+        InlineKeyboardMarkup: new inline keyboard
+    """
+    return InlineKeyboardMarkup([[
+        InlineKeyboardButton(text="Si", callback_data="meme_confirm_yes"),
+        InlineKeyboardButton(text="No", callback_data="meme_confirm_no")
+    ]])
+
+
 def get_approve_kb() -> InlineKeyboardMarkup:
     """Generates the InlineKeyboard for the pending post
 

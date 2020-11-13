@@ -8,6 +8,7 @@ from modules.data.data_reader import read_md, config_map
 from modules.data.meme_data import MemeData
 from modules.utils.info_util import get_message_info, check_message_type
 from modules.utils.post_util import send_post_to
+from modules.utils.keyboard_util import get_confirm_kb
 
 STATE = {'posting': 1, 'confirm': 2, 'end': -1}
 
@@ -93,14 +94,14 @@ def settings_cmd(update: Update, context: CallbackContext):
 
 def post_cmd(update: Update, context: CallbackContext) -> int:
     """Handles the /post command.
-    Checks that the user is in a private chat and it's not banned and start the post process
+    Checks that the user is in a private chat and it's not banned and start the post conversation
 
     Args:
         update (Update): update event
         context (CallbackContext): context passed by the handler
 
     Returns:
-        int: value passed to the handler, if requested
+        int: next state of the conversation
     """
     info = get_message_info(update, context)
     if update.message.chat.type != "private":  # you can only post with a private message
@@ -190,7 +191,7 @@ def reply_cmd(update: Update, context: CallbackContext):
             return
         try:
             info['bot'].send_message(chat_id=user_id,
-                                 text="COMUNICAZIONE DEGLI ADMIN SUL TUO ULTIMO POST:\n" + info['text'][7:].strip())
+                                     text="COMUNICAZIONE DEGLI ADMIN SUL TUO ULTIMO POST:\n" + info['text'][7:].strip())
             info['bot'].send_message(chat_id=info['chat_id'],
                                  text="L'utente ha ricevuto il seguente messaggio:\n"\
                                     "COMUNICAZIONE DEGLI ADMIN SUL TUO ULTIMO POST:\n" + info['text'][7:].strip(),
@@ -220,8 +221,8 @@ def clean_pending_cmd(update: Update, context: CallbackContext):
                 user_id = MemeData.get_user_id(group_id=info['chat_id'], g_message_id=meme_id)
                 try:
                     info['bot'].send_message(
-                    chat_id=user_id,
-                    text="Gli admin erano impegnati in affari improrogabili, e non sono riusciti a valutare lo spot in tempo")
+                        chat_id=user_id,
+                        text="Gli admin erano sicuramente molto impegnati e non sono riusciti a valutare lo spot in tempo")
                 except (BadRequest, Unauthorized) as e:
                     logger.warning("Notifying the user on /clean_pending: %s", e)
                 removed += 1
@@ -234,7 +235,7 @@ def clean_pending_cmd(update: Update, context: CallbackContext):
 
 
 def cancel_cmd(update: Update, context: CallbackContext) -> int:
-    """Handles the reply to the /cancel command.
+    """Handles the /cancel command.
     Exit from the post pipeline
 
     Args:
@@ -242,7 +243,7 @@ def cancel_cmd(update: Update, context: CallbackContext) -> int:
         context (CallbackContext): context passed by the handler
 
     Returns:
-        int: value passed to the handler, if requested
+        int: next state of the conversation
     """
     info = get_message_info(update, context)
 
@@ -263,7 +264,7 @@ def post_msg(update: Update, context: CallbackContext) -> int:
         context (CallbackContext): context passed by the handler
 
     Returns:
-        int: value passed to the handler, if requested
+        int: next state of the conversation
     """
     info = get_message_info(update, context)
 
@@ -271,17 +272,13 @@ def post_msg(update: Update, context: CallbackContext) -> int:
         info['bot'].send_message(
             chat_id=info['chat_id'],
             text="Questo tipo di messaggio non è supportato\nÈ consentito solo testo, stikers, immagini, audio, video o poll\n\
-                Invia il post che vuoi pubblicare\nPuoi annullare il processo con /cancel",
-        )
+                Invia il post che vuoi pubblicare\nPuoi annullare il processo con /cancel")
         return STATE['posting']
 
     info['bot'].send_message(chat_id=info['chat_id'],
                              text="Sei sicuro di voler publicare questo post?",
                              reply_to_message_id=info['message_id'],
-                             reply_markup=InlineKeyboardMarkup([[
-                                 InlineKeyboardButton(text="Si", callback_data="meme_confirm_yes"),
-                                 InlineKeyboardButton(text="No", callback_data="meme_confirm_no")
-                             ]]))
+                             reply_markup=get_confirm_kb())
     return STATE['confirm']
 
 
