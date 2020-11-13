@@ -352,3 +352,63 @@ class MemeData():
             bool: whether the user is to be credited or not
         """
         return DbManager.count_from(table_name="credited_users", where="user_id = %s", where_args=(user_id, )) == 1
+
+    @staticmethod
+    def get_n_posts() -> int:
+        """Gets the total number of posts
+
+        Returns:
+            int: total number of posts
+        """
+        return DbManager.count_from(table_name="published_meme")
+
+    @staticmethod
+    def get_n_votes(vote: bool = None) -> int:
+        """Gets the total number of votes of the specified
+
+        Args:
+            vote (bool, optional): type of votes to consider. None means all. Defaults to None.
+
+        Returns:
+            int: number of votes of the specified type
+        """
+        if vote is not None:
+            return DbManager.count_from(table_name="votes", where="is_upvote = %s", where_args=(vote, ))
+        return DbManager.count_from(table_name="votes")
+
+    @staticmethod
+    def get_avg(vote: bool = None) -> int:
+        """Shows the average number of votes of the specified type per post
+
+        Args:
+            vote (bool, optional): type of votes to consider. None means all. Defaults to None.
+
+        Returns:
+            int: average number of votes
+        """
+        avg = MemeData.get_n_votes(vote) / MemeData.get_n_posts()
+        return round(avg, 2)
+
+    @staticmethod
+    def get_max_id(vote: bool = None) -> Tuple[int, int, str]:
+        """Gets the id of the post with the most votes of the specified type
+
+        Args:
+            vote (bool, optional): type of votes to consider. None means all. Defaults to None.
+
+        Returns:
+            Tuple[int, int, int]: number of votes, id of the message, id of the channel
+        """
+        where = ""
+        if vote is not None:
+            where = "WHERE v.is_upvote = {}".format("1" if vote is True else "0")
+
+        sub_select = f"""(
+                            SELECT COUNT(*) as n_votes, v.c_message_id as message_id, v.channel_id as channel_id
+                            FROM votes as v 
+                            {where}
+                            GROUP BY v.c_message_id, v.channel_id
+                            ORDER BY v.c_message_id DESC
+                        )"""
+        max_message = DbManager.select_from(select="MAX(n_votes) as max, message_id, channel_id", table_name=sub_select)
+        return int(max_message[0]['max']), int(max_message[0]['message_id']), str(max_message[0]['channel_id'])

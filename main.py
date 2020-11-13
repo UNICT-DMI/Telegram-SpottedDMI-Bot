@@ -12,8 +12,8 @@ from modules.debug.log_manager import log_message
 from modules.data.data_reader import config_map
 # commands
 from modules.handlers.command_handlers import STATE, start_cmd, help_cmd, settings_cmd, post_cmd, ban_cmd, reply_cmd,\
-    clean_pending_cmd, post_msg, rules_cmd, sban_cmd, cancel_cmd, forwarded_post_msg
-from modules.handlers.callback_handlers import meme_callback
+    clean_pending_cmd, post_msg, rules_cmd, sban_cmd, cancel_cmd, stats_cmd, forwarded_post_msg
+from modules.handlers.callback_handlers import meme_callback, stats_callback
 # endregion
 
 
@@ -28,6 +28,7 @@ def add_commands(up: Updater):
         BotCommand("spot", "inizia a spottare"),
         BotCommand("help ", "funzionamento e scopo del bot"),
         BotCommand("rules ", "regole da tenere a mente"),
+        BotCommand("stats", "visualizza statistiche sugli spot"),
         BotCommand("settings", "cambia le impostazioni di privacy")
     ]
     up.bot.set_my_commands(commands=commands)
@@ -46,6 +47,7 @@ def add_handlers(dp: Dispatcher):
     dp.add_handler(CommandHandler("start", start_cmd))
     dp.add_handler(CommandHandler("help", help_cmd))
     dp.add_handler(CommandHandler("rules", rules_cmd))
+    dp.add_handler(CommandHandler("stats", stats_cmd))
     dp.add_handler(CommandHandler("settings", settings_cmd))
     dp.add_handler(CommandHandler("sban", sban_cmd))
     dp.add_handler(CommandHandler("clean_pending", clean_pending_cmd))
@@ -67,6 +69,7 @@ def add_handlers(dp: Dispatcher):
 
     # Callback handlers
     dp.add_handler(CallbackQueryHandler(meme_callback, pattern=r"^meme_\.*"))
+    dp.add_handler(CallbackQueryHandler(stats_callback, pattern=r"^stats_\.*"))
 
     if config_map['meme']['comments']:
         dp.add_handler(MessageHandler(Filters.forwarded, forwarded_post_msg))

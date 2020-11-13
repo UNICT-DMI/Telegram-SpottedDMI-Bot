@@ -16,6 +16,36 @@ def get_confirm_kb() -> InlineKeyboardMarkup:
     ]])
 
 
+def get_stats_kb() -> InlineKeyboardMarkup:
+    """Generates the InlineKeyboard for the stats menu
+
+    Returns:
+        InlineKeyboardMarkup: new inline keyboard
+    """
+    return InlineKeyboardMarkup([
+        [InlineKeyboardButton("~  Lo spot con più ___  ~", callback_data="none")],
+        [
+            InlineKeyboardButton("voti", callback_data="stats_max,votes"),
+            InlineKeyboardButton("👍", callback_data="stats_max,yes"),
+            InlineKeyboardButton("👎", callback_data="stats_max,no"),
+        ],
+        [InlineKeyboardButton("~  Media di ___ per spot  ~", callback_data="none")],
+        [
+            InlineKeyboardButton("voti", callback_data="stats_avg,votes"),
+            InlineKeyboardButton("👍", callback_data="stats_avg,yes"),
+            InlineKeyboardButton("👎", callback_data="stats_avg,no"),
+        ],
+        [InlineKeyboardButton("~  Numero di ___ totale  ~", callback_data="none")],
+        [
+            InlineKeyboardButton("spot", callback_data="stats_tot,posts"),
+            InlineKeyboardButton("voti", callback_data="stats_tot,votes"),
+            InlineKeyboardButton("👍", callback_data="stats_tot,yes"),
+            InlineKeyboardButton("👎", callback_data="stats_tot,no"),
+        ],
+        [InlineKeyboardButton("Chiudi", callback_data="stats_close,")],
+    ])
+
+
 def get_approve_kb() -> InlineKeyboardMarkup:
     """Generates the InlineKeyboard for the pending post
 

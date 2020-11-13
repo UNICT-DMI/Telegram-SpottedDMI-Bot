@@ -7,21 +7,21 @@ from modules.debug.log_manager import logger
 from modules.data.data_reader import config_map
 from modules.data.meme_data import MemeData
 from modules.utils.info_util import get_callback_info
-from modules.utils.keyboard_util import update_approve_kb, update_vote_kb
+from modules.utils.keyboard_util import update_approve_kb, update_vote_kb, get_stats_kb
 from modules.utils.post_util import send_post_to, show_admins_votes
 
 STATE = {'posting': 1, 'confirm': 2, 'end': -1}
 
 
 def meme_callback(update: Update, context: CallbackContext) -> int:
-    """Passes the callback to the correct handler
+    """Passes the meme callback to the correct handler
 
     Args:
         update (Update): update event
         context (CallbackContext): context passed by the handler
 
     Returns:
-        int: value passed to the handler, if requested
+        int: value to return to the handler, if requested
     """
     info = get_callback_info(update, context)
     data = info['data']
@@ -250,3 +250,109 @@ def vote_no_callback(info: dict) -> Tuple[str, InlineKeyboardMarkup, int]:
 
 
 # endregion
+
+
+def stats_callback(update: Update, context: CallbackContext):
+    """Passes the stats callback to the correct handler
+
+    Args:
+        update (Update): update event
+        context (CallbackContext): context passed by the handler
+    """
+    info = get_callback_info(update, context)
+    data = info['data'].split(",")  # the callback data indicates the correct callback and the arg to pass to it separated by ,
+    try:
+        message_text = globals()[f'{data[0][6:]}_callback'](data[1])  # call the function based on its name
+    except KeyError as e:
+        logger.error("stats_callback: %s", e)
+        return
+
+    if message_text:  # if there is a valid text, edit the menu with the new text
+        info['bot'].edit_message_text(chat_id=info['chat_id'],
+                                      message_id=info['message_id'],
+                                      text=message_text,
+                                      reply_markup=get_stats_kb())
+    else:  # remove the reply markup
+        info['bot'].edit_message_reply_markup(chat_id=info['chat_id'], message_id=info['message_id'], reply_markup=None)
+
+
+def avg_callback(arg: str) -> str:
+    """Handles the avg_* callback.
+    Shows the average of the %arg per post
+
+    Args:
+        arg (str): [ votes | yes | no ]
+
+    Returns:
+        str: text for the reply
+    """
+    if arg == "yes":
+        avg_votes = MemeData.get_avg(True)
+        text = f"Gli spot ricevono in media {avg_votes} 👍"
+    elif arg == "no":
+        avg_votes = MemeData.get_avg(False)
+        text = f"Gli spot ricevono in media {avg_votes} 👎"
+    else:
+        avg_votes = MemeData.get_avg()
+        text = f"Gli spot ricevono in media {avg_votes} voti"
+
+    return text
+
+
+def max_callback(arg: str) -> str:
+    """Handles the max_* callback
+    Shows the post with the most %arg
+
+    Args:
+        arg (str): [ votes | yes | no ]
+
+    Returns:
+        str: text for the reply
+    """
+    if arg == "yes":
+        max_votes, message_id, channel_id = MemeData.get_max_id(True)
+        text = f"Lo spot con più 👍 ne ha {max_votes} (hurray)\n" \
+                f"Lo trovi a questo link: https://t.me/c/{channel_id[4:]}/{message_id}"
+    elif arg == "no":
+        max_votes, message_id, channel_id = MemeData.get_max_id(False)
+        text = f"Lo spot con più 👎 ne ha {max_votes} (yikes)\n"\
+            f"Lo trovi a questo link: https://t.me/c/{channel_id[4:]}/{message_id}"
+    else:
+        max_votes, message_id, channel_id = MemeData.get_max_id()
+        text = f"Lo spot con più voti ne ha {max_votes}\n"\
+                f"Lo trovi a questo link: https://t.me/c/{channel_id[4:]}/{message_id}"
+
+    return text
+
+def tot_callback(arg: str) -> str:
+    """Handles the tot_* callback
+    Shows the total number of %arg
+    Args:
+        arg (str): [ posts | votes | yes | no ]
+
+    Returns:
+        str: text for the reply
+    """
+    if arg == "posts":
+        n_posts = MemeData.get_n_posts()
+        text = f"Sono stati pubblicati {n_posts} spot nel canale fin'ora.\nPotresti ampliare questo numero..."
+    elif arg == "yes":
+        n_votes = MemeData.get_n_votes(True)
+        text = f"Il totale dei 👍 ammonta a {n_votes}"
+    elif arg == "no":
+        n_votes = MemeData.get_n_votes(False)
+        text = f"Il totale dei 👎 ammonta a {n_votes}"
+    else:
+        n_votes = MemeData.get_n_votes()
+        text = f"Il totale dei voti ammonta a {n_votes}"
+
+    return text
+
+def close_callback(arg) -> str: # pylint: disable=unused-argument
+    """Handles the close callback
+    Closes the stats menu
+
+    Returns:
+        str: text and replyMarkup that make up the reply
+    """
+    return None

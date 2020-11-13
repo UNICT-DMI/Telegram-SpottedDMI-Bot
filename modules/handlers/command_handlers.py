@@ -8,7 +8,7 @@ from modules.data.data_reader import read_md, config_map
 from modules.data.meme_data import MemeData
 from modules.utils.info_util import get_message_info, check_message_type
 from modules.utils.post_util import send_post_to
-from modules.utils.keyboard_util import get_confirm_kb
+from modules.utils.keyboard_util import get_confirm_kb, get_stats_kb
 
 STATE = {'posting': 1, 'confirm': 2, 'end': -1}
 
@@ -249,6 +249,19 @@ def cancel_cmd(update: Update, context: CallbackContext) -> int:
 
     info['bot'].send_message(chat_id=info['chat_id'], text="Post annullato")
     return STATE['end']
+
+
+def stats_cmd(update: Update, context: CallbackContext):
+    """Handles the /stats command.
+    Lets the user choose what stats they want to see
+
+    Args:
+        update (Update): update event
+        context (CallbackContext): context passed by the handler
+    """
+    info = get_message_info(update, context)
+
+    info['bot'].send_message(chat_id=info['chat_id'], text="Che statistica ti interessa?", reply_markup=get_stats_kb())
 
 
 # endregion
