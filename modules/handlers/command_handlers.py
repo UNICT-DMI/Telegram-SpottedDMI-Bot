@@ -1,8 +1,8 @@
 """Handles the execution of commands by the bot"""
-from datetime import datetime, timedelta, timezone
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup, ParseMode
 from telegram.ext import CallbackContext
 from telegram.error import BadRequest, Unauthorized
+from modules.handlers.job_handlers import clean_pending_job
 from modules.debug.log_manager import logger
 from modules.data.data_reader import read_md, config_map
 from modules.data.meme_data import MemeData
@@ -202,7 +202,7 @@ def reply_cmd(update: Update, context: CallbackContext):
 
 def clean_pending_cmd(update: Update, context: CallbackContext):
     """Handles the /clean_pending command.
-    Automatically reject all pending posts that are older than the chosen amount of hours
+    Automatically rejects all pending posts that are older than the chosen amount of hours
 
     Args:
         update (Update): update event
@@ -210,28 +210,7 @@ def clean_pending_cmd(update: Update, context: CallbackContext):
     """
     info = get_message_info(update, context)
     if info['chat_id'] == config_map['meme']['group_id']:  # you have to be in the admin group
-        before_time = datetime.now(tz=timezone.utc) - timedelta(hours=config_map['meme']['remove_after_h'])
-        pending_meme_ids = MemeData.get_list_pending_memes(group_id=info['chat_id'], before=before_time)
-
-        # For each pending meme older than before_time
-        removed = 0
-        for meme_id in pending_meme_ids:
-            try:
-                info['bot'].delete_message(chat_id=info['chat_id'], message_id=meme_id)
-                user_id = MemeData.get_user_id(group_id=info['chat_id'], g_message_id=meme_id)
-                try:
-                    info['bot'].send_message(
-                        chat_id=user_id,
-                        text="Gli admin erano sicuramente molto impegnati e non sono riusciti a valutare lo spot in tempo")
-                except (BadRequest, Unauthorized) as e:
-                    logger.warning("Notifying the user on /clean_pending: %s", e)
-                removed += 1
-            except BadRequest as e:
-                logger.error("Deleting old pending message: %s", e)
-            finally:
-                MemeData.remove_pending_meme(group_id=info['chat_id'], g_message_id=meme_id)  # remove the pending_meme data
-
-        info['bot'].send_message(chat_id=info['chat_id'], text=f"Sono stati eliminati {removed} messaggi rimasti in sospeso")
+        clean_pending_job(context=context)
 
 
 def cancel_cmd(update: Update, context: CallbackContext) -> int:

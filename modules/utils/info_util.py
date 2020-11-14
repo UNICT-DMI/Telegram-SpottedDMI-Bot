@@ -47,6 +47,20 @@ def get_callback_info(update: Update, context: CallbackContext) -> dict:
     }
 
 
+def get_job_info(context: CallbackContext) -> dict:
+    """Get the classic info from the context parameter for jobs
+
+    Args:
+        context (CallbackContext): context passed by the handler
+
+    Returns:
+        dict: {bot}
+    """
+    return {
+        'bot': context.bot,
+    }
+
+
 def check_message_type(message: Message) -> bool:
     """Check that the type of the message is one of the ones supported
 

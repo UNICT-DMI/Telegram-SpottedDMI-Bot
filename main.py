@@ -2,6 +2,8 @@
 # region imports
 # libs
 import warnings
+from datetime import time
+from pytz import utc
 # telegram
 from telegram import BotCommand
 from telegram.ext import Updater, CommandHandler, MessageHandler, CallbackQueryHandler, ConversationHandler,\
@@ -10,10 +12,11 @@ from telegram.ext import Updater, CommandHandler, MessageHandler, CallbackQueryH
 from modules.debug.log_manager import log_message
 # data
 from modules.data.data_reader import config_map
-# commands
+# handlers
 from modules.handlers.command_handlers import STATE, start_cmd, help_cmd, settings_cmd, post_cmd, ban_cmd, reply_cmd,\
     clean_pending_cmd, post_msg, rules_cmd, sban_cmd, cancel_cmd, stats_cmd, forwarded_post_msg
 from modules.handlers.callback_handlers import meme_callback, stats_callback
+from modules.handlers.job_handlers import clean_pending_job
 # endregion
 
 
@@ -75,12 +78,22 @@ def add_handlers(dp: Dispatcher):
         dp.add_handler(MessageHandler(Filters.forwarded, forwarded_post_msg))
 
 
+def add_jobs(dp: Dispatcher):
+    """Adds all the jobs to be scheduled to the dispatcher
+
+    Args:
+        dp (Dispatcher): supplyed dispatcher
+    """
+    dp.job_queue.run_daily(clean_pending_job, time=time(hour=5, tzinfo=utc))  # run each day at 05:00 utc
+
+
 def main():
     """Main function
     """
     updater = Updater(config_map['token'], request_kwargs={'read_timeout': 20, 'connect_timeout': 20}, use_context=True)
     add_commands(updater)
     add_handlers(updater.dispatcher)
+    add_jobs(updater.dispatcher)
 
     updater.start_polling()
     updater.idle()
