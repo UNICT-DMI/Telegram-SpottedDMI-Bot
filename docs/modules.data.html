@@ -370,7 +370,7 @@ Should not be used to select something</p>
 </div>
 <div class="section" id="module-modules.data.meme_data">
 <span id="meme-data"></span><h2>meme_data<a class="headerlink" href="#module-modules.data.meme_data" title="Permalink to this headline">¶</a></h2>
-<p>Data management for the meme bot</p>
+<p>Data management for the bot</p>
 <dl class="py class">
 <dt id="modules.data.meme_data.MemeData">
 <em class="property">class </em><code class="sig-prename descclassname">modules.data.meme_data.</code><code class="sig-name descname">MemeData</code><a class="headerlink" href="#modules.data.meme_data.MemeData" title="Permalink to this definition">¶</a></dt>
@@ -422,6 +422,23 @@ Should not be used to select something</p>
 </dd></dl>
 
 <dl class="py method">
+<dt id="modules.data.meme_data.MemeData.get_avg">
+<em class="property">static </em><code class="sig-name descname">get_avg</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">vote</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">None</span></em><span class="sig-paren">)</span> &#x2192; int<a class="headerlink" href="#modules.data.meme_data.MemeData.get_avg" title="Permalink to this definition">¶</a></dt>
+<dd><p>Shows the average number of votes of the specified type per post</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>vote</strong> (<em>bool</em><em>, </em><em>optional</em>) – type of votes to consider. None means all. Defaults to None.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>average number of votes</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt id="modules.data.meme_data.MemeData.get_list_admin_votes">
 <em class="property">static </em><code class="sig-name descname">get_list_admin_votes</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">g_message_id</span><span class="p">:</span> <span class="n">int</span></em>, <em class="sig-param"><span class="n">group_id</span><span class="p">:</span> <span class="n">int</span></em>, <em class="sig-param"><span class="n">vote</span><span class="p">:</span> <span class="n">bool</span></em><span class="sig-paren">)</span> &#x2192; Tuple<span class="p">[</span>str<span class="p">]</span><a class="headerlink" href="#modules.data.meme_data.MemeData.get_list_admin_votes" title="Permalink to this definition">¶</a></dt>
 <dd><p>Gets the list of admins that approved or rejected a pending post</p>
@@ -459,6 +476,54 @@ If before is specified, returns only the one sent before that timestamp</p>
 </dd>
 <dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p>Tuple[str]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="modules.data.meme_data.MemeData.get_max_id">
+<em class="property">static </em><code class="sig-name descname">get_max_id</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">vote</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">None</span></em><span class="sig-paren">)</span> &#x2192; Tuple<span class="p">[</span>int<span class="p">, </span>int<span class="p">, </span>str<span class="p">]</span><a class="headerlink" href="#modules.data.meme_data.MemeData.get_max_id" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets the id of the post with the most votes of the specified type</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>vote</strong> (<em>bool</em><em>, </em><em>optional</em>) – type of votes to consider. None means all. Defaults to None.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>number of votes, id of the message, id of the channel</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>Tuple[int, int, int]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="modules.data.meme_data.MemeData.get_n_posts">
+<em class="property">static </em><code class="sig-name descname">get_n_posts</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; int<a class="headerlink" href="#modules.data.meme_data.MemeData.get_n_posts" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets the total number of posts</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>total number of posts</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="modules.data.meme_data.MemeData.get_n_votes">
+<em class="property">static </em><code class="sig-name descname">get_n_votes</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">vote</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">None</span></em><span class="sig-paren">)</span> &#x2192; int<a class="headerlink" href="#modules.data.meme_data.MemeData.get_n_votes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets the total number of votes of the specified</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>vote</strong> (<em>bool</em><em>, </em><em>optional</em>) – type of votes to consider. None means all. Defaults to None.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>number of votes of the specified type</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>int</p>
 </dd>
 </dl>
 </dd></dl>

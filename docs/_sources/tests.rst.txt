@@ -8,7 +8,7 @@ Tests package
    :undoc-members:
    :show-inheritance:
 
-tests.conftest
+conftest
 ---------------------
 
 .. automodule:: tests.conftest
@@ -16,7 +16,7 @@ tests.conftest
    :undoc-members:
    :show-inheritance:
 
-tests.test\_bot
+test\_bot
 ----------------------
 
 .. automodule:: tests.test_bot
@@ -24,7 +24,7 @@ tests.test\_bot
    :undoc-members:
    :show-inheritance:
 
-tests.test\_db
+test\_db
 ---------------------
 
 .. automodule:: tests.test_db

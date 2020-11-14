@@ -26,3 +26,11 @@ command\_handlers
    :show-inheritance:
 
 
+job\_handlers
+-----------------------------------------
+
+.. automodule:: modules.handlers.job_handlers
+   :members:
+   :undoc-members:
+   :show-inheritance:
+

@@ -5,7 +5,7 @@
 
 Telegram-SpottedDMI-Bot's documentation
 ===================================================
-You can find this bot live on telegram `@Spotted_DMI_bot <https://telegram.me/tendTo_bot>`_
+You can find this bot live on telegram `@Spotted_DMI_bot <https://telegram.me/Spotted_DMI_Bot>`_
 
 For the complete source code, check this `repo <https://github.com/UNICT-DMI/Telegram-SpottedDMI-Bot>`_
 

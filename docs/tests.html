@@ -86,9 +86,9 @@
 <li class="toctree-l1"><a class="reference internal" href="main.html">Main</a></li>
 <li class="toctree-l1"><a class="reference internal" href="modules.html">All modules</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Tests package</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#module-tests.conftest">tests.conftest</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#module-tests.test_bot">tests.test_bot</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#module-tests.test_db">tests.test_db</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#conftest">conftest</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-tests.test_bot">test_bot</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-tests.test_db">test_db</a></li>
 </ul>
 </li>
 </ul>
@@ -160,76 +160,15 @@
 <h1>Tests package<a class="headerlink" href="#tests-package" title="Permalink to this headline">¶</a></h1>
 <p><strong>Description</strong></p>
 <span class="target" id="module-tests"></span><p>Tests</p>
-<div class="section" id="module-tests.conftest">
-<span id="tests-conftest"></span><h2>tests.conftest<a class="headerlink" href="#module-tests.conftest" title="Permalink to this headline">¶</a></h2>
-<p>Test configuration</p>
-<dl class="py function">
-<dt id="tests.conftest.bot">
-<code class="sig-prename descclassname">tests.conftest.</code><code class="sig-name descname">bot</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#tests.conftest.bot" title="Permalink to this definition">¶</a></dt>
-<dd><p>Called at the beginning of the testing session.
-Starts the bot with the testing setting in another thread</p>
-<dl class="field-list simple">
-<dt class="field-odd">Yields</dt>
-<dd class="field-odd"><p><em>None</em> – wait for the testing session to end</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt id="tests.conftest.client">
-<code class="sig-prename descclassname">tests.conftest.</code><code class="sig-name descname">client</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">bot</span></em><span class="sig-paren">)</span> &#x2192; telethon.client.telegramclient.TelegramClient<a class="headerlink" href="#tests.conftest.client" title="Permalink to this definition">¶</a></dt>
-<dd><p>Called at the beginning of the testing session.
-Creates the telegram client that will simulate the user</p>
-<dl class="field-list simple">
-<dt class="field-odd">Yields</dt>
-<dd class="field-odd"><p><em>Iterator[TelegramClient]</em> – telegram client that will simulate the user</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt id="tests.conftest.db_results">
-<code class="sig-prename descclassname">tests.conftest.</code><code class="sig-name descname">db_results</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; dict<a class="headerlink" href="#tests.conftest.db_results" title="Permalink to this definition">¶</a></dt>
-<dd><p>Called at the beginning of the testing session.
-Creates initializes the database</p>
-<dl class="field-list simple">
-<dt class="field-odd">Yields</dt>
-<dd class="field-odd"><p><em>Iterator[dict]</em> – dictionary containing the results for the test queries</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt id="tests.conftest.event_loop">
-<code class="sig-prename descclassname">tests.conftest.</code><code class="sig-name descname">event_loop</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#tests.conftest.event_loop" title="Permalink to this definition">¶</a></dt>
-<dd><p>Allows to use &#64;pytest.fixture(scope=”session”) for the folowing functions</p>
-<dl class="field-list simple">
-<dt class="field-odd">Yields</dt>
-<dd class="field-odd"><p><em>AbstractEventLoop</em> – loop to be executed</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt id="tests.conftest.get_session">
-<code class="sig-prename descclassname">tests.conftest.</code><code class="sig-name descname">get_session</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#tests.conftest.get_session" title="Permalink to this definition">¶</a></dt>
-<dd><p>Shows the String session.
-The string found must be inserted in the settings.yaml file</p>
-</dd></dl>
-
-<dl class="py function">
-<dt id="tests.conftest.start_test_bot">
-<code class="sig-prename descclassname">tests.conftest.</code><code class="sig-name descname">start_test_bot</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#tests.conftest.start_test_bot" title="Permalink to this definition">¶</a></dt>
-<dd><p>Starts the bot with the test stettings</p>
-</dd></dl>
-
+<div class="section" id="conftest">
+<h2>conftest<a class="headerlink" href="#conftest" title="Permalink to this headline">¶</a></h2>
 </div>
 <div class="section" id="module-tests.test_bot">
-<span id="tests-test-bot"></span><h2>tests.test_bot<a class="headerlink" href="#module-tests.test_bot" title="Permalink to this headline">¶</a></h2>
+<span id="test-bot"></span><h2>test_bot<a class="headerlink" href="#module-tests.test_bot" title="Permalink to this headline">¶</a></h2>
 <p>Tests the bot functionality</p>
 </div>
 <div class="section" id="module-tests.test_db">
-<span id="tests-test-db"></span><h2>tests.test_db<a class="headerlink" href="#module-tests.test_db" title="Permalink to this headline">¶</a></h2>
+<span id="test-db"></span><h2>test_db<a class="headerlink" href="#module-tests.test_db" title="Permalink to this headline">¶</a></h2>
 <p>Test all the modules related to data management</p>
 <dl class="py function">
 <dt id="tests.test_db.query_to_string">

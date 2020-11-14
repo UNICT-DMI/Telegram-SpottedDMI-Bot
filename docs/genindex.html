@@ -156,7 +156,6 @@
  | <a href="#B"><strong>B</strong></a>
  | <a href="#C"><strong>C</strong></a>
  | <a href="#D"><strong>D</strong></a>
- | <a href="#E"><strong>E</strong></a>
  | <a href="#F"><strong>F</strong></a>
  | <a href="#G"><strong>G</strong></a>
  | <a href="#H"><strong>H</strong></a>
@@ -179,6 +178,8 @@
 </li>
       <li><a href="main.html#main.add_handlers">add_handlers() (in module main)</a>
 </li>
+      <li><a href="main.html#main.add_jobs">add_jobs() (in module main)</a>
+</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="modules.utils.html#modules.utils.post_util.anonym_name">anonym_name() (in module modules.utils.post_util)</a>
@@ -186,6 +187,8 @@
       <li><a href="modules.handlers.html#modules.handlers.callback_handlers.approve_no_callback">approve_no_callback() (in module modules.handlers.callback_handlers)</a>
 </li>
       <li><a href="modules.handlers.html#modules.handlers.callback_handlers.approve_yes_callback">approve_yes_callback() (in module modules.handlers.callback_handlers)</a>
+</li>
+      <li><a href="modules.handlers.html#modules.handlers.callback_handlers.avg_callback">avg_callback() (in module modules.handlers.callback_handlers)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -203,8 +206,6 @@
 </li>
       <li><a href="modules.data.html#modules.data.meme_data.MemeData.become_credited">become_credited() (modules.data.meme_data.MemeData static method)</a>
 </li>
-      <li><a href="tests.html#tests.conftest.bot">bot() (in module tests.conftest)</a>
-</li>
   </ul></td>
 </tr></table>
 
@@ -217,9 +218,11 @@
 </li>
       <li><a href="modules.handlers.html#modules.handlers.command_handlers.clean_pending_cmd">clean_pending_cmd() (in module modules.handlers.command_handlers)</a>
 </li>
+      <li><a href="modules.handlers.html#modules.handlers.job_handlers.clean_pending_job">clean_pending_job() (in module modules.handlers.job_handlers)</a>
+</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="tests.html#tests.conftest.client">client() (in module tests.conftest)</a>
+      <li><a href="modules.handlers.html#modules.handlers.callback_handlers.close_callback">close_callback() (in module modules.handlers.callback_handlers)</a>
 </li>
       <li><a href="modules.handlers.html#modules.handlers.callback_handlers.confirm_no_callback">confirm_no_callback() (in module modules.handlers.callback_handlers)</a>
 </li>
@@ -233,8 +236,6 @@
 <h2 id="D">D</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="tests.html#tests.conftest.db_results">db_results() (in module tests.conftest)</a>
-</li>
       <li><a href="modules.data.html#modules.data.db_manager.DbManager">DbManager (class in modules.data.db_manager)</a>
 </li>
   </ul></td>
@@ -242,14 +243,6 @@
       <li><a href="modules.data.html#modules.data.db_manager.DbManager.delete_from">delete_from() (modules.data.db_manager.DbManager static method)</a>
 </li>
       <li><a href="modules.data.html#modules.data.db_manager.dict_factory">dict_factory() (in module modules.data.db_manager)</a>
-</li>
-  </ul></td>
-</tr></table>
-
-<h2 id="E">E</h2>
-<table style="width: 100%" class="indextable genindextable"><tr>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="tests.html#tests.conftest.event_loop">event_loop() (in module tests.conftest)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -269,9 +262,15 @@
 </li>
       <li><a href="modules.utils.html#modules.utils.keyboard_util.get_approve_kb">get_approve_kb() (in module modules.utils.keyboard_util)</a>
 </li>
+      <li><a href="modules.data.html#modules.data.meme_data.MemeData.get_avg">get_avg() (modules.data.meme_data.MemeData static method)</a>
+</li>
       <li><a href="modules.utils.html#modules.utils.info_util.get_callback_info">get_callback_info() (in module modules.utils.info_util)</a>
 </li>
+      <li><a href="modules.utils.html#modules.utils.keyboard_util.get_confirm_kb">get_confirm_kb() (in module modules.utils.keyboard_util)</a>
+</li>
       <li><a href="modules.data.html#modules.data.db_manager.DbManager.get_db">get_db() (modules.data.db_manager.DbManager static method)</a>
+</li>
+      <li><a href="modules.utils.html#modules.utils.info_util.get_job_info">get_job_info() (in module modules.utils.info_util)</a>
 </li>
       <li><a href="modules.data.html#modules.data.meme_data.MemeData.get_list_admin_votes">get_list_admin_votes() (modules.data.meme_data.MemeData static method)</a>
 </li>
@@ -279,13 +278,19 @@
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="modules.data.html#modules.data.meme_data.MemeData.get_max_id">get_max_id() (modules.data.meme_data.MemeData static method)</a>
+</li>
       <li><a href="modules.utils.html#modules.utils.info_util.get_message_info">get_message_info() (in module modules.utils.info_util)</a>
+</li>
+      <li><a href="modules.data.html#modules.data.meme_data.MemeData.get_n_posts">get_n_posts() (modules.data.meme_data.MemeData static method)</a>
+</li>
+      <li><a href="modules.data.html#modules.data.meme_data.MemeData.get_n_votes">get_n_votes() (modules.data.meme_data.MemeData static method)</a>
 </li>
       <li><a href="modules.data.html#modules.data.meme_data.MemeData.get_pending_votes">get_pending_votes() (modules.data.meme_data.MemeData static method)</a>
 </li>
       <li><a href="modules.data.html#modules.data.meme_data.MemeData.get_published_votes">get_published_votes() (modules.data.meme_data.MemeData static method)</a>
 </li>
-      <li><a href="tests.html#tests.conftest.get_session">get_session() (in module tests.conftest)</a>
+      <li><a href="modules.utils.html#modules.utils.keyboard_util.get_stats_kb">get_stats_kb() (in module modules.utils.keyboard_util)</a>
 </li>
       <li><a href="modules.data.html#modules.data.meme_data.MemeData.get_user_id">get_user_id() (modules.data.meme_data.MemeData static method)</a>
 </li>
@@ -342,6 +347,8 @@
       </ul></li>
       <li><a href="main.html#main.main">main() (in module main)</a>
 </li>
+      <li><a href="modules.handlers.html#modules.handlers.callback_handlers.max_callback">max_callback() (in module modules.handlers.callback_handlers)</a>
+</li>
       <li><a href="modules.handlers.html#modules.handlers.callback_handlers.meme_callback">meme_callback() (in module modules.handlers.callback_handlers)</a>
 </li>
       <li><a href="modules.data.html#modules.data.meme_data.MemeData">MemeData (class in modules.data.meme_data)</a>
@@ -372,6 +379,8 @@
 </li>
         <li><a href="modules.handlers.html#module-modules.handlers.command_handlers">modules.handlers.command_handlers</a>
 </li>
+        <li><a href="modules.handlers.html#module-modules.handlers.job_handlers">modules.handlers.job_handlers</a>
+</li>
         <li><a href="modules.utils.html#module-modules.utils">modules.utils</a>
 </li>
         <li><a href="modules.utils.html#module-modules.utils.info_util">modules.utils.info_util</a>
@@ -381,8 +390,6 @@
         <li><a href="modules.utils.html#module-modules.utils.post_util">modules.utils.post_util</a>
 </li>
         <li><a href="tests.html#module-tests">tests</a>
-</li>
-        <li><a href="tests.html#module-tests.conftest">tests.conftest</a>
 </li>
         <li><a href="tests.html#module-tests.test_bot">tests.test_bot</a>
 </li>
@@ -459,6 +466,13 @@
 
       <ul>
         <li><a href="modules.handlers.html#module-modules.handlers.command_handlers">module</a>
+</li>
+      </ul></li>
+      <li>
+    modules.handlers.job_handlers
+
+      <ul>
+        <li><a href="modules.handlers.html#module-modules.handlers.job_handlers">module</a>
 </li>
       </ul></li>
       <li>
@@ -551,10 +565,10 @@
 </li>
       <li><a href="modules.data.html#modules.data.meme_data.MemeData.set_admin_vote">set_admin_vote() (modules.data.meme_data.MemeData static method)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="modules.data.html#modules.data.meme_data.MemeData.set_user_vote">set_user_vote() (modules.data.meme_data.MemeData static method)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="modules.handlers.html#modules.handlers.callback_handlers.settings_anonimo_callback">settings_anonimo_callback() (in module modules.handlers.callback_handlers)</a>
 </li>
       <li><a href="modules.handlers.html#modules.handlers.command_handlers.settings_cmd">settings_cmd() (in module modules.handlers.command_handlers)</a>
@@ -565,7 +579,9 @@
 </li>
       <li><a href="modules.handlers.html#modules.handlers.command_handlers.start_cmd">start_cmd() (in module modules.handlers.command_handlers)</a>
 </li>
-      <li><a href="tests.html#tests.conftest.start_test_bot">start_test_bot() (in module tests.conftest)</a>
+      <li><a href="modules.handlers.html#modules.handlers.callback_handlers.stats_callback">stats_callback() (in module modules.handlers.callback_handlers)</a>
+</li>
+      <li><a href="modules.handlers.html#modules.handlers.command_handlers.stats_cmd">stats_cmd() (in module modules.handlers.command_handlers)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -585,20 +601,13 @@
 </li>
       <li><a href="tests.html#tests.test_db.test_select_from">test_select_from() (in module tests.test_db)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li>
     tests
 
       <ul>
         <li><a href="tests.html#module-tests">module</a>
-</li>
-      </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li>
-    tests.conftest
-
-      <ul>
-        <li><a href="tests.html#module-tests.conftest">module</a>
 </li>
       </ul></li>
       <li>
@@ -615,6 +624,8 @@
         <li><a href="tests.html#module-tests.test_db">module</a>
 </li>
       </ul></li>
+      <li><a href="modules.handlers.html#modules.handlers.callback_handlers.tot_callback">tot_callback() (in module modules.handlers.callback_handlers)</a>
+</li>
   </ul></td>
 </tr></table>
 
