@@ -1,11 +1,12 @@
 # Telegram-SpottedDMI-Bot
 
-**Telegram-SpottedDMI-Bot** [**@Spotted_DMI_Bot**](https://telegram.me/Spotted_DMI_Bot) is a Telegram bot
+**Telegram-SpottedDMI-Bot** is the platform that powers **[@Spotted_DMI_Bot](https://telegram.me/Spotted_DMI_Bot)**, a Telegram bot that let students send an anonymous message to the channel community.
 
 ### Using the live version
 The bot is live on Telegram with the username [**@Spotted_DMI_Bot**](https://telegram.me/Spotted_DMI_Bot).
 To see the posts, once published, check [**Spotted DMI**](https://t.me/Spotted_DMI)
 Send **'/start'** to start it, **'/help'** to see a list of commands.
+
 Please note that the commands and their answers are in Italian.
 
 ## Table of contents

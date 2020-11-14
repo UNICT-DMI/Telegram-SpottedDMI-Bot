@@ -11,14 +11,13 @@ def get_message_info(update: Update, context: CallbackContext) -> dict:
         context (CallbackContext): context passed by the handler
 
     Returns:
-        dict: {bot, chat_id, text, message_id, sender_first_name, sender_id}
+        dict: {bot, chat_id, text, message_id, sender_id}
     """
     return {
         'bot': context.bot,
         'chat_id': update.message.chat_id,
         'text': update.message.text,
         'message_id': update.message.message_id,
-        'sender_first_name': update.message.from_user.first_name,
         'sender_id': update.message.from_user.id
     }
 
@@ -31,17 +30,34 @@ def get_callback_info(update: Update, context: CallbackContext) -> dict:
         context (CallbackContext): context passed by the handler
 
     Returns:
-        dict: {bot, chat_id, text, query_id, data, message_id, sender_first_name, sender_id}
+        dict: {bot, bot_data, message, chat_id, text, query_id, data, message_id, sender_id, sender_username, reply_markup}
     """
     return {
         'bot': context.bot,
+        'bot_data': context.bot_data,
+        'message': update.callback_query.message,
         'chat_id': update.callback_query.message.chat_id,
         'text': update.callback_query.message.text,
         'query_id': update.callback_query.id,
         'data': update.callback_query.data,
         'message_id': update.callback_query.message.message_id,
-        'sender_first_name': update.callback_query.from_user.first_name,
-        'sender_id': update.callback_query.from_user.id
+        'sender_id': update.callback_query.from_user.id,
+        'sender_username': update.callback_query.from_user.username,
+        'reply_markup': update.callback_query.message.reply_markup
+    }
+
+
+def get_job_info(context: CallbackContext) -> dict:
+    """Get the classic info from the context parameter for jobs
+
+    Args:
+        context (CallbackContext): context passed by the handler
+
+    Returns:
+        dict: {bot}
+    """
+    return {
+        'bot': context.bot,
     }
 
 

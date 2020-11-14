@@ -1,13 +1,14 @@
-"""Commands for the meme bot"""
-from datetime import datetime, timedelta, timezone
+"""Handles the execution of commands by the bot"""
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup, ParseMode
 from telegram.ext import CallbackContext
 from telegram.error import BadRequest, Unauthorized
+from modules.handlers.job_handlers import clean_pending_job
 from modules.debug.log_manager import logger
 from modules.data.data_reader import read_md, config_map
 from modules.data.meme_data import MemeData
 from modules.utils.info_util import get_message_info, check_message_type
 from modules.utils.post_util import send_post_to
+from modules.utils.keyboard_util import get_confirm_kb, get_stats_kb
 
 STATE = {'posting': 1, 'confirm': 2, 'end': -1}
 
@@ -93,14 +94,14 @@ def settings_cmd(update: Update, context: CallbackContext):
 
 def post_cmd(update: Update, context: CallbackContext) -> int:
     """Handles the /post command.
-    Checks that the user is in a private chat and it's not banned and start the post process
+    Checks that the user is in a private chat and it's not banned and start the post conversation
 
     Args:
         update (Update): update event
         context (CallbackContext): context passed by the handler
 
     Returns:
-        int: value passed to the handler, if requested
+        int: next state of the conversation
     """
     info = get_message_info(update, context)
     if update.message.chat.type != "private":  # you can only post with a private message
@@ -190,7 +191,7 @@ def reply_cmd(update: Update, context: CallbackContext):
             return
         try:
             info['bot'].send_message(chat_id=user_id,
-                                 text="COMUNICAZIONE DEGLI ADMIN SUL TUO ULTIMO POST:\n" + info['text'][7:].strip())
+                                     text="COMUNICAZIONE DEGLI ADMIN SUL TUO ULTIMO POST:\n" + info['text'][7:].strip())
             info['bot'].send_message(chat_id=info['chat_id'],
                                  text="L'utente ha ricevuto il seguente messaggio:\n"\
                                     "COMUNICAZIONE DEGLI ADMIN SUL TUO ULTIMO POST:\n" + info['text'][7:].strip(),
@@ -201,7 +202,7 @@ def reply_cmd(update: Update, context: CallbackContext):
 
 def clean_pending_cmd(update: Update, context: CallbackContext):
     """Handles the /clean_pending command.
-    Automatically reject all pending posts that are older than the chosen amount of hours
+    Automatically rejects all pending posts that are older than the chosen amount of hours
 
     Args:
         update (Update): update event
@@ -209,32 +210,11 @@ def clean_pending_cmd(update: Update, context: CallbackContext):
     """
     info = get_message_info(update, context)
     if info['chat_id'] == config_map['meme']['group_id']:  # you have to be in the admin group
-        before_time = datetime.now(tz=timezone.utc) - timedelta(hours=config_map['meme']['remove_after_h'])
-        pending_meme_ids = MemeData.get_list_pending_memes(group_id=info['chat_id'], before=before_time)
-
-        # For each pending meme older than before_time
-        removed = 0
-        for meme_id in pending_meme_ids:
-            try:
-                info['bot'].delete_message(chat_id=info['chat_id'], message_id=meme_id)
-                user_id = MemeData.get_user_id(group_id=info['chat_id'], g_message_id=meme_id)
-                try:
-                    info['bot'].send_message(
-                    chat_id=user_id,
-                    text="Gli admin erano impegnati in affari improrogabili, e non sono riusciti a valutare lo spot in tempo")
-                except (BadRequest, Unauthorized) as e:
-                    logger.warning("Notifying the user on /clean_pending: %s", e)
-                removed += 1
-            except BadRequest as e:
-                logger.error("Deleting old pending message: %s", e)
-            finally:
-                MemeData.remove_pending_meme(group_id=info['chat_id'], g_message_id=meme_id)  # remove the pending_meme data
-
-        info['bot'].send_message(chat_id=info['chat_id'], text=f"Sono stati eliminati {removed} messaggi rimasti in sospeso")
+        clean_pending_job(context=context)
 
 
 def cancel_cmd(update: Update, context: CallbackContext) -> int:
-    """Handles the reply to the /cancel command.
+    """Handles the /cancel command.
     Exit from the post pipeline
 
     Args:
@@ -242,12 +222,25 @@ def cancel_cmd(update: Update, context: CallbackContext) -> int:
         context (CallbackContext): context passed by the handler
 
     Returns:
-        int: value passed to the handler, if requested
+        int: next state of the conversation
     """
     info = get_message_info(update, context)
 
     info['bot'].send_message(chat_id=info['chat_id'], text="Post annullato")
     return STATE['end']
+
+
+def stats_cmd(update: Update, context: CallbackContext):
+    """Handles the /stats command.
+    Lets the user choose what stats they want to see
+
+    Args:
+        update (Update): update event
+        context (CallbackContext): context passed by the handler
+    """
+    info = get_message_info(update, context)
+
+    info['bot'].send_message(chat_id=info['chat_id'], text="Che statistica ti interessa?", reply_markup=get_stats_kb())
 
 
 # endregion
@@ -263,7 +256,7 @@ def post_msg(update: Update, context: CallbackContext) -> int:
         context (CallbackContext): context passed by the handler
 
     Returns:
-        int: value passed to the handler, if requested
+        int: next state of the conversation
     """
     info = get_message_info(update, context)
 
@@ -271,17 +264,13 @@ def post_msg(update: Update, context: CallbackContext) -> int:
         info['bot'].send_message(
             chat_id=info['chat_id'],
             text="Questo tipo di messaggio non è supportato\nÈ consentito solo testo, stikers, immagini, audio, video o poll\n\
-                Invia il post che vuoi pubblicare\nPuoi annullare il processo con /cancel",
-        )
+                Invia il post che vuoi pubblicare\nPuoi annullare il processo con /cancel")
         return STATE['posting']
 
     info['bot'].send_message(chat_id=info['chat_id'],
                              text="Sei sicuro di voler publicare questo post?",
                              reply_to_message_id=info['message_id'],
-                             reply_markup=InlineKeyboardMarkup([[
-                                 InlineKeyboardButton(text="Si", callback_data="meme_confirm_yes"),
-                                 InlineKeyboardButton(text="No", callback_data="meme_confirm_no")
-                             ]]))
+                             reply_markup=get_confirm_kb())
     return STATE['confirm']
 
 
