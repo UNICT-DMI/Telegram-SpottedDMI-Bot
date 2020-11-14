@@ -1,4 +1,4 @@
-"""Commands for the meme bot"""
+"""Handles the execution of commands by the bot"""
 from datetime import datetime, timedelta, timezone
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup, ParseMode
 from telegram.ext import CallbackContext

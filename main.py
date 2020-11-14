@@ -35,10 +35,10 @@ def add_commands(up: Updater):
 
 
 def add_handlers(dp: Dispatcher):
-    """Adds all the needed handlers to the dipatcher
+    """Adds all the needed handlers to the dispatcher
 
     Args:
-        dp (Dispatcher): supplyed dispacther
+        dp (Dispatcher): supplyed dispatcher
     """
     if config_map['debug']['local_log']:  # add MessageHandler only if log_message is enabled
         dp.add_handler(MessageHandler(Filters.all, log_message), 1)

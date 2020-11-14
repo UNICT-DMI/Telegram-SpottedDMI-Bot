@@ -1,4 +1,4 @@
-"""Commands for the meme bot"""
+"""Handles the execution of callbacks by the bot"""
 from typing import Tuple
 from telegram import Update, InlineKeyboardMarkup
 from telegram.ext import CallbackContext

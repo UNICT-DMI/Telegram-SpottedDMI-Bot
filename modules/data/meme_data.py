@@ -1,4 +1,4 @@
-"""Data management for the meme bot"""
+"""Data management for the bot"""
 from typing import Optional, Tuple
 from datetime import datetime
 from telegram import Message
