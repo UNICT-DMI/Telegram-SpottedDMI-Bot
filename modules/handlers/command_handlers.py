@@ -283,6 +283,8 @@ def forwarded_post_msg(update: Update, context: CallbackContext):
         context (CallbackContext): context passed by the handler
     """
     info = get_message_info(update, context)
+    if update.message.forward_from_chat is None:
+        return
     forward_from_chat_id = update.message.forward_from_chat.id
     forward_from_id = update.message.forward_from_message_id
 
