@@ -21,7 +21,7 @@ CREATE TABLE IF NOT EXISTS votes
   user_id BIGINT NOT NULL,
   c_message_id BIGINT NOT NULL,
   channel_id BIGINT NOT NULL,
-  is_upvote boolean NOT NULL,
+  vote varchar(4) NOT NULL,
   PRIMARY KEY (user_id, c_message_id, channel_id),
   FOREIGN KEY (c_message_id, channel_id) REFERENCES published_meme (c_message_id, channel_id) ON DELETE CASCADE ON UPDATE CASCADE
 );
