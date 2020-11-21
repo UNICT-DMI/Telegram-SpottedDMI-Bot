@@ -1,7 +1,9 @@
-"""Creates the inlinekeyboard sent by the bot in its messages"""
+"""Creates the inlinekeyboard sent by the bot in its messages.
+Callback_data format: <callback_family>_<callback_name>,[arg]"""
 from typing import List
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 from modules.data.meme_data import MemeData
+
 
 
 def get_confirm_kb() -> InlineKeyboardMarkup:
@@ -11,8 +13,20 @@ def get_confirm_kb() -> InlineKeyboardMarkup:
         InlineKeyboardMarkup: new inline keyboard
     """
     return InlineKeyboardMarkup([[
-        InlineKeyboardButton(text="Si", callback_data="meme_confirm_yes"),
-        InlineKeyboardButton(text="No", callback_data="meme_confirm_no")
+        InlineKeyboardButton(text="Si", callback_data="meme_confirm,yes"),
+        InlineKeyboardButton(text="No", callback_data="meme_confirm,no")
+    ]])
+
+
+def get_settings_kb() -> InlineKeyboardMarkup:
+    """Generates the InlineKeyboard to edit the settings
+
+    Returns:
+        InlineKeyboardMarkup: new inline keyboard
+    """
+    return InlineKeyboardMarkup([[
+        InlineKeyboardButton(" Anonimo ", callback_data="meme_settings,anonimo"),
+        InlineKeyboardButton(" Con credit ", callback_data="meme_settings,credit"),
     ]])
 
 
@@ -53,8 +67,8 @@ def get_approve_kb() -> InlineKeyboardMarkup:
         InlineKeyboardMarkup: new inline keyboard
     """
     return InlineKeyboardMarkup([[
-        InlineKeyboardButton("🟢 0", callback_data="meme_approve_yes"),
-        InlineKeyboardButton("🔴 0", callback_data="meme_approve_no")
+        InlineKeyboardButton("🟢 0", callback_data="meme_approve_yes,"),
+        InlineKeyboardButton("🔴 0", callback_data="meme_approve_no,")
     ]])
 
 
@@ -65,8 +79,8 @@ def get_vote_kb() -> InlineKeyboardMarkup:
         InlineKeyboardMarkup: new inline keyboard
     """
     return InlineKeyboardMarkup([[
-        InlineKeyboardButton("👍 0", callback_data="meme_vote_yes"),
-        InlineKeyboardButton("👎 0", callback_data="meme_vote_no")
+        InlineKeyboardButton("👍 0", callback_data="meme_vote,1"),
+        InlineKeyboardButton("👎 0", callback_data="meme_vote,0")
     ]])
 
 

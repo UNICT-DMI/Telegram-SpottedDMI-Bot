@@ -1,5 +1,5 @@
 """Handles the execution of commands by the bot"""
-from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup, ParseMode
+from telegram import Update, ParseMode
 from telegram.ext import CallbackContext
 from telegram.error import BadRequest, Unauthorized
 from modules.handlers.job_handlers import clean_pending_job
@@ -8,7 +8,7 @@ from modules.data.data_reader import read_md, config_map
 from modules.data.meme_data import MemeData
 from modules.utils.info_util import get_message_info, check_message_type
 from modules.utils.post_util import send_post_to
-from modules.utils.keyboard_util import get_confirm_kb, get_stats_kb
+from modules.utils.keyboard_util import get_confirm_kb, get_settings_kb, get_stats_kb
 
 STATE = {'posting': 1, 'confirm': 2, 'end': -1}
 
@@ -81,14 +81,9 @@ def settings_cmd(update: Update, context: CallbackContext):
         )
         return
 
-    keyboard = [[
-        InlineKeyboardButton(" Anonimo ", callback_data="meme_settings_anonimo"),
-        InlineKeyboardButton(" Con credit ", callback_data="meme_settings_credit"),
-    ]]
-
     info['bot'].send_message(chat_id=info['chat_id'],
                              text="***Come vuoi che sia il tuo post:***",
-                             reply_markup=InlineKeyboardMarkup(keyboard),
+                             reply_markup=get_settings_kb(),
                              parse_mode=ParseMode.MARKDOWN_V2)
 
 
