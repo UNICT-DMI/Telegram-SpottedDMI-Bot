@@ -7,11 +7,27 @@ from modules.debug.log_manager import logger
 from modules.data.data_reader import config_map
 from modules.data.meme_data import MemeData
 from modules.utils.info_util import get_callback_info
-from modules.utils.keyboard_util import update_approve_kb, update_vote_kb, get_stats_kb
+from modules.utils.keyboard_util import REACTION, update_approve_kb, update_vote_kb, get_stats_kb
 from modules.utils.post_util import send_post_to, show_admins_votes
 
 STATE = {'posting': 1, 'confirm': 2, 'end': -1}
-REACTION = {'0': "👎", '1': "👍", '2': "🤣", '3': "😡", '4': "🥰"}
+
+
+def old_reactions(data: str) -> str:
+    """Used to mantain compatibility with the old reactions.
+    Can be removed later
+
+    Args:
+        data (str): callback data
+
+    Returns:
+        str: new reaction data corrisponding with the old reaction
+    """
+    if data == "meme_vote_yes":
+        return "meme_vote,1"
+    if data == "meme_vote_no":
+        return "meme_vote,0"
+    return data
 
 
 def meme_callback(update: Update, context: CallbackContext) -> int:
@@ -25,6 +41,7 @@ def meme_callback(update: Update, context: CallbackContext) -> int:
         int: value to return to the handler, if requested
     """
     info = get_callback_info(update, context)
+    info['data'] = old_reactions(info['data'])
     data = info['data'].split(",")  # the callback data indicates the correct callback and the arg to pass to it separated by ,
     try:
         message_text, reply_markup, output = globals()[f'{data[0][5:]}_callback'](info, data[1])  # call the correct function

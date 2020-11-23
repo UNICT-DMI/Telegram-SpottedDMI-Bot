@@ -4,6 +4,7 @@ from typing import List
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 from modules.data.meme_data import MemeData
 
+REACTION = {'0': "👎", '1': "👍", '2': "🤣", '3': "😡", '4': "🥰"}
 
 def get_confirm_kb() -> InlineKeyboardMarkup:
     """Generates the InlineKeyboard to confirm the creation of the post
@@ -78,12 +79,12 @@ def get_vote_kb() -> InlineKeyboardMarkup:
         InlineKeyboardMarkup: new inline keyboard
     """
     return InlineKeyboardMarkup(
-        [[InlineKeyboardButton("👍 0", callback_data="meme_vote,1"),
-          InlineKeyboardButton("👎 0", callback_data="meme_vote,0")],
+        [[InlineKeyboardButton(f"{REACTION['1']} 0", callback_data="meme_vote,1"),
+          InlineKeyboardButton(f"{REACTION['0']} 0", callback_data="meme_vote,0")],
          [
-             InlineKeyboardButton("🤣 0", callback_data="meme_vote,2"),
-             InlineKeyboardButton("😡 0", callback_data="meme_vote,3"),
-             InlineKeyboardButton("🥰 0", callback_data="meme_vote,4"),
+             InlineKeyboardButton(f"{REACTION['2']} 0", callback_data="meme_vote,2"),
+             InlineKeyboardButton(f"{REACTION['3']} 0", callback_data="meme_vote,3"),
+             InlineKeyboardButton(f"{REACTION['4']} 0", callback_data="meme_vote,4"),
          ]])
 
 
