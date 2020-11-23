@@ -1,4 +1,5 @@
-"""Creates the inlinekeyboard sent by the bot in its messages"""
+"""Creates the inlinekeyboard sent by the bot in its messages.
+Callback_data format: <callback_family>_<callback_name>,[arg]"""
 from typing import List
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 from modules.data.meme_data import MemeData
@@ -11,8 +12,20 @@ def get_confirm_kb() -> InlineKeyboardMarkup:
         InlineKeyboardMarkup: new inline keyboard
     """
     return InlineKeyboardMarkup([[
-        InlineKeyboardButton(text="Si", callback_data="meme_confirm_yes"),
-        InlineKeyboardButton(text="No", callback_data="meme_confirm_no")
+        InlineKeyboardButton(text="Si", callback_data="meme_confirm,yes"),
+        InlineKeyboardButton(text="No", callback_data="meme_confirm,no")
+    ]])
+
+
+def get_settings_kb() -> InlineKeyboardMarkup:
+    """Generates the InlineKeyboard to edit the settings
+
+    Returns:
+        InlineKeyboardMarkup: new inline keyboard
+    """
+    return InlineKeyboardMarkup([[
+        InlineKeyboardButton(" Anonimo ", callback_data="meme_settings,anonimo"),
+        InlineKeyboardButton(" Con credit ", callback_data="meme_settings,credit"),
     ]])
 
 
@@ -26,21 +39,21 @@ def get_stats_kb() -> InlineKeyboardMarkup:
         [InlineKeyboardButton("~  Lo spot con più ___  ~", callback_data="none")],
         [
             InlineKeyboardButton("voti", callback_data="stats_max,votes"),
-            InlineKeyboardButton("👍", callback_data="stats_max,yes"),
-            InlineKeyboardButton("👎", callback_data="stats_max,no"),
+            InlineKeyboardButton("👍", callback_data="stats_max,1"),
+            InlineKeyboardButton("👎", callback_data="stats_max,0"),
         ],
         [InlineKeyboardButton("~  Media di ___ per spot  ~", callback_data="none")],
         [
             InlineKeyboardButton("voti", callback_data="stats_avg,votes"),
-            InlineKeyboardButton("👍", callback_data="stats_avg,yes"),
-            InlineKeyboardButton("👎", callback_data="stats_avg,no"),
+            InlineKeyboardButton("👍", callback_data="stats_avg,1"),
+            InlineKeyboardButton("👎", callback_data="stats_avg,0"),
         ],
         [InlineKeyboardButton("~  Numero di ___ totale  ~", callback_data="none")],
         [
             InlineKeyboardButton("spot", callback_data="stats_tot,posts"),
             InlineKeyboardButton("voti", callback_data="stats_tot,votes"),
-            InlineKeyboardButton("👍", callback_data="stats_tot,yes"),
-            InlineKeyboardButton("👎", callback_data="stats_tot,no"),
+            InlineKeyboardButton("👍", callback_data="stats_tot,1"),
+            InlineKeyboardButton("👎", callback_data="stats_tot,0"),
         ],
         [InlineKeyboardButton("Chiudi", callback_data="stats_close,")],
     ])
@@ -53,8 +66,8 @@ def get_approve_kb() -> InlineKeyboardMarkup:
         InlineKeyboardMarkup: new inline keyboard
     """
     return InlineKeyboardMarkup([[
-        InlineKeyboardButton("🟢 0", callback_data="meme_approve_yes"),
-        InlineKeyboardButton("🔴 0", callback_data="meme_approve_no")
+        InlineKeyboardButton("🟢 0", callback_data="meme_approve_yes,"),
+        InlineKeyboardButton("🔴 0", callback_data="meme_approve_no,")
     ]])
 
 
@@ -64,10 +77,14 @@ def get_vote_kb() -> InlineKeyboardMarkup:
     Returns:
         InlineKeyboardMarkup: new inline keyboard
     """
-    return InlineKeyboardMarkup([[
-        InlineKeyboardButton("👍 0", callback_data="meme_vote_yes"),
-        InlineKeyboardButton("👎 0", callback_data="meme_vote_no")
-    ]])
+    return InlineKeyboardMarkup(
+        [[InlineKeyboardButton("👍 0", callback_data="meme_vote,1"),
+          InlineKeyboardButton("👎 0", callback_data="meme_vote,0")],
+         [
+             InlineKeyboardButton("🤣 0", callback_data="meme_vote,2"),
+             InlineKeyboardButton("😡 0", callback_data="meme_vote,3"),
+             InlineKeyboardButton("🥰 0", callback_data="meme_vote,4"),
+         ]])
 
 
 def update_approve_kb(keyboard: List[List[InlineKeyboardButton]],
@@ -98,29 +115,21 @@ def update_approve_kb(keyboard: List[List[InlineKeyboardButton]],
     return InlineKeyboardMarkup(keyboard)
 
 
-def update_vote_kb(keyboard: List[List[InlineKeyboardButton]],
-                   c_message_id: int,
-                   channel_id: int,
-                   upvote: int = -1,
-                   downvote: int = -1) -> InlineKeyboardMarkup:
+def update_vote_kb(keyboard: List[List[InlineKeyboardButton]], c_message_id: int, channel_id: int) -> InlineKeyboardMarkup:
     """Updates the InlineKeyboard when the valutation of a published post changes
 
     Args:
         keyboard (List[List[InlineKeyboardButton]]): previous keyboard
         c_message_id (int): id of the published post in question
         channel_id (int): id of the channel
-        upvote (int, optional): number of upvotes, if known. Defaults to -1.
-        downvote (int, optional): number of downvotes, if known. Defaults to -1.
 
     Returns:
         InlineKeyboardMarkup: updated inline keyboard
     """
-    if upvote >= 0:
-        keyboard[0][0].text = f"👍 {upvote}"
-    else:
-        keyboard[0][0].text = f"👍 {MemeData.get_published_votes(c_message_id, channel_id, vote=True)}"
-    if downvote >= 0:
-        keyboard[0][1].text = f"👎 {downvote}"
-    else:
-        keyboard[0][1].text = f"👎 {MemeData.get_published_votes(c_message_id, channel_id, vote=False)}"
+    keyboard[0][0].text = f"👍 {MemeData.get_published_votes(c_message_id, channel_id, vote='1')}"
+    keyboard[0][1].text = f"👎 {MemeData.get_published_votes(c_message_id, channel_id, vote='0')}"
+    if len(keyboard) > 1:  # to keep support for older published memes
+        keyboard[1][0].text = f"🤣 {MemeData.get_published_votes(c_message_id, channel_id, vote='2')}"
+        keyboard[1][1].text = f"😡 {MemeData.get_published_votes(c_message_id, channel_id, vote='3')}"
+        keyboard[1][2].text = f"🥰 {MemeData.get_published_votes(c_message_id, channel_id, vote='4')}"
     return InlineKeyboardMarkup(keyboard)
