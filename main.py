@@ -29,6 +29,7 @@ def add_commands(up: Updater):
     commands = [
         BotCommand("start", "presentazione iniziale del bot"),
         BotCommand("spot", "inizia a spottare"),
+        BotCommand("cancel", "interrompe lo spot e resetta il bot"),
         BotCommand("help ", "funzionamento e scopo del bot"),
         BotCommand("rules ", "regole da tenere a mente"),
         BotCommand("stats", "visualizza statistiche sugli spot"),
