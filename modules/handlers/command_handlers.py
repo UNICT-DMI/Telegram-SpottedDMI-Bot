@@ -2,6 +2,7 @@
 from telegram import Update, ParseMode
 from telegram.ext import CallbackContext
 from telegram.error import BadRequest, Unauthorized
+from modules.handlers import STATE
 from modules.handlers.job_handlers import clean_pending_job
 from modules.debug.log_manager import logger
 from modules.data.data_reader import read_md, config_map
@@ -9,9 +10,6 @@ from modules.data.meme_data import MemeData
 from modules.utils.info_util import get_message_info, check_message_type
 from modules.utils.post_util import send_post_to
 from modules.utils.keyboard_util import get_confirm_kb, get_settings_kb, get_stats_kb
-
-STATE = {'posting': 1, 'confirm': 2, 'end': -1}
-
 
 # region cmd
 def start_cmd(update: Update, context: CallbackContext):

@@ -3,8 +3,7 @@ Callback_data format: <callback_family>_<callback_name>,[arg]"""
 from typing import List
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 from modules.data.meme_data import MemeData
-
-REACTION = {'0': "👎", '1': "👍", '2': "🤣", '3': "😡", '4': "🥰"}
+from modules.utils import REACTION
 
 
 def get_confirm_kb() -> InlineKeyboardMarkup:
@@ -129,10 +128,10 @@ def update_vote_kb(keyboard: List[List[InlineKeyboardButton]], c_message_id: int
     Returns:
         InlineKeyboardMarkup: updated inline keyboard
     """
-    keyboard[0][0].text = f"👍 {MemeData.get_published_votes(c_message_id, channel_id, vote='1')}"
-    keyboard[0][1].text = f"👎 {MemeData.get_published_votes(c_message_id, channel_id, vote='0')}"
+    keyboard[0][0].text = f"{REACTION['1']} {MemeData.get_published_votes(c_message_id, channel_id, vote='1')}"
+    keyboard[0][1].text = f"{REACTION['0']} {MemeData.get_published_votes(c_message_id, channel_id, vote='0')}"
     if len(keyboard) > 1:  # to keep support for older published memes
-        keyboard[1][0].text = f"🤣 {MemeData.get_published_votes(c_message_id, channel_id, vote='2')}"
-        keyboard[1][1].text = f"😡 {MemeData.get_published_votes(c_message_id, channel_id, vote='3')}"
-        keyboard[1][2].text = f"🥰 {MemeData.get_published_votes(c_message_id, channel_id, vote='4')}"
+        keyboard[1][0].text = f"{REACTION['2']} {MemeData.get_published_votes(c_message_id, channel_id, vote='2')}"
+        keyboard[1][1].text = f"{REACTION['3']} {MemeData.get_published_votes(c_message_id, channel_id, vote='3')}"
+        keyboard[1][2].text = f"{REACTION['4']} {MemeData.get_published_votes(c_message_id, channel_id, vote='4')}"
     return InlineKeyboardMarkup(keyboard)
