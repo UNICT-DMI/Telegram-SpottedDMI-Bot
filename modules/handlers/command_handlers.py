@@ -220,7 +220,9 @@ def cancel_cmd(update: Update, context: CallbackContext) -> int:
         int: next state of the conversation
     """
     info = get_message_info(update, context)
-
+    g_message_id, group_id = MemeData.cancel_pending_meme(user_id=info['sender_id'])
+    if g_message_id is not None:
+        info['bot'].delete_message(chat_id=group_id, message_id=g_message_id)
     info['bot'].send_message(chat_id=info['chat_id'], text="Post annullato")
     return STATE['end']
 
