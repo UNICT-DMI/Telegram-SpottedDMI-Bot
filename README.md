@@ -46,6 +46,7 @@ meme:
   n_votes: votes needed to approve/reject a pending post
   remove_after_h: number of hours after wich pending posts will be automatically by /clean_pending
   reset_on_load: whether or not the database should reset every time the bot launches. USE CAREFULLY
+  tag: whether or not the bot should tag the admins or just write their usernames
 
 test:
   api_hash: hash of the telegram app used for testing
