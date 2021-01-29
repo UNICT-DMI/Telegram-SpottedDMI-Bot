@@ -3,8 +3,8 @@ Callback_data format: <callback_family>_<callback_name>,[arg]"""
 from typing import List
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 from modules.data.meme_data import MemeData
+from modules.utils import REACTION
 
-REACTION = {'0': "👎", '1': "👍", '2': "🤣", '3': "😡", '4': "🥰"}
 
 def get_confirm_kb() -> InlineKeyboardMarkup:
     """Generates the InlineKeyboard to confirm the creation of the post
@@ -78,14 +78,15 @@ def get_vote_kb() -> InlineKeyboardMarkup:
     Returns:
         InlineKeyboardMarkup: new inline keyboard
     """
-    return InlineKeyboardMarkup(
-        [[InlineKeyboardButton(f"{REACTION['1']} 0", callback_data="meme_vote,1"),
-          InlineKeyboardButton(f"{REACTION['0']} 0", callback_data="meme_vote,0")],
-         [
-             InlineKeyboardButton(f"{REACTION['2']} 0", callback_data="meme_vote,2"),
-             InlineKeyboardButton(f"{REACTION['3']} 0", callback_data="meme_vote,3"),
-             InlineKeyboardButton(f"{REACTION['4']} 0", callback_data="meme_vote,4"),
-         ]])
+    return InlineKeyboardMarkup([[
+        InlineKeyboardButton(f"{REACTION['1']} 0", callback_data="meme_vote,1"),
+        InlineKeyboardButton(f"{REACTION['0']} 0", callback_data="meme_vote,0")
+    ],
+                                 [
+                                     InlineKeyboardButton(f"{REACTION['2']} 0", callback_data="meme_vote,2"),
+                                     InlineKeyboardButton(f"{REACTION['3']} 0", callback_data="meme_vote,3"),
+                                     InlineKeyboardButton(f"{REACTION['4']} 0", callback_data="meme_vote,4"),
+                                 ]])
 
 
 def update_approve_kb(keyboard: List[List[InlineKeyboardButton]],
@@ -127,10 +128,10 @@ def update_vote_kb(keyboard: List[List[InlineKeyboardButton]], c_message_id: int
     Returns:
         InlineKeyboardMarkup: updated inline keyboard
     """
-    keyboard[0][0].text = f"👍 {MemeData.get_published_votes(c_message_id, channel_id, vote='1')}"
-    keyboard[0][1].text = f"👎 {MemeData.get_published_votes(c_message_id, channel_id, vote='0')}"
+    keyboard[0][0].text = f"{REACTION['1']} {MemeData.get_published_votes(c_message_id, channel_id, vote='1')}"
+    keyboard[0][1].text = f"{REACTION['0']} {MemeData.get_published_votes(c_message_id, channel_id, vote='0')}"
     if len(keyboard) > 1:  # to keep support for older published memes
-        keyboard[1][0].text = f"🤣 {MemeData.get_published_votes(c_message_id, channel_id, vote='2')}"
-        keyboard[1][1].text = f"😡 {MemeData.get_published_votes(c_message_id, channel_id, vote='3')}"
-        keyboard[1][2].text = f"🥰 {MemeData.get_published_votes(c_message_id, channel_id, vote='4')}"
+        keyboard[1][0].text = f"{REACTION['2']} {MemeData.get_published_votes(c_message_id, channel_id, vote='2')}"
+        keyboard[1][1].text = f"{REACTION['3']} {MemeData.get_published_votes(c_message_id, channel_id, vote='3')}"
+        keyboard[1][2].text = f"{REACTION['4']} {MemeData.get_published_votes(c_message_id, channel_id, vote='4')}"
     return InlineKeyboardMarkup(keyboard)

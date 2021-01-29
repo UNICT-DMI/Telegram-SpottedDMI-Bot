@@ -161,6 +161,28 @@ class MemeData():
                               where_args=(g_message_id, group_id))
 
     @staticmethod
+    def cancel_pending_meme(user_id: int) -> tuple:
+        """Removes a post that is still pending if the user so desires
+
+        Args:
+            user_id (int): id of the user that made the post
+
+        Returns:
+            tuple: if a pending post was deleted, returns its id and the admin group id, return None otherwise
+        """
+        result_row = DbManager.select_from(select='g_message_id, group_id',
+                                           table_name='pending_meme',
+                                           where='user_id = %s',
+                                           where_args=(user_id, ))
+
+        if len(result_row) == 0:  # there was no pending meme
+            return None, None
+        else:
+            result_row = result_row[0]
+            MemeData.remove_pending_meme(g_message_id=result_row['g_message_id'], group_id=result_row['group_id'])
+            return result_row['g_message_id'], result_row['group_id']
+
+    @staticmethod
     def insert_published_post(channel_message: Message):
         """Inserts a new post in the table of pending posts
 

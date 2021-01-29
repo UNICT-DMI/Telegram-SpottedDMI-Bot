@@ -8,6 +8,7 @@ meme:
   n_votes: 1
   remove_after_h: 12
   reset_on_load: false
+  tag: false
 test:
   api_hash: ''
   api_id: -1

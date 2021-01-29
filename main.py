@@ -29,7 +29,8 @@ def add_commands(up: Updater):
     commands = [
         BotCommand("start", "presentazione iniziale del bot"),
         BotCommand("spot", "inizia a spottare"),
-        BotCommand("cancel", "interrompe lo spot e resetta il bot"),
+        BotCommand("cancel ",
+                   "annulla la procedura in corso e cancella l'ultimo spot inviato, se non è ancora stato pubblicato"),
         BotCommand("help ", "funzionamento e scopo del bot"),
         BotCommand("rules ", "regole da tenere a mente"),
         BotCommand("stats", "visualizza statistiche sugli spot"),
@@ -47,6 +48,18 @@ def add_handlers(dp: Dispatcher):
     if config_map['debug']['local_log']:  # add MessageHandler only if log_message is enabled
         dp.add_handler(MessageHandler(Filters.all, log_message), 1)
 
+    # Conversation handler
+    dp.add_handler(
+        ConversationHandler(entry_points=[CommandHandler("spot", post_cmd)],
+                            states={
+                                STATE['posting']: [MessageHandler(~Filters.command, post_msg)],
+                                STATE['confirm']: [CallbackQueryHandler(meme_callback, pattern=r"^meme_confirm\.*")]
+                            },
+                            fallbacks=[
+                                CommandHandler("cancel", cancel_cmd),
+                            ],
+                            allow_reentry=False))
+
     # Command handlers
     dp.add_handler(CommandHandler("start", start_cmd))
     dp.add_handler(CommandHandler("help", help_cmd))
@@ -55,24 +68,14 @@ def add_handlers(dp: Dispatcher):
     dp.add_handler(CommandHandler("settings", settings_cmd))
     dp.add_handler(CommandHandler("sban", sban_cmd))
     dp.add_handler(CommandHandler("clean_pending", clean_pending_cmd))
+    dp.add_handler(CommandHandler("cancel", cancel_cmd))  # it must be after the conversation handler's 'cancel'
 
-    # Conversation handler
-    dp.add_handler(
-        ConversationHandler(entry_points=[CommandHandler("spot", post_cmd)],
-                            states={
-                                STATE['posting']: [MessageHandler(~Filters.command, post_msg)],
-                                STATE['confirm']: [CallbackQueryHandler(meme_callback, pattern=r"meme_confirm_\.*")]
-                            },
-                            fallbacks=[
-                                CommandHandler("cancel", cancel_cmd),
-                            ],
-                            allow_reentry=False))
     # MessageHandler
     dp.add_handler(MessageHandler(Filters.reply & Filters.regex(r"^/ban$"), ban_cmd))
     dp.add_handler(MessageHandler(Filters.reply & Filters.regex(r"^/reply"), reply_cmd))
 
     # Callback handlers
-    dp.add_handler(CallbackQueryHandler(meme_callback, pattern=r"^meme_\.*"))
+    dp.add_handler(CallbackQueryHandler(meme_callback, pattern=r"^meme_[^(confirm)]\.*"))
     dp.add_handler(CallbackQueryHandler(stats_callback, pattern=r"^stats_\.*"))
 
     if config_map['meme']['comments']:

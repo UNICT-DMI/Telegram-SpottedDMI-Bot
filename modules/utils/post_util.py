@@ -83,7 +83,6 @@ def send_post_to(message: Message, bot: Bot, destination: str, user_id: int = No
         logger.error("Sending the post on send_post_to: %s", e)
         return None
 
-
     if destination == "admin":  # insert the post among the pending ones
         MemeData.insert_pending_post(user_message=message, admin_message=post_message)
     elif destination == "channel":  # insert the post among the published ones and show the credtit...
@@ -140,9 +139,10 @@ def show_admins_votes(chat_id: int, message_id: int, bot: Bot, approve: bool):
     """
     admins = MemeData.get_list_admin_votes(g_message_id=message_id, group_id=chat_id, vote=approve)
     text = "Approvato da:\n" if approve else "Rifiutato da:\n"
+    tag = '@' if config_map['meme']['tag'] else ''
     for admin in admins:
         username = bot.get_chat(admin).username
-        text += f"@{username}\n" if username else f"{bot.get_chat(admin).first_name}\n"
+        text += f"{tag}{username}\n" if username else f"{bot.get_chat(admin).first_name}\n"
 
     bot.edit_message_reply_markup(chat_id=chat_id, message_id=message_id, reply_markup=None)
     bot.send_message(chat_id=chat_id, text=text, reply_to_message_id=message_id)
