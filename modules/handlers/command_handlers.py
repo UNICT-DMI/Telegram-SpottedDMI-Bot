@@ -11,6 +11,7 @@ from modules.utils.info_util import get_message_info, check_message_type
 from modules.utils.post_util import send_post_to
 from modules.utils.keyboard_util import get_confirm_kb, get_settings_kb, get_stats_kb
 
+
 # region cmd
 def start_cmd(update: Update, context: CallbackContext):
     """Handles the /start command.
@@ -208,7 +209,7 @@ def clean_pending_cmd(update: Update, context: CallbackContext):
 
 def cancel_cmd(update: Update, context: CallbackContext) -> int:
     """Handles the /cancel command.
-    Exit from the post pipeline
+    Exits from the post pipeline and removes the eventual pending post of the user
 
     Args:
         update (Update): update event
@@ -218,10 +219,15 @@ def cancel_cmd(update: Update, context: CallbackContext) -> int:
         int: next state of the conversation
     """
     info = get_message_info(update, context)
+    if update.message.chat.type != "private":  # you can only cancel a post with a private message
+        return STATE['end']
     g_message_id, group_id = MemeData.cancel_pending_meme(user_id=info['sender_id'])
     if g_message_id is not None:
-        info['bot'].delete_message(chat_id=group_id, message_id=g_message_id)
-    info['bot'].send_message(chat_id=info['chat_id'], text="Post annullato")
+        try:
+            info['bot'].send_message(chat_id=info['chat_id'], text="Post annullato")
+            info['bot'].delete_message(chat_id=group_id, message_id=g_message_id)
+        except (BadRequest, Unauthorized) as e:
+            logger.warning("Deleting a post on /cancel: %s", e)
     return STATE['end']
 
 
