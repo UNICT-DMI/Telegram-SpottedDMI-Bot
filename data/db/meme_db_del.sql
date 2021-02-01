@@ -14,3 +14,5 @@ DROP TABLE IF EXISTS banned_users
 DROP TABLE IF EXISTS command_list
 -----
 DROP TABLE IF EXISTS log_message
+-----
+DROP TABLE IF EXISTS spot_report

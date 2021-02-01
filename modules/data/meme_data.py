@@ -196,6 +196,73 @@ class MemeData():
                               values=(channel_id, c_message_id))
 
     @staticmethod
+    def set_post_report(user_id: int, c_message_id: int, channel_id: int) -> bool:
+        """Adds the report of the user on a specific post
+
+        Args:
+            user_id (int): id of the user that reported
+            c_message_id (int): id of the post in question in the channel
+            channel_id (int): id of the channel
+
+        Returns:
+            bool: whether the vote was added or removed
+        """
+        current_report = MemeData.get_post_report(user_id, c_message_id, channel_id)
+        report_added = True
+        if current_report is None:  # there isn't a report yet
+            DbManager.insert_into(table_name="spot_report",
+                                  columns=("user_id", "c_message_id", "channel_id"),
+                                  values=(user_id, c_message_id, channel_id))
+        else:  # the user has reported in past
+            report_added = False
+
+        return report_added
+
+    @staticmethod
+    def get_post_report(user_id: int, c_message_id: int, channel_id: int) -> Optional[str]:
+        """Gets the report of a specific user on a published post
+
+        Args:
+            user_id (int): id of the user that voted
+            c_message_id (int): id of the post in question in the channel
+            channel_id (int): id of the channel
+
+        Returns:
+            Optional[str]: value of the vote or None if a vote was not yet made
+        """
+
+        report = DbManager.select_from(select="*",
+                                     table_name="spot_report",
+                                     where="user_id = %s and c_message_id = %s and channel_id = %s",
+                                     where_args=(user_id, c_message_id, channel_id))
+
+        if len(report) == 0:  # the vote is not present
+            return None
+        return report[0]
+
+    @staticmethod
+    def get_last_post_report(user_id: int, channel_id: int) -> Optional[str]:
+        """Gets the last report of a specific user on a published post
+
+        Args:
+            user_id (int): id of the user that reported
+            c_message_id (int): id of the post in question in the channel
+            channel_id (int): id of the channel
+
+        Returns:
+            Optional[str]: value of the vote or None if a vote was not yet made
+        """
+
+        report = DbManager.select_from(select="c_message_id",
+                                     table_name="spot_report",
+                                     where="user_id = %s and channel_id = %s",
+                                     where_args=(user_id, channel_id))
+
+        if len(report) == 0:  # the vote is not present
+            return None
+        return report[0]['c_message_id']
+
+    @staticmethod
     def set_user_vote(user_id: int, c_message_id: int, channel_id: int, vote: str) -> bool:
         """Adds the vote of the user on a specific post, or update the existing vote, if needed
 

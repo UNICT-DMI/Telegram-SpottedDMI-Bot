@@ -14,7 +14,7 @@ from modules.debug.log_manager import log_message
 from modules.data.data_reader import config_map
 # handlers
 from modules.handlers.command_handlers import STATE, start_cmd, help_cmd, settings_cmd, post_cmd, ban_cmd, reply_cmd,\
-    clean_pending_cmd, post_msg, rules_cmd, sban_cmd, cancel_cmd, stats_cmd, forwarded_post_msg
+    clean_pending_cmd, post_msg, rules_cmd, sban_cmd, cancel_cmd, stats_cmd, forwarded_post_msg, report_post
 from modules.handlers.callback_handlers import meme_callback, stats_callback
 from modules.handlers.job_handlers import clean_pending_job
 # endregion
@@ -60,6 +60,17 @@ def add_handlers(dp: Dispatcher):
                             ],
                             allow_reentry=False))
 
+    dp.add_handler(
+        ConversationHandler(entry_points=[CallbackQueryHandler(meme_callback, 
+                                                                pattern=r"^meme_report_[^(confirm)]\.*")],
+                            states={
+                                STATE['reporting_spot']: [MessageHandler(~Filters.command, report_post)],
+                            },
+                            fallbacks=[
+                                CommandHandler("cancel", cancel_cmd)
+                            ],
+                            allow_reentry=False,
+                            per_chat=False))
     # Command handlers
     dp.add_handler(CommandHandler("start", start_cmd))
     dp.add_handler(CommandHandler("help", help_cmd))
