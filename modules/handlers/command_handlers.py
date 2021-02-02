@@ -10,6 +10,7 @@ from modules.data.meme_data import MemeData
 from modules.utils.info_util import get_message_info, check_message_type
 from modules.utils.post_util import send_post_to
 from modules.utils.keyboard_util import get_confirm_kb, get_settings_kb, get_stats_kb
+from datetime import datetime
 
 # region cmd
 def start_cmd(update: Update, context: CallbackContext):
@@ -323,7 +324,104 @@ def report_post(update: Update, context: CallbackContext) -> int:
                                 message_id=abusive_message_id)
 
     info['bot'].sendMessage(chat_id=chat_id, text="🚨🚨 SEGNALAZIONE 🚨🚨\n\n" + info['text'])
+    info['bot'].send_message(chat_id=info['chat_id'],
+                            text="Gli admins verificheranno quanto accaduto. Grazie per la collaborazione!")
 
     return STATE['end']
 
 # endregion
+
+# region report user
+
+def report_cmd(update: Update, context: CallbackContext) -> int:
+    """Handles the reply to the key "Report".
+    Checks the message the user wants to report
+
+    Args:
+        update (Update): update event
+        context (CallbackContext): context passed by the handler
+
+    Returns:
+        int: next state of the conversation
+    """
+    info = get_message_info(update, context)
+    if update.message.chat.type != "private":  # you can only post with a private message
+        info['bot'].send_message(
+            chat_id=info['chat_id'],
+            text="Non puoi usare quest comando ora\nChatta con @Spotted_DMI_bot in privato",
+        )
+        return STATE['end']
+
+    user_report = MemeData.get_last_user_report(user_id=info['sender_id'])
+    if user_report and user_report['is_sent']:
+        delta_time = datetime.now() - datetime.strptime(user_report['message_date'], "%Y-%m-%d %H:%M:%S.%f")
+        delta_minutes = delta_time.total_seconds()/60
+        remain_minutes = int(config_map['report_wait_mins'] - delta_minutes)
+        info['bot'].send_message(chat_id=info['chat_id'], text=f"Aspetta {remain_minutes} minuti.")
+        return STATE['end']
+
+    info['bot'].send_message(chat_id=info['chat_id'], text="Invia l'username di chi vuoi segnalare. Es. @massimobene")
+
+    return STATE['reporting_user']
+
+def report_user_msg(update: Update, context: CallbackContext) -> int:
+    """Handles the reply to the /report command after sent the @username.
+    Checks the the user wants to report, and goes to ask the reason
+
+    Args:
+        update (Update): update event
+        context (CallbackContext): context passed by the handler
+
+    Returns:
+        int: next state of the conversation
+    """
+    info = get_message_info(update, context)
+    if not check_message_type(update.message) or not info['text'].startswith('@') or info['text'].find(' ') != -1:  # the type is NOT supported
+        info['bot'].send_message(
+            chat_id=info['chat_id'],
+            text="Questo tipo di messaggio non è supportato\nÈ consentito solo username telegram. Puoi annullare il processo con /cancel")
+        return STATE['reporting_user']
+    
+    MemeData.set_user_report(user_id=info['sender_id'], evil_username=info['text'], is_sent=False)
+
+    info['bot'].send_message(
+        chat_id=info['chat_id'],
+        text="Scrivi il motivo della tua segnalazione.\n" +
+            f"Cerca di essere esaustivo, potrai inviare un altro report dopo {config_map['report_wait_mins']} minuti.\nPuoi annullare il processo con /cancel")
+
+    return STATE['sending_user_report']
+
+def report_user_sent_msg(update: Update, context: CallbackContext) -> int:
+    """Handles the reply to the /report command after sent the reason.
+    Checks the the user wants to report, and goes to final step
+
+    Args:
+        update (Update): update event
+        context (CallbackContext): context passed by the handler
+
+    Returns:
+        int: next state of the conversation
+    """
+    info = get_message_info(update, context)
+    if not check_message_type(update.message):  # the type is NOT supported
+        info['bot'].send_message(
+            chat_id=info['chat_id'],
+            text="Questo tipo di messaggio non è supportato\nÈ consentito solo testo, stikers, immagini, audio, video o poll\n\
+                Invia il post che vuoi pubblicare\nPuoi annullare il processo con /cancel")
+        return STATE['sending_user_report']
+    
+    user_report = MemeData.get_last_user_report(user_id=info['sender_id'])
+    
+    MemeData.set_user_report(user_id=info['sender_id'], evil_username=user_report['evil_username'], is_sent=True)
+
+    chat_id = config_map['meme']['group_id'] # should be admin group
+    info['bot'].sendMessage(chat_id=chat_id, text="🚨🚨 SEGNALAZIONE 🚨🚨\n\n" +
+                                            "Username: " + user_report['evil_username']+ "\n\n" +
+                                            info['text'])
+    
+    info['bot'].send_message(
+        chat_id=info['chat_id'],
+        text="Gli admins verificheranno quanto accaduto. Grazie per la collaborazione!")
+
+    return STATE['end']
+# end region

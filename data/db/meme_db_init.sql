@@ -56,7 +56,15 @@ CREATE TABLE IF NOT EXISTS spot_report
   PRIMARY KEY (user_id, c_message_id, channel_id),
   FOREIGN KEY (c_message_id, channel_id) REFERENCES published_meme (c_message_id, channel_id) ON DELETE CASCADE ON UPDATE CASCADE
 );
-
+-----
+CREATE TABLE IF NOT EXISTS user_report
+(
+  user_id BIGINT NOT NULL,
+  evil_username VARCHAR(32) NOT NULL,
+  message_date TIMESTAMP,
+  is_sent BOOLEAN,
+  PRIMARY KEY (user_id, evil_username, message_date)
+);
 /*
 CREATE VIEW approved AS
     SELECT COUNT(is_upvote) as number, a_group_id, a_message_id 

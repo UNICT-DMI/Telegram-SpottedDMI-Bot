@@ -14,7 +14,8 @@ from modules.debug.log_manager import log_message
 from modules.data.data_reader import config_map
 # handlers
 from modules.handlers.command_handlers import STATE, start_cmd, help_cmd, settings_cmd, post_cmd, ban_cmd, reply_cmd,\
-    clean_pending_cmd, post_msg, rules_cmd, sban_cmd, cancel_cmd, stats_cmd, forwarded_post_msg, report_post
+    clean_pending_cmd, post_msg, rules_cmd, sban_cmd, cancel_cmd, stats_cmd, forwarded_post_msg, report_post, report_cmd, \
+    report_user_msg, report_user_sent_msg
 from modules.handlers.callback_handlers import meme_callback, stats_callback
 from modules.handlers.job_handlers import clean_pending_job
 # endregion
@@ -55,10 +56,18 @@ def add_handlers(dp: Dispatcher):
                                 STATE['posting']: [MessageHandler(~Filters.command, post_msg)],
                                 STATE['confirm']: [CallbackQueryHandler(meme_callback, pattern=r"^meme_confirm\.*")]
                             },
-                            fallbacks=[
-                                CommandHandler("cancel", cancel_cmd),
-                            ],
+                            fallbacks=[CommandHandler("cancel", cancel_cmd)],
                             allow_reentry=False))
+    
+    dp.add_handler(
+    ConversationHandler(entry_points=[CommandHandler("report", report_cmd)],
+                        states={
+                            STATE['reporting_user']: [MessageHandler(~Filters.command, report_user_msg)],
+                            STATE['reporting_user_reason']: [MessageHandler(~Filters.command, report_user_msg)],
+                            STATE['sending_user_report']: [MessageHandler(~Filters.command, report_user_sent_msg)]
+                        },
+                        fallbacks=[CommandHandler("cancel", cancel_cmd)],
+                        allow_reentry=False))
 
     dp.add_handler(
         ConversationHandler(entry_points=[CallbackQueryHandler(meme_callback, 
@@ -66,9 +75,7 @@ def add_handlers(dp: Dispatcher):
                             states={
                                 STATE['reporting_spot']: [MessageHandler(~Filters.command, report_post)],
                             },
-                            fallbacks=[
-                                CommandHandler("cancel", cancel_cmd)
-                            ],
+                            fallbacks=[CommandHandler("cancel", cancel_cmd)],
                             allow_reentry=False,
                             per_chat=False))
     # Command handlers

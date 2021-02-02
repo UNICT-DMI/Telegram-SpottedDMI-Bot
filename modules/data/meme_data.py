@@ -194,6 +194,73 @@ class MemeData():
         DbManager.insert_into(table_name="published_meme",
                               columns=("channel_id", "c_message_id"),
                               values=(channel_id, c_message_id))
+    
+    @staticmethod
+    def set_user_report(user_id: int, evil_username: int, is_sent: bool) -> bool:
+        """Adds the report of the user on a specific post
+
+        Args:
+            user_id (int): id of the user that reported
+            evil_username (str): username of reported user
+            is_sent (bool): status of report
+
+        Returns:
+            bool: whether the vote was added or removed
+        """
+        current_report = MemeData.get_user_report(user_id, evil_username)
+        report_added = True
+        if current_report is not None:
+            DbManager.delete_from(table_name="user_report",
+                                  where="user_id = %s",
+                                  where_args=(user_id,))
+        
+        DbManager.insert_into(table_name="user_report",
+                      columns=("user_id", "evil_username", "message_date", "is_sent"),
+                      values=(user_id, evil_username, datetime.now(), is_sent))
+
+        return True
+
+    @staticmethod
+    def get_user_report(user_id: int, evil_username: str) -> Optional[str]:
+        """Gets the report of a specific user on a published post
+
+        Args:
+            user_id (int): id of the user that reported
+            evil_username (str): username of reported user
+
+        Returns:
+            Optional[str]: value of the report or None if a report was not yet made
+        """
+
+        report = DbManager.select_from(select="*",
+                                     table_name="user_report",
+                                     where="user_id = %s and evil_username = %s",
+                                     where_args=(user_id, evil_username))
+
+        if len(report) == 0:  # the vote is not present
+            return None
+        return report[0]
+    
+    @staticmethod
+    def get_last_user_report(user_id: int) -> Optional[str]:
+        """Gets the last report of a specific user on a published post
+
+        Args:
+            user_id (int): id of the user that reported
+            evil_user_id (int): id of the post in question in the channel
+
+        Returns:
+            Optional[str]: value of the report or None if a report was not yet made
+        """
+
+        report = DbManager.select_from(select="*",
+                                     table_name="user_report",
+                                     where="user_id = %s",
+                                     where_args=(user_id,))
+
+        if len(report) == 0:  # the vote is not present
+            return None
+        return report[0]
 
     @staticmethod
     def set_post_report(user_id: int, c_message_id: int, channel_id: int) -> bool:
@@ -205,7 +272,7 @@ class MemeData():
             channel_id (int): id of the channel
 
         Returns:
-            bool: whether the vote was added or removed
+            bool: whether the report was added or removed
         """
         current_report = MemeData.get_post_report(user_id, c_message_id, channel_id)
         report_added = True
@@ -223,12 +290,12 @@ class MemeData():
         """Gets the report of a specific user on a published post
 
         Args:
-            user_id (int): id of the user that voted
+            user_id (int): id of the user that reported
             c_message_id (int): id of the post in question in the channel
             channel_id (int): id of the channel
 
         Returns:
-            Optional[str]: value of the vote or None if a vote was not yet made
+            Optional[str]: value of the report or None if a report was not yet made
         """
 
         report = DbManager.select_from(select="*",
@@ -250,7 +317,7 @@ class MemeData():
             channel_id (int): id of the channel
 
         Returns:
-            Optional[str]: value of the vote or None if a vote was not yet made
+            Optional[str]: last message id reported
         """
 
         report = DbManager.select_from(select="c_message_id",
