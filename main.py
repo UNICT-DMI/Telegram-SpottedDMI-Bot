@@ -33,6 +33,7 @@ def add_commands(up: Updater):
         BotCommand("cancel ",
                    "annulla la procedura in corso e cancella l'ultimo spot inviato, se non è ancora stato pubblicato"),
         BotCommand("help ", "funzionamento e scopo del bot"),
+        BotCommand("report", "segnala un utente"),
         BotCommand("rules ", "regole da tenere a mente"),
         BotCommand("stats", "visualizza statistiche sugli spot"),
         BotCommand("settings", "cambia le impostazioni di privacy")
