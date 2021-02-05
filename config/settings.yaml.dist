@@ -17,4 +17,3 @@ test:
   tag: ''
   token: ''
 token: ''
-report_wait_mins: 30
