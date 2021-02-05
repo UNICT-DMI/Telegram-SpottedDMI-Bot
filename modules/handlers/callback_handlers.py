@@ -45,11 +45,12 @@ def meme_callback(update: Update, context: CallbackContext) -> int:
     data = info['data'].split(",")
     try:
         # call the correct function
-        if(len(data) > 1): # is reaction
+        if(len(data) > 1):  # is reaction
             message_text, reply_markup, output = globals()[f'{data[0][5:]}_callback'](
                 info, data[1])
-        else: # is report
-            message_text, reply_markup, output = globals()[f'{data[0][5:]}_callback'](info)
+        else:  # is report
+            message_text, reply_markup, output = globals()[
+                f'{data[0][5:]}_callback'](info)
 
     except KeyError as e:
         message_text = reply_markup = output = None
@@ -115,7 +116,8 @@ def settings_callback(info: dict, arg: str) -> Tuple[str, InlineKeyboardMarkup, 
         Tuple[str, InlineKeyboardMarkup, int]: text and replyMarkup that make up the reply, new conversation state
     """
     if arg == "anonimo":  # if the user wants to be anonym
-        if MemeData.become_anonym(user_id=info['sender_id']):  # if the user was already anonym
+        # if the user was already anonym
+        if MemeData.become_anonym(user_id=info['sender_id']):
             text = "Sei già anonimo"
         else:
             text = "La tua preferenza è stata aggiornata\n"\
@@ -161,8 +163,8 @@ def approve_yes_callback(info: dict, arg: None) -> Tuple[str, InlineKeyboardMark
         published_post = send_post_to(
             message=message, bot=info['bot'], destination="channel")
 
-        
-        if config_map['meme']['comments']: # if comments are enabled, save the user_id, so the user can be credited
+        # if comments are enabled, save the user_id, so the user can be credited
+        if config_map['meme']['comments']:
             info['bot_data'][f"{published_post.chat_id},{published_post.message_id}"] = user_id
 
         try:
@@ -264,8 +266,7 @@ def report_spot_callback(info: dict) -> Tuple[str, InlineKeyboardMarkup, int]:
     abusive_message_id = info['message']['reply_to_message']['message_id']
 
     was_added = MemeData.get_post_report(user_id=info['sender_id'],
-                                         c_message_id=abusive_message_id,
-                                         channel_id=info['chat_id'])
+                                         c_message_id=abusive_message_id)
     if was_added:
         info['bot'].answerCallbackQuery(
             callback_query_id=info['query_id'], text=f"Hai già segnalato questo spot.")
@@ -281,9 +282,7 @@ def report_spot_callback(info: dict) -> Tuple[str, InlineKeyboardMarkup, int]:
     info['bot'].send_message(chat_id=info['sender_id'],
                              text="Scrivi il motivo della segnalazione del post, altrimenti digita /cancel")
 
-    MemeData.set_post_report(user_id=info['sender_id'],
-                             c_message_id=abusive_message_id,
-                             channel_id=info['chat_id'])
+    info['user_data']['current_post_reported'] = abusive_message_id
 
     return None, None, STATE['reporting_spot']
 

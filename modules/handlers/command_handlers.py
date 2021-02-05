@@ -12,7 +12,6 @@ from modules.utils.post_util import send_post_to
 from modules.utils.keyboard_util import get_confirm_kb, get_settings_kb, get_stats_kb
 from datetime import datetime
 
-
 # region cmd
 def start_cmd(update: Update, context: CallbackContext):
     """Handles the /start command.
@@ -224,11 +223,9 @@ def cancel_cmd(update: Update, context: CallbackContext) -> int:
         return STATE['end']
     g_message_id, group_id = MemeData.cancel_pending_meme(user_id=info['sender_id'])
     if g_message_id is not None:
-        try:
-            info['bot'].send_message(chat_id=info['chat_id'], text="Post annullato")
-            info['bot'].delete_message(chat_id=group_id, message_id=g_message_id)
-        except (BadRequest, Unauthorized) as e:
-            logger.warning("Deleting a post on /cancel: %s", e)
+        info['bot'].delete_message(chat_id=group_id, message_id=g_message_id)
+    info['bot'].send_message(chat_id=info['chat_id'], text="Operazione annullata")
+
     return STATE['end']
 
 
@@ -323,13 +320,15 @@ def report_post(update: Update, context: CallbackContext) -> int:
     chat_id = config_map['meme']['group_id'] # should be admin group
     channel_id = config_map['meme']['channel_group_id'] # should be users group
 
-    abusive_message_id = MemeData.get_last_post_report(user_id=info['sender_id'], channel_id=channel_id)
+    abusive_message_id = context.user_data['current_post_reported']
+
+    MemeData.set_post_report(user_id=info['sender_id'], c_message_id=abusive_message_id)
 
     info['bot'].forward_message(chat_id=chat_id,
                                 from_chat_id=channel_id,
                                 message_id=abusive_message_id)
-
-    info['bot'].sendMessage(chat_id=chat_id, text="🚨🚨 SEGNALAZIONE 🚨🚨\n\n" + info['text'])
+    info['bot'].sendMessage(chat_id=chat_id, 
+                            text="🚨🚨 SEGNALAZIONE 🚨🚨\n\n" + info['text'])
     info['bot'].send_message(chat_id=info['chat_id'],
                             text="Gli admins verificheranno quanto accaduto. Grazie per la collaborazione!")
 

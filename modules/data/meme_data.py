@@ -239,34 +239,33 @@ class MemeData():
         return report[0]
 
     @staticmethod
-    def set_post_report(user_id: int, c_message_id: int, channel_id: int) -> bool:
+    def set_post_report(user_id: int, c_message_id: int) -> bool:
         """Adds the report of the user on a specific post
 
         Args:
             user_id (int): id of the user that reported
             c_message_id (int): id of the post in question in the channel
-            channel_id (int): id of the channel
 
         Returns:
             bool: whether the report was added or removed
         """
-        current_report = MemeData.get_post_report(user_id, c_message_id, channel_id)
+        current_report = MemeData.get_post_report(user_id, c_message_id)
+
         if current_report:  # there is a report
             return False
         
         DbManager.insert_into(table_name="spot_report",
-                                columns=("user_id", "c_message_id", "channel_id"),
-                                values=(user_id, c_message_id, channel_id))            
+                                columns=("user_id", "c_message_id"),
+                                values=(user_id, c_message_id))            
         return True
 
     @staticmethod
-    def get_post_report(user_id: int, c_message_id: int, channel_id: int) -> Optional[str]:
+    def get_post_report(user_id: int, c_message_id: int) -> Optional[str]:
         """Gets the report of a specific user on a published post
 
         Args:
             user_id (int): id of the user that reported
             c_message_id (int): id of the post in question in the channel
-            channel_id (int): id of the channel
 
         Returns:
             Optional[str]: value of the report or None if a report was not yet made
@@ -274,21 +273,20 @@ class MemeData():
 
         report = DbManager.select_from(select="*",
                                      table_name="spot_report",
-                                     where="user_id = %s and c_message_id = %s and channel_id = %s",
-                                     where_args=(user_id, c_message_id, channel_id))
+                                     where="user_id = %s and c_message_id = %s",
+                                     where_args=(user_id, c_message_id))
 
         if len(report) == 0:  # the vote is not present
             return None
         return report[0]
 
     @staticmethod
-    def get_last_post_report(user_id: int, channel_id: int) -> Optional[str]:
+    def get_last_post_report(user_id: int) -> Optional[str]:
         """Gets the last report of a specific user on a published post
 
         Args:
             user_id (int): id of the user that reported
             c_message_id (int): id of the post in question in the channel
-            channel_id (int): id of the channel
 
         Returns:
             Optional[str]: last message id reported
@@ -296,8 +294,8 @@ class MemeData():
 
         report = DbManager.select_from(select="c_message_id",
                                      table_name="spot_report",
-                                     where="user_id = %s and channel_id = %s",
-                                     where_args=(user_id, channel_id),
+                                     where="user_id = %s",
+                                     where_args=(user_id,),
                                      order_by="ROWID DESC")
 
         if len(report) == 0:  # the vote is not present
