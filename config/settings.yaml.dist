@@ -9,6 +9,7 @@ meme:
   remove_after_h: 12
   reset_on_load: false
   tag: false
+  report_wait_mins: 30
 test:
   api_hash: ''
   api_id: -1
@@ -16,3 +17,4 @@ test:
   tag: ''
   token: ''
 token: ''
+report_wait_mins: 30

@@ -261,7 +261,7 @@ def report_spot_callback(info: dict) -> Tuple[str, InlineKeyboardMarkup, int]:
         Tuple[str, InlineKeyboardMarkup, int]: text and replyMarkup that make up the reply, new conversation state
     """
 
-    abusive_message_id = info['message_id'] - 1  # not sure if it is safe
+    abusive_message_id = info['message']['reply_to_message']['message_id']
 
     was_added = MemeData.get_post_report(user_id=info['sender_id'],
                                          c_message_id=abusive_message_id,

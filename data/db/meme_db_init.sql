@@ -62,7 +62,6 @@ CREATE TABLE IF NOT EXISTS user_report
   user_id BIGINT NOT NULL,
   evil_username VARCHAR(32) NOT NULL,
   message_date TIMESTAMP,
-  is_sent BOOLEAN,
   PRIMARY KEY (user_id, evil_username, message_date)
 );
 /*
