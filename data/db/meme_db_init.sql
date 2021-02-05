@@ -47,6 +47,23 @@ CREATE TABLE IF NOT EXISTS banned_users
   user_id BIGINT NOT NULL,
   PRIMARY KEY (user_id)
 );
+-----
+CREATE TABLE IF NOT EXISTS spot_report
+(
+  user_id BIGINT NOT NULL,
+  c_message_id BIGINT NOT NULL,
+  channel_id BIGINT NOT NULL,
+  PRIMARY KEY (user_id, c_message_id, channel_id),
+  FOREIGN KEY (c_message_id, channel_id) REFERENCES published_meme (c_message_id, channel_id) ON DELETE CASCADE ON UPDATE CASCADE
+);
+-----
+CREATE TABLE IF NOT EXISTS user_report
+(
+  user_id BIGINT NOT NULL,
+  target_username VARCHAR(32) NOT NULL,
+  message_date TIMESTAMP,
+  PRIMARY KEY (user_id, target_username, message_date)
+);
 /*
 CREATE VIEW approved AS
     SELECT COUNT(is_upvote) as number, a_group_id, a_message_id 

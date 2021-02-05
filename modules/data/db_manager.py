@@ -73,7 +73,7 @@ class DbManager():
         conn.close()
 
     @staticmethod
-    def select_from(table_name: str, select: str = "*", where: str = "", where_args: tuple = None) -> list:
+    def select_from(table_name: str, select: str = "*", where: str = "", where_args: tuple = None, order_by: str = "") -> list:
         """Returns the result of a SELECT select FROM table_name [WHERE where (with where_args)]
 
         Args:
@@ -89,23 +89,30 @@ class DbManager():
 
         where = where.replace("%s", "?")
 
+        sql_query = f"SELECT {select} FROM {table_name} "
+
         if where:
+            sql_query += f"WHERE {where} "  
+            if order_by:
+                sql_query += f"ORDER BY {order_by} "               
             if where_args:
                 try:
-                    cur.execute(f"SELECT {select} FROM {table_name} WHERE {where}", where_args)
+                    cur.execute(sql_query, where_args)
                 except sqlite3.Error as e:
                     logger.error(str(e))
             else:
                 try:
-                    cur.execute(f"SELECT {select} FROM {table_name} WHERE {where}")
+                    cur.execute(sql_query)
                 except sqlite3.Error as e:
                     logger.error(str(e))
         else:
+            if order_by:
+                sql_query += f"ORDER BY {order_by} "  
             try:
-                cur.execute(f"SELECT {select} FROM {table_name}")
+                cur.execute(sql_query)
             except sqlite3.Error as e:
                 logger.error(str(e))
-
+        
         query_result = cur.fetchall()
         cur.close()
         conn.close()
