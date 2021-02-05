@@ -285,7 +285,6 @@ def report_spot_callback(info: dict) -> Tuple[str, InlineKeyboardMarkup, int]:
                              c_message_id=abusive_message_id,
                              channel_id=info['chat_id'])
 
-    keyboard = info['reply_markup'].inline_keyboard
     return None, None, STATE['reporting_spot']
 
 

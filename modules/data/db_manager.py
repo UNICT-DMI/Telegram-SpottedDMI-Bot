@@ -92,9 +92,9 @@ class DbManager():
         sql_query = f"SELECT {select} FROM {table_name} "
 
         if where:
-            sql_query += f"WHERE {where} "
+            sql_query += f"WHERE {where} "  
             if order_by:
-                sql_query += f"ORDER BY {order_by}"      
+                sql_query += f"ORDER BY {order_by} "               
             if where_args:
                 try:
                     cur.execute(sql_query, where_args)
@@ -106,6 +106,8 @@ class DbManager():
                 except sqlite3.Error as e:
                     logger.error(str(e))
         else:
+            if order_by:
+                sql_query += f"ORDER BY {order_by} "  
             try:
                 cur.execute(sql_query)
             except sqlite3.Error as e:

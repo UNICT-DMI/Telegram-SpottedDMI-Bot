@@ -384,7 +384,7 @@ def report_user_msg(update: Update, context: CallbackContext) -> int:
             text="Questo tipo di messaggio non è supportato\nÈ consentito solo username telegram. Puoi annullare il processo con /cancel")
         return STATE['reporting_user']
 
-    MemeData.set_user_report(user_id=info['sender_id'], evil_username=info['text'])
+    context.user_data['current_report_target'] = info['text']
     context.user_data['report_sent'] = False
 
     info['bot'].send_message(
@@ -413,14 +413,14 @@ def report_user_sent_msg(update: Update, context: CallbackContext) -> int:
                 Invia il post che vuoi pubblicare\nPuoi annullare il processo con /cancel")
         return STATE['sending_user_report']
     
-    user_report = MemeData.get_user_report(user_id=info['sender_id'])
+    target_username = context.user_data['current_report_target']
     
-    MemeData.set_user_report(user_id=info['sender_id'], evil_username=user_report['evil_username'])
+    MemeData.set_user_report(user_id=info['sender_id'], target_username=target_username)
     context.user_data['report_sent'] = True
 
     chat_id = config_map['meme']['group_id'] # should be admin group
     info['bot'].sendMessage(chat_id=chat_id, text="🚨🚨 SEGNALAZIONE 🚨🚨\n\n" +
-                                            "Username: " + user_report['evil_username']+ "\n\n" +
+                                            "Username: " + target_username+ "\n\n" +
                                             info['text'])
     info['bot'].send_message(
         chat_id=info['chat_id'],

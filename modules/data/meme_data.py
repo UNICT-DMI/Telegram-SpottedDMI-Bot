@@ -196,38 +196,38 @@ class MemeData():
                               values=(channel_id, c_message_id))
     
     @staticmethod
-    def set_user_report(user_id: int, evil_username: int) -> None:
+    def set_user_report(user_id: int, target_username: str) -> None:
         """Adds the report of the user on a specific post
 
         Args:
             user_id (int): id of the user that reported
-            evil_username (str): username of reported user
+            target_username (str): username of reported user
         """
         DbManager.delete_from(table_name="user_report",
                               where="user_id = %s",
                               where_args=(user_id,))
         
         DbManager.insert_into(table_name="user_report",
-                      columns=("user_id", "evil_username", "message_date"),
-                      values=(user_id, evil_username, datetime.now()))
+                      columns=("user_id", "target_username", "message_date"),
+                      values=(user_id, target_username, datetime.now()))
 
     @staticmethod
-    def get_user_report(user_id: int, evil_username: str = None) -> Optional[str]:
+    def get_user_report(user_id: int, target_username: str = None) -> Optional[str]:
         """Gets the report of a specific user on a published post
 
         Args:
             user_id (int): id of the user that reported
-            evil_username (str): username of reported user
+            target_username (str): username of reported user
 
         Returns:
             Optional[str]: value of the report or None if a report was not yet made
         """
 
-        if evil_username:
+        if target_username:
             report = DbManager.select_from(select="*",
                                         table_name="user_report",
-                                        where="user_id = %s and evil_username = %s",
-                                        where_args=(user_id, evil_username))
+                                        where="user_id = %s and target_username = %s",
+                                        where_args=(user_id, target_username))
         else:
             report = DbManager.select_from(select="*",
                                         table_name="user_report",

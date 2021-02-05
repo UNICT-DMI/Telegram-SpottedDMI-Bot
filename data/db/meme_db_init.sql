@@ -60,9 +60,9 @@ CREATE TABLE IF NOT EXISTS spot_report
 CREATE TABLE IF NOT EXISTS user_report
 (
   user_id BIGINT NOT NULL,
-  evil_username VARCHAR(32) NOT NULL,
+  target_username VARCHAR(32) NOT NULL,
   message_date TIMESTAMP,
-  PRIMARY KEY (user_id, evil_username, message_date)
+  PRIMARY KEY (user_id, target_username, message_date)
 );
 /*
 CREATE VIEW approved AS
