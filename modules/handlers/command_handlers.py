@@ -309,6 +309,9 @@ def report_post(update: Update, context: CallbackContext) -> int:
     """
     info = get_message_info(update, context)
 
+    if update.message.chat.type != "private":
+        return STATE['reporting_spot']
+
     if not check_message_type(update.message):  # the type is NOT supported
         info['bot'].send_message(
             chat_id=info['chat_id'],
