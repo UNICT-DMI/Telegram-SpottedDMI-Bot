@@ -250,6 +250,7 @@ class MemeData():
             bool: whether the report was added or removed
         """
         current_report = MemeData.get_post_report(user_id, c_message_id)
+        
         if current_report:  # there is a report
             return False
         
