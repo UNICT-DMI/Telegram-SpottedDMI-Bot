@@ -234,7 +234,7 @@ class MemeData():
         return report[0]
 
     @staticmethod
-    def set_post_report(user_id: id, c_message_id: int, admin_message: Message) -> bool:
+    def set_post_report(user_id: int, c_message_id: int, admin_message: Message) -> bool:
         """Adds the report of the user on a specific post
 
         Args:
