@@ -52,6 +52,8 @@ CREATE TABLE IF NOT EXISTS spot_report
 (
   user_id BIGINT NOT NULL,
   c_message_id BIGINT NOT NULL,
+  g_message_id BIGINT NOT NULL,
+  group_id BIGINT NOT NULL,
   PRIMARY KEY (user_id, c_message_id),
   FOREIGN KEY (c_message_id) REFERENCES published_meme (c_message_id) ON DELETE CASCADE ON UPDATE CASCADE
 );
@@ -60,7 +62,9 @@ CREATE TABLE IF NOT EXISTS user_report
 (
   user_id BIGINT NOT NULL,
   target_username VARCHAR(32) NOT NULL,
-  message_date TIMESTAMP,
+  g_message_id BIGINT NOT NULL,
+  group_id BIGINT NOT NULL,
+  message_date TIMESTAMP NOT NULL,
   PRIMARY KEY (user_id, target_username, message_date)
 );
 /*

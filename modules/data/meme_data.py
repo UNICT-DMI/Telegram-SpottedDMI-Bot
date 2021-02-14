@@ -20,7 +20,7 @@ class MemeData():
 
         Args:
             user_message (Message): message sent by the user that contains the post
-            admin_message (Message): message recieved in the admin group that references the post
+            admin_message (Message): message received in the admin group that references the post
         """
         user_id = user_message.from_user.id
         u_message_id = user_message.message_id
@@ -196,67 +196,67 @@ class MemeData():
                               values=(channel_id, c_message_id))
     
     @staticmethod
-    def set_user_report(user_id: int, target_username: str) -> None:
+    def set_user_report(user_id: int, target_username: str, admin_message: Message) -> None:
         """Adds the report of the user on a specific post
 
         Args:
             user_id (int): id of the user that reported
             target_username (str): username of reported user
+            admin_message (Message): message received in the admin group that references the report
         """
-        DbManager.delete_from(table_name="user_report",
-                              where="user_id = %s",
-                              where_args=(user_id,))
-        
+ 
+        g_message_id = admin_message.message_id
+        group_id = admin_message.chat_id
+
         DbManager.insert_into(table_name="user_report",
-                      columns=("user_id", "target_username", "message_date"),
-                      values=(user_id, target_username, datetime.now()))
+                            columns=("user_id", "target_username", "message_date", "group_id", "g_message_id"),
+                            values=(user_id, target_username, datetime.now(), group_id, g_message_id))
 
     @staticmethod
-    def get_user_report(user_id: int, target_username: str = None) -> Optional[str]:
+    def get_user_report(user_id: int) -> Optional[str]:
         """Gets the report of a specific user on a published post
 
         Args:
             user_id (int): id of the user that reported
-            target_username (str): username of reported user
 
         Returns:
             Optional[str]: value of the report or None if a report was not yet made
         """
 
-        if target_username:
-            report = DbManager.select_from(select="*",
-                                        table_name="user_report",
-                                        where="user_id = %s and target_username = %s",
-                                        where_args=(user_id, target_username))
-        else:
-            report = DbManager.select_from(select="*",
-                                        table_name="user_report",
-                                        where="user_id = %s",
-                                        where_args=(user_id,))
+        report = DbManager.select_from(select="*",
+                                    table_name="user_report",
+                                    where="user_id = %s",
+                                    where_args=(user_id,),
+                                    order_by="ROWID DESC")
 
         if len(report) == 0:  # the vote is not present
             return None
         return report[0]
 
     @staticmethod
-    def set_post_report(user_id: int, c_message_id: int) -> bool:
+    def set_post_report(user_id: int, c_message_id: int, admin_message: Message) -> bool:
         """Adds the report of the user on a specific post
 
         Args:
             user_id (int): id of the user that reported
             c_message_id (int): id of the post in question in the channel
+            admin_message (Message): message received in the admin group that references the report
 
         Returns:
             bool: whether the report was added or removed
         """
-        current_report = MemeData.get_post_report(user_id, c_message_id)
 
+        g_message_id = admin_message.message_id
+        group_id = admin_message.chat_id
+
+        current_report = MemeData.get_post_report(user_id, c_message_id)
+        
         if current_report:  # there is a report
             return False
-        
+                
         DbManager.insert_into(table_name="spot_report",
-                                columns=("user_id", "c_message_id"),
-                                values=(user_id, c_message_id))            
+                                columns=("user_id", "c_message_id", "group_id", "g_message_id"),
+                                values=(user_id, c_message_id, group_id, g_message_id))            
         return True
 
     @staticmethod
@@ -388,6 +388,23 @@ class MemeData():
                                              where_args=(g_message_id, group_id))
         if list_user_id:
             return list_user_id[0]['user_id']
+        
+        list_user_id = DbManager.select_from(select="user_id",
+                                            table_name="spot_report",
+                                            where="g_message_id = %s and group_id = %s",
+                                            where_args=(g_message_id, group_id))
+
+        if list_user_id:
+            return list_user_id[0]['user_id']
+        
+        list_user_id = DbManager.select_from(select="user_id",
+                                            table_name="user_report",
+                                            where="g_message_id = %s and group_id = %s",
+                                            where_args=(g_message_id, group_id))
+
+        if list_user_id:
+            return list_user_id[0]['user_id']
+
         return None
 
     @staticmethod

@@ -185,10 +185,10 @@ def reply_cmd(update: Update, context: CallbackContext):
             return
         try:
             info['bot'].send_message(chat_id=user_id,
-                                     text="COMUNICAZIONE DEGLI ADMIN SUL TUO ULTIMO POST:\n" + info['text'][7:].strip())
+                                     text="COMUNICAZIONE DEGLI ADMIN SUL TUO POST O REPORT:\n" + info['text'][7:].strip())
             info['bot'].send_message(chat_id=info['chat_id'],
                                  text="L'utente ha ricevuto il seguente messaggio:\n"\
-                                    "COMUNICAZIONE DEGLI ADMIN SUL TUO ULTIMO POST:\n" + info['text'][7:].strip(),
+                                    "COMUNICAZIONE DEGLI ADMIN SUL TUO POST O REPORT:\n" + info['text'][7:].strip(),
                                  reply_to_message_id=g_message_id)
         except (BadRequest, Unauthorized) as e:
             logger.warning("Notifying the user on /reply: %s", e)
@@ -225,7 +225,6 @@ def cancel_cmd(update: Update, context: CallbackContext) -> int:
     if g_message_id is not None:
         info['bot'].delete_message(chat_id=group_id, message_id=g_message_id)
     info['bot'].send_message(chat_id=info['chat_id'], text="Operazione annullata")
-
     return STATE['end']
 
 
@@ -310,6 +309,9 @@ def report_post(update: Update, context: CallbackContext) -> int:
     """
     info = get_message_info(update, context)
 
+    if update.message.chat.type != "private":
+        return STATE['reporting_spot']
+
     if not check_message_type(update.message):  # the type is NOT supported
         info['bot'].send_message(
             chat_id=info['chat_id'],
@@ -320,17 +322,17 @@ def report_post(update: Update, context: CallbackContext) -> int:
     chat_id = config_map['meme']['group_id'] # should be admin group
     channel_id = config_map['meme']['channel_group_id'] # should be users group
 
-    abusive_message_id = context.user_data['current_post_reported']
-
-    MemeData.set_post_report(user_id=info['sender_id'], c_message_id=abusive_message_id)
+    target_message_id = context.user_data['current_post_reported']
 
     info['bot'].forward_message(chat_id=chat_id,
                                 from_chat_id=channel_id,
-                                message_id=abusive_message_id)
-    info['bot'].sendMessage(chat_id=chat_id, 
-                            text="🚨🚨 SEGNALAZIONE 🚨🚨\n\n" + info['text'])
+                                message_id=target_message_id)
+    admin_message = info['bot'].sendMessage(chat_id=chat_id, 
+                                            text="🚨🚨 SEGNALAZIONE 🚨🚨\n\n" + info['text'])
     info['bot'].send_message(chat_id=info['chat_id'],
                             text="Gli admins verificheranno quanto accaduto. Grazie per la collaborazione!")
+
+    MemeData.set_post_report(user_id=info['sender_id'], c_message_id=target_message_id, admin_message=admin_message)
 
     return STATE['end']
 
@@ -420,16 +422,18 @@ def report_user_sent_msg(update: Update, context: CallbackContext) -> int:
     
     target_username = context.user_data['current_report_target']
     
-    MemeData.set_user_report(user_id=info['sender_id'], target_username=target_username)
     context.user_data['report_sent'] = True
 
     chat_id = config_map['meme']['group_id'] # should be admin group
-    info['bot'].sendMessage(chat_id=chat_id, text="🚨🚨 SEGNALAZIONE 🚨🚨\n\n" +
+    admin_message = info['bot'].sendMessage(chat_id=chat_id, text="🚨🚨 SEGNALAZIONE 🚨🚨\n\n" +
                                             "Username: " + target_username+ "\n\n" +
                                             info['text'])
+    
     info['bot'].send_message(
         chat_id=info['chat_id'],
         text="Gli admins verificheranno quanto accaduto. Grazie per la collaborazione!")
+
+    MemeData.set_user_report(user_id=info['sender_id'], target_username=target_username, admin_message=admin_message)
 
     return STATE['end']
 # end region
