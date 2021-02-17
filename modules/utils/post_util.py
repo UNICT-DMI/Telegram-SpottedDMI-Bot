@@ -4,8 +4,7 @@ from telegram import Message, Bot, InlineKeyboardMarkup
 from telegram.error import BadRequest, Unauthorized
 from modules.debug.log_manager import logger
 from modules.data.data_reader import config_map, read_md
-from modules.data.meme_data import MemeData
-from modules.data import PendingPost, PublishedPost
+from modules.data import PendingPost, PublishedPost, User
 from modules.utils.keyboard_util import get_approve_kb, get_vote_kb
 
 
@@ -117,7 +116,7 @@ def send_helper_message(user_id: int,
         Message: helper message
     """
     sign = anonym_name()
-    if MemeData.is_credited(user_id=user_id):  # the user wants to be credited
+    if User(user_id).is_credited:  # the user wants to be credited
         username = bot.getChat(user_id).username
         if username:
             sign = "@" + username

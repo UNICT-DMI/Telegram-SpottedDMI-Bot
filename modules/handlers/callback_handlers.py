@@ -7,7 +7,7 @@ from modules.handlers import STATE
 from modules.debug.log_manager import logger
 from modules.data.data_reader import config_map
 from modules.data.meme_data import MemeData
-from modules.data import PendingPost, PublishedPost
+from modules.data import PendingPost, PublishedPost, User
 from modules.utils.info_util import get_callback_info
 from modules.utils.keyboard_util import REACTION, update_approve_kb, update_vote_kb, get_stats_kb
 from modules.utils.post_util import send_post_to, show_admins_votes
@@ -116,16 +116,17 @@ def settings_callback(info: dict, arg: str) -> Tuple[str, InlineKeyboardMarkup, 
     Returns:
         Tuple[str, InlineKeyboardMarkup, int]: text and replyMarkup that make up the reply, new conversation state
     """
+    user = User(info['sender_id'])
     if arg == "anonimo":  # if the user wants to be anonym
         # if the user was already anonym
-        if MemeData.become_anonym(user_id=info['sender_id']):
+        if user.become_anonym():
             text = "Sei già anonimo"
         else:
             text = "La tua preferenza è stata aggiornata\n"\
                 "Ora i tuoi post saranno anonimi"
 
     elif arg == "credit":  # if the user wants to be credited
-        if MemeData.become_credited(user_id=info['sender_id']):
+        if user.become_credited():
             text = "Sei già creditato nei post\n"
         else:
             text = "La tua preferenza è stata aggiornata\n"

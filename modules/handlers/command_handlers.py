@@ -8,7 +8,7 @@ from modules.handlers.job_handlers import clean_pending_job
 from modules.debug.log_manager import logger
 from modules.data.data_reader import read_md, config_map
 from modules.data.meme_data import MemeData
-from modules.data import PendingPost
+from modules.data import PendingPost, User
 from modules.utils.info_util import get_message_info, check_message_type
 from modules.utils.post_util import send_post_to
 from modules.utils.keyboard_util import get_confirm_kb, get_settings_kb, get_stats_kb
@@ -99,6 +99,7 @@ def post_cmd(update: Update, context: CallbackContext) -> int:
         int: next state of the conversation
     """
     info = get_message_info(update, context)
+    user = User(info['sender_id'])
     if update.message.chat.type != "private":  # you can only post with a private message
         info['bot'].send_message(
             chat_id=info['chat_id'],
@@ -106,12 +107,11 @@ def post_cmd(update: Update, context: CallbackContext) -> int:
         )
         return STATE['end']
 
-    if MemeData.is_banned(user_id=info['sender_id']):  # you are banned
+    if user.is_banned:  # you are banned
         info['bot'].send_message(chat_id=info['chat_id'], text="Sei stato bannato 😅")
         return STATE['end']
 
-    # have already a post in pending
-    if PendingPost.is_pending(user_id=info['sender_id']):
+    if user.is_pending:  # tou have already a post in pending
         info['bot'].send_message(chat_id=info['chat_id'], text="Hai già un post in approvazione 🧐")
         return STATE['end']
 
@@ -131,12 +131,13 @@ def ban_cmd(update: Update, context: CallbackContext):
     if info['chat_id'] == config_map['meme']['group_id']:  # you have to be in the admin group
         g_message_id = update.message.reply_to_message.message_id
         pending_post = PendingPost.from_group(group_id=info['chat_id'], g_message_id=g_message_id)
+        user = User(pending_post.user_id)
 
         if pending_post is None:
             info['bot'].send_message(chat_id=info['chat_id'], text="Per bannare qualcuno, rispondi al suo post con /ban")
             return
 
-        MemeData.ban_user(user_id=pending_post.user_id)
+        user.ban()
         pending_post.delete_post()
         info['bot'].edit_message_reply_markup(chat_id=info['chat_id'], message_id=g_message_id)
         info['bot'].send_message(chat_id=info['chat_id'], text="L'utente è stato bannato")
@@ -157,7 +158,7 @@ def sban_cmd(update: Update, context: CallbackContext):
             return
         for user_id in context.args:
             # the sban was unsuccesful (maybe the user id was not found)
-            if not MemeData.sban_user(user_id=user_id):
+            if not User(user_id).sban():
                 break
         else:
             info['bot'].send_message(chat_id=info['chat_id'], text="Sban effettuato")
