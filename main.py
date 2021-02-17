@@ -72,7 +72,7 @@ def add_handlers(dp: Dispatcher):
 
     dp.add_handler(
         ConversationHandler(entry_points=[CallbackQueryHandler(meme_callback,
-                                                                pattern=r"^meme_report_[^(confirm)]\.*")],
+                                                                pattern=r"^meme_report\.*")],
                             states={
                                 STATE['reporting_spot']: [MessageHandler(~Filters.command, report_post)],
                             },
@@ -94,7 +94,7 @@ def add_handlers(dp: Dispatcher):
     dp.add_handler(MessageHandler(Filters.reply & Filters.regex(r"^/reply"), reply_cmd))
 
     # Callback handlers
-    dp.add_handler(CallbackQueryHandler(meme_callback, pattern=r"^meme_[^(confirm)]\.*"))
+    dp.add_handler(CallbackQueryHandler(meme_callback, pattern=r"^meme_\.*"))
     dp.add_handler(CallbackQueryHandler(stats_callback, pattern=r"^stats_\.*"))
 
     if config_map['meme']['comments']:

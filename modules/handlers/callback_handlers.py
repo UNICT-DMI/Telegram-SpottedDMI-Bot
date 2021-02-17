@@ -7,7 +7,7 @@ from modules.handlers import STATE
 from modules.debug.log_manager import logger
 from modules.data.data_reader import config_map
 from modules.data.meme_data import MemeData
-from modules.data import PendingPost, PublishedPost, User
+from modules.data import PendingPost, PublishedPost, Report, User
 from modules.utils.info_util import get_callback_info
 from modules.utils.keyboard_util import REACTION, update_approve_kb, update_vote_kb, get_stats_kb
 from modules.utils.post_util import send_post_to, show_admins_votes
@@ -261,9 +261,9 @@ def report_spot_callback(info: dict) -> Tuple[str, InlineKeyboardMarkup, int]:
 
     abusive_message_id = info['message']['reply_to_message']['message_id']
 
-    was_added = MemeData.get_post_report(user_id=info['sender_id'],
-                                         c_message_id=abusive_message_id)
-    if was_added:
+    report = Report.get_post_report(user_id=info['sender_id'],
+                                    c_message_id=abusive_message_id)
+    if report is not None:
         info['bot'].answerCallbackQuery(
             callback_query_id=info['query_id'], text="Hai già segnalato questo spot.")
         return None, None, STATE['end']

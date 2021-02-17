@@ -1,5 +1,4 @@
 """Handles the execution of commands by the bot"""
-from datetime import datetime
 from telegram import Update, ParseMode
 from telegram.ext import CallbackContext
 from telegram.error import BadRequest, Unauthorized
@@ -8,7 +7,7 @@ from modules.handlers.job_handlers import clean_pending_job
 from modules.debug.log_manager import logger
 from modules.data.data_reader import read_md, config_map
 from modules.data.meme_data import MemeData
-from modules.data import PendingPost, User
+from modules.data import PendingPost, Report, User
 from modules.utils.info_util import get_message_info, check_message_type
 from modules.utils.post_util import send_post_to
 from modules.utils.keyboard_util import get_confirm_kb, get_settings_kb, get_stats_kb
@@ -340,7 +339,7 @@ def report_post(update: Update, context: CallbackContext) -> int:
     info['bot'].send_message(chat_id=info['chat_id'],
                             text="Gli admins verificheranno quanto accaduto. Grazie per la collaborazione!")
 
-    MemeData.set_post_report(user_id=info['sender_id'], c_message_id=target_message_id, admin_message=admin_message)
+    Report.create_post_report(user_id=info['sender_id'], c_message_id=target_message_id, admin_message=admin_message)
 
     return STATE['end']
 
@@ -366,14 +365,13 @@ def report_cmd(update: Update, context: CallbackContext) -> int:
             text="Non puoi usare quest comando ora\nChatta con @Spotted_DMI_bot in privato")
         return STATE['end']
 
-    user_report = MemeData.get_user_report(user_id=info['sender_id'])
+    user_report = Report.get_last_user_report(user_id=info['sender_id'])
 
-    if user_report:
-        delta_time = datetime.now() - datetime.strptime(user_report['message_date'], "%Y-%m-%d %H:%M:%S.%f")
-        delta_minutes = delta_time.total_seconds()/60
-        remain_minutes = int(config_map['meme']['report_wait_mins'] - delta_minutes)
+    if user_report is not None:
+        minutes_enlapsed = user_report.minutes_passed
+        remain_minutes = int(config_map['meme']['report_wait_mins'] - minutes_enlapsed)
 
-        if context.user_data['report_sent'] and remain_minutes > 0:
+        if remain_minutes > 0:
             info['bot'].send_message(chat_id=info['chat_id'], text=f"Aspetta {remain_minutes} minuti.")
             return STATE['end']
 
@@ -398,16 +396,17 @@ def report_user_msg(update: Update, context: CallbackContext) -> int:
     or info['text'].find(' ') != -1:  # the type is NOT supported
         info['bot'].send_message(
             chat_id=info['chat_id'],
-            text="Questo tipo di messaggio non è supportato\nÈ consentito solo username telegram. Puoi annullare il processo con /cancel")
+            text="Questo tipo di messaggio non è supportato\n"\
+                "È consentito solo username telegram. Puoi annullare il processo con /cancel")
         return STATE['reporting_user']
 
     context.user_data['current_report_target'] = info['text']
-    context.user_data['report_sent'] = False
 
     info['bot'].send_message(
         chat_id=info['chat_id'],
-        text="Scrivi il motivo della tua segnalazione.\n" +
-            f"Cerca di essere esaustivo, potrai inviare un altro report dopo {config_map['meme']['report_wait_mins']} minuti.\nPuoi annullare il processo con /cancel")
+        text="Scrivi il motivo della tua segnalazione.\n"\
+            f"Cerca di essere esaustivo, potrai inviare un altro report dopo {config_map['meme']['report_wait_mins']} minuti.\n"\
+            "Puoi annullare il processo con /cancel")
 
     return STATE['sending_user_report']
 
@@ -432,8 +431,6 @@ def report_user_sent_msg(update: Update, context: CallbackContext) -> int:
 
     target_username = context.user_data['current_report_target']
 
-    context.user_data['report_sent'] = True
-
     chat_id = config_map['meme']['group_id'] # should be admin group
     admin_message = info['bot'].sendMessage(chat_id=chat_id, text="🚨🚨 SEGNALAZIONE 🚨🚨\n\n" +
                                             "Username: " + target_username+ "\n\n" +
@@ -443,7 +440,7 @@ def report_user_sent_msg(update: Update, context: CallbackContext) -> int:
         chat_id=info['chat_id'],
         text="Gli admins verificheranno quanto accaduto. Grazie per la collaborazione!")
 
-    MemeData.set_user_report(user_id=info['sender_id'], target_username=target_username, admin_message=admin_message)
+    Report.create_user_report(user_id=info['sender_id'], target_username=target_username, admin_message=admin_message)
 
     return STATE['end']
 # end region
