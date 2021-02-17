@@ -45,7 +45,7 @@ def meme_callback(update: Update, context: CallbackContext) -> int:
     data = info['data'].split(",")
     try:
         # call the correct function
-        if(len(data) > 1):  # is reaction
+        if len(data) > 1:  # is reaction
             message_text, reply_markup, output = globals()[f'{data[0][5:]}_callback'](
                 info, data[1])
         else:  # is report
@@ -269,11 +269,11 @@ def report_spot_callback(info: dict) -> Tuple[str, InlineKeyboardMarkup, int]:
                                          c_message_id=abusive_message_id)
     if was_added:
         info['bot'].answerCallbackQuery(
-            callback_query_id=info['query_id'], text=f"Hai già segnalato questo spot.")
+            callback_query_id=info['query_id'], text="Hai già segnalato questo spot.")
         return None, None, STATE['end']
 
     info['bot'].answerCallbackQuery(
-        callback_query_id=info['query_id'], text=f"Segnala in privato tramite il bot.")
+        callback_query_id=info['query_id'], text="Segnala in privato tramite il bot.")
 
     info['bot'].forward_message(chat_id=info['sender_id'],
                                 from_chat_id=info['chat_id'],

@@ -1,4 +1,5 @@
 """Handles the execution of commands by the bot"""
+from datetime import datetime
 from telegram import Update, ParseMode
 from telegram.ext import CallbackContext
 from telegram.error import BadRequest, Unauthorized
@@ -10,7 +11,6 @@ from modules.data.meme_data import MemeData
 from modules.utils.info_util import get_message_info, check_message_type
 from modules.utils.post_util import send_post_to
 from modules.utils.keyboard_util import get_confirm_kb, get_settings_kb, get_stats_kb
-from datetime import datetime
 
 # region cmd
 def start_cmd(update: Update, context: CallbackContext):
@@ -318,7 +318,7 @@ def report_post(update: Update, context: CallbackContext) -> int:
             text="Questo tipo di messaggio non è supportato\nÈ consentito solo testo, stikers, immagini, audio, video o poll\n\
                 Invia il post che vuoi pubblicare\nPuoi annullare il processo con /cancel")
         return STATE['reporting_spot']
-    
+
     chat_id = config_map['meme']['group_id'] # should be admin group
     channel_id = config_map['meme']['channel_group_id'] # should be users group
 
@@ -327,7 +327,7 @@ def report_post(update: Update, context: CallbackContext) -> int:
     info['bot'].forward_message(chat_id=chat_id,
                                 from_chat_id=channel_id,
                                 message_id=target_message_id)
-    admin_message = info['bot'].sendMessage(chat_id=chat_id, 
+    admin_message = info['bot'].sendMessage(chat_id=chat_id,
                                             text="🚨🚨 SEGNALAZIONE 🚨🚨\n\n" + info['text'])
     info['bot'].send_message(chat_id=info['chat_id'],
                             text="Gli admins verificheranno quanto accaduto. Grazie per la collaborazione!")
@@ -385,7 +385,9 @@ def report_user_msg(update: Update, context: CallbackContext) -> int:
         int: next state of the conversation
     """
     info = get_message_info(update, context)
-    if not check_message_type(update.message) or not info['text'].startswith('@') or info['text'].find(' ') != -1:  # the type is NOT supported
+    if not check_message_type(update.message) \
+    or not info['text'].startswith('@') \
+    or info['text'].find(' ') != -1:  # the type is NOT supported
         info['bot'].send_message(
             chat_id=info['chat_id'],
             text="Questo tipo di messaggio non è supportato\nÈ consentito solo username telegram. Puoi annullare il processo con /cancel")
@@ -419,16 +421,16 @@ def report_user_sent_msg(update: Update, context: CallbackContext) -> int:
             text="Questo tipo di messaggio non è supportato\nÈ consentito solo testo, stikers, immagini, audio, video o poll\n\
                 Invia il post che vuoi pubblicare\nPuoi annullare il processo con /cancel")
         return STATE['sending_user_report']
-    
+
     target_username = context.user_data['current_report_target']
-    
+
     context.user_data['report_sent'] = True
 
     chat_id = config_map['meme']['group_id'] # should be admin group
     admin_message = info['bot'].sendMessage(chat_id=chat_id, text="🚨🚨 SEGNALAZIONE 🚨🚨\n\n" +
                                             "Username: " + target_username+ "\n\n" +
                                             info['text'])
-    
+
     info['bot'].send_message(
         chat_id=info['chat_id'],
         text="Gli admins verificheranno quanto accaduto. Grazie per la collaborazione!")

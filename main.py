@@ -59,7 +59,7 @@ def add_handlers(dp: Dispatcher):
                             },
                             fallbacks=[CommandHandler("cancel", cancel_cmd)],
                             allow_reentry=False))
-    
+
     dp.add_handler(
     ConversationHandler(entry_points=[CommandHandler("report", report_cmd)],
                         states={
@@ -71,7 +71,7 @@ def add_handlers(dp: Dispatcher):
                         allow_reentry=False))
 
     dp.add_handler(
-        ConversationHandler(entry_points=[CallbackQueryHandler(meme_callback, 
+        ConversationHandler(entry_points=[CallbackQueryHandler(meme_callback,
                                                                 pattern=r"^meme_report_[^(confirm)]\.*")],
                             states={
                                 STATE['reporting_spot']: [MessageHandler(~Filters.command, report_post)],

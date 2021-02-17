@@ -194,7 +194,7 @@ class MemeData():
         DbManager.insert_into(table_name="published_meme",
                               columns=("channel_id", "c_message_id"),
                               values=(channel_id, c_message_id))
-    
+
     @staticmethod
     def set_user_report(user_id: int, target_username: str, admin_message: Message) -> None:
         """Adds the report of the user on a specific post
@@ -204,7 +204,7 @@ class MemeData():
             target_username (str): username of reported user
             admin_message (Message): message received in the admin group that references the report
         """
- 
+
         g_message_id = admin_message.message_id
         group_id = admin_message.chat_id
 
@@ -250,13 +250,13 @@ class MemeData():
         group_id = admin_message.chat_id
 
         current_report = MemeData.get_post_report(user_id, c_message_id)
-        
+
         if current_report:  # there is a report
             return False
-                
+
         DbManager.insert_into(table_name="spot_report",
                                 columns=("user_id", "c_message_id", "group_id", "g_message_id"),
-                                values=(user_id, c_message_id, group_id, g_message_id))            
+                                values=(user_id, c_message_id, group_id, g_message_id))
         return True
 
     @staticmethod
@@ -388,7 +388,7 @@ class MemeData():
                                              where_args=(g_message_id, group_id))
         if list_user_id:
             return list_user_id[0]['user_id']
-        
+
         list_user_id = DbManager.select_from(select="user_id",
                                             table_name="spot_report",
                                             where="g_message_id = %s and group_id = %s",
@@ -396,7 +396,7 @@ class MemeData():
 
         if list_user_id:
             return list_user_id[0]['user_id']
-        
+
         list_user_id = DbManager.select_from(select="user_id",
                                             table_name="user_report",
                                             where="g_message_id = %s and group_id = %s",
