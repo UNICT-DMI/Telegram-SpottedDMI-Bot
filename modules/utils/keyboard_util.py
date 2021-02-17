@@ -82,12 +82,12 @@ def get_vote_kb() -> InlineKeyboardMarkup:
         InlineKeyboardButton(f"{REACTION['1']} 0", callback_data="meme_vote,1"),
         InlineKeyboardButton(f"{REACTION['0']} 0", callback_data="meme_vote,0")
     ],
-                                 [
-                                     InlineKeyboardButton(f"{REACTION['2']} 0", callback_data="meme_vote,2"),
-                                     InlineKeyboardButton(f"{REACTION['3']} 0", callback_data="meme_vote,3"),
-                                     InlineKeyboardButton(f"{REACTION['4']} 0", callback_data="meme_vote,4"),
-                                     InlineKeyboardButton("🚩 Report", callback_data="meme_report_spot")
-                                 ]])
+    [
+        InlineKeyboardButton(f"{REACTION['2']} 0", callback_data="meme_vote,2"),
+        InlineKeyboardButton(f"{REACTION['3']} 0", callback_data="meme_vote,3"),
+        InlineKeyboardButton(f"{REACTION['4']} 0", callback_data="meme_vote,4"),
+        InlineKeyboardButton("🚩 Report", callback_data="meme_report_spot")
+    ]])
 
 
 def update_approve_kb(keyboard: List[List[InlineKeyboardButton]],

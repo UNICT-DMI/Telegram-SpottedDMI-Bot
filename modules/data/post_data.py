@@ -1,15 +1,9 @@
 """Data management for the bot"""
 from typing import Optional, Tuple
 from modules.data.db_manager import DbManager
-from modules.data.data_reader import config_map
-
-if config_map['meme']['reset_on_load']:
-    DbManager.query_from_file("data", "db", "meme_db_del.sql")
-DbManager.query_from_file("data", "db", "meme_db_init.sql")
 
 
-# region db management
-class MemeData():
+class PostData():
     """Class that handles the management of persistent data fetch or manipulation in the meme bot
     """
     @staticmethod
@@ -24,23 +18,22 @@ class MemeData():
             Optional[int]: user_id, if found
         """
         list_user_id = DbManager.select_from(select="user_id",
-                                            table_name="spot_report",
-                                            where="g_message_id = %s and group_id = %s",
-                                            where_args=(g_message_id, group_id))
+                                             table_name="spot_report",
+                                             where="g_message_id = %s and group_id = %s",
+                                             where_args=(g_message_id, group_id))
 
         if list_user_id:
             return list_user_id[0]['user_id']
 
         list_user_id = DbManager.select_from(select="user_id",
-                                            table_name="user_report",
-                                            where="g_message_id = %s and group_id = %s",
-                                            where_args=(g_message_id, group_id))
+                                             table_name="user_report",
+                                             where="g_message_id = %s and group_id = %s",
+                                             where_args=(g_message_id, group_id))
 
         if list_user_id:
             return list_user_id[0]['user_id']
 
         return None
-
 
     @staticmethod
     def get_n_posts() -> int:
@@ -75,7 +68,7 @@ class MemeData():
         Returns:
             int: average number of votes
         """
-        avg = MemeData.get_n_votes(vote) / MemeData.get_n_posts()
+        avg = PostData.get_n_votes(vote) / PostData.get_n_posts()
         return round(avg, 2)
 
     @staticmethod

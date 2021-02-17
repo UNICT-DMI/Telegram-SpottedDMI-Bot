@@ -1,5 +1,5 @@
 """Users management"""
-from modules.data.meme_data import DbManager
+from modules.data.db_manager import DbManager
 from modules.data.pending_post import PendingPost
 
 
@@ -11,10 +11,10 @@ class User():
 
     @property
     def is_pending(self) -> bool:
-        """Checks if the user is banned or not
+        """Checks if the user has a post already pending or not
 
         Returns:
-            bool: whether the user is banned or not
+            bool: whether the user has a post already pending or not
         """
         if PendingPost.from_user(self.user_id):
             return True
@@ -32,9 +32,6 @@ class User():
     @property
     def is_credited(self) -> bool:
         """Checks if the user is in the credited list
-
-        Args:
-            user_id (int): id of the user to check
 
         Returns:
             bool: whether the user is to be credited or not

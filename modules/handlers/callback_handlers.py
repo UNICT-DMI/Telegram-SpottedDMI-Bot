@@ -6,8 +6,7 @@ from telegram.error import BadRequest, Unauthorized
 from modules.handlers import STATE
 from modules.debug.log_manager import logger
 from modules.data.data_reader import config_map
-from modules.data.meme_data import MemeData
-from modules.data import PendingPost, PublishedPost, Report, User
+from modules.data import PendingPost, PublishedPost, PostData, Report, User
 from modules.utils.info_util import get_callback_info
 from modules.utils.keyboard_util import REACTION, update_approve_kb, update_vote_kb, get_stats_kb
 from modules.utils.post_util import send_post_to, show_admins_votes
@@ -47,11 +46,9 @@ def meme_callback(update: Update, context: CallbackContext) -> int:
     try:
         # call the correct function
         if len(data) > 1:  # is reaction
-            message_text, reply_markup, output = globals()[f'{data[0][5:]}_callback'](
-                info, data[1])
+            message_text, reply_markup, output = globals()[f'{data[0][5:]}_callback'](info, data[1])
         else:  # is report
-            message_text, reply_markup, output = globals()[
-                f'{data[0][5:]}_callback'](info)
+            message_text, reply_markup, output = globals()[f'{data[0][5:]}_callback'](info)
 
     except KeyError as e:
         message_text = reply_markup = output = None
@@ -85,8 +82,7 @@ def confirm_callback(info: dict, arg: str) -> Tuple[str, InlineKeyboardMarkup, i
     """
     if arg == "yes":  # if the the user wants to publish the post
         user_message = info['message'].reply_to_message
-        admin_message = send_post_to(
-            message=user_message, bot=info['bot'], destination="admin")
+        admin_message = send_post_to(message=user_message, bot=info['bot'], destination="admin")
         if admin_message:
             text = "Il tuo post è in fase di valutazione\n"\
                 "Una volta pubblicato, lo potrai trovare su @Spotted_DMI"
@@ -161,8 +157,7 @@ def approve_yes_callback(info: dict, arg: None) -> Tuple[str, InlineKeyboardMark
     if n_approve >= config_map['meme']['n_votes']:
         message = info['message']
         user_id = pending_post.user_id
-        published_post = send_post_to(
-            message=message, bot=info['bot'], destination="channel")
+        published_post = send_post_to(message=message, bot=info['bot'], destination="channel")
 
         # if comments are enabled, save the user_id, so the user can be credited
         if config_map['meme']['comments']:
@@ -237,14 +232,13 @@ def vote_callback(info: dict, arg: str) -> Tuple[str, InlineKeyboardMarkup, int]
     was_added = publishedPost.set_user_vote(user_id=info['sender_id'], vote=arg)
 
     if was_added:
-        info['bot'].answerCallbackQuery(
-            callback_query_id=info['query_id'], text=f"Hai messo un {REACTION[arg]}")
+        info['bot'].answerCallbackQuery(callback_query_id=info['query_id'], text=f"Hai messo un {REACTION[arg]}")
     else:
-        info['bot'].answerCallbackQuery(
-            callback_query_id=info['query_id'], text=f"Hai tolto il {REACTION[arg]}")
+        info['bot'].answerCallbackQuery(callback_query_id=info['query_id'], text=f"Hai tolto il {REACTION[arg]}")
 
     keyboard = info['reply_markup'].inline_keyboard
     return None, update_vote_kb(keyboard=keyboard, published_post=publishedPost), None
+
 
 # endregion
 
@@ -261,19 +255,14 @@ def report_spot_callback(info: dict) -> Tuple[str, InlineKeyboardMarkup, int]:
 
     abusive_message_id = info['message']['reply_to_message']['message_id']
 
-    report = Report.get_post_report(user_id=info['sender_id'],
-                                    c_message_id=abusive_message_id)
+    report = Report.get_post_report(user_id=info['sender_id'], c_message_id=abusive_message_id)
     if report is not None:
-        info['bot'].answerCallbackQuery(
-            callback_query_id=info['query_id'], text="Hai già segnalato questo spot.")
+        info['bot'].answerCallbackQuery(callback_query_id=info['query_id'], text="Hai già segnalato questo spot.")
         return None, None, STATE['end']
 
-    info['bot'].answerCallbackQuery(
-        callback_query_id=info['query_id'], text="Segnala in privato tramite il bot.")
+    info['bot'].answerCallbackQuery(callback_query_id=info['query_id'], text="Segnala in privato tramite il bot.")
 
-    info['bot'].forward_message(chat_id=info['sender_id'],
-                                from_chat_id=info['chat_id'],
-                                message_id=abusive_message_id)
+    info['bot'].forward_message(chat_id=info['sender_id'], from_chat_id=info['chat_id'], message_id=abusive_message_id)
 
     info['bot'].send_message(chat_id=info['sender_id'],
                              text="Scrivi il motivo della segnalazione del post, altrimenti digita /cancel")
@@ -294,8 +283,7 @@ def stats_callback(update: Update, context: CallbackContext):
     # the callback data indicates the correct callback and the arg to pass to it separated by ,
     data = info['data'].split(",")
     try:
-        message_text = globals()[f'{data[0][6:]}_callback'](
-            data[1])  # call the function based on its name
+        message_text = globals()[f'{data[0][6:]}_callback'](data[1])  # call the function based on its name
     except KeyError as e:
         logger.error("stats_callback: %s", e)
         return
@@ -306,8 +294,7 @@ def stats_callback(update: Update, context: CallbackContext):
                                       text=message_text,
                                       reply_markup=get_stats_kb())
     else:  # remove the reply markup
-        info['bot'].edit_message_reply_markup(
-            chat_id=info['chat_id'], message_id=info['message_id'], reply_markup=None)
+        info['bot'].edit_message_reply_markup(chat_id=info['chat_id'], message_id=info['message_id'], reply_markup=None)
 
 
 # region handle stats_callback
@@ -322,10 +309,10 @@ def avg_callback(arg: str) -> str:
         str: text for the reply
     """
     if arg == "votes":
-        avg_votes = MemeData.get_avg()
+        avg_votes = PostData.get_avg()
         text = f"Gli spot ricevono in media {avg_votes} voti"
     else:
-        avg_votes = MemeData.get_avg(arg)
+        avg_votes = PostData.get_avg(arg)
         text = f"Gli spot ricevono in media {avg_votes} {REACTION[arg]}"
 
     return text
@@ -342,11 +329,11 @@ def max_callback(arg: str) -> str:
         str: text for the reply
     """
     if arg == "votes":
-        max_votes, message_id, channel_id = MemeData.get_max_id()
+        max_votes, message_id, channel_id = PostData.get_max_id()
         text = f"Lo spot con più voti ne ha {max_votes}\n"\
             f"Lo trovi a questo link: https://t.me/c/{channel_id[4:]}/{message_id}"
     else:
-        max_votes, message_id, channel_id = MemeData.get_max_id(arg)
+        max_votes, message_id, channel_id = PostData.get_max_id(arg)
         text = f"Lo spot con più {REACTION[arg]} ne ha {max_votes}\n" \
             f"Lo trovi a questo link: https://t.me/c/{channel_id[4:]}/{message_id}"
 
@@ -364,13 +351,13 @@ def tot_callback(arg: str) -> str:
         str: text for the reply
     """
     if arg == "posts":
-        n_posts = MemeData.get_n_posts()
+        n_posts = PostData.get_n_posts()
         text = f"Sono stati pubblicati {n_posts} spot nel canale fin'ora.\nPotresti ampliare questo numero..."
     elif arg == "votes":
-        n_votes = MemeData.get_n_votes()
+        n_votes = PostData.get_n_votes()
         text = f"Il totale dei voti ammonta a {n_votes}"
     else:
-        n_votes = MemeData.get_n_votes(arg)
+        n_votes = PostData.get_n_votes(arg)
         text = f"Il totale dei {REACTION[arg]} ammonta a {n_votes}"
 
     return text

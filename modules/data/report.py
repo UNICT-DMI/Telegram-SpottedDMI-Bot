@@ -1,7 +1,7 @@
 """Reports management"""
 from datetime import datetime
 from telegram import Message
-from modules.data.meme_data import DbManager
+from modules.data.db_manager import DbManager
 
 
 class Report():
@@ -62,7 +62,7 @@ class Report():
 
     @classmethod
     def create_user_report(cls, user_id: int, target_username: str, admin_message: Message):
-        """Adds the report of the user on a specific post
+        """Adds the report of the user targetting another user
 
         Args:
             user_id (int): id of the user that reported
@@ -70,7 +70,7 @@ class Report():
             admin_message (Message): message received in the admin group that references the report
 
         Returns:
-            Report: istance of the class or None if the report was not created
+            Report: istance of the class
         """
 
         g_message_id = admin_message.message_id
@@ -114,7 +114,7 @@ class Report():
 
     @classmethod
     def get_last_user_report(cls, user_id: int):
-        """Gets the report of a specific user on a published post
+        """Gets the last user report of a specific user
 
         Args:
             user_id (int): id of the user that reported
@@ -139,7 +139,7 @@ class Report():
 
     @classmethod
     def from_group(cls, group_id: int, g_message_id: int):
-        """Gets the report of a specific user on a published post
+        """Gets a report of any type related to the specified message in the admin group
 
         Args:
             group_id (int): id of the admin group

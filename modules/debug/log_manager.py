@@ -7,7 +7,7 @@ logger = logging.getLogger(__name__)
 logger.info("Logger enabled")
 
 
-def log_message(update, context):
+def log_message(update, context):  # pylint: disable=unused-argument
     """Log the message that caused the update
 
     Args:

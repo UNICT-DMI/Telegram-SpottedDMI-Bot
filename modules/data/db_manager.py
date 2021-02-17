@@ -81,6 +81,7 @@ class DbManager():
             select (str, optional): columns considered for the query. Defaults to "*".
             where (str, optional): where clause, with %s placeholders for the where_args. Defaults to "".
             where_args (tuple, optional): args used in the where clause. Defaults to None.
+            order_by (str, optional): order by clause. Defaults to "".
 
         Returns:
             list: rows from the select

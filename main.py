@@ -61,18 +61,17 @@ def add_handlers(dp: Dispatcher):
                             allow_reentry=False))
 
     dp.add_handler(
-    ConversationHandler(entry_points=[CommandHandler("report", report_cmd)],
-                        states={
-                            STATE['reporting_user']: [MessageHandler(~Filters.command, report_user_msg)],
-                            STATE['reporting_user_reason']: [MessageHandler(~Filters.command, report_user_msg)],
-                            STATE['sending_user_report']: [MessageHandler(~Filters.command, report_user_sent_msg)]
-                        },
-                        fallbacks=[CommandHandler("cancel", cancel_cmd)],
-                        allow_reentry=False))
+        ConversationHandler(entry_points=[CommandHandler("report", report_cmd)],
+                            states={
+                                STATE['reporting_user']: [MessageHandler(~Filters.command, report_user_msg)],
+                                STATE['reporting_user_reason']: [MessageHandler(~Filters.command, report_user_msg)],
+                                STATE['sending_user_report']: [MessageHandler(~Filters.command, report_user_sent_msg)]
+                            },
+                            fallbacks=[CommandHandler("cancel", cancel_cmd)],
+                            allow_reentry=False))
 
     dp.add_handler(
-        ConversationHandler(entry_points=[CallbackQueryHandler(meme_callback,
-                                                                pattern=r"^meme_report\.*")],
+        ConversationHandler(entry_points=[CallbackQueryHandler(meme_callback, pattern=r"^meme_report\.*")],
                             states={
                                 STATE['reporting_spot']: [MessageHandler(~Filters.command, report_post)],
                             },

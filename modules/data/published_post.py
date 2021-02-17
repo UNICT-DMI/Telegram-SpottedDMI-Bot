@@ -1,7 +1,7 @@
 """Published post management"""
 from typing import Optional
 from telegram import Message
-from modules.data.meme_data import DbManager
+from modules.data.db_manager import DbManager
 
 
 class PublishedPost():
@@ -30,7 +30,7 @@ class PublishedPost():
 
     @classmethod
     def from_channel(cls, channel_id: int, c_message_id: int):
-        """Retrieves a pending post from the info related to the channel
+        """Retrieves a published post from the info related to the channel
 
         Args:
             channel_id (int): id of the channel
@@ -95,7 +95,7 @@ class PublishedPost():
         return vote_added
 
     def get_votes(self, vote: str) -> int:
-        """Gets all the votes of a specific kind (upvote or downvote) on the post
+        """Gets all the votes of a specific kind on the post
 
         Args:
             vote (str): kind of vote you are looking for

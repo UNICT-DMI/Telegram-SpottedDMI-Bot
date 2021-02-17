@@ -2,7 +2,7 @@
 from typing import Optional, Tuple
 from datetime import datetime
 from telegram import Message
-from modules.data.meme_data import DbManager
+from modules.data.db_manager import DbManager
 
 
 class PendingPost():
