@@ -11,8 +11,8 @@ class PendingPost():
     def __init__(self, user_id: int, u_message_id: int, g_message_id: int, group_id: int, date: datetime):
         self.user_id = user_id
         self.u_message_id = u_message_id
-        self.g_message_id = g_message_id
         self.group_id = group_id
+        self.g_message_id = g_message_id
         self.date = date
 
     @classmethod
@@ -99,18 +99,16 @@ class PendingPost():
             List[type(PendingPost)]: list of ids of pending memes
         """
         if datetime:
-            pending_posts_id = DbManager.select_from(select="g_message_id",
-                                                       table_name="pending_meme",
-                                                       where="group_id = %s and (message_date < %s or message_date IS NULL)",
-                                                       where_args=(group_id, before))
+            pending_posts_id = DbManager.select_from(
+                select="g_message_id",
+                table_name="pending_meme",
+                where="group_id = %s and (message_date < %s or message_date IS NULL)",
+                where_args=(group_id, before))
         else:
             pending_posts_id = DbManager.select_from(select="g_message_id",
-                                                       table_name="pending_meme",
-                                                       where="group_id = %s",
-                                                       where_args=(group_id, ))
-        if not pending_posts_id:
-            return None
-
+                                                     table_name="pending_meme",
+                                                     where="group_id = %s",
+                                                     where_args=(group_id, ))
         pending_posts = []
         for post in pending_posts_id:
             g_message_id = int(post['g_message_id'])
@@ -216,3 +214,10 @@ class PendingPost():
                               where="g_message_id = %s and group_id = %s",
                               where_args=(self.g_message_id, self.group_id))
         del self
+
+    def __repr__(self):
+        return f"[ user_id: {self.user_id}\n"\
+                f"u_message_id: {self.u_message_id}\n"\
+                f"group_id: {self.group_id}\n"\
+                f"g_message_id: {self.g_message_id}\n"\
+                f"date : {self.date} ]"
