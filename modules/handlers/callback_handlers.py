@@ -7,7 +7,7 @@ from modules.handlers import STATE
 from modules.debug.log_manager import logger
 from modules.data.data_reader import config_map
 from modules.data.meme_data import MemeData
-from modules.data import PendingPost
+from modules.data import PendingPost, PublishedPost
 from modules.utils.info_util import get_callback_info
 from modules.utils.keyboard_util import REACTION, update_approve_kb, update_vote_kb, get_stats_kb
 from modules.utils.post_util import send_post_to, show_admins_votes
@@ -180,7 +180,7 @@ def approve_yes_callback(info: dict, arg: None) -> Tuple[str, InlineKeyboardMark
 
     if n_approve != -1:  # the vote changed
         keyboard = info['reply_markup'].inline_keyboard
-        return None, update_approve_kb(keyboard, pending_post=pending_post, approve=n_approve), None
+        return None, update_approve_kb(keyboard=keyboard, pending_post=pending_post, approve=n_approve), None
 
     return None, None, None
 
@@ -216,7 +216,7 @@ def approve_no_callback(info: dict, arg: None) -> Tuple[str, InlineKeyboardMarku
 
     if n_reject != -1:  # the vote changed
         keyboard = info['reply_markup'].inline_keyboard
-        return None, update_approve_kb(keyboard, pending_post=pending_post, reject=n_reject), None
+        return None, update_approve_kb(keyboard=keyboard, pending_post=pending_post, reject=n_reject), None
 
     return None, None, None
 
@@ -232,10 +232,8 @@ def vote_callback(info: dict, arg: str) -> Tuple[str, InlineKeyboardMarkup, int]
     Returns:
         Tuple[str, InlineKeyboardMarkup, int]: text and replyMarkup that make up the reply, new conversation state
     """
-    was_added = MemeData.set_user_vote(user_id=info['sender_id'],
-                                       c_message_id=info['message_id'],
-                                       channel_id=info['chat_id'],
-                                       vote=arg)
+    publishedPost = PublishedPost.from_channel(channel_id=info['chat_id'], c_message_id=info['message_id'])
+    was_added = publishedPost.set_user_vote(user_id=info['sender_id'], vote=arg)
 
     if was_added:
         info['bot'].answerCallbackQuery(
@@ -245,7 +243,7 @@ def vote_callback(info: dict, arg: str) -> Tuple[str, InlineKeyboardMarkup, int]
             callback_query_id=info['query_id'], text=f"Hai tolto il {REACTION[arg]}")
 
     keyboard = info['reply_markup'].inline_keyboard
-    return None, update_vote_kb(keyboard, info['message_id'], info['chat_id']), None
+    return None, update_vote_kb(keyboard=keyboard, published_post=publishedPost), None
 
 # endregion
 

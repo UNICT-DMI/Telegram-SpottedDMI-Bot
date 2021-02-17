@@ -2,8 +2,7 @@
 Callback_data format: <callback_family>_<callback_name>,[arg]"""
 from typing import List
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
-from modules.data.meme_data import MemeData
-from modules.data import PendingPost
+from modules.data import PendingPost, PublishedPost
 from modules.utils import REACTION
 
 
@@ -99,8 +98,7 @@ def update_approve_kb(keyboard: List[List[InlineKeyboardButton]],
 
     Args:
         keyboard (List[List[InlineKeyboardButton]]): previous keyboard
-        g_message_id (int): id of the pending post in question ni the admin group
-        group_id (int): id of the admin group
+        pending_post (PendingPost): pending post to which the keyboard is attached
         approve (int, optional): number of approve votes, if known. Defaults to -1.
         reject (int, optional): number of reject votes, if known. Defaults to -1.
 
@@ -118,22 +116,20 @@ def update_approve_kb(keyboard: List[List[InlineKeyboardButton]],
     return InlineKeyboardMarkup(keyboard)
 
 
-def update_vote_kb(keyboard: List[List[InlineKeyboardButton]], c_message_id: int,
-                   channel_id: int) -> InlineKeyboardMarkup:
+def update_vote_kb(keyboard: List[List[InlineKeyboardButton]], published_post: PublishedPost) -> InlineKeyboardMarkup:
     """Updates the InlineKeyboard when the valutation of a published post changes
 
     Args:
         keyboard (List[List[InlineKeyboardButton]]): previous keyboard
-        c_message_id (int): id of the published post in question
-        channel_id (int): id of the channel
+        published_post (PublishedPost): published post to which the keyboard is attached
 
     Returns:
         InlineKeyboardMarkup: updated inline keyboard
     """
-    keyboard[0][0].text = f"{REACTION['1']} {MemeData.get_published_votes(c_message_id, channel_id, vote='1')}"
-    keyboard[0][1].text = f"{REACTION['0']} {MemeData.get_published_votes(c_message_id, channel_id, vote='0')}"
+    keyboard[0][0].text = f"{REACTION['1']} {published_post.get_votes(vote='1')}"
+    keyboard[0][1].text = f"{REACTION['0']} {published_post.get_votes(vote='0')}"
     if len(keyboard) > 1:  # to keep support for older published memes
-        keyboard[1][0].text = f"{REACTION['2']} {MemeData.get_published_votes(c_message_id, channel_id, vote='2')}"
-        keyboard[1][1].text = f"{REACTION['3']} {MemeData.get_published_votes(c_message_id, channel_id, vote='3')}"
-        keyboard[1][2].text = f"{REACTION['4']} {MemeData.get_published_votes(c_message_id, channel_id, vote='4')}"
+        keyboard[1][0].text = f"{REACTION['2']} {published_post.get_votes(vote='2')}"
+        keyboard[1][1].text = f"{REACTION['3']} {published_post.get_votes(vote='3')}"
+        keyboard[1][2].text = f"{REACTION['4']} {published_post.get_votes(vote='4')}"
     return InlineKeyboardMarkup(keyboard)

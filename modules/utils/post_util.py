@@ -5,7 +5,7 @@ from telegram.error import BadRequest, Unauthorized
 from modules.debug.log_manager import logger
 from modules.data.data_reader import config_map, read_md
 from modules.data.meme_data import MemeData
-from modules.data import PendingPost
+from modules.data import PendingPost, PublishedPost
 from modules.utils.keyboard_util import get_approve_kb, get_vote_kb
 
 
@@ -88,13 +88,13 @@ def send_post_to(message: Message, bot: Bot, destination: str, user_id: int = No
         PendingPost.create(user_message=message, admin_message=post_message)
     elif destination == "channel":  # insert the post among the published ones and show the credtit...
         if not config_map['meme']['comments']:  # ... but only if the user can vote directly on the post
-            MemeData.insert_published_post(post_message)
+            PublishedPost.create(post_message)
             send_helper_message(user_id=user_id,
                                 chat_id=config_map['meme']['channel_id'],
                                 reply_message_id=post_message.message_id,
                                 bot=bot)
     elif destination == "channel_group":  # insert the first comment among the published posts, so that votes can be tracked
-        MemeData.insert_published_post(post_message)
+        PublishedPost.create(post_message)
 
     return post_message
 

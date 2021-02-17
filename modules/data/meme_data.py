@@ -15,19 +15,6 @@ class MemeData():
     """Class that handles the management of persistent data fetch or manipulation in the meme bot
     """
     @staticmethod
-    def insert_published_post(channel_message: Message):
-        """Inserts a new post in the table of pending posts
-
-        Args:
-            channel_message (Message): message approved to be published
-        """
-        c_message_id = channel_message.message_id
-        channel_id = channel_message.chat_id
-        DbManager.insert_into(table_name="published_meme",
-                              columns=("channel_id", "c_message_id"),
-                              values=(channel_id, c_message_id))
-
-    @staticmethod
     def set_user_report(user_id: int, target_username: str, admin_message: Message) -> None:
         """Adds the report of the user on a specific post
 
@@ -134,74 +121,6 @@ class MemeData():
             return None
         return report[0]['c_message_id']
 
-    @staticmethod
-    def set_user_vote(user_id: int, c_message_id: int, channel_id: int, vote: str) -> bool:
-        """Adds the vote of the user on a specific post, or update the existing vote, if needed
-
-        Args:
-            user_id (int): id of the user that voted
-            c_message_id (int): id of the post in question in the channel
-            channel_id (int): id of the channel
-            vote (str): kind of vote the user wants to add or remove
-
-        Returns:
-            bool: whether the vote was added or removed
-        """
-        current_vote = MemeData.__get_user_vote(user_id, c_message_id, channel_id)
-        vote_added = True
-        if current_vote is None:  # there isn't a vote yet
-            DbManager.insert_into(table_name="votes",
-                                  columns=("user_id", "c_message_id", "channel_id", "vote"),
-                                  values=(user_id, c_message_id, channel_id, vote))
-        elif current_vote != vote:  # the old vote was different from the new vote
-            DbManager.query_from_string(f"UPDATE votes SET vote = {vote}\
-                                        WHERE user_id = '{user_id}'\
-                                        and c_message_id = '{c_message_id}'\
-                                        and channel_id = '{channel_id}'")
-        else:  # the user wants to remove his vote
-            DbManager.delete_from(table_name="votes",
-                                  where="user_id = %s and c_message_id = %s and channel_id = %s",
-                                  where_args=(user_id, c_message_id, channel_id))
-            vote_added = False
-
-        return vote_added
-
-    @staticmethod
-    def __get_user_vote(user_id: int, c_message_id: int, channel_id: int) -> Optional[str]:
-        """Gets the vote of a specific user on a published post
-
-        Args:
-            user_id (int): id of the user that voted
-            c_message_id (int): id of the post in question in the channel
-            channel_id (int): id of the channel
-
-        Returns:
-            Optional[str]: value of the vote or None if a vote was not yet made
-        """
-        vote = DbManager.select_from(select="vote",
-                                     table_name="votes",
-                                     where="user_id = %s and c_message_id = %s and channel_id = %s",
-                                     where_args=(user_id, c_message_id, channel_id))
-
-        if len(vote) == 0:  # the vote is not present
-            return None
-        return vote[0]['vote']
-
-    @staticmethod
-    def get_published_votes(c_message_id: int, channel_id: int, vote: str) -> int:
-        """Gets all the votes of a specific kind (upvote or downvote) on a published post
-
-        Args:
-            c_message_id (int): id of the post in question in the channel
-            channel_id (int): id of the channel
-            vote (str): kind of vote you are looking for
-
-        Returns:
-            int: number of votes
-        """
-        return DbManager.count_from(table_name="votes",
-                                    where="c_message_id = %s and channel_id = %s and vote = %s",
-                                    where_args=(c_message_id, channel_id, vote))
 
     @staticmethod
     def get_user_id(g_message_id: int, group_id: int) -> Optional[int]:
