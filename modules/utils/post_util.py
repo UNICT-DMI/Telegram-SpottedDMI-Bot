@@ -5,6 +5,7 @@ from telegram.error import BadRequest, Unauthorized
 from modules.debug.log_manager import logger
 from modules.data.data_reader import config_map, read_md
 from modules.data.meme_data import MemeData
+from modules.data import PendingPost
 from modules.utils.keyboard_util import get_approve_kb, get_vote_kb
 
 
@@ -84,7 +85,7 @@ def send_post_to(message: Message, bot: Bot, destination: str, user_id: int = No
         return None
 
     if destination == "admin":  # insert the post among the pending ones
-        MemeData.insert_pending_post(user_message=message, admin_message=post_message)
+        PendingPost.create(user_message=message, admin_message=post_message)
     elif destination == "channel":  # insert the post among the published ones and show the credtit...
         if not config_map['meme']['comments']:  # ... but only if the user can vote directly on the post
             MemeData.insert_published_post(post_message)
@@ -127,7 +128,7 @@ def send_helper_message(user_id: int,
                             reply_to_message_id=reply_message_id)
 
 
-def show_admins_votes(chat_id: int, message_id: int, bot: Bot, approve: bool):
+def show_admins_votes(pending_post: PendingPost, bot: Bot, approve: bool):
     """After a post is been approved or rejected, shows the admins that aproved or rejected it \
         and edit the message to delete the reply_markup
 
@@ -137,7 +138,10 @@ def show_admins_votes(chat_id: int, message_id: int, bot: Bot, approve: bool):
         bot (Bot): bot
         approve (bool): whether the vote is approve or reject
     """
-    admins = MemeData.get_list_admin_votes(g_message_id=message_id, group_id=chat_id, vote=approve)
+    chat_id = pending_post.group_id
+    message_id = pending_post.g_message_id
+
+    admins = pending_post.get_list_admin_votes(vote=approve)
     text = "Approvato da:\n" if approve else "Rifiutato da:\n"
     tag = '@' if config_map['meme']['tag'] else ''
     for admin in admins:

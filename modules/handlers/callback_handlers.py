@@ -7,6 +7,7 @@ from modules.handlers import STATE
 from modules.debug.log_manager import logger
 from modules.data.data_reader import config_map
 from modules.data.meme_data import MemeData
+from modules.data import PendingPost
 from modules.utils.info_util import get_callback_info
 from modules.utils.keyboard_util import REACTION, update_approve_kb, update_vote_kb, get_stats_kb
 from modules.utils.post_util import send_post_to, show_admins_votes
@@ -152,14 +153,13 @@ def approve_yes_callback(info: dict, arg: None) -> Tuple[str, InlineKeyboardMark
     Returns:
         Tuple[str, InlineKeyboardMarkup, int]: text and replyMarkup that make up the reply, new conversation state
     """
-    n_approve = MemeData.set_admin_vote(
-        info['sender_id'], info['message_id'], info['chat_id'], True)
+    pending_post = PendingPost.from_group(group_id=info['chat_id'], g_message_id=info['message_id'])
+    n_approve = pending_post.set_admin_vote(info['sender_id'], True)
 
     # The post passed the approval phase and is to be published
     if n_approve >= config_map['meme']['n_votes']:
         message = info['message']
-        user_id = MemeData.get_user_id(
-            g_message_id=info['message_id'], group_id=info['chat_id'])
+        user_id = pending_post.user_id
         published_post = send_post_to(
             message=message, bot=info['bot'], destination="channel")
 
@@ -174,14 +174,13 @@ def approve_yes_callback(info: dict, arg: None) -> Tuple[str, InlineKeyboardMark
             logger.warning("Notifying the user on approve_yes: %s", e)
 
         # Shows the list of admins who approved the pending post and removes it form the db
-        show_admins_votes(
-            chat_id=info['chat_id'], message_id=info['message_id'], bot=info['bot'], approve=True)
-        MemeData.remove_pending_meme(info['message_id'], info['chat_id'])
+        show_admins_votes(pending_post=pending_post, bot=info['bot'], approve=True)
+        pending_post.delete_post()
         return None, None, None
 
     if n_approve != -1:  # the vote changed
         keyboard = info['reply_markup'].inline_keyboard
-        return None, update_approve_kb(keyboard, info['message_id'], info['chat_id'], approve=n_approve), None
+        return None, update_approve_kb(keyboard, pending_post=pending_post, approve=n_approve), None
 
     return None, None, None
 
@@ -196,13 +195,12 @@ def approve_no_callback(info: dict, arg: None) -> Tuple[str, InlineKeyboardMarku
     Returns:
         Tuple[str, InlineKeyboardMarkup, int]: text and replyMarkup that make up the reply, new conversation state
     """
-    n_reject = MemeData.set_admin_vote(
-        info['sender_id'], info['message_id'], info['chat_id'], False)
+    pending_post = PendingPost.from_group(group_id=info['chat_id'], g_message_id=info['message_id'])
+    n_reject = pending_post.set_admin_vote(info['sender_id'], False)
 
     # The post has been refused
     if n_reject >= config_map['meme']['n_votes']:
-        user_id = MemeData.get_user_id(
-            g_message_id=info['message_id'], group_id=info['chat_id'])
+        user_id = pending_post.user_id
 
         try:
             info['bot'].send_message(
@@ -212,14 +210,13 @@ def approve_no_callback(info: dict, arg: None) -> Tuple[str, InlineKeyboardMarku
             logger.warning("Notifying the user on approve_no: %s", e)
 
         # Shows the list of admins who refused the pending post and removes it form the db
-        show_admins_votes(
-            chat_id=info['chat_id'], message_id=info['message_id'], bot=info['bot'], approve=False)
-        MemeData.remove_pending_meme(info['message_id'], info['chat_id'])
+        show_admins_votes(pending_post=pending_post, bot=info['bot'], approve=False)
+        pending_post.delete_post()
         return None, None, None
 
     if n_reject != -1:  # the vote changed
         keyboard = info['reply_markup'].inline_keyboard
-        return None, update_approve_kb(keyboard, info['message_id'], info['chat_id'], reject=n_reject), None
+        return None, update_approve_kb(keyboard, pending_post=pending_post, reject=n_reject), None
 
     return None, None, None
 

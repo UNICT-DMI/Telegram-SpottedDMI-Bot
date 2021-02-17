@@ -3,6 +3,7 @@ Callback_data format: <callback_family>_<callback_name>,[arg]"""
 from typing import List
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 from modules.data.meme_data import MemeData
+from modules.data import PendingPost
 from modules.utils import REACTION
 
 
@@ -78,23 +79,20 @@ def get_vote_kb() -> InlineKeyboardMarkup:
     Returns:
         InlineKeyboardMarkup: new inline keyboard
     """
-    return InlineKeyboardMarkup([
-                                    [
-                                        InlineKeyboardButton(f"{REACTION['1']} 0", callback_data="meme_vote,1"),
-                                        InlineKeyboardButton(f"{REACTION['0']} 0", callback_data="meme_vote,0")
-                                    ],
-                                    [
-                                        InlineKeyboardButton(f"{REACTION['2']} 0", callback_data="meme_vote,2"),
-                                        InlineKeyboardButton(f"{REACTION['3']} 0", callback_data="meme_vote,3"),
-                                        InlineKeyboardButton(f"{REACTION['4']} 0", callback_data="meme_vote,4"),
-                                        InlineKeyboardButton("🚩 Report", callback_data="meme_report_spot")
-                                    ]
-                                 ])
+    return InlineKeyboardMarkup([[
+        InlineKeyboardButton(f"{REACTION['1']} 0", callback_data="meme_vote,1"),
+        InlineKeyboardButton(f"{REACTION['0']} 0", callback_data="meme_vote,0")
+    ],
+                                 [
+                                     InlineKeyboardButton(f"{REACTION['2']} 0", callback_data="meme_vote,2"),
+                                     InlineKeyboardButton(f"{REACTION['3']} 0", callback_data="meme_vote,3"),
+                                     InlineKeyboardButton(f"{REACTION['4']} 0", callback_data="meme_vote,4"),
+                                     InlineKeyboardButton("🚩 Report", callback_data="meme_report_spot")
+                                 ]])
 
 
 def update_approve_kb(keyboard: List[List[InlineKeyboardButton]],
-                      g_message_id: int,
-                      group_id: int,
+                      pending_post: PendingPost,
                       approve: int = -1,
                       reject: int = -1) -> InlineKeyboardMarkup:
     """Updates the InlineKeyboard when the valutation of a pending post changes
@@ -112,15 +110,16 @@ def update_approve_kb(keyboard: List[List[InlineKeyboardButton]],
     if approve >= 0:
         keyboard[0][0].text = f"🟢 {approve}"
     else:
-        keyboard[0][0].text = f"🟢 {MemeData.get_pending_votes(g_message_id, group_id, vote=True)}"
+        keyboard[0][0].text = f"🟢 {pending_post.get_votes(vote=True)}"
     if reject >= 0:
         keyboard[0][1].text = f"🔴 {reject}"
     else:
-        keyboard[0][1].text = f"🔴 {MemeData.get_pending_votes(g_message_id, group_id, vote=False)}"
+        keyboard[0][1].text = f"🔴 {pending_post.get_votes(vote=False)}"
     return InlineKeyboardMarkup(keyboard)
 
 
-def update_vote_kb(keyboard: List[List[InlineKeyboardButton]], c_message_id: int, channel_id: int) -> InlineKeyboardMarkup:
+def update_vote_kb(keyboard: List[List[InlineKeyboardButton]], c_message_id: int,
+                   channel_id: int) -> InlineKeyboardMarkup:
     """Updates the InlineKeyboard when the valutation of a published post changes
 
     Args:

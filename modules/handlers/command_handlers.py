@@ -8,6 +8,7 @@ from modules.handlers.job_handlers import clean_pending_job
 from modules.debug.log_manager import logger
 from modules.data.data_reader import read_md, config_map
 from modules.data.meme_data import MemeData
+from modules.data import PendingPost
 from modules.utils.info_util import get_message_info, check_message_type
 from modules.utils.post_util import send_post_to
 from modules.utils.keyboard_util import get_confirm_kb, get_settings_kb, get_stats_kb
@@ -110,7 +111,7 @@ def post_cmd(update: Update, context: CallbackContext) -> int:
         return STATE['end']
 
     # have already a post in pending
-    if MemeData.is_pending(user_id=info['sender_id']):
+    if PendingPost.is_pending(user_id=info['sender_id']):
         info['bot'].send_message(chat_id=info['chat_id'], text="Hai già un post in approvazione 🧐")
         return STATE['end']
 
@@ -129,14 +130,14 @@ def ban_cmd(update: Update, context: CallbackContext):
     info = get_message_info(update, context)
     if info['chat_id'] == config_map['meme']['group_id']:  # you have to be in the admin group
         g_message_id = update.message.reply_to_message.message_id
-        user_id = MemeData.get_user_id(g_message_id=g_message_id, group_id=info['chat_id'])
+        pending_post = PendingPost.from_group(group_id=info['chat_id'], g_message_id=g_message_id)
 
-        if user_id is None:
+        if pending_post is None:
             info['bot'].send_message(chat_id=info['chat_id'], text="Per bannare qualcuno, rispondi al suo post con /ban")
             return
 
-        MemeData.ban_user(user_id=user_id)
-        MemeData.remove_pending_meme(g_message_id=g_message_id, group_id=info['chat_id'])
+        MemeData.ban_user(user_id=pending_post.user_id)
+        pending_post.delete_post()
         info['bot'].edit_message_reply_markup(chat_id=info['chat_id'], message_id=g_message_id)
         info['bot'].send_message(chat_id=info['chat_id'], text="L'utente è stato bannato")
 
@@ -221,10 +222,16 @@ def cancel_cmd(update: Update, context: CallbackContext) -> int:
     info = get_message_info(update, context)
     if update.message.chat.type != "private":  # you can only cancel a post with a private message
         return STATE['end']
-    g_message_id, group_id = MemeData.cancel_pending_meme(user_id=info['sender_id'])
-    if g_message_id is not None:
-        info['bot'].delete_message(chat_id=group_id, message_id=g_message_id)
-    info['bot'].send_message(chat_id=info['chat_id'], text="Operazione annullata")
+    pending_post = PendingPost.from_user(user_id=info['sender_id'])
+    if pending_post:
+        try:
+            info['bot'].delete_message(chat_id=pending_post.group_id, message_id=pending_post.g_message_id)
+            info['bot'].send_message(chat_id=info['chat_id'], text="Lo spot precedentemente inviato è stato cancellato")
+        except (BadRequest, Unauthorized) as e:
+            logger.warning("Cancelling a post /reply: %s", e)
+        pending_post.delete_post()
+    else:
+        info['bot'].send_message(chat_id=info['chat_id'], text="Operazione annullata")
     return STATE['end']
 
 
