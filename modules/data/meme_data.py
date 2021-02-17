@@ -1,7 +1,5 @@
 """Data management for the bot"""
 from typing import Optional, Tuple
-from datetime import datetime
-from telegram import Message
 from modules.data.db_manager import DbManager
 from modules.data.data_reader import config_map
 

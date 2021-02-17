@@ -6,7 +6,6 @@ from modules.handlers import STATE
 from modules.handlers.job_handlers import clean_pending_job
 from modules.debug.log_manager import logger
 from modules.data.data_reader import read_md, config_map
-from modules.data.meme_data import MemeData
 from modules.data import PendingPost, Report, User
 from modules.utils.info_util import get_message_info, check_message_type
 from modules.utils.post_util import send_post_to
@@ -175,24 +174,47 @@ def reply_cmd(update: Update, context: CallbackContext):
     """
     info = get_message_info(update, context)
     if info['chat_id'] == config_map['meme']['group_id']:  # you have to be in the admin group
-        g_message_id = update.message.reply_to_message.message_id
-        user_id = MemeData.get_user_id(g_message_id=g_message_id, group_id=info['chat_id'])
-        if user_id is None or len(info['text']) <= 7:
+
+        if len(info['text']) <= 7: # the reply is empty
             info['bot'].send_message(
                 chat_id=info['chat_id'],
-                text=
-                "Per mandare un messaggio ad un utente, rispondere al suo post con /reply seguito da ciò che gli si vuole dire"
+                text="La reply è vuota\n"\
+                "Per mandare un messaggio ad un utente, rispondere al suo post o report con /reply seguito da ciò che gli si vuole dire"
             )
             return
-        try:
-            info['bot'].send_message(chat_id=user_id,
-                                     text="COMUNICAZIONE DEGLI ADMIN SUL TUO POST O REPORT:\n" + info['text'][7:].strip())
-            info['bot'].send_message(chat_id=info['chat_id'],
-                                 text="L'utente ha ricevuto il seguente messaggio:\n"\
-                                    "COMUNICAZIONE DEGLI ADMIN SUL TUO POST O REPORT:\n" + info['text'][7:].strip(),
-                                 reply_to_message_id=g_message_id)
-        except (BadRequest, Unauthorized) as e:
-            logger.warning("Notifying the user on /reply: %s", e)
+
+        g_message_id = update.message.reply_to_message.message_id
+
+        pending_post = PendingPost.from_group(group_id=info['chat_id'], g_message_id=g_message_id)
+        if pending_post is not None: # the message was a pending post
+            try:
+                info['bot'].send_message(chat_id=pending_post.user_id,
+                                        text="COMUNICAZIONE DEGLI ADMIN SUL TUO ULTIMO POST:\n" + info['text'][7:].strip())
+                info['bot'].send_message(chat_id=info['chat_id'],
+                                    text="L'utente ha ricevuto il seguente messaggio:\n"\
+                                        "COMUNICAZIONE DEGLI ADMIN SUL TUO ULTIMO POST:\n" + info['text'][7:].strip(),
+                                    reply_to_message_id=g_message_id)
+            except (BadRequest, Unauthorized) as e:
+                logger.warning("Notifying the user on /reply: %s", e)
+            return
+        report = Report.from_group(group_id=info['chat_id'], g_message_id=g_message_id)
+        if report is not None: # the message was a report
+            try:
+                info['bot'].send_message(chat_id=report.user_id,
+                                        text="COMUNICAZIONE DEGLI ADMIN SUL TUO ULTIMO REPORT:\n" + info['text'][7:].strip())
+                info['bot'].send_message(chat_id=info['chat_id'],
+                                    text="L'utente ha ricevuto il seguente messaggio:\n"\
+                                        "COMUNICAZIONE DEGLI ADMIN SUL TUO ULTIMO REPORT:\n" + info['text'][7:].strip(),
+                                    reply_to_message_id=g_message_id)
+            except (BadRequest, Unauthorized) as e:
+                logger.warning("Notifying the user on /reply: %s", e)
+            return
+
+        info['bot'].send_message(
+                chat_id=info['chat_id'],
+                text="Il messaggio selezionato non è valido.\n"\
+                "Per mandare un messaggio ad un utente, rispondere al suo post o report con /reply seguito da ciò che gli si vuole dire"
+            )
 
 
 def clean_pending_cmd(update: Update, context: CallbackContext):

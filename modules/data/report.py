@@ -137,6 +137,44 @@ class Report():
                    group_id=report['group_id'],
                    g_message_id=report['g_message_id'])
 
+    @classmethod
+    def from_group(cls, group_id: int, g_message_id: int):
+        """Gets the report of a specific user on a published post
+
+        Args:
+            group_id (int): id of the admin group
+            g_message_id (int): id of the report in the group
+
+        Returns:
+            Report: istance of the class or None if the report was not present
+        """
+        reports = DbManager.select_from(select="*",
+                                        table_name="user_report",
+                                        where="group_id = %s and g_message_id = %s",
+                                        where_args=(group_id, g_message_id))
+
+        if len(reports) > 0:  # the vote is not present
+            report = reports[0]
+            return cls(user_id=report['user_id'],
+                       target_username=report['target_username'],
+                       date=datetime.strptime(report['message_date'], "%Y-%m-%d %H:%M:%S.%f"),
+                       group_id=report['group_id'],
+                       g_message_id=report['g_message_id'])
+
+        reports = DbManager.select_from(select="*",
+                                        table_name="spot_report",
+                                        where="group_id = %s and g_message_id = %s",
+                                        where_args=(group_id, g_message_id))
+
+        if len(reports) > 0:  # the vote is not present
+            report = reports[0]
+            return cls(user_id=report['user_id'],
+                       c_message_id=report['c_message_id'],
+                       group_id=report['group_id'],
+                       g_message_id=report['g_message_id'])
+
+        return None
+
     def __repr__(self):
         if self.c_message_id is not None:
             return f"PostReport: [ user_id: {self.user_id}\n"\
