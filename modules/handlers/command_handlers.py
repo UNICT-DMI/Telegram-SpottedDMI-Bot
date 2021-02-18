@@ -184,7 +184,7 @@ def reply_cmd(update: Update, context: CallbackContext):
                 "Per mandare un messaggio ad un utente, rispondere al suo post o report con /reply "\
                     "seguito da ciò che gli si vuole dire"
             )
-            return
+            return None
 
         g_message_id = update.message.reply_to_message.message_id
 
@@ -200,7 +200,7 @@ def reply_cmd(update: Update, context: CallbackContext):
                                     reply_to_message_id=g_message_id)
             except (BadRequest, Unauthorized) as e:
                 logger.warning("Notifying the user on /reply: %s", e)
-            return
+            return None
         report = Report.from_group(group_id=info['chat_id'], g_message_id=g_message_id)
         if report is not None:  # the message was a report
             try:
@@ -213,7 +213,7 @@ def reply_cmd(update: Update, context: CallbackContext):
                                     reply_to_message_id=g_message_id)
             except (BadRequest, Unauthorized) as e:
                 logger.warning("Notifying the user on /reply: %s", e)
-            return
+            return None
 
         info['bot'].send_message(
                 chat_id=info['chat_id'],

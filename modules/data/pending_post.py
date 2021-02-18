@@ -216,7 +216,7 @@ class PendingPost():
         del self
 
     def __repr__(self):
-        return f"[ user_id: {self.user_id}\n"\
+        return f"PendingPost: [ user_id: {self.user_id}\n"\
                 f"u_message_id: {self.u_message_id}\n"\
                 f"group_id: {self.group_id}\n"\
                 f"g_message_id: {self.g_message_id}\n"\

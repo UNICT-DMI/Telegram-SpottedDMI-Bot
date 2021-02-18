@@ -76,7 +76,6 @@ class PublishedPost():
             bool: whether the vote was added or removed
         """
         current_vote = self.__get_user_vote(user_id=user_id)
-        vote_added = True
         if current_vote is None:  # there isn't a vote yet
             DbManager.insert_into(table_name="votes",
                                   columns=("user_id", "c_message_id", "channel_id", "vote"),
@@ -90,9 +89,9 @@ class PublishedPost():
             DbManager.delete_from(table_name="votes",
                                   where="user_id = %s and c_message_id = %s and channel_id = %s",
                                   where_args=(user_id, self.c_message_id, self.channel_id))
-            vote_added = False
+            return False
 
-        return vote_added
+        return True
 
     def get_votes(self, vote: str) -> int:
         """Gets all the votes of a specific kind on the post
@@ -108,5 +107,5 @@ class PublishedPost():
                                     where_args=(self.c_message_id, self.channel_id, vote))
 
     def __repr__(self):
-        return f"[ channel_id: {self.channel_id}\n"\
+        return f"PublishedPost: [ channel_id: {self.channel_id}\n"\
                 f"c_message_id: {self.c_message_id} ]"
