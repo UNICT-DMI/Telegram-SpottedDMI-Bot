@@ -151,6 +151,7 @@ def approve_yes_callback(info: dict, arg: None) -> Tuple[str, InlineKeyboardMark
         Tuple[str, InlineKeyboardMarkup, int]: text and replyMarkup that make up the reply, new conversation state
     """
     pending_post = PendingPost.from_group(group_id=info['chat_id'], g_message_id=info['message_id'])
+    info['bot'].answerCallbackQuery(callback_query_id=info['query_id'])  # end the spinning progress bar
     n_approve = pending_post.set_admin_vote(info['sender_id'], True)
 
     # The post passed the approval phase and is to be published
@@ -192,6 +193,7 @@ def approve_no_callback(info: dict, arg: None) -> Tuple[str, InlineKeyboardMarku
         Tuple[str, InlineKeyboardMarkup, int]: text and replyMarkup that make up the reply, new conversation state
     """
     pending_post = PendingPost.from_group(group_id=info['chat_id'], g_message_id=info['message_id'])
+    info['bot'].answerCallbackQuery(callback_query_id=info['query_id'])  # end the spinning progress bar
     n_reject = pending_post.set_admin_vote(info['sender_id'], False)
 
     # The post has been refused
