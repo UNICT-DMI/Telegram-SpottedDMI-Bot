@@ -213,7 +213,11 @@ class PendingPost():
         DbManager.delete_from(table_name="admin_votes",
                               where="g_message_id = %s and group_id = %s",
                               where_args=(self.g_message_id, self.group_id))
-        del self
+        self.user_id = None
+        self.u_message_id = None
+        self.group_id = None
+        self.g_message_id = None
+        self.date = None
 
     def __repr__(self):
         return f"PendingPost: [ user_id: {self.user_id}\n"\

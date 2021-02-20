@@ -9,7 +9,7 @@ from telegram import BotCommand
 from telegram.ext import Updater, CommandHandler, MessageHandler, CallbackQueryHandler, ConversationHandler,\
      Filters, Dispatcher
 # debug
-from modules.debug.log_manager import log_message
+from modules.debug.log_manager import log_message, error_handler
 # data
 from modules.data.data_reader import config_map
 # handlers
@@ -49,6 +49,9 @@ def add_handlers(dp: Dispatcher):
     """
     if config_map['debug']['local_log']:  # add MessageHandler only if log_message is enabled
         dp.add_handler(MessageHandler(Filters.all, log_message), 1)
+
+    # Error handler
+    dp.add_error_handler(error_handler)
 
     # Conversation handler
     dp.add_handler(

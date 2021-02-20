@@ -190,29 +190,22 @@ def reply_cmd(update: Update, context: CallbackContext):
 
         pending_post = PendingPost.from_group(group_id=info['chat_id'], g_message_id=g_message_id)
         if pending_post is not None:  # the message was a pending post
-            try:
-                info['bot'].send_message(chat_id=pending_post.user_id,
-                                         text="COMUNICAZIONE DEGLI ADMIN SUL TUO ULTIMO POST:\n" +
-                                         info['text'][7:].strip())
-                info['bot'].send_message(chat_id=info['chat_id'],
+            info['bot'].send_message(chat_id=pending_post.user_id,
+                                     text="COMUNICAZIONE DEGLI ADMIN SUL TUO ULTIMO POST:\n" + info['text'][7:].strip())
+            info['bot'].send_message(chat_id=info['chat_id'],
                                     text="L'utente ha ricevuto il seguente messaggio:\n"\
                                         "COMUNICAZIONE DEGLI ADMIN SUL TUO ULTIMO POST:\n" + info['text'][7:].strip(),
                                     reply_to_message_id=g_message_id)
-            except (BadRequest, Unauthorized) as e:
-                logger.warning("Notifying the user on /reply: %s", e)
             return None
         report = Report.from_group(group_id=info['chat_id'], g_message_id=g_message_id)
         if report is not None:  # the message was a report
-            try:
-                info['bot'].send_message(chat_id=report.user_id,
-                                         text="COMUNICAZIONE DEGLI ADMIN SUL TUO ULTIMO REPORT:\n" +
-                                         info['text'][7:].strip())
-                info['bot'].send_message(chat_id=info['chat_id'],
+            info['bot'].send_message(chat_id=report.user_id,
+                                     text="COMUNICAZIONE DEGLI ADMIN SUL TUO ULTIMO REPORT:\n" +
+                                     info['text'][7:].strip())
+            info['bot'].send_message(chat_id=info['chat_id'],
                                     text="L'utente ha ricevuto il seguente messaggio:\n"\
                                         "COMUNICAZIONE DEGLI ADMIN SUL TUO ULTIMO REPORT:\n" + info['text'][7:].strip(),
                                     reply_to_message_id=g_message_id)
-            except (BadRequest, Unauthorized) as e:
-                logger.warning("Notifying the user on /reply: %s", e)
             return None
 
         info['bot'].send_message(
