@@ -271,8 +271,9 @@ def stats_cmd(update: Update, context: CallbackContext):
 
 # endregion
 
-
 # region msg
+
+
 def post_msg(update: Update, context: CallbackContext) -> int:
     """Handles the reply to the /post command.
     Checks the message the user wants to post, and goes to the final step
@@ -471,4 +472,4 @@ def report_user_sent_msg(update: Update, context: CallbackContext) -> int:
     return STATE['end']
 
 
-# end region
+# endregion

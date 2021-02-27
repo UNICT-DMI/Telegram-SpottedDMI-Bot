@@ -115,6 +115,7 @@ class DbManager():
                 logger.error(str(e))
 
         query_result = cur.fetchall()
+        conn.commit()
         cur.close()
         conn.close()
         return query_result
@@ -154,6 +155,7 @@ class DbManager():
                 logger.error(str(e))
 
         query_result = cur.fetchall()
+        conn.commit()
         cur.close()
         conn.close()
         return query_result[0]['number']
