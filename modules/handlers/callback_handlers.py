@@ -45,10 +45,7 @@ def meme_callback(update: Update, context: CallbackContext) -> int:
     data = info['data'].split(",")
     try:
         # call the correct function
-        if len(data) > 1:  # is reaction
-            message_text, reply_markup, output = globals()[f'{data[0][5:]}_callback'](info, data[1])
-        else:  # is report
-            message_text, reply_markup, output = globals()[f'{data[0][5:]}_callback'](info)
+        message_text, reply_markup, output = globals()[f'{data[0][5:]}_callback'](info, data[1])
 
     except KeyError as e:
         message_text = reply_markup = output = None
@@ -249,11 +246,12 @@ def vote_callback(info: dict, arg: str) -> Tuple[str, InlineKeyboardMarkup, int]
 # endregion
 
 
-def report_spot_callback(info: dict) -> Tuple[str, InlineKeyboardMarkup, int]:
+def report_spot_callback(info: dict, args: str) -> Tuple[str, InlineKeyboardMarkup, int]:  # pylint: disable=unused-argument
     """Handles the report callback.
 
     Args:
         info (dict): information about the callback
+        arg (str): unused
 
     Returns:
         Tuple[str, InlineKeyboardMarkup, int]: text and replyMarkup that make up the reply, new conversation state
@@ -261,8 +259,10 @@ def report_spot_callback(info: dict) -> Tuple[str, InlineKeyboardMarkup, int]:
 
     abusive_message_id = info['message']['reply_to_message']['message_id']
 
-    report = Report.get_post_report(user_id=info['sender_id'], c_message_id=abusive_message_id)
-    if report is not None:
+    report = Report.get_post_report(user_id=info['sender_id'],
+                                    channel_id=config_map['meme']['channel_id'],
+                                    c_message_id=abusive_message_id)
+    if report is not None:  # this user has already reported this post
         info['bot'].answerCallbackQuery(callback_query_id=info['query_id'], text="Hai già segnalato questo spot.")
         return None, None, STATE['end']
 

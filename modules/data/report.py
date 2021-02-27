@@ -11,12 +11,14 @@ class Report():
                  user_id: int,
                  group_id: int,
                  g_message_id: int,
+                 channel_id: int = None,
                  c_message_id: int = None,
                  target_username: str = None,
                  date: datetime = None):
         self.user_id = user_id
         self.group_id = group_id
         self.g_message_id = g_message_id
+        self.channel_id = channel_id
         self.c_message_id = c_message_id
         self.target_username = target_username
         self.date = date
@@ -35,11 +37,12 @@ class Report():
         return delta_time.total_seconds() / 60
 
     @classmethod
-    def create_post_report(cls, user_id: int, c_message_id: int, admin_message: Message):
+    def create_post_report(cls, user_id: int, channel_id: int, c_message_id: int, admin_message: Message):
         """Adds the report of the user on a specific post
 
         Args:
             user_id (int): id of the user that reported
+            c_message_id (int): id of the channel
             c_message_id (int): id of the post in question in the channel
             admin_message (Message): message received in the admin group that references the report
 
@@ -50,15 +53,19 @@ class Report():
         g_message_id = admin_message.message_id
         group_id = admin_message.chat_id
 
-        current_report = Report.get_post_report(user_id, c_message_id)
+        current_report = cls.get_post_report(user_id, channel_id, c_message_id)
 
         if current_report:  # there is already a report, the creation fails
             return None
 
         DbManager.insert_into(table_name="spot_report",
-                              columns=("user_id", "c_message_id", "group_id", "g_message_id"),
-                              values=(user_id, c_message_id, group_id, g_message_id))
-        return cls(user_id=user_id, c_message_id=c_message_id, group_id=group_id, g_message_id=g_message_id)
+                              columns=("user_id", "channel_id", "c_message_id", "group_id", "g_message_id"),
+                              values=(user_id, channel_id, c_message_id, group_id, g_message_id))
+        return cls(user_id=user_id,
+                   channel_id=channel_id,
+                   c_message_id=c_message_id,
+                   group_id=group_id,
+                   g_message_id=g_message_id)
 
     @classmethod
     def create_user_report(cls, user_id: int, target_username: str, admin_message: Message):
@@ -88,11 +95,12 @@ class Report():
                    date=date)
 
     @classmethod
-    def get_post_report(cls, user_id: int, c_message_id: int):
+    def get_post_report(cls, user_id: int, channel_id: int, c_message_id: int):
         """Gets the report of a specific user on a published post
 
         Args:
             user_id (int): id of the user that reported
+            c_message_id (int): id of the channel
             c_message_id (int): id of the post in question in the channel
 
         Returns:
@@ -101,13 +109,14 @@ class Report():
 
         reports = DbManager.select_from(select="*",
                                         table_name="spot_report",
-                                        where="user_id = %s and c_message_id = %s",
-                                        where_args=(user_id, c_message_id))
+                                        where="user_id = %s and channel_id = %s and c_message_id = %s",
+                                        where_args=(user_id, channel_id, c_message_id))
         if len(reports) == 0:  # the report is not present
             return None
 
         report = reports[0]
         return cls(user_id=report['user_id'],
+                   channel_id=report['channel_id'],
                    c_message_id=report['c_message_id'],
                    group_id=report['group_id'],
                    g_message_id=report['g_message_id'])
@@ -178,6 +187,7 @@ class Report():
     def __repr__(self):
         if self.c_message_id is not None:
             return f"PostReport: [ user_id: {self.user_id}\n"\
+                    f"channel_id: {self.channel_id}\n"\
                     f"c_message_id: {self.c_message_id}\n"\
                     f"group_id: {self.group_id}\n"\
                     f"g_message_id: {self.g_message_id} ]"

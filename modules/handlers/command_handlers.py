@@ -362,7 +362,10 @@ def report_post(update: Update, context: CallbackContext) -> int:
     info['bot'].send_message(chat_id=info['chat_id'],
                              text="Gli admins verificheranno quanto accaduto. Grazie per la collaborazione!")
 
-    Report.create_post_report(user_id=info['sender_id'], c_message_id=target_message_id, admin_message=admin_message)
+    Report.create_post_report(user_id=info['sender_id'],
+                              channel_id=channel_id,
+                              c_message_id=target_message_id,
+                              admin_message=admin_message)
 
     return STATE['end']
 

@@ -51,6 +51,7 @@ CREATE TABLE IF NOT EXISTS banned_users
 CREATE TABLE IF NOT EXISTS spot_report
 (
   user_id BIGINT NOT NULL,
+  channel_id BIGINT NOT NULL,
   c_message_id BIGINT NOT NULL,
   g_message_id BIGINT NOT NULL,
   group_id BIGINT NOT NULL,
