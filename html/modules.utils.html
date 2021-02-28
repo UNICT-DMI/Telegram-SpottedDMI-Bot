@@ -1,0 +1,500 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>Utils modules &mdash; Spotted dmi bot  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="Handlers modules" href="modules.handlers.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> Spotted dmi bot
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="main.html">Main</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">All modules</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="modules.data.html">Data modules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="modules.debug.html">Debug Modules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="modules.handlers.html">Handlers modules</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Utils modules</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#module-modules.utils.info_util">info_util</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-modules.utils.keyboard_util">keyboard_util</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-modules.utils.post_util">post_util</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Spotted dmi bot</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="modules.html">All modules</a> &raquo;</li>
+        
+      <li>Utils modules</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="_sources/modules.utils.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="utils-modules">
+<h1>Utils modules<a class="headerlink" href="#utils-modules" title="Permalink to this headline">¶</a></h1>
+<p><strong>Description</strong></p>
+<span class="target" id="module-modules.utils"></span><p>Modules that provide various util</p>
+<div class="section" id="module-modules.utils.info_util">
+<span id="info-util"></span><h2>info_util<a class="headerlink" href="#module-modules.utils.info_util" title="Permalink to this headline">¶</a></h2>
+<p>Common info needed in both command and callback handlers</p>
+<dl class="py function">
+<dt id="modules.utils.info_util.check_message_type">
+<code class="sig-prename descclassname"><span class="pre">modules.utils.info_util.</span></code><code class="sig-name descname"><span class="pre">check_message_type</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">message</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">telegram.message.Message</span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">bool</span><a class="headerlink" href="#modules.utils.info_util.check_message_type" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check that the type of the message is one of the ones supported</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>message</strong> (<em>Message</em>) – message to check</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>whether its type is supported or not</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="modules.utils.info_util.get_callback_info">
+<code class="sig-prename descclassname"><span class="pre">modules.utils.info_util.</span></code><code class="sig-name descname"><span class="pre">get_callback_info</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">update</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">telegram.update.Update</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">context</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">telegram.ext.callbackcontext.CallbackContext</span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">dict</span><a class="headerlink" href="#modules.utils.info_util.get_callback_info" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the classic info from the update and context parameters for callbacks</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>update</strong> (<em>Update</em>) – update event</p></li>
+<li><p><strong>context</strong> (<em>CallbackContext</em>) – context passed by the handler</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>{bot, bot_data, message, chat_id, text, query_id, data, message_id, sender_id, sender_username, reply_markup, user_data}</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="modules.utils.info_util.get_job_info">
+<code class="sig-prename descclassname"><span class="pre">modules.utils.info_util.</span></code><code class="sig-name descname"><span class="pre">get_job_info</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">telegram.ext.callbackcontext.CallbackContext</span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">dict</span><a class="headerlink" href="#modules.utils.info_util.get_job_info" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the classic info from the context parameter for jobs</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>context</strong> (<em>CallbackContext</em>) – context passed by the handler</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>{bot}</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="modules.utils.info_util.get_message_info">
+<code class="sig-prename descclassname"><span class="pre">modules.utils.info_util.</span></code><code class="sig-name descname"><span class="pre">get_message_info</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">update</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">telegram.update.Update</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">context</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">telegram.ext.callbackcontext.CallbackContext</span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">dict</span><a class="headerlink" href="#modules.utils.info_util.get_message_info" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the classic info from the update and context parameters for commands and messages</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>update</strong> (<em>Update</em>) – update event</p></li>
+<li><p><strong>context</strong> (<em>CallbackContext</em>) – context passed by the handler</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>{bot, chat_id, text, message_id, sender_id}</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="module-modules.utils.keyboard_util">
+<span id="keyboard-util"></span><h2>keyboard_util<a class="headerlink" href="#module-modules.utils.keyboard_util" title="Permalink to this headline">¶</a></h2>
+<p>Creates the inlinekeyboard sent by the bot in its messages.
+Callback_data format: &lt;callback_family&gt;_&lt;callback_name&gt;,[arg]</p>
+<dl class="py function">
+<dt id="modules.utils.keyboard_util.get_approve_kb">
+<code class="sig-prename descclassname"><span class="pre">modules.utils.keyboard_util.</span></code><code class="sig-name descname"><span class="pre">get_approve_kb</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; <span class="pre">telegram.inline.inlinekeyboardmarkup.InlineKeyboardMarkup</span><a class="headerlink" href="#modules.utils.keyboard_util.get_approve_kb" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generates the InlineKeyboard for the pending post</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>new inline keyboard</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>InlineKeyboardMarkup</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="modules.utils.keyboard_util.get_confirm_kb">
+<code class="sig-prename descclassname"><span class="pre">modules.utils.keyboard_util.</span></code><code class="sig-name descname"><span class="pre">get_confirm_kb</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; <span class="pre">telegram.inline.inlinekeyboardmarkup.InlineKeyboardMarkup</span><a class="headerlink" href="#modules.utils.keyboard_util.get_confirm_kb" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generates the InlineKeyboard to confirm the creation of the post</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>new inline keyboard</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>InlineKeyboardMarkup</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="modules.utils.keyboard_util.get_settings_kb">
+<code class="sig-prename descclassname"><span class="pre">modules.utils.keyboard_util.</span></code><code class="sig-name descname"><span class="pre">get_settings_kb</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; <span class="pre">telegram.inline.inlinekeyboardmarkup.InlineKeyboardMarkup</span><a class="headerlink" href="#modules.utils.keyboard_util.get_settings_kb" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generates the InlineKeyboard to edit the settings</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>new inline keyboard</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>InlineKeyboardMarkup</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="modules.utils.keyboard_util.get_stats_kb">
+<code class="sig-prename descclassname"><span class="pre">modules.utils.keyboard_util.</span></code><code class="sig-name descname"><span class="pre">get_stats_kb</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; <span class="pre">telegram.inline.inlinekeyboardmarkup.InlineKeyboardMarkup</span><a class="headerlink" href="#modules.utils.keyboard_util.get_stats_kb" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generates the InlineKeyboard for the stats menu</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>new inline keyboard</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>InlineKeyboardMarkup</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="modules.utils.keyboard_util.get_vote_kb">
+<code class="sig-prename descclassname"><span class="pre">modules.utils.keyboard_util.</span></code><code class="sig-name descname"><span class="pre">get_vote_kb</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; <span class="pre">telegram.inline.inlinekeyboardmarkup.InlineKeyboardMarkup</span><a class="headerlink" href="#modules.utils.keyboard_util.get_vote_kb" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generates the InlineKeyboard for the published post</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>new inline keyboard</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>InlineKeyboardMarkup</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="modules.utils.keyboard_util.update_approve_kb">
+<code class="sig-prename descclassname"><span class="pre">modules.utils.keyboard_util.</span></code><code class="sig-name descname"><span class="pre">update_approve_kb</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">keyboard</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">telegram.inline.inlinekeyboardbutton.InlineKeyboardButton</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pending_post</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference internal" href="modules.data.html#modules.data.pending_post.PendingPost" title="modules.data.pending_post.PendingPost"><span class="pre">modules.data.pending_post.PendingPost</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">approve</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">int</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">-</span> <span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reject</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">int</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">-</span> <span class="pre">1</span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">telegram.inline.inlinekeyboardmarkup.InlineKeyboardMarkup</span><a class="headerlink" href="#modules.utils.keyboard_util.update_approve_kb" title="Permalink to this definition">¶</a></dt>
+<dd><p>Updates the InlineKeyboard when the valutation of a pending post changes</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>keyboard</strong> (<em>List</em><em>[</em><em>List</em><em>[</em><em>InlineKeyboardButton</em><em>]</em><em>]</em>) – previous keyboard</p></li>
+<li><p><strong>pending_post</strong> (<a class="reference internal" href="modules.data.html#modules.data.pending_post.PendingPost" title="modules.data.pending_post.PendingPost"><em>PendingPost</em></a>) – pending post to which the keyboard is attached</p></li>
+<li><p><strong>approve</strong> (<em>int</em><em>, </em><em>optional</em>) – number of approve votes, if known. Defaults to -1.</p></li>
+<li><p><strong>reject</strong> (<em>int</em><em>, </em><em>optional</em>) – number of reject votes, if known. Defaults to -1.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>updated inline keyboard</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>InlineKeyboardMarkup</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="modules.utils.keyboard_util.update_vote_kb">
+<code class="sig-prename descclassname"><span class="pre">modules.utils.keyboard_util.</span></code><code class="sig-name descname"><span class="pre">update_vote_kb</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">keyboard</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">telegram.inline.inlinekeyboardbutton.InlineKeyboardButton</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">published_post</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference internal" href="modules.data.html#modules.data.published_post.PublishedPost" title="modules.data.published_post.PublishedPost"><span class="pre">modules.data.published_post.PublishedPost</span></a></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">telegram.inline.inlinekeyboardmarkup.InlineKeyboardMarkup</span><a class="headerlink" href="#modules.utils.keyboard_util.update_vote_kb" title="Permalink to this definition">¶</a></dt>
+<dd><p>Updates the InlineKeyboard when the valutation of a published post changes</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>keyboard</strong> (<em>List</em><em>[</em><em>List</em><em>[</em><em>InlineKeyboardButton</em><em>]</em><em>]</em>) – previous keyboard</p></li>
+<li><p><strong>published_post</strong> (<a class="reference internal" href="modules.data.html#modules.data.published_post.PublishedPost" title="modules.data.published_post.PublishedPost"><em>PublishedPost</em></a>) – published post to which the keyboard is attached</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>updated inline keyboard</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>InlineKeyboardMarkup</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="module-modules.utils.post_util">
+<span id="post-util"></span><h2>post_util<a class="headerlink" href="#module-modules.utils.post_util" title="Permalink to this headline">¶</a></h2>
+<p>Modules that handles how the post shall be sent according to the chat (adming group or channel)</p>
+<dl class="py function">
+<dt id="modules.utils.post_util.anonym_name">
+<code class="sig-prename descclassname"><span class="pre">modules.utils.post_util.</span></code><code class="sig-name descname"><span class="pre">anonym_name</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; <span class="pre">str</span><a class="headerlink" href="#modules.utils.post_util.anonym_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generates a random name for an anonym user</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>a name among the ones proposed</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="modules.utils.post_util.send_helper_message">
+<code class="sig-prename descclassname"><span class="pre">modules.utils.post_util.</span></code><code class="sig-name descname"><span class="pre">send_helper_message</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">user_id</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">chat_id</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reply_message_id</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bot</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">telegram.bot.Bot</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reply_markup</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">telegram.inline.inlinekeyboardmarkup.InlineKeyboardMarkup</span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">telegram.message.Message</span><a class="headerlink" href="#modules.utils.post_util.send_helper_message" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sends an helper message to show the author of the post, and to vote on the post if comments are enabled</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>user_id</strong> (<em>int</em>) – id of the user that originated the post</p></li>
+<li><p><strong>chat_id</strong> (<em>int</em>) – id of the chat to which send the helper message</p></li>
+<li><p><strong>reply_message_id</strong> (<em>int</em>) – id of the message the helper message will reply to</p></li>
+<li><p><strong>bot</strong> (<em>Bot</em>) – bot</p></li>
+<li><p><strong>reply_markup</strong> (<em>InlineKeyboardMarkup</em><em>, </em><em>optional</em>) – voting Inline Keyboard. Defaults to None.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>helper message</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>Message</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="modules.utils.post_util.send_post_to">
+<code class="sig-prename descclassname"><span class="pre">modules.utils.post_util.</span></code><code class="sig-name descname"><span class="pre">send_post_to</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">message</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">telegram.message.Message</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bot</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">telegram.bot.Bot</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">destination</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">user_id</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">telegram.message.Message</span><a class="headerlink" href="#modules.utils.post_util.send_post_to" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sends the post to the specified destination:</p>
+<p>admin -&gt; to the admin group, so it can be approved</p>
+<p>channel -&gt; to the channel, so it can be ejoyed by the users (and voted, if comments are disabled)</p>
+<p>channel_group -&gt; to the group associated to the channel, so that users can vote the post (if comments are enabled)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>message</strong> (<em>Message</em>) – message that contains the post to send</p></li>
+<li><p><strong>bot</strong> (<em>Bot</em>) – bot</p></li>
+<li><p><strong>destination</strong> (<em>str</em>) – destination of the message (admin | channel | channel_group)</p></li>
+<li><p><strong>user_id</strong> (<em>int</em><em>, </em><em>optional</em>) – id of the user that originated the post. Defaults to None.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>message used to send a post to a specific destination</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>Message</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="modules.utils.post_util.show_admins_votes">
+<code class="sig-prename descclassname"><span class="pre">modules.utils.post_util.</span></code><code class="sig-name descname"><span class="pre">show_admins_votes</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pending_post</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference internal" href="modules.data.html#modules.data.pending_post.PendingPost" title="modules.data.pending_post.PendingPost"><span class="pre">modules.data.pending_post.PendingPost</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">bot</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">telegram.bot.Bot</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">approve</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">bool</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#modules.utils.post_util.show_admins_votes" title="Permalink to this definition">¶</a></dt>
+<dd><p>After a post is been approved or rejected, shows the admins that aproved or rejected it         and edit the message to delete the reply_markup</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>chat_id</strong> (<em>int</em>) – id of the admin group</p></li>
+<li><p><strong>message_id</strong> (<em>int</em>) – id of the post in question in the group</p></li>
+<li><p><strong>bot</strong> (<em>Bot</em>) – bot</p></li>
+<li><p><strong>approve</strong> (<em>bool</em>) – whether the vote is approve or reject</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+        <a href="modules.handlers.html" class="btn btn-neutral float-left" title="Handlers modules" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2021, Tend, drendog, alepiaz, Helias.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

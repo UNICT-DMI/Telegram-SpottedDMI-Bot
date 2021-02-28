@@ -1,0 +1,33 @@
+Handlers modules
+========================
+
+**Description**
+
+.. automodule:: modules.handlers
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+callback\_handlers
+------------------------------------------
+
+.. automodule:: modules.handlers.callback_handlers
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+command\_handlers
+-----------------------------------------
+
+.. automodule:: modules.handlers.command_handlers
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+job\_handlers
+-------------------------------------
+
+.. automodule:: modules.handlers.job_handlers
+   :members:
+   :undoc-members:
+   :show-inheritance:

@@ -1,0 +1,983 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>Data modules &mdash; Spotted dmi bot  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Debug Modules" href="modules.debug.html" />
+    <link rel="prev" title="All modules" href="modules.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> Spotted dmi bot
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="main.html">Main</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">All modules</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Data modules</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#module-modules.data.data_reader">data_reader</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-modules.data.db_manager">db_manager</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-modules.data.pending_post">pending_post</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-modules.data.post_data">post_data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-modules.data.published_post">published_post</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-modules.data.report">report</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-modules.data.user">user</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="modules.debug.html">Debug Modules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="modules.handlers.html">Handlers modules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="modules.utils.html">Utils modules</a></li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Spotted dmi bot</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="modules.html">All modules</a> &raquo;</li>
+        
+      <li>Data modules</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="_sources/modules.data.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="data-modules">
+<h1>Data modules<a class="headerlink" href="#data-modules" title="Permalink to this headline">¶</a></h1>
+<p><strong>Description</strong></p>
+<span class="target" id="module-modules.data"></span><p>Modules that work with the data section</p>
+<div class="section" id="module-modules.data.data_reader">
+<span id="data-reader"></span><h2>data_reader<a class="headerlink" href="#module-modules.data.data_reader" title="Permalink to this headline">¶</a></h2>
+<p>Read data from files</p>
+<dl class="py function">
+<dt id="modules.data.data_reader.get_abs_path">
+<code class="sig-prename descclassname"><span class="pre">modules.data.data_reader.</span></code><code class="sig-name descname"><span class="pre">get_abs_path</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">root_file_path</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">str</span><a class="headerlink" href="#modules.data.data_reader.get_abs_path" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the abs path from the root directory of the project to the requested path</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>root_file_path</strong> (<em>*str</em>) – path from the root project directory</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>corrisponding abs path</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="modules.data.data_reader.read_file">
+<code class="sig-prename descclassname"><span class="pre">modules.data.data_reader.</span></code><code class="sig-name descname"><span class="pre">read_file</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">root_file_path</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">str</span><a class="headerlink" href="#modules.data.data_reader.read_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read the contens of the file</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>root_file_path</strong> (<em>*str</em>) – path of the file to read from the root project directory</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>contents of the file</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="modules.data.data_reader.read_md">
+<code class="sig-prename descclassname"><span class="pre">modules.data.data_reader.</span></code><code class="sig-name descname"><span class="pre">read_md</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_name</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">str</span><a class="headerlink" href="#modules.data.data_reader.read_md" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read the contens of a markdown file. The path is data/markdown</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>file_name</strong> (<em>str</em>) – name of the file</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>contents of the file</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="module-modules.data.db_manager">
+<span id="db-manager"></span><h2>db_manager<a class="headerlink" href="#module-modules.data.db_manager" title="Permalink to this headline">¶</a></h2>
+<p>Handles the management of databases</p>
+<dl class="py class">
+<dt id="modules.data.db_manager.DbManager">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">modules.data.db_manager.</span></code><code class="sig-name descname"><span class="pre">DbManager</span></code><a class="headerlink" href="#modules.data.db_manager.DbManager" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Class that handles the management of databases</p>
+<dl class="py method">
+<dt id="modules.data.db_manager.DbManager.count_from">
+<em class="property"><span class="pre">static</span> </em><code class="sig-name descname"><span class="pre">count_from</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">table_name</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">select</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">'*'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">where</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">where_args</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">tuple</span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">int</span><a class="headerlink" href="#modules.data.db_manager.DbManager.count_from" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the number of rows from SELECT COUNT(*) FROM table_name WHERE where</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>table_name</strong> (<em>str</em>) – name of the table used in the FROM</p></li>
+<li><p><strong>select</strong> (<em>str</em><em>, </em><em>optional</em>) – columns considered for the query. Defaults to “*”.</p></li>
+<li><p><strong>where</strong> (<em>str</em><em>, </em><em>optional</em>) – where clause, with %s placeholders for the where_args. Defaults to “”.</p></li>
+<li><p><strong>where_args</strong> (<em>tuple</em><em>, </em><em>optional</em>) – args used in the where clause. Defaults to None.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>number of rows</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="modules.data.db_manager.DbManager.delete_from">
+<em class="property"><span class="pre">static</span> </em><code class="sig-name descname"><span class="pre">delete_from</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">table_name</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">where</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">where_args</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">tuple</span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#modules.data.db_manager.DbManager.delete_from" title="Permalink to this definition">¶</a></dt>
+<dd><p>Deletes the rows from the specified table, where the condition, when set, is satisfied
+Execute “DELETE FROM table_name [WHERE where (with where_args)]”</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>table_name</strong> (<em>str</em>) – name of the table used in the DELETE FROM</p></li>
+<li><p><strong>where</strong> (<em>str</em><em>, </em><em>optional</em>) – where clause, with %s placeholders for the where args. Defaults to “”.</p></li>
+<li><p><strong>where_args</strong> (<em>tuple</em><em>, </em><em>optional</em>) – args used in the where clause. Defaults to None.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="modules.data.db_manager.DbManager.get_db">
+<em class="property"><span class="pre">static</span> </em><code class="sig-name descname"><span class="pre">get_db</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; <span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">sqlite3.Connection</span><span class="p"><span class="pre">,</span> </span><span class="pre">sqlite3.Cursor</span><span class="p"><span class="pre">]</span></span><a class="headerlink" href="#modules.data.db_manager.DbManager.get_db" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates the connection to the database. It can be sqlite or postgres</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>sqlite database connection and cursor</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>Tuple[sqlite3.Connection, sqlite3.Cursor]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="modules.data.db_manager.DbManager.insert_into">
+<em class="property"><span class="pre">static</span> </em><code class="sig-name descname"><span class="pre">insert_into</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">table_name</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">values</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">tuple</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">columns</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">tuple</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#modules.data.db_manager.DbManager.insert_into" title="Permalink to this definition">¶</a></dt>
+<dd><p>Inserts the specified values in the database</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>table_name</strong> (<em>str</em>) – name of the table used in the INSERT INTO</p></li>
+<li><p><strong>values</strong> (<em>tuple</em>) – values to be inserted</p></li>
+<li><p><strong>columns</strong> (<em>tuple</em><em>, </em><em>optional</em>) – columns that will be inserted, as a tuple of strings. Defaults to None.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="modules.data.db_manager.DbManager.query_from_file">
+<em class="property"><span class="pre">static</span> </em><code class="sig-name descname"><span class="pre">query_from_file</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">file_path</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#modules.data.db_manager.DbManager.query_from_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>Commits all the queries in the specified file. The queries must be separated by a —– string
+Should not be used to select something</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>file_path</strong> (<em>str</em>) – path of the text file containing the queries</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="modules.data.db_manager.DbManager.query_from_string">
+<em class="property"><span class="pre">static</span> </em><code class="sig-name descname"><span class="pre">query_from_string</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">queries</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#modules.data.db_manager.DbManager.query_from_string" title="Permalink to this definition">¶</a></dt>
+<dd><p>Commits all the queries in the string
+Should not be used to select something</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>queries</strong> (<em>str</em>) – tuple of queries</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="modules.data.db_manager.DbManager.select_from">
+<em class="property"><span class="pre">static</span> </em><code class="sig-name descname"><span class="pre">select_from</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">table_name</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">select</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">'*'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">where</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">where_args</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">tuple</span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">order_by</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">list</span><a class="headerlink" href="#modules.data.db_manager.DbManager.select_from" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the result of a SELECT select FROM table_name [WHERE where (with where_args)]</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>table_name</strong> (<em>str</em>) – name of the table used in the FROM</p></li>
+<li><p><strong>select</strong> (<em>str</em><em>, </em><em>optional</em>) – columns considered for the query. Defaults to “*”.</p></li>
+<li><p><strong>where</strong> (<em>str</em><em>, </em><em>optional</em>) – where clause, with %s placeholders for the where_args. Defaults to “”.</p></li>
+<li><p><strong>where_args</strong> (<em>tuple</em><em>, </em><em>optional</em>) – args used in the where clause. Defaults to None.</p></li>
+<li><p><strong>order_by</strong> (<em>str</em><em>, </em><em>optional</em>) – order by clause. Defaults to “”.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>rows from the select</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt id="modules.data.db_manager.dict_factory">
+<code class="sig-prename descclassname"><span class="pre">modules.data.db_manager.</span></code><code class="sig-name descname"><span class="pre">dict_factory</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cursor</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">sqlite3.Cursor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">row</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">sqlite3.Row</span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">dict</span><a class="headerlink" href="#modules.data.db_manager.dict_factory" title="Permalink to this definition">¶</a></dt>
+<dd><p>Makes so that the cursor is a list of dictionaries with column names as keys</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>cursor</strong> (<em>sqlite3.Cursor</em>) – cursor generated by the database</p></li>
+<li><p><strong>row</strong> (<em>sqlite3.Row</em>) – rows of the database</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>structure of the database used used by the cursor</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="module-modules.data.pending_post">
+<span id="pending-post"></span><h2>pending_post<a class="headerlink" href="#module-modules.data.pending_post" title="Permalink to this headline">¶</a></h2>
+<p>Pending post management</p>
+<dl class="py class">
+<dt id="modules.data.pending_post.PendingPost">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">modules.data.pending_post.</span></code><code class="sig-name descname"><span class="pre">PendingPost</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">user_id</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">u_message_id</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">g_message_id</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">group_id</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">date</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">datetime.datetime</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#modules.data.pending_post.PendingPost" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Class that represents a pending post</p>
+<dl class="py method">
+<dt id="modules.data.pending_post.PendingPost.create">
+<em class="property"><span class="pre">classmethod</span> </em><code class="sig-name descname"><span class="pre">create</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">user_message</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">telegram.message.Message</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">admin_message</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">telegram.message.Message</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#modules.data.pending_post.PendingPost.create" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates a new post and inserts it in the table of pending posts</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>user_message</strong> (<em>Message</em>) – message sent by the user that contains the post</p></li>
+<li><p><strong>admin_message</strong> (<em>Message</em>) – message received in the admin group that references the post</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>istance of the class</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#modules.data.pending_post.PendingPost" title="modules.data.pending_post.PendingPost">PendingPost</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="modules.data.pending_post.PendingPost.delete_post">
+<code class="sig-name descname"><span class="pre">delete_post</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#modules.data.pending_post.PendingPost.delete_post" title="Permalink to this definition">¶</a></dt>
+<dd><p>Removes all entries on a post that is no longer pending</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="modules.data.pending_post.PendingPost.from_group">
+<em class="property"><span class="pre">classmethod</span> </em><code class="sig-name descname"><span class="pre">from_group</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">group_id</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">g_message_id</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#modules.data.pending_post.PendingPost.from_group" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieves a pending post from the info related to the admin group</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>group_id</strong> (<em>int</em>) – id of the admin group</p></li>
+<li><p><strong>g_message_id</strong> (<em>int</em>) – id of the post in the group</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>istance of the class</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#modules.data.pending_post.PendingPost" title="modules.data.pending_post.PendingPost">PendingPost</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="modules.data.pending_post.PendingPost.from_user">
+<em class="property"><span class="pre">classmethod</span> </em><code class="sig-name descname"><span class="pre">from_user</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">user_id</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#modules.data.pending_post.PendingPost.from_user" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieves a pending post from the user_id</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>user_id</strong> (<em>int</em>) – id of the author of the post</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>istance of the class</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#modules.data.pending_post.PendingPost" title="modules.data.pending_post.PendingPost">PendingPost</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="modules.data.pending_post.PendingPost.get_all_pending_memes">
+<em class="property"><span class="pre">static</span> </em><code class="sig-name descname"><span class="pre">get_all_pending_memes</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">group_id</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">before</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">datetime.datetime</span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">list</span><a class="headerlink" href="#modules.data.pending_post.PendingPost.get_all_pending_memes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets the list of pending memes in the specified admin group.
+If before is specified, returns only the one sent before that timestamp</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>group_id</strong> (<em>int</em>) – id of the admin group</p></li>
+<li><p><strong>before</strong> (<em>datetime</em><em>, </em><em>optional</em>) – timestamp before wich messages will be considered. Defaults to None.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>list of ids of pending memes</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>List[type(<a class="reference internal" href="#modules.data.pending_post.PendingPost" title="modules.data.pending_post.PendingPost">PendingPost</a>)]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="modules.data.pending_post.PendingPost.get_list_admin_votes">
+<code class="sig-name descname"><span class="pre">get_list_admin_votes</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">vote</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">bool</span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><a class="headerlink" href="#modules.data.pending_post.PendingPost.get_list_admin_votes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets the list of admins that approved or rejected the post</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>vote</strong> (<em>bool</em>) – whether you look for the approve or reject votes</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>tuple of admins that approved or rejected a pending post</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>Tuple[str]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="modules.data.pending_post.PendingPost.get_votes">
+<code class="sig-name descname"><span class="pre">get_votes</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">vote</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">bool</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#modules.data.pending_post.PendingPost.get_votes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets all the votes of a specific kind (approve or reject)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>vote</strong> (<em>bool</em>) – whether you look for the approve or reject votes</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>number of votes</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="modules.data.pending_post.PendingPost.is_pending">
+<em class="property"><span class="pre">static</span> </em><code class="sig-name descname"><span class="pre">is_pending</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">user_id</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">bool</span><a class="headerlink" href="#modules.data.pending_post.PendingPost.is_pending" title="Permalink to this definition">¶</a></dt>
+<dd><p>Checks if the user still has a post pending</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>user_id</strong> (<em>int</em>) – id of the user to check</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>whether the user still has a post pending or not</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="modules.data.pending_post.PendingPost.set_admin_vote">
+<code class="sig-name descname"><span class="pre">set_admin_vote</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">admin_id</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">approval</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">bool</span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">int</span><a class="headerlink" href="#modules.data.pending_post.PendingPost.set_admin_vote" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds the vote of the admin on a specific post, or update the existing vote, if needed</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>admin_id</strong> (<em>int</em>) – id of the admin that voted</p></li>
+<li><p><strong>approval</strong> (<em>bool</em>) – whether the vote is approval or reject</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>number of similar votes (all the approve or the reject), or -1 if the vote wasn’t updated</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-modules.data.post_data">
+<span id="post-data"></span><h2>post_data<a class="headerlink" href="#module-modules.data.post_data" title="Permalink to this headline">¶</a></h2>
+<p>Data management for the bot</p>
+<dl class="py class">
+<dt id="modules.data.post_data.PostData">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">modules.data.post_data.</span></code><code class="sig-name descname"><span class="pre">PostData</span></code><a class="headerlink" href="#modules.data.post_data.PostData" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Class that handles the management of persistent data fetch or manipulation in the meme bot</p>
+<dl class="py method">
+<dt id="modules.data.post_data.PostData.get_avg">
+<em class="property"><span class="pre">static</span> </em><code class="sig-name descname"><span class="pre">get_avg</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">vote</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">int</span><a class="headerlink" href="#modules.data.post_data.PostData.get_avg" title="Permalink to this definition">¶</a></dt>
+<dd><p>Shows the average number of votes of the specified type per post</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>vote</strong> (<em>str</em><em>, </em><em>optional</em>) – type of votes to consider. None means all. Defaults to None.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>average number of votes</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="modules.data.post_data.PostData.get_max_id">
+<em class="property"><span class="pre">static</span> </em><code class="sig-name descname"><span class="pre">get_max_id</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">vote</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span> </span><span class="pre">int</span><span class="p"><span class="pre">,</span> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><a class="headerlink" href="#modules.data.post_data.PostData.get_max_id" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets the id of the post with the most votes of the specified type</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>vote</strong> (<em>str</em><em>, </em><em>optional</em>) – type of votes to consider. None means all. Defaults to None.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>number of votes, id of the message, id of the channel</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>Tuple[int, int, int]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="modules.data.post_data.PostData.get_n_posts">
+<em class="property"><span class="pre">static</span> </em><code class="sig-name descname"><span class="pre">get_n_posts</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; <span class="pre">int</span><a class="headerlink" href="#modules.data.post_data.PostData.get_n_posts" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets the total number of posts</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>total number of posts</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="modules.data.post_data.PostData.get_n_votes">
+<em class="property"><span class="pre">static</span> </em><code class="sig-name descname"><span class="pre">get_n_votes</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">vote</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">int</span><a class="headerlink" href="#modules.data.post_data.PostData.get_n_votes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets the total number of votes of the specified</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>vote</strong> (<em>str</em><em>, </em><em>optional</em>) – type of votes to consider. None means all. Defaults to None.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>number of votes of the specified type</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-modules.data.published_post">
+<span id="published-post"></span><h2>published_post<a class="headerlink" href="#module-modules.data.published_post" title="Permalink to this headline">¶</a></h2>
+<p>Published post management</p>
+<dl class="py class">
+<dt id="modules.data.published_post.PublishedPost">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">modules.data.published_post.</span></code><code class="sig-name descname"><span class="pre">PublishedPost</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">channel_id</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">c_message_id</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#modules.data.published_post.PublishedPost" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Class that represents a published post</p>
+<dl class="py method">
+<dt id="modules.data.published_post.PublishedPost.create">
+<em class="property"><span class="pre">classmethod</span> </em><code class="sig-name descname"><span class="pre">create</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">channel_message</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">telegram.message.Message</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#modules.data.published_post.PublishedPost.create" title="Permalink to this definition">¶</a></dt>
+<dd><p>Inserts a new post in the table of published posts</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>channel_message</strong> (<em>Message</em>) – message ready to be published</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>istance of the class</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#modules.data.published_post.PublishedPost" title="modules.data.published_post.PublishedPost">PublishedPost</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="modules.data.published_post.PublishedPost.from_channel">
+<em class="property"><span class="pre">classmethod</span> </em><code class="sig-name descname"><span class="pre">from_channel</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">channel_id</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">c_message_id</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#modules.data.published_post.PublishedPost.from_channel" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieves a published post from the info related to the channel</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>channel_id</strong> (<em>int</em>) – id of the channel</p></li>
+<li><p><strong>c_message_id</strong> (<em>int</em>) – id of the post in the channel</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>istance of the class</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#modules.data.published_post.PublishedPost" title="modules.data.published_post.PublishedPost">PublishedPost</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="modules.data.published_post.PublishedPost.get_votes">
+<code class="sig-name descname"><span class="pre">get_votes</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">vote</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">int</span><a class="headerlink" href="#modules.data.published_post.PublishedPost.get_votes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets all the votes of a specific kind on the post</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>vote</strong> (<em>str</em>) – kind of vote you are looking for</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>number of votes</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="modules.data.published_post.PublishedPost.set_user_vote">
+<code class="sig-name descname"><span class="pre">set_user_vote</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">user_id</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vote</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">bool</span><a class="headerlink" href="#modules.data.published_post.PublishedPost.set_user_vote" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds the vote of the user on the post, updates the existing vote or deletes it</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>user_id</strong> (<em>int</em>) – id of the user that voted</p></li>
+<li><p><strong>vote</strong> (<em>str</em>) – kind of vote the user wants to add or remove</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>whether the vote was added or removed</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-modules.data.report">
+<span id="report"></span><h2>report<a class="headerlink" href="#module-modules.data.report" title="Permalink to this headline">¶</a></h2>
+<p>Reports management</p>
+<dl class="py class">
+<dt id="modules.data.report.Report">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">modules.data.report.</span></code><code class="sig-name descname"><span class="pre">Report</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">user_id</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">group_id</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">g_message_id</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">channel_id</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">c_message_id</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_username</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">date</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">datetime.datetime</span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#modules.data.report.Report" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Class that represents a report</p>
+<dl class="py method">
+<dt id="modules.data.report.Report.create_post_report">
+<em class="property"><span class="pre">classmethod</span> </em><code class="sig-name descname"><span class="pre">create_post_report</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">user_id</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">channel_id</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">c_message_id</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">admin_message</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">telegram.message.Message</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#modules.data.report.Report.create_post_report" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds the report of the user on a specific post</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>user_id</strong> (<em>int</em>) – id of the user that reported</p></li>
+<li><p><strong>c_message_id</strong> (<em>int</em>) – id of the channel</p></li>
+<li><p><strong>c_message_id</strong> – id of the post in question in the channel</p></li>
+<li><p><strong>admin_message</strong> (<em>Message</em>) – message received in the admin group that references the report</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>istance of the class or None if the report was not created</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#modules.data.report.Report" title="modules.data.report.Report">Report</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="modules.data.report.Report.create_user_report">
+<em class="property"><span class="pre">classmethod</span> </em><code class="sig-name descname"><span class="pre">create_user_report</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">user_id</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_username</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">admin_message</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">telegram.message.Message</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#modules.data.report.Report.create_user_report" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds the report of the user targetting another user</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>user_id</strong> (<em>int</em>) – id of the user that reported</p></li>
+<li><p><strong>target_username</strong> (<em>str</em>) – username of reported user</p></li>
+<li><p><strong>admin_message</strong> (<em>Message</em>) – message received in the admin group that references the report</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>istance of the class</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#modules.data.report.Report" title="modules.data.report.Report">Report</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="modules.data.report.Report.from_group">
+<em class="property"><span class="pre">classmethod</span> </em><code class="sig-name descname"><span class="pre">from_group</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">group_id</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">g_message_id</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#modules.data.report.Report.from_group" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets a report of any type related to the specified message in the admin group</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>group_id</strong> (<em>int</em>) – id of the admin group</p></li>
+<li><p><strong>g_message_id</strong> (<em>int</em>) – id of the report in the group</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>istance of the class or None if the report was not present</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#modules.data.report.Report" title="modules.data.report.Report">Report</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="modules.data.report.Report.get_last_user_report">
+<em class="property"><span class="pre">classmethod</span> </em><code class="sig-name descname"><span class="pre">get_last_user_report</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">user_id</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#modules.data.report.Report.get_last_user_report" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets the last user report of a specific user</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>user_id</strong> (<em>int</em>) – id of the user that reported</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>istance of the class or None if the report was not present</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#modules.data.report.Report" title="modules.data.report.Report">Report</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="modules.data.report.Report.get_post_report">
+<em class="property"><span class="pre">classmethod</span> </em><code class="sig-name descname"><span class="pre">get_post_report</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">user_id</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">channel_id</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">c_message_id</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#modules.data.report.Report.get_post_report" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets the report of a specific user on a published post</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>user_id</strong> (<em>int</em>) – id of the user that reported</p></li>
+<li><p><strong>c_message_id</strong> (<em>int</em>) – id of the channel</p></li>
+<li><p><strong>c_message_id</strong> – id of the post in question in the channel</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>istance of the class or None if the report was not present</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#modules.data.report.Report" title="modules.data.report.Report">Report</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="modules.data.report.Report.minutes_passed">
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">minutes_passed</span></code><a class="headerlink" href="#modules.data.report.Report.minutes_passed" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates the ammount of minutes elapsed from when the report was submitted, if applicable</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>how many minutes have enlapsed, if applicable, -1 otherwise</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-modules.data.user">
+<span id="user"></span><h2>user<a class="headerlink" href="#module-modules.data.user" title="Permalink to this headline">¶</a></h2>
+<p>Users management</p>
+<dl class="py class">
+<dt id="modules.data.user.User">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">modules.data.user.</span></code><code class="sig-name descname"><span class="pre">User</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">user_id</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#modules.data.user.User" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Class that represents a user</p>
+<dl class="py method">
+<dt id="modules.data.user.User.ban">
+<code class="sig-name descname"><span class="pre">ban</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#modules.data.user.User.ban" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds the user to the banned list</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="modules.data.user.User.become_anonym">
+<code class="sig-name descname"><span class="pre">become_anonym</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; <span class="pre">bool</span><a class="headerlink" href="#modules.data.user.User.become_anonym" title="Permalink to this definition">¶</a></dt>
+<dd><p>Removes the user from the credited list, if he was present</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>whether the user was already anonym</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="modules.data.user.User.become_credited">
+<code class="sig-name descname"><span class="pre">become_credited</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; <span class="pre">bool</span><a class="headerlink" href="#modules.data.user.User.become_credited" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds the user to the credited list, if he wasn’t already credited</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>whether the user was already credited</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="modules.data.user.User.is_banned">
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">is_banned</span></code><a class="headerlink" href="#modules.data.user.User.is_banned" title="Permalink to this definition">¶</a></dt>
+<dd><p>Checks if the user is banned or not</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>whether the user is banned or not</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="modules.data.user.User.is_credited">
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">is_credited</span></code><a class="headerlink" href="#modules.data.user.User.is_credited" title="Permalink to this definition">¶</a></dt>
+<dd><p>Checks if the user is in the credited list</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>whether the user is to be credited or not</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="modules.data.user.User.is_pending">
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">is_pending</span></code><a class="headerlink" href="#modules.data.user.User.is_pending" title="Permalink to this definition">¶</a></dt>
+<dd><p>Checks if the user has a post already pending or not</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>whether the user has a post already pending or not</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="modules.data.user.User.sban">
+<code class="sig-name descname"><span class="pre">sban</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; <span class="pre">bool</span><a class="headerlink" href="#modules.data.user.User.sban" title="Permalink to this definition">¶</a></dt>
+<dd><p>Removes the user from the banned list</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>whether the user was present in the banned list before the sban or not</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+        <a href="modules.debug.html" class="btn btn-neutral float-right" title="Debug Modules" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="modules.html" class="btn btn-neutral float-left" title="All modules" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2021, Tend, drendog, alepiaz, Helias.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
