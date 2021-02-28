@@ -1,0 +1,8 @@
+pip3 install sphinx
+pip3 install sphinx_rtd_theme
+sphinx-apidoc -o docs/source .
+--Edit the .rts files--
+sphinx-build -b html docs\source docs\build
+docs\make html
+
+https://github.com/TendTo/sphinx-doc for more info
