@@ -6,4 +6,4 @@ To see the actual source code, go to the master brach
 
 ## Database schema
 
-![DbSchema](img/DBbchema.JPG)
+![DbSchema](img/DbSchema.JPG)
