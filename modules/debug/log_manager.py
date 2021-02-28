@@ -1,13 +1,62 @@
 """Handles the logging of events"""
 import logging
-from modules.data.data_reader import get_abs_path
+import traceback
+import html
+from datetime import datetime
+from telegram import Update, ParseMode
+from telegram.ext import CallbackContext
+from modules.data.data_reader import config_map, get_abs_path
 
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO)
 logger = logging.getLogger(__name__)
 logger.info("Logger enabled")
 
 
-def log_message(update, context):
+def error_handler(update: Update, context: CallbackContext):  # pylint: disable=unused-argument
+    """Logs the error and notifies the admins.
+
+    Args:
+        update (Update): update event
+        context (CallbackContext): context passed by the handler
+    """
+    logger.error(msg="Exception while handling an update:", exc_info=context.error)
+
+    traceback_list = traceback.format_exception(None, context.error, context.error.__traceback__)
+    traceback_str = ''.join(traceback_list)
+
+    notify_error_admin(context=context, traceback_str=traceback_str)
+    try:  # log the error
+        with open(get_abs_path("logs", "errors.log"), "a", encoding="utf8") as log_file:
+            message = "\n___ERROR LOG___\n"\
+                        f"time: {datetime.now()}\n"\
+                        f"error: {context.error}\n"\
+                        f"error_traceback: {traceback_str}\n"
+            if update and update.message:  # if the update contains a message, show additional info
+                chat = update.message.chat
+                message += f"id_message:  {update.message.message_id}\n"\
+                            f"chat_id:  {chat.id}\n"\
+                            f"chat_type:  {chat.type}\n"\
+                            f"chat_title:  {chat.title}\n"\
+                            f"message_date:  {update.message.date}\n"
+            message += "_____________\n"
+            log_file.write("\n" + message)
+    except AttributeError as e:
+        logger.warning(e)
+    except FileNotFoundError as e:
+        logger.error(e)
+
+
+def notify_error_admin(context: CallbackContext, traceback_str: str):
+    """Sends a telegram message to notify the admins.
+
+    Args:
+        context (CallbackContext): context passed by the handler
+    """
+    text = (f'An exception was raised while handling an update\n\n' f'<pre>{html.escape(traceback_str)}</pre>')
+    context.bot.send_message(chat_id=config_map['meme']['group_id'], text=text, parse_mode=ParseMode.HTML)
+
+
+def log_message(update, context):  # pylint: disable=unused-argument
     """Log the message that caused the update
 
     Args:

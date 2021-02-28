@@ -81,6 +81,7 @@ class DbManager():
             select (str, optional): columns considered for the query. Defaults to "*".
             where (str, optional): where clause, with %s placeholders for the where_args. Defaults to "".
             where_args (tuple, optional): args used in the where clause. Defaults to None.
+            order_by (str, optional): order by clause. Defaults to "".
 
         Returns:
             list: rows from the select
@@ -92,9 +93,9 @@ class DbManager():
         sql_query = f"SELECT {select} FROM {table_name} "
 
         if where:
-            sql_query += f"WHERE {where} "  
+            sql_query += f"WHERE {where} "
             if order_by:
-                sql_query += f"ORDER BY {order_by} "               
+                sql_query += f"ORDER BY {order_by} "
             if where_args:
                 try:
                     cur.execute(sql_query, where_args)
@@ -107,13 +108,14 @@ class DbManager():
                     logger.error(str(e))
         else:
             if order_by:
-                sql_query += f"ORDER BY {order_by} "  
+                sql_query += f"ORDER BY {order_by} "
             try:
                 cur.execute(sql_query)
             except sqlite3.Error as e:
                 logger.error(str(e))
-        
+
         query_result = cur.fetchall()
+        conn.commit()
         cur.close()
         conn.close()
         return query_result
@@ -153,6 +155,7 @@ class DbManager():
                 logger.error(str(e))
 
         query_result = cur.fetchall()
+        conn.commit()
         cur.close()
         conn.close()
         return query_result[0]['number']
