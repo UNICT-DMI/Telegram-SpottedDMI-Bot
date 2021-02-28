@@ -1,40 +1,11 @@
 """Data management for the bot"""
-from typing import Optional, Tuple
+from typing import Tuple
 from modules.data.db_manager import DbManager
 
 
 class PostData():
     """Class that handles the management of persistent data fetch or manipulation in the meme bot
     """
-    @staticmethod
-    def get_user_id(g_message_id: int, group_id: int) -> Optional[int]:
-        """Gets the user_id of the user that made the report
-
-        Args:
-            g_message_id (int): id of the post in question in the group
-            group_id (int): id of the admin group
-
-        Returns:
-            Optional[int]: user_id, if found
-        """
-        list_user_id = DbManager.select_from(select="user_id",
-                                             table_name="spot_report",
-                                             where="g_message_id = %s and group_id = %s",
-                                             where_args=(g_message_id, group_id))
-
-        if list_user_id:
-            return list_user_id[0]['user_id']
-
-        list_user_id = DbManager.select_from(select="user_id",
-                                             table_name="user_report",
-                                             where="g_message_id = %s and group_id = %s",
-                                             where_args=(g_message_id, group_id))
-
-        if list_user_id:
-            return list_user_id[0]['user_id']
-
-        return None
-
     @staticmethod
     def get_n_posts() -> int:
         """Gets the total number of posts
@@ -93,4 +64,7 @@ class PostData():
                             ORDER BY v.c_message_id DESC
                         )"""
         max_message = DbManager.select_from(select="MAX(n_votes) as max, message_id, channel_id", table_name=sub_select)
+
+        if max_message[0]['max'] is None:  # there is no post with the requested vote
+            return 0, 0, "0"
         return int(max_message[0]['max']), int(max_message[0]['message_id']), str(max_message[0]['channel_id'])

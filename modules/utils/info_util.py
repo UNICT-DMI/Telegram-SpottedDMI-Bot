@@ -30,7 +30,7 @@ def get_callback_info(update: Update, context: CallbackContext) -> dict:
         context (CallbackContext): context passed by the handler
 
     Returns:
-        dict: {bot, bot_data, message, chat_id, text, query_id, data, message_id, sender_id, sender_username, reply_markup, 'user_data'}
+        dict: {bot, bot_data, message, chat_id, text, query_id, data, message_id, sender_id, sender_username, reply_markup, user_data}
     """
     return {
         'bot': context.bot,

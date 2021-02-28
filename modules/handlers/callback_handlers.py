@@ -286,6 +286,7 @@ def stats_callback(update: Update, context: CallbackContext):
         context (CallbackContext): context passed by the handler
     """
     info = get_callback_info(update, context)
+    info['bot'].answerCallbackQuery(callback_query_id=info['query_id'])  # end the spinning progress bar
     # the callback data indicates the correct callback and the arg to pass to it separated by ,
     data = info['data'].split(",")
     try:

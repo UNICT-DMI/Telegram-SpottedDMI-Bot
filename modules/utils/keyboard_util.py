@@ -40,21 +40,30 @@ def get_stats_kb() -> InlineKeyboardMarkup:
         [InlineKeyboardButton("~  Lo spot con più ___  ~", callback_data="none")],
         [
             InlineKeyboardButton("voti", callback_data="stats_max,votes"),
-            InlineKeyboardButton("👍", callback_data="stats_max,1"),
-            InlineKeyboardButton("👎", callback_data="stats_max,0"),
+            InlineKeyboardButton(REACTION['1'], callback_data="stats_max,1"),
+            InlineKeyboardButton(REACTION['0'], callback_data="stats_max,0"),
+            InlineKeyboardButton(REACTION['2'], callback_data="stats_max,2"),
+            InlineKeyboardButton(REACTION['3'], callback_data="stats_max,3"),
+            InlineKeyboardButton(REACTION['4'], callback_data="stats_max,4"),
         ],
         [InlineKeyboardButton("~  Media di ___ per spot  ~", callback_data="none")],
         [
             InlineKeyboardButton("voti", callback_data="stats_avg,votes"),
-            InlineKeyboardButton("👍", callback_data="stats_avg,1"),
-            InlineKeyboardButton("👎", callback_data="stats_avg,0"),
+            InlineKeyboardButton(REACTION['1'], callback_data="stats_avg,1"),
+            InlineKeyboardButton(REACTION['0'], callback_data="stats_avg,0"),
+            InlineKeyboardButton(REACTION['2'], callback_data="stats_avg,2"),
+            InlineKeyboardButton(REACTION['3'], callback_data="stats_avg,3"),
+            InlineKeyboardButton(REACTION['4'], callback_data="stats_avg,4"),
         ],
         [InlineKeyboardButton("~  Numero di ___ totale  ~", callback_data="none")],
         [
             InlineKeyboardButton("spot", callback_data="stats_tot,posts"),
             InlineKeyboardButton("voti", callback_data="stats_tot,votes"),
-            InlineKeyboardButton("👍", callback_data="stats_tot,1"),
-            InlineKeyboardButton("👎", callback_data="stats_tot,0"),
+            InlineKeyboardButton(REACTION['1'], callback_data="stats_tot,1"),
+            InlineKeyboardButton(REACTION['0'], callback_data="stats_tot,0"),
+            InlineKeyboardButton(REACTION['2'], callback_data="stats_tot,2"),
+            InlineKeyboardButton(REACTION['3'], callback_data="stats_tot,3"),
+            InlineKeyboardButton(REACTION['4'], callback_data="stats_tot,4"),
         ],
         [InlineKeyboardButton("Chiudi", callback_data="stats_close,")],
     ])
@@ -82,12 +91,12 @@ def get_vote_kb() -> InlineKeyboardMarkup:
         InlineKeyboardButton(f"{REACTION['1']} 0", callback_data="meme_vote,1"),
         InlineKeyboardButton(f"{REACTION['0']} 0", callback_data="meme_vote,0")
     ],
-    [
-        InlineKeyboardButton(f"{REACTION['2']} 0", callback_data="meme_vote,2"),
-        InlineKeyboardButton(f"{REACTION['3']} 0", callback_data="meme_vote,3"),
-        InlineKeyboardButton(f"{REACTION['4']} 0", callback_data="meme_vote,4"),
-        InlineKeyboardButton("🚩 Report", callback_data="meme_report_spot,")
-    ]])
+                                 [
+                                     InlineKeyboardButton(f"{REACTION['2']} 0", callback_data="meme_vote,2"),
+                                     InlineKeyboardButton(f"{REACTION['3']} 0", callback_data="meme_vote,3"),
+                                     InlineKeyboardButton(f"{REACTION['4']} 0", callback_data="meme_vote,4"),
+                                     InlineKeyboardButton("🚩 Report", callback_data="meme_report_spot,")
+                                 ]])
 
 
 def update_approve_kb(keyboard: List[List[InlineKeyboardButton]],
