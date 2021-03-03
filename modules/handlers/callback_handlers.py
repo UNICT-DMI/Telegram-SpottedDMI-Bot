@@ -243,9 +243,6 @@ def vote_callback(info: dict, arg: str) -> Tuple[str, InlineKeyboardMarkup, int]
     return None, update_vote_kb(keyboard=keyboard, published_post=publishedPost), None
 
 
-# endregion
-
-
 def report_spot_callback(info: dict, args: str) -> Tuple[str, InlineKeyboardMarkup, int]:  # pylint: disable=unused-argument
     """Handles the report callback.
 
@@ -265,17 +262,22 @@ def report_spot_callback(info: dict, args: str) -> Tuple[str, InlineKeyboardMark
     if report is not None:  # this user has already reported this post
         info['bot'].answerCallbackQuery(callback_query_id=info['query_id'], text="Hai già segnalato questo spot.")
         return None, None, STATE['end']
-
-    info['bot'].answerCallbackQuery(callback_query_id=info['query_id'], text="Segnala in privato tramite il bot.")
-
-    info['bot'].forward_message(chat_id=info['sender_id'], from_chat_id=info['chat_id'], message_id=abusive_message_id)
-
-    info['bot'].send_message(chat_id=info['sender_id'],
-                             text="Scrivi il motivo della segnalazione del post, altrimenti digita /cancel")
+    try:
+        info['bot'].forward_message(chat_id=info['sender_id'], from_chat_id=info['chat_id'], message_id=abusive_message_id)
+        info['bot'].send_message(chat_id=info['sender_id'],
+                                text="Scrivi il motivo della segnalazione del post, altrimenti digita /cancel")
+        info['bot'].answerCallbackQuery(callback_query_id=info['query_id'], text="Segnala in privato tramite il bot")
+    except (BadRequest, Unauthorized):
+        info['bot'].answerCallbackQuery(callback_query_id=info['query_id'],
+                                        text="Assicurati di aver avviato la chat con @Spotted_DMI_Bot")
+        return None, None, None
 
     info['user_data']['current_post_reported'] = abusive_message_id
 
     return None, None, STATE['reporting_spot']
+
+
+# endregion
 
 
 def stats_callback(update: Update, context: CallbackContext):
