@@ -150,7 +150,10 @@ def approve_yes_callback(info: dict, arg: None) -> Tuple[str, InlineKeyboardMark
     pending_post = PendingPost.from_group(group_id=info['chat_id'], g_message_id=info['message_id'])
     if pending_post is None:  # this pending post is not present in the database
         return None, None, None
-    info['bot'].answerCallbackQuery(callback_query_id=info['query_id'])  # end the spinning progress bar
+    try:
+        info['bot'].answerCallbackQuery(callback_query_id=info['query_id'])  # end the spinning progress bar
+    except BadRequest:
+        pass
     n_approve = pending_post.set_admin_vote(info['sender_id'], True)
 
     # The post passed the approval phase and is to be published
@@ -194,7 +197,10 @@ def approve_no_callback(info: dict, arg: None) -> Tuple[str, InlineKeyboardMarku
     pending_post = PendingPost.from_group(group_id=info['chat_id'], g_message_id=info['message_id'])
     if pending_post is None:  # this pending post is not present in the database
         return None, None, None
-    info['bot'].answerCallbackQuery(callback_query_id=info['query_id'])  # end the spinning progress bar
+    try:
+        info['bot'].answerCallbackQuery(callback_query_id=info['query_id'])  # end the spinning progress bar
+    except BadRequest:
+        pass
     n_reject = pending_post.set_admin_vote(info['sender_id'], False)
 
     # The post has been refused
@@ -234,10 +240,13 @@ def vote_callback(info: dict, arg: str) -> Tuple[str, InlineKeyboardMarkup, int]
     publishedPost = PublishedPost.from_channel(channel_id=info['chat_id'], c_message_id=info['message_id'])
     was_added = publishedPost.set_user_vote(user_id=info['sender_id'], vote=arg)
 
-    if was_added:
-        info['bot'].answerCallbackQuery(callback_query_id=info['query_id'], text=f"Hai messo un {REACTION[arg]}")
-    else:
-        info['bot'].answerCallbackQuery(callback_query_id=info['query_id'], text=f"Hai tolto il {REACTION[arg]}")
+    try:
+        if was_added:
+            info['bot'].answerCallbackQuery(callback_query_id=info['query_id'], text=f"Hai messo un {REACTION[arg]}")
+        else:
+            info['bot'].answerCallbackQuery(callback_query_id=info['query_id'], text=f"Hai tolto il {REACTION[arg]}")
+    except BadRequest:
+        return None, None, None
 
     keyboard = info['reply_markup'].inline_keyboard
     return None, update_vote_kb(keyboard=keyboard, published_post=publishedPost), None
