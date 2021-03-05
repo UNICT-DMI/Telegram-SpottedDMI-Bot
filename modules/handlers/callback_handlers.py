@@ -2,7 +2,7 @@
 from typing import Tuple
 from telegram import Update, InlineKeyboardMarkup
 from telegram.ext import CallbackContext
-from telegram.error import BadRequest, Unauthorized
+from telegram.error import BadRequest, RetryAfter, Unauthorized
 from modules.handlers import STATE
 from modules.debug.log_manager import logger
 from modules.data.data_reader import config_map
@@ -61,7 +61,7 @@ def meme_callback(update: Update, context: CallbackContext) -> int:
             info['bot'].edit_message_reply_markup(chat_id=info['chat_id'],
                                                 message_id=info['message_id'],
                                                 reply_markup=reply_markup)
-    except BadRequest as e:
+    except (BadRequest, RetryAfter) as e:
         logger.warning(e)
 
     return output
