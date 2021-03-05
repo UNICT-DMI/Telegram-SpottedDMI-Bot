@@ -51,15 +51,19 @@ def meme_callback(update: Update, context: CallbackContext) -> int:
         message_text = reply_markup = output = None
         logger.error("meme_callback: %s", e)
 
-    if message_text:  # if there is a valid text, edit the menu with the new text
-        info['bot'].edit_message_text(chat_id=info['chat_id'],
-                                      message_id=info['message_id'],
-                                      text=message_text,
-                                      reply_markup=reply_markup)
-    elif reply_markup:  # if there is a valid reply_markup, edit the menu with the new reply_markup
-        info['bot'].edit_message_reply_markup(chat_id=info['chat_id'],
-                                              message_id=info['message_id'],
-                                              reply_markup=reply_markup)
+    try:
+        if message_text:  # if there is a valid text, edit the menu with the new text
+            info['bot'].edit_message_text(chat_id=info['chat_id'],
+                                        message_id=info['message_id'],
+                                        text=message_text,
+                                        reply_markup=reply_markup)
+        elif reply_markup:  # if there is a valid reply_markup, edit the menu with the new reply_markup
+            info['bot'].edit_message_reply_markup(chat_id=info['chat_id'],
+                                                message_id=info['message_id'],
+                                                reply_markup=reply_markup)
+    except BadRequest as e:
+        logger.warning(e)
+
     return output
 
 
@@ -78,6 +82,8 @@ def confirm_callback(info: dict, arg: str) -> Tuple[str, InlineKeyboardMarkup, i
         Tuple[str, InlineKeyboardMarkup, int]: text and replyMarkup that make up the reply, new conversation state
     """
     if arg == "yes":  # if the the user wants to publish the post
+        if User(info['sender_id']).is_pending:  # there is already a spot in pending by this user
+            return None, None, STATE['end']
         user_message = info['message'].reply_to_message
         admin_message = send_post_to(message=user_message, bot=info['bot'], destination="admin")
         if admin_message:
@@ -152,8 +158,8 @@ def approve_yes_callback(info: dict, arg: None) -> Tuple[str, InlineKeyboardMark
         return None, None, None
     try:
         info['bot'].answerCallbackQuery(callback_query_id=info['query_id'])  # end the spinning progress bar
-    except BadRequest:
-        pass
+    except BadRequest as e:
+        logger.warning(e)
     n_approve = pending_post.set_admin_vote(info['sender_id'], True)
 
     # The post passed the approval phase and is to be published
@@ -199,8 +205,8 @@ def approve_no_callback(info: dict, arg: None) -> Tuple[str, InlineKeyboardMarku
         return None, None, None
     try:
         info['bot'].answerCallbackQuery(callback_query_id=info['query_id'])  # end the spinning progress bar
-    except BadRequest:
-        pass
+    except BadRequest as e:
+        logger.warning(e)
     n_reject = pending_post.set_admin_vote(info['sender_id'], False)
 
     # The post has been refused
@@ -245,7 +251,8 @@ def vote_callback(info: dict, arg: str) -> Tuple[str, InlineKeyboardMarkup, int]
             info['bot'].answerCallbackQuery(callback_query_id=info['query_id'], text=f"Hai messo un {REACTION[arg]}")
         else:
             info['bot'].answerCallbackQuery(callback_query_id=info['query_id'], text=f"Hai tolto il {REACTION[arg]}")
-    except BadRequest:
+    except BadRequest as e:
+        logger.warning(e)
         return None, None, None
 
     keyboard = info['reply_markup'].inline_keyboard
@@ -269,16 +276,22 @@ def report_spot_callback(info: dict, args: str) -> Tuple[str, InlineKeyboardMark
                                     channel_id=config_map['meme']['channel_id'],
                                     c_message_id=abusive_message_id)
     if report is not None:  # this user has already reported this post
-        info['bot'].answerCallbackQuery(callback_query_id=info['query_id'], text="Hai già segnalato questo spot.")
+        try:
+            info['bot'].answerCallbackQuery(callback_query_id=info['query_id'], text="Hai già segnalato questo spot.")
+        except BadRequest as e:
+            logger.warning(e)
         return None, None, STATE['end']
     try:
         info['bot'].forward_message(chat_id=info['sender_id'], from_chat_id=info['chat_id'], message_id=abusive_message_id)
         info['bot'].send_message(chat_id=info['sender_id'],
                                 text="Scrivi il motivo della segnalazione del post, altrimenti digita /cancel")
         info['bot'].answerCallbackQuery(callback_query_id=info['query_id'], text="Segnala in privato tramite il bot")
-    except (BadRequest, Unauthorized):
+    except Unauthorized:
         info['bot'].answerCallbackQuery(callback_query_id=info['query_id'],
                                         text="Assicurati di aver avviato la chat con @Spotted_DMI_Bot")
+        return None, None, None
+    except BadRequest as e:
+        logger.warning(e)
         return None, None, None
 
     info['user_data']['current_post_reported'] = abusive_message_id
