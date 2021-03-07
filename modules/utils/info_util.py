@@ -143,17 +143,40 @@ class EventInfo():
 
     @classmethod
     def from_message(cls, update: Update, ctx: CallbackContext):
-        """Istance of SpottedBot created by a message update"""
+        """Istance of SpottedBot created by a message update
+
+        Args:
+            update (Update): update event
+            context (CallbackContext): context passed by the handler
+
+        Returns:
+            EventInfo: istance of the class
+        """
         return cls(bot=ctx.bot, ctx=ctx, update=update, message=update.message)
 
     @classmethod
     def from_callback(cls, update: Update, ctx: CallbackContext):
-        """Istance of SpottedBot created by a callback update"""
+        """Istance of SpottedBot created by a callback update
+
+        Args:
+            update (Update): update event
+            context (CallbackContext): context passed by the handler
+
+        Returns:
+            EventInfo: istance of the class
+        """
         return cls(bot=ctx.bot, ctx=ctx, update=update, message=update.callback_query.message, query=update.callback_query)
 
     @classmethod
     def from_job(cls, ctx: CallbackContext):
-        """Istance of SpottedBot created by a job update"""
+        """Istance of SpottedBot created by a job update
+
+        Args:
+            context (CallbackContext): context passed by the handler
+
+        Returns:
+            EventInfo: istance of the class
+        """
         return cls(bot=ctx.bot, ctx=ctx)
 
     def answer_callback_query(self, text: str = None):
