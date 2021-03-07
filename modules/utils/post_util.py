@@ -2,9 +2,8 @@
 from random import choice
 from telegram import Message, Bot, InlineKeyboardMarkup
 from telegram.error import BadRequest, Unauthorized
-from modules.debug.log_manager import logger
-from modules.data.data_reader import config_map, read_md
-from modules.data import PendingPost, PublishedPost, User
+from modules.debug import logger
+from modules.data import config_map, read_md, PendingPost, PublishedPost, User
 from modules.utils.keyboard_util import get_approve_kb, get_vote_kb
 
 

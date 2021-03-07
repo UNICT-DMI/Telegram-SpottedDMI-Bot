@@ -2,12 +2,11 @@
 from telegram import Update, ParseMode
 from telegram.ext import CallbackContext
 from telegram.error import BadRequest, Unauthorized
-from modules.handlers import STATE
+from modules.handlers import STATE, CHAT_PRIVATE_ERROR, INVALID_MESSAGE_TYPE_ERROR
 from modules.handlers.job_handlers import clean_pending_job
-from modules.debug.log_manager import logger
-from modules.data.data_reader import read_md, config_map
-from modules.data import PendingPost, Report, User
-from modules.utils.info_util import get_message_info, check_message_type
+from modules.debug import logger
+from modules.data import config_map, read_md, PendingPost, Report, User
+from modules.utils import EventInfo
 from modules.utils.post_util import send_post_to
 from modules.utils.keyboard_util import get_confirm_kb, get_settings_kb, get_stats_kb
 
@@ -21,9 +20,9 @@ def start_cmd(update: Update, context: CallbackContext):
         update (Update): update event
         context (CallbackContext): context passed by the handler
     """
-    info = get_message_info(update, context)
+    info = EventInfo.from_message(update, context)
     text = read_md("start")
-    info['bot'].send_message(chat_id=info['chat_id'],
+    info.bot.send_message(chat_id=info.chat_id,
                              text=text,
                              parse_mode=ParseMode.MARKDOWN_V2,
                              disable_web_page_preview=True)
@@ -37,12 +36,12 @@ def help_cmd(update: Update, context: CallbackContext):
         update (Update): update event
         context (CallbackContext): context passed by the handler
     """
-    info = get_message_info(update, context)
-    if info['chat_id'] == config_map['meme']['group_id']:  # if you are in the admin group
+    info = EventInfo.from_message(update, context)
+    if info.chat_id == config_map['meme']['group_id']:  # if you are in the admin group
         text = read_md("instructions")
     else:  # you are NOT in the admin group
         text = read_md("help")
-    info['bot'].send_message(chat_id=info['chat_id'],
+    info.bot.send_message(chat_id=info.chat_id,
                              text=text,
                              parse_mode=ParseMode.MARKDOWN_V2,
                              disable_web_page_preview=True)
@@ -56,9 +55,9 @@ def rules_cmd(update: Update, context: CallbackContext):
         update (Update): update event
         context (CallbackContext): context passed by the handler
     """
-    info = get_message_info(update, context)
+    info = EventInfo.from_message(update, context)
     text = read_md("rules")
-    info['bot'].send_message(chat_id=info['chat_id'],
+    info.bot.send_message(chat_id=info.chat_id,
                              text=text,
                              parse_mode=ParseMode.MARKDOWN_V2,
                              disable_web_page_preview=True)
@@ -72,15 +71,12 @@ def settings_cmd(update: Update, context: CallbackContext):
         update (Update): update event
         context (CallbackContext): context passed by the handler
     """
-    info = get_message_info(update, context)
-    if update.message.chat.type != "private":  # you can only post with a private message
-        info['bot'].send_message(
-            chat_id=info['chat_id'],
-            text="Non puoi usare quest comando ora\nChatta con @tendTo_bot in privato",
-        )
-        return
+    info = EventInfo.from_message(update, context)
+    if not info.is_private_chat:  # you can only post with a private message
+        info.bot.send_message(chat_id=info.chat_id, text=CHAT_PRIVATE_ERROR)
+        return None
 
-    info['bot'].send_message(chat_id=info['chat_id'],
+    info.bot.send_message(chat_id=info.chat_id,
                              text="***Come vuoi che sia il tuo post:***",
                              reply_markup=get_settings_kb(),
                              parse_mode=ParseMode.MARKDOWN_V2)
@@ -97,24 +93,21 @@ def post_cmd(update: Update, context: CallbackContext) -> int:
     Returns:
         int: next state of the conversation
     """
-    info = get_message_info(update, context)
-    user = User(info['sender_id'])
-    if update.message.chat.type != "private":  # you can only post with a private message
-        info['bot'].send_message(
-            chat_id=info['chat_id'],
-            text="Non puoi usare quest comando ora\nChatta con @Spotted_DMI_bot in privato",
-        )
+    info = EventInfo.from_message(update, context)
+    user = User(info.user_id)
+    if not info.is_private_chat:  # you can only post from a private chat
+        info.bot.send_message(chat_id=info.chat_id, text=CHAT_PRIVATE_ERROR)
         return STATE['end']
 
-    if user.is_banned:  # you are banned
-        info['bot'].send_message(chat_id=info['chat_id'], text="Sei stato bannato 😅")
+    if user.is_banned:  # the user is banned
+        info.bot.send_message(chat_id=info.chat_id, text="Sei stato bannato 😅")
         return STATE['end']
 
-    if user.is_pending:  # tou have already a post in pending
-        info['bot'].send_message(chat_id=info['chat_id'], text="Hai già un post in approvazione 🧐")
+    if user.is_pending:  # there is already a post in pending
+        info.bot.send_message(chat_id=info.chat_id, text="Hai già un post in approvazione 🧐")
         return STATE['end']
 
-    info['bot'].send_message(chat_id=info['chat_id'], text="Invia il post che vuoi pubblicare")
+    info.bot.send_message(chat_id=info.chat_id, text="Invia il post che vuoi pubblicare")
     return STATE['posting']
 
 
@@ -126,21 +119,21 @@ def ban_cmd(update: Update, context: CallbackContext):
         update (Update): update event
         context (CallbackContext): context passed by the handler
     """
-    info = get_message_info(update, context)
-    if info['chat_id'] == config_map['meme']['group_id']:  # you have to be in the admin group
+    info = EventInfo.from_message(update, context)
+    if info.chat_id == config_map['meme']['group_id']:  # you have to be in the admin group
         g_message_id = update.message.reply_to_message.message_id
-        pending_post = PendingPost.from_group(group_id=info['chat_id'], g_message_id=g_message_id)
+        pending_post = PendingPost.from_group(group_id=info.chat_id, g_message_id=g_message_id)
 
         if pending_post is None:
-            info['bot'].send_message(chat_id=info['chat_id'],
+            info.bot.send_message(chat_id=info.chat_id,
                                      text="Per bannare qualcuno, rispondi al suo post con /ban")
             return
 
         user = User(pending_post.user_id)
         user.ban()
         pending_post.delete_post()
-        info['bot'].edit_message_reply_markup(chat_id=info['chat_id'], message_id=g_message_id)
-        info['bot'].send_message(chat_id=info['chat_id'], text="L'utente è stato bannato")
+        info.bot.edit_message_reply_markup(chat_id=info.chat_id, message_id=g_message_id)
+        info.bot.send_message(chat_id=info.chat_id, text="L'utente è stato bannato")
 
 
 def sban_cmd(update: Update, context: CallbackContext):
@@ -151,19 +144,19 @@ def sban_cmd(update: Update, context: CallbackContext):
         update (Update): update event
         context (CallbackContext): context passed by the handler
     """
-    info = get_message_info(update, context)
-    if info['chat_id'] == config_map['meme']['group_id']:  # you have to be in the admin group
+    info = EventInfo.from_message(update, context)
+    if info.chat_id == config_map['meme']['group_id']:  # you have to be in the admin group
         if len(context.args) == 0:  # if no args have been passed
-            info['bot'].send_message(chat_id=info['chat_id'], text="[uso]: /sban <user_id1> [...user_id2]")
+            info.bot.send_message(chat_id=info.chat_id, text="[uso]: /sban <user_id1> [...user_id2]")
             return
         for user_id in context.args:
             # the sban was unsuccesful (maybe the user id was not found)
             if not User(user_id).sban():
                 break
         else:
-            info['bot'].send_message(chat_id=info['chat_id'], text="Sban effettuato")
+            info.bot.send_message(chat_id=info.chat_id, text="Sban effettuato")
             return
-        info['bot'].send_message(chat_id=info['chat_id'], text="Uno o più sban sono falliti")
+        info.bot.send_message(chat_id=info.chat_id, text="Uno o più sban sono falliti")
 
 
 def reply_cmd(update: Update, context: CallbackContext):
@@ -174,42 +167,42 @@ def reply_cmd(update: Update, context: CallbackContext):
         update (Update): update event
         context (CallbackContext): context passed by the handler
     """
-    info = get_message_info(update, context)
-    if info['chat_id'] == config_map['meme']['group_id']:  # you have to be in the admin group
+    info = EventInfo.from_message(update, context)
+    if info.chat_id == config_map['meme']['group_id']:  # you have to be in the admin group
 
-        if len(info['text']) <= 7:  # the reply is empty
-            info['bot'].send_message(
-                chat_id=info['chat_id'],
+        if len(info.text) <= 7:  # the reply is empty
+            info.bot.send_message(
+                chat_id=info.chat_id,
                 text="La reply è vuota\n"\
                 "Per mandare un messaggio ad un utente, rispondere al suo post o report con /reply "\
-                    "seguito da ciò che gli si vuole dire"
+                "seguito da ciò che gli si vuole dire"
             )
             return None
 
         g_message_id = update.message.reply_to_message.message_id
 
-        pending_post = PendingPost.from_group(group_id=info['chat_id'], g_message_id=g_message_id)
+        pending_post = PendingPost.from_group(group_id=info.chat_id, g_message_id=g_message_id)
         if pending_post is not None:  # the message was a pending post
-            info['bot'].send_message(chat_id=pending_post.user_id,
-                                     text="COMUNICAZIONE DEGLI ADMIN SUL TUO ULTIMO POST:\n" + info['text'][7:].strip())
-            info['bot'].send_message(chat_id=info['chat_id'],
+            info.bot.send_message(chat_id=pending_post.user_id,
+                                     text="COMUNICAZIONE DEGLI ADMIN SUL TUO ULTIMO POST:\n" + info.text[7:].strip())
+            info.bot.send_message(chat_id=info.chat_id,
                                     text="L'utente ha ricevuto il seguente messaggio:\n"\
-                                        "COMUNICAZIONE DEGLI ADMIN SUL TUO ULTIMO POST:\n" + info['text'][7:].strip(),
+                                        "COMUNICAZIONE DEGLI ADMIN SUL TUO ULTIMO POST:\n" + info.text[7:].strip(),
                                     reply_to_message_id=g_message_id)
             return None
-        report = Report.from_group(group_id=info['chat_id'], g_message_id=g_message_id)
+        report = Report.from_group(group_id=info.chat_id, g_message_id=g_message_id)
         if report is not None:  # the message was a report
-            info['bot'].send_message(chat_id=report.user_id,
+            info.bot.send_message(chat_id=report.user_id,
                                      text="COMUNICAZIONE DEGLI ADMIN SUL TUO ULTIMO REPORT:\n" +
-                                     info['text'][7:].strip())
-            info['bot'].send_message(chat_id=info['chat_id'],
+                                     info.text[7:].strip())
+            info.bot.send_message(chat_id=info.chat_id,
                                     text="L'utente ha ricevuto il seguente messaggio:\n"\
-                                        "COMUNICAZIONE DEGLI ADMIN SUL TUO ULTIMO REPORT:\n" + info['text'][7:].strip(),
+                                        "COMUNICAZIONE DEGLI ADMIN SUL TUO ULTIMO REPORT:\n" + info.text[7:].strip(),
                                     reply_to_message_id=g_message_id)
             return None
 
-        info['bot'].send_message(
-                chat_id=info['chat_id'],
+        info.bot.send_message(
+                chat_id=info.chat_id,
                 text="Il messaggio selezionato non è valido.\n"\
                 "Per mandare un messaggio ad un utente, rispondere al suo post o report con /reply "\
                 "seguito da ciò che gli si vuole dire"
@@ -224,8 +217,8 @@ def clean_pending_cmd(update: Update, context: CallbackContext):
         update (Update): update event
         context (CallbackContext): context passed by the handler
     """
-    info = get_message_info(update, context)
-    if info['chat_id'] == config_map['meme']['group_id']:  # you have to be in the admin group
+    info = EventInfo.from_message(update, context)
+    if info.chat_id == config_map['meme']['group_id']:  # you have to be in the admin group
         clean_pending_job(context=context)
 
 
@@ -240,19 +233,19 @@ def cancel_cmd(update: Update, context: CallbackContext) -> int:
     Returns:
         int: next state of the conversation
     """
-    info = get_message_info(update, context)
-    if update.message.chat.type != "private":  # you can only cancel a post with a private message
+    info = EventInfo.from_message(update, context)
+    if not info.is_private_chat:  # you can only cancel a post with a private message
         return STATE['end']
-    pending_post = PendingPost.from_user(user_id=info['sender_id'])
+    pending_post = PendingPost.from_user(user_id=info.user_id)
     if pending_post:
         try:
-            info['bot'].delete_message(chat_id=pending_post.group_id, message_id=pending_post.g_message_id)
-            info['bot'].send_message(chat_id=info['chat_id'], text="Lo spot precedentemente inviato è stato cancellato")
+            info.bot.delete_message(chat_id=pending_post.group_id, message_id=pending_post.g_message_id)
+            info.bot.send_message(chat_id=info.chat_id, text="Lo spot precedentemente inviato è stato cancellato")
         except (BadRequest, Unauthorized) as e:
             logger.warning("Cancelling a post /reply: %s", e)
         pending_post.delete_post()
     else:
-        info['bot'].send_message(chat_id=info['chat_id'], text="Operazione annullata")
+        info.bot.send_message(chat_id=info.chat_id, text="Operazione annullata")
     return STATE['end']
 
 
@@ -264,9 +257,9 @@ def stats_cmd(update: Update, context: CallbackContext):
         update (Update): update event
         context (CallbackContext): context passed by the handler
     """
-    info = get_message_info(update, context)
+    info = EventInfo.from_message(update, context)
 
-    info['bot'].send_message(chat_id=info['chat_id'], text="Che statistica ti interessa?", reply_markup=get_stats_kb())
+    info.bot.send_message(chat_id=info.chat_id, text="Che statistica ti interessa?", reply_markup=get_stats_kb())
 
 
 # endregion
@@ -285,19 +278,19 @@ def post_msg(update: Update, context: CallbackContext) -> int:
     Returns:
         int: next state of the conversation
     """
-    info = get_message_info(update, context)
+    info = EventInfo.from_message(update, context)
 
-    if not check_message_type(update.message):  # the type is NOT supported
-        info['bot'].send_message(
-            chat_id=info['chat_id'],
+    if not info.is_valid_message_type:  # the type is NOT supported
+        info.bot.send_message(
+            chat_id=info.chat_id,
             text=
-            "Questo tipo di messaggio non è supportato\nÈ consentito solo testo, stikers, immagini, audio, video o poll\n\
-                Invia il post che vuoi pubblicare\nPuoi annullare il processo con /cancel")
+            "Questo tipo di messaggio non è supportato\nÈ consentito solo testo, stikers, immagini, audio, video o poll\n"\
+            "Invia il post che vuoi pubblicare\nPuoi annullare il processo con /cancel")
         return STATE['posting']
 
-    info['bot'].send_message(chat_id=info['chat_id'],
+    info.bot.send_message(chat_id=info.chat_id,
                              text="Sei sicuro di voler publicare questo post?",
-                             reply_to_message_id=info['message_id'],
+                             reply_to_message_id=info.message_id,
                              reply_markup=get_confirm_kb())
     return STATE['confirm']
 
@@ -310,16 +303,15 @@ def forwarded_post_msg(update: Update, context: CallbackContext):
         update (Update): update event
         context (CallbackContext): context passed by the handler
     """
-    info = get_message_info(update, context)
+    info = EventInfo.from_message(update, context)
     if update.message.forward_from_chat is None:
         return
     forward_from_chat_id = update.message.forward_from_chat.id
     forward_from_id = update.message.forward_from_message_id
 
-    if info['chat_id'] == config_map['meme']['channel_group_id'] and forward_from_chat_id == config_map['meme'][
-            'channel_id']:
+    if info.chat_id == config_map['meme']['channel_group_id'] and forward_from_chat_id == config_map['meme']['channel_id']:
         user_id = context.bot_data[f"{forward_from_chat_id},{forward_from_id}"]
-        send_post_to(message=update.message, bot=info['bot'], destination="channel_group", user_id=user_id)
+        send_post_to(message=update.message, bot=info.bot, destination="channel_group", user_id=user_id)
         del context.bot_data[f"{forward_from_chat_id},{forward_from_id}"]
 
 
@@ -339,17 +331,13 @@ def report_post(update: Update, context: CallbackContext) -> int:
     Returns:
         int: next state of the conversation
     """
-    info = get_message_info(update, context)
+    info = EventInfo.from_message(update, context)
 
-    if update.message.chat.type != "private":
+    if not info.is_private_chat:
         return STATE['reporting_spot']
 
-    if not check_message_type(update.message):  # the type is NOT supported
-        info['bot'].send_message(
-            chat_id=info['chat_id'],
-            text=
-            "Questo tipo di messaggio non è supportato\nÈ consentito solo testo, stikers, immagini, audio, video o poll\n\
-                Invia il post che vuoi pubblicare\nPuoi annullare il processo con /cancel")
+    if not info.is_valid_message_type:  # the type is NOT supported
+        info.bot.send_message(chat_id=info.chat_id, text=INVALID_MESSAGE_TYPE_ERROR)
         return STATE['reporting_spot']
 
     chat_id = config_map['meme']['group_id']  # should be admin group
@@ -357,12 +345,12 @@ def report_post(update: Update, context: CallbackContext) -> int:
 
     target_message_id = context.user_data['current_post_reported']
 
-    info['bot'].forward_message(chat_id=chat_id, from_chat_id=channel_id, message_id=target_message_id)
-    admin_message = info['bot'].sendMessage(chat_id=chat_id, text="🚨🚨 SEGNALAZIONE 🚨🚨\n\n" + info['text'])
-    info['bot'].send_message(chat_id=info['chat_id'],
+    info.bot.forward_message(chat_id=chat_id, from_chat_id=channel_id, message_id=target_message_id)
+    admin_message = info.bot.sendMessage(chat_id=chat_id, text="🚨🚨 SEGNALAZIONE 🚨🚨\n\n" + info.text)
+    info.bot.send_message(chat_id=info.chat_id,
                              text="Gli admins verificheranno quanto accaduto. Grazie per la collaborazione!")
 
-    Report.create_post_report(user_id=info['sender_id'],
+    Report.create_post_report(user_id=info.user_id,
                               channel_id=channel_id,
                               c_message_id=target_message_id,
                               admin_message=admin_message)
@@ -386,23 +374,22 @@ def report_cmd(update: Update, context: CallbackContext) -> int:
     Returns:
         int: next state of the conversation
     """
-    info = get_message_info(update, context)
-    if update.message.chat.type != "private":  # you can only post with a private message
-        info['bot'].send_message(chat_id=info['chat_id'],
-                                 text="Non puoi usare quest comando ora\nChatta con @Spotted_DMI_bot in privato")
+    info = EventInfo.from_message(update, context)
+    if not info.is_private_chat:  # you can only post with a private message
+        info.bot.send_message(chat_id=info.chat_id, text=CHAT_PRIVATE_ERROR)
         return STATE['end']
 
-    user_report = Report.get_last_user_report(user_id=info['sender_id'])
+    user_report = Report.get_last_user_report(user_id=info.user_id)
 
     if user_report is not None:
         minutes_enlapsed = user_report.minutes_passed
         remain_minutes = int(config_map['meme']['report_wait_mins'] - minutes_enlapsed)
 
         if remain_minutes > 0:
-            info['bot'].send_message(chat_id=info['chat_id'], text=f"Aspetta {remain_minutes} minuti.")
+            info.bot.send_message(chat_id=info.chat_id, text=f"Aspetta {remain_minutes} minuti.")
             return STATE['end']
 
-    info['bot'].send_message(chat_id=info['chat_id'], text="Invia l'username di chi vuoi segnalare. Es. @massimobene")
+    info.bot.send_message(chat_id=info.chat_id, text="Invia l'username di chi vuoi segnalare. Es. @massimobene")
 
     return STATE['reporting_user']
 
@@ -418,20 +405,20 @@ def report_user_msg(update: Update, context: CallbackContext) -> int:
     Returns:
         int: next state of the conversation
     """
-    info = get_message_info(update, context)
-    if not check_message_type(update.message) \
-    or not info['text'].startswith('@') \
-    or info['text'].find(' ') != -1:  # the type is NOT supported
-        info['bot'].send_message(
-            chat_id=info['chat_id'],
+    info = EventInfo.from_message(update, context)
+    if not info.is_valid_message_type \
+    or not info.text.startswith('@') \
+    or info.text.find(' ') != -1:  # the type is NOT supported
+        info.bot.send_message(
+            chat_id=info.chat_id,
             text="Questo tipo di messaggio non è supportato\n"\
                 "È consentito solo username telegram. Puoi annullare il processo con /cancel")
         return STATE['reporting_user']
 
-    context.user_data['current_report_target'] = info['text']
+    context.user_data['current_report_target'] = info.text
 
-    info['bot'].send_message(
-        chat_id=info['chat_id'],
+    info.bot.send_message(
+        chat_id=info.chat_id,
         text="Scrivi il motivo della tua segnalazione.\n"\
             "Cerca di essere esaustivo, potrai inviare un altro report "\
             f"dopo {config_map['meme']['report_wait_mins']} minuti.\n"\
@@ -451,26 +438,22 @@ def report_user_sent_msg(update: Update, context: CallbackContext) -> int:
     Returns:
         int: next state of the conversation
     """
-    info = get_message_info(update, context)
-    if not check_message_type(update.message):  # the type is NOT supported
-        info['bot'].send_message(
-            chat_id=info['chat_id'],
-            text=
-            "Questo tipo di messaggio non è supportato\nÈ consentito solo testo, stikers, immagini, audio, video o poll\n\
-                Invia il post che vuoi pubblicare\nPuoi annullare il processo con /cancel")
+    info = EventInfo.from_message(update, context)
+    if not info.is_valid_message_type:  # the type is NOT supported
+        info.bot.send_message(chat_id=info.chat_id, text=INVALID_MESSAGE_TYPE_ERROR)
         return STATE['sending_user_report']
 
     target_username = context.user_data['current_report_target']
 
     chat_id = config_map['meme']['group_id']  # should be admin group
-    admin_message = info['bot'].sendMessage(chat_id=chat_id,
+    admin_message = info.bot.sendMessage(chat_id=chat_id,
                                             text="🚨🚨 SEGNALAZIONE 🚨🚨\n\n" + "Username: " + target_username + "\n\n" +
-                                            info['text'])
+                                            info.text)
 
-    info['bot'].send_message(chat_id=info['chat_id'],
+    info.bot.send_message(chat_id=info.chat_id,
                              text="Gli admins verificheranno quanto accaduto. Grazie per la collaborazione!")
 
-    Report.create_user_report(user_id=info['sender_id'], target_username=target_username, admin_message=admin_message)
+    Report.create_user_report(user_id=info.user_id, target_username=target_username, admin_message=admin_message)
 
     return STATE['end']
 

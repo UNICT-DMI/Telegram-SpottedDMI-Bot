@@ -8,7 +8,7 @@ from telethon.sync import TelegramClient
 from telethon.sessions import StringSession
 from main import main
 from modules.data.db_manager import DbManager
-from modules.data.data_reader import config_map
+from modules.data import config_map
 
 warnings.filterwarnings("ignore",
                         message="If 'per_message=False', 'CallbackQueryHandler' will not be tracked for every message.")
