@@ -53,14 +53,14 @@ def meme_callback(update: Update, context: CallbackContext) -> int:
     try:
         if message_text:  # if there is a valid text, edit the menu with the new text
             info.bot.edit_message_text(chat_id=info.chat_id,
-                                        message_id=info.message_id,
-                                        text=message_text,
-                                        reply_markup=reply_markup)
+                                       message_id=info.message_id,
+                                       text=message_text,
+                                       reply_markup=reply_markup)
         elif reply_markup:  # if there is a valid reply_markup, edit the menu with the new reply_markup
             info.bot.edit_message_reply_markup(chat_id=info.chat_id,
-                                                message_id=info.message_id,
-                                                reply_markup=reply_markup)
-    except (BadRequest, RetryAfter) as e:
+                                               message_id=info.message_id,
+                                               reply_markup=reply_markup)
+    except RetryAfter as e:
         logger.warning(e)
 
     return output
@@ -155,10 +155,8 @@ def approve_yes_callback(info: EventInfo, arg: None) -> Tuple[str, InlineKeyboar
     pending_post = PendingPost.from_group(group_id=info.chat_id, g_message_id=info.message_id)
     if pending_post is None:  # this pending post is not present in the database
         return None, None, None
-    try:
-        info.bot.answerCallbackQuery(callback_query_id=info.query_id)  # end the spinning progress bar
-    except BadRequest as e:
-        logger.warning(e)
+
+    info.answer_callback_query()  # end the spinning progress bar
     n_approve = pending_post.set_admin_vote(info.user_id, True)
 
     # The post passed the approval phase and is to be published
@@ -172,7 +170,7 @@ def approve_yes_callback(info: EventInfo, arg: None) -> Tuple[str, InlineKeyboar
 
         try:
             info.bot.send_message(chat_id=user_id,
-                                     text="Il tuo ultimo post è stato pubblicato su @Spotted_DMI")  # notify the user
+                                  text="Il tuo ultimo post è stato pubblicato su @Spotted_DMI")  # notify the user
         except (BadRequest, Unauthorized) as e:
             logger.warning("Notifying the user on approve_yes: %s", e)
 
@@ -201,10 +199,8 @@ def approve_no_callback(info: EventInfo, arg: None) -> Tuple[str, InlineKeyboard
     pending_post = PendingPost.from_group(group_id=info.chat_id, g_message_id=info.message_id)
     if pending_post is None:  # this pending post is not present in the database
         return None, None, None
-    try:
-        info.bot.answerCallbackQuery(callback_query_id=info.query_id)  # end the spinning progress bar
-    except BadRequest as e:
-        logger.warning(e)
+
+    info.answer_callback_query()  # end the spinning progress bar
     n_reject = pending_post.set_admin_vote(info.user_id, False)
 
     # The post has been refused
@@ -244,14 +240,10 @@ def vote_callback(info: EventInfo, arg: str) -> Tuple[str, InlineKeyboardMarkup,
     publishedPost = PublishedPost.from_channel(channel_id=info.chat_id, c_message_id=info.message_id)
     was_added = publishedPost.set_user_vote(user_id=info.user_id, vote=arg)
 
-    try:
-        if was_added:
-            info.bot.answerCallbackQuery(callback_query_id=info.query_id, text=f"Hai messo un {REACTION[arg]}")
-        else:
-            info.bot.answerCallbackQuery(callback_query_id=info.query_id, text=f"Hai tolto il {REACTION[arg]}")
-    except BadRequest as e:
-        logger.warning(e)
-        return None, None, None
+    if was_added:
+        info.answer_callback_query(text=f"Hai messo un {REACTION[arg]}")
+    else:
+        info.answer_callback_query(text=f"Hai tolto il {REACTION[arg]}")
 
     keyboard = info.reply_markup.inline_keyboard
     return None, update_vote_kb(keyboard=keyboard, published_post=publishedPost), None
@@ -274,22 +266,15 @@ def report_spot_callback(info: EventInfo, args: str) -> Tuple[str, InlineKeyboar
                                     channel_id=config_map['meme']['channel_id'],
                                     c_message_id=abusive_message_id)
     if report is not None:  # this user has already reported this post
-        try:
-            info.bot.answerCallbackQuery(callback_query_id=info.query_id, text="Hai già segnalato questo spot.")
-        except BadRequest as e:
-            logger.warning(e)
+        info.answer_callback_query(text="Hai già segnalato questo spot.")
         return None, None, STATE['end']
     try:
         info.bot.forward_message(chat_id=info.user_id, from_chat_id=info.chat_id, message_id=abusive_message_id)
         info.bot.send_message(chat_id=info.user_id,
-                                text="Scrivi il motivo della segnalazione del post, altrimenti digita /cancel")
-        info.bot.answerCallbackQuery(callback_query_id=info.query_id, text="Segnala in privato tramite il bot")
+                              text="Scrivi il motivo della segnalazione del post, altrimenti digita /cancel")
+        info.answer_callback_query(text="Segnala in privato tramite il bot")
     except Unauthorized:
-        info.bot.answerCallbackQuery(callback_query_id=info.query_id,
-                                        text="Assicurati di aver avviato la chat con @Spotted_DMI_Bot")
-        return None, None, None
-    except BadRequest as e:
-        logger.warning(e)
+        info.answer_callback_query(text="Assicurati di aver avviato la chat con @Spotted_DMI_Bot")
         return None, None, None
 
     info.user_data['current_post_reported'] = abusive_message_id
@@ -308,7 +293,7 @@ def stats_callback(update: Update, context: CallbackContext):
         context (CallbackContext): context passed by the handler
     """
     info = EventInfo.from_callback(update, context)
-    info.bot.answerCallbackQuery(callback_query_id=info.query_id)  # end the spinning progress bar
+    info.answer_callback_query()  # end the spinning progress bar
     # the callback data indicates the correct callback and the arg to pass to it separated by ,
     data = info.query_data.split(",")
     try:
@@ -319,9 +304,9 @@ def stats_callback(update: Update, context: CallbackContext):
 
     if message_text:  # if there is a valid text, edit the menu with the new text
         info.bot.edit_message_text(chat_id=info.chat_id,
-                                      message_id=info.message_id,
-                                      text=message_text,
-                                      reply_markup=get_stats_kb())
+                                   message_id=info.message_id,
+                                   text=message_text,
+                                   reply_markup=get_stats_kb())
     else:  # remove the reply markup
         info.bot.edit_message_reply_markup(chat_id=info.chat_id, message_id=info.message_id, reply_markup=None)
 

@@ -1,8 +1,8 @@
 """Common info needed in both command and callback handlers"""
 from telegram import Bot, Update, Message, CallbackQuery, ReplyMarkup, Chat
 from telegram.ext import CallbackContext
-# from telegram.error import BadRequest, Unauthorized
-# from modules.debug.log_manager import logger, notify_error_admin
+from telegram.error import BadRequest
+from modules.debug.log_manager import logger
 
 
 class EventInfo():
@@ -155,3 +155,14 @@ class EventInfo():
     def from_job(cls, ctx: CallbackContext):
         """Istance of SpottedBot created by a job update"""
         return cls(bot=ctx.bot, ctx=ctx)
+
+    def answer_callback_query(self, text: str = None):
+        """Calls the answer_callback_query method of the bot class, while also handling the exception
+
+        Args:
+            text (str, optional): Text to show to the user. Defaults to None.
+        """
+        try:
+            self.__bot.answer_callback_query(callback_query_id=self.query_id, text=text)
+        except BadRequest as e:
+            logger.warning("On answer_callback_query: %s", e)

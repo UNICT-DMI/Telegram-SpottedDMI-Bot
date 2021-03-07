@@ -1,10 +1,8 @@
 """Handles the execution of commands by the bot"""
 from telegram import Update, ParseMode
 from telegram.ext import CallbackContext
-from telegram.error import BadRequest, Unauthorized
 from modules.handlers import STATE, CHAT_PRIVATE_ERROR, INVALID_MESSAGE_TYPE_ERROR
 from modules.handlers.job_handlers import clean_pending_job
-from modules.debug import logger
 from modules.data import config_map, read_md, PendingPost, Report, User
 from modules.utils import EventInfo
 from modules.utils.post_util import send_post_to
@@ -237,13 +235,13 @@ def cancel_cmd(update: Update, context: CallbackContext) -> int:
     if not info.is_private_chat:  # you can only cancel a post with a private message
         return STATE['end']
     pending_post = PendingPost.from_user(user_id=info.user_id)
-    if pending_post:
-        try:
-            info.bot.delete_message(chat_id=pending_post.group_id, message_id=pending_post.g_message_id)
-            info.bot.send_message(chat_id=info.chat_id, text="Lo spot precedentemente inviato è stato cancellato")
-        except (BadRequest, Unauthorized) as e:
-            logger.warning("Cancelling a post /reply: %s", e)
+    if pending_post: # if the user has a pending post in evaluation, delete it
+        group_id = pending_post.group_id
+        g_message_id = pending_post.g_message_id
         pending_post.delete_post()
+
+        info.bot.delete_message(chat_id=group_id, message_id=g_message_id)
+        info.bot.send_message(chat_id=info.chat_id, text="Lo spot precedentemente inviato è stato cancellato")
     else:
         info.bot.send_message(chat_id=info.chat_id, text="Operazione annullata")
     return STATE['end']
