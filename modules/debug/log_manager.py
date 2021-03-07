@@ -24,7 +24,11 @@ def error_handler(update: Update, context: CallbackContext):  # pylint: disable=
     traceback_list = traceback.format_exception(None, context.error, context.error.__traceback__)
     traceback_str = ''.join(traceback_list)
 
-    notify_error_admin(context=context, traceback_str=traceback_str)
+    min_traceback_list = [line for line in traceback_list if "modules" in line]
+    min_traceback_list.append(traceback_list[-1])
+    min_traceback_str = ''.join(min_traceback_list)
+    notify_error_admin(context=context, traceback_str=min_traceback_str)
+
     try:  # log the error
         with open(get_abs_path("logs", "errors.log"), "a", encoding="utf8") as log_file:
             message = "\n___ERROR LOG___\n"\
@@ -52,7 +56,7 @@ def notify_error_admin(context: CallbackContext, traceback_str: str):
     Args:
         context (CallbackContext): context passed by the handler
     """
-    text = (f'An exception was raised while handling an update\n\n' f'<pre>{html.escape(traceback_str)}</pre>')
+    text = (f'An exception was raised:\n' f'<pre>{html.escape(traceback_str)}</pre>')
     context.bot.send_message(chat_id=config_map['meme']['group_id'], text=text, parse_mode=ParseMode.HTML)
 
 
