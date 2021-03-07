@@ -8,7 +8,7 @@ from modules.debug import logger
 from modules.data import config_map, PendingPost, PublishedPost, PostData, Report, User
 from modules.utils import EventInfo
 from modules.utils.keyboard_util import REACTION, update_approve_kb, update_vote_kb, get_stats_kb
-from modules.utils.post_util import send_post_to, show_admins_votes
+from modules.utils.post_util import send_post_to
 
 
 def old_reactions(data: str) -> str:
@@ -84,8 +84,7 @@ def confirm_callback(info: EventInfo, arg: str) -> Tuple[str, InlineKeyboardMark
         if User(info.user_id).is_pending:  # there is already a spot in pending by this user
             return None, None, STATE['end']
         user_message = info.message.reply_to_message
-        admin_message = send_post_to(message=user_message, bot=info.bot, destination="admin")
-        if admin_message:
+        if send_post_to(message=user_message, bot=info.bot, destination="admin"):
             text = "Il tuo post è in fase di valutazione\n"\
                 "Una volta pubblicato, lo potrai trovare su @Spotted_DMI"
         else:
@@ -129,8 +128,8 @@ def settings_callback(info: EventInfo, arg: str) -> Tuple[str, InlineKeyboardMar
         else:
             text = "La tua preferenza è stata aggiornata\n"
 
-        if info.sender_username:  # the user has a valid username
-            text += f"I tuoi post avranno come credit @{info.sender_username}"
+        if info.user_username:  # the user has a valid username
+            text += f"I tuoi post avranno come credit @{info.user_username}"
         else:
             text += "ATTENZIONE:\nNon hai nessun username associato al tuo account telegram\n"\
                 "Se non lo aggiungi, non sarai creditato"
@@ -162,11 +161,7 @@ def approve_yes_callback(info: EventInfo, arg: None) -> Tuple[str, InlineKeyboar
     # The post passed the approval phase and is to be published
     if n_approve >= config_map['meme']['n_votes']:
         user_id = pending_post.user_id
-        published_post = send_post_to(message=info.message, bot=info.bot, destination="channel")
-
-        # if comments are enabled, save the user_id, so the user can be credited
-        if config_map['meme']['comments']:
-            info.bot_data[f"{published_post.chat_id},{published_post.message_id}"] = user_id
+        send_post_to(message=info.message, bot=info.bot, destination="channel", user_id=user_id, bot_data=info.bot_data)
 
         try:
             info.bot.send_message(chat_id=user_id,
@@ -175,7 +170,7 @@ def approve_yes_callback(info: EventInfo, arg: None) -> Tuple[str, InlineKeyboar
             logger.warning("Notifying the user on approve_yes: %s", e)
 
         # Shows the list of admins who approved the pending post and removes it form the db
-        show_admins_votes(pending_post=pending_post, bot=info.bot, approve=True)
+        pending_post.show_admins_votes(bot=info.bot, approve=True)
         pending_post.delete_post()
         return None, None, None
 
@@ -215,7 +210,7 @@ def approve_no_callback(info: EventInfo, arg: None) -> Tuple[str, InlineKeyboard
             logger.warning("Notifying the user on approve_no: %s", e)
 
         # Shows the list of admins who refused the pending post and removes it form the db
-        show_admins_votes(pending_post=pending_post, bot=info.bot, approve=False)
+        pending_post.show_admins_votes(bot=info.bot, approve=False)
         pending_post.delete_post()
         return None, None, None
 
@@ -260,7 +255,7 @@ def report_spot_callback(info: EventInfo, args: str) -> Tuple[str, InlineKeyboar
         Tuple[str, InlineKeyboardMarkup, int]: text and replyMarkup that make up the reply, new conversation state
     """
 
-    abusive_message_id = info.message_id
+    abusive_message_id = info.message.reply_to_message.message_id
 
     report = Report.get_post_report(user_id=info.user_id,
                                     channel_id=config_map['meme']['channel_id'],

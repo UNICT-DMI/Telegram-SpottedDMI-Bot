@@ -7,7 +7,7 @@ from modules.data import config_map, read_md, PendingPost, PublishedPost, User
 from modules.utils.keyboard_util import get_approve_kb, get_vote_kb
 
 
-def send_post_to(message: Message, bot: Bot, destination: str, user_id: int = None) -> Message:
+def send_post_to(message: Message, bot: Bot, destination: str, user_id: int = None, bot_data: dict = None) -> Message:
     """Sends the post to the specified destination:
 
     admin -> to the admin group, so it can be approved
@@ -45,8 +45,9 @@ def send_post_to(message: Message, bot: Bot, destination: str, user_id: int = No
         if not config_map['meme']['comments']:  # ... append the voting Inline Keyboard, if comments are not to be supported
             reply_markup = get_vote_kb()
     elif destination == "channel_group":  # sends a support message with the voting Inline Keyboard in the comment session
+        chat_id = config_map['meme']['channel_group_id']
         post_message = send_helper_message(user_id=user_id,
-                                           chat_id=config_map['meme']['channel_group_id'],
+                                           chat_id=chat_id,
                                            reply_message_id=message.message_id,
                                            bot=bot,
                                            reply_markup=get_vote_kb())
@@ -91,6 +92,8 @@ def send_post_to(message: Message, bot: Bot, destination: str, user_id: int = No
                                 chat_id=config_map['meme']['channel_id'],
                                 reply_message_id=post_message.message_id,
                                 bot=bot)
+        else:  # ... else, if comments are enabled, save the user_id, so the user can be credited
+            bot_data[f"{chat_id},{post_message.message_id}"] = user_id
     elif destination == "channel_group":  # insert the first comment among the published posts, so that votes can be tracked
         PublishedPost.create(post_message)
 
@@ -124,30 +127,6 @@ def send_helper_message(user_id: int,
                             text=f"by: {sign}",
                             reply_markup=reply_markup,
                             reply_to_message_id=reply_message_id)
-
-
-def show_admins_votes(pending_post: PendingPost, bot: Bot, approve: bool):
-    """After a post is been approved or rejected, shows the admins that aproved or rejected it \
-        and edit the message to delete the reply_markup
-
-    Args:
-        chat_id (int): id of the admin group
-        message_id (int): id of the post in question in the group
-        bot (Bot): bot
-        approve (bool): whether the vote is approve or reject
-    """
-    chat_id = pending_post.group_id
-    message_id = pending_post.g_message_id
-
-    admins = pending_post.get_list_admin_votes(vote=approve)
-    text = "Approvato da:\n" if approve else "Rifiutato da:\n"
-    tag = '@' if config_map['meme']['tag'] else ''
-    for admin in admins:
-        username = bot.get_chat(admin).username
-        text += f"{tag}{username}\n" if username else f"{bot.get_chat(admin).first_name}\n"
-
-    bot.edit_message_reply_markup(chat_id=chat_id, message_id=message_id, reply_markup=None)
-    bot.send_message(chat_id=chat_id, text=text, reply_to_message_id=message_id)
 
 
 def anonym_name() -> str:
