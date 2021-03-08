@@ -1,6 +1,6 @@
 """Pending post management"""
 from typing import Optional, Tuple
-from datetime import datetime
+from datetime import datetime, timezone
 from telegram import Message, Bot
 from modules.data.db_manager import DbManager
 from modules.data.data_reader import config_map
@@ -17,21 +17,20 @@ class PendingPost():
         self.date = date
 
     @classmethod
-    def create(cls, user_message: Message, admin_message: Message):
+    def create(cls, user_message: Message, g_message_id: int, group_id: int):
         """Creates a new post and inserts it in the table of pending posts
 
         Args:
             user_message (Message): message sent by the user that contains the post
-            admin_message (Message): message received in the admin group that references the post
+            g_message_id (int): id of the post in the group
+            group_id (int): id of the admin group
 
         Returns:
             PendingPost: istance of the class
         """
         user_id = user_message.from_user.id
         u_message_id = user_message.message_id
-        g_message_id = admin_message.message_id
-        group_id = admin_message.chat_id
-        date = admin_message.date
+        date = datetime.now(tz=timezone.utc)
 
         DbManager.insert_into(table_name="pending_meme",
                               columns=("user_id", "u_message_id", "g_message_id", "group_id", "message_date"),
@@ -39,12 +38,12 @@ class PendingPost():
         return cls(user_id=user_id, u_message_id=u_message_id, g_message_id=g_message_id, group_id=group_id, date=date)
 
     @classmethod
-    def from_group(cls, group_id: int, g_message_id: int):
+    def from_group(cls, g_message_id: int, group_id: int):
         """Retrieves a pending post from the info related to the admin group
 
         Args:
-            group_id (int): id of the admin group
             g_message_id (int): id of the post in the group
+            group_id (int): id of the admin group
 
         Returns:
             PendingPost: istance of the class
@@ -114,18 +113,6 @@ class PendingPost():
             g_message_id = int(post['g_message_id'])
             pending_posts.append(PendingPost.from_group(group_id=group_id, g_message_id=g_message_id))
         return pending_posts
-
-    @staticmethod
-    def is_pending(user_id: int) -> bool:
-        """Checks if the user still has a post pending
-
-        Args:
-            user_id (int): id of the user to check
-
-        Returns:
-            bool: whether the user still has a post pending or not
-        """
-        return DbManager.count_from(table_name="pending_meme", where="user_id = %s", where_args=(user_id,)) > 0
 
     def get_votes(self, vote: bool):
         """Gets all the votes of a specific kind (approve or reject)

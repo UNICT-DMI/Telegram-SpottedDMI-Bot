@@ -5,7 +5,6 @@ from modules.handlers import STATE, CHAT_PRIVATE_ERROR, INVALID_MESSAGE_TYPE_ERR
 from modules.handlers.job_handlers import clean_pending_job
 from modules.data import config_map, read_md, PendingPost, Report, User
 from modules.utils import EventInfo
-from modules.utils.post_util import send_post_to
 from modules.utils.keyboard_util import get_confirm_kb, get_settings_kb, get_stats_kb
 
 
@@ -20,10 +19,7 @@ def start_cmd(update: Update, context: CallbackContext):
     """
     info = EventInfo.from_message(update, context)
     text = read_md("start")
-    info.bot.send_message(chat_id=info.chat_id,
-                             text=text,
-                             parse_mode=ParseMode.MARKDOWN_V2,
-                             disable_web_page_preview=True)
+    info.bot.send_message(chat_id=info.chat_id, text=text, parse_mode=ParseMode.MARKDOWN_V2, disable_web_page_preview=True)
 
 
 def help_cmd(update: Update, context: CallbackContext):
@@ -39,10 +35,7 @@ def help_cmd(update: Update, context: CallbackContext):
         text = read_md("instructions")
     else:  # you are NOT in the admin group
         text = read_md("help")
-    info.bot.send_message(chat_id=info.chat_id,
-                             text=text,
-                             parse_mode=ParseMode.MARKDOWN_V2,
-                             disable_web_page_preview=True)
+    info.bot.send_message(chat_id=info.chat_id, text=text, parse_mode=ParseMode.MARKDOWN_V2, disable_web_page_preview=True)
 
 
 def rules_cmd(update: Update, context: CallbackContext):
@@ -55,10 +48,7 @@ def rules_cmd(update: Update, context: CallbackContext):
     """
     info = EventInfo.from_message(update, context)
     text = read_md("rules")
-    info.bot.send_message(chat_id=info.chat_id,
-                             text=text,
-                             parse_mode=ParseMode.MARKDOWN_V2,
-                             disable_web_page_preview=True)
+    info.bot.send_message(chat_id=info.chat_id, text=text, parse_mode=ParseMode.MARKDOWN_V2, disable_web_page_preview=True)
 
 
 def settings_cmd(update: Update, context: CallbackContext):
@@ -75,9 +65,9 @@ def settings_cmd(update: Update, context: CallbackContext):
         return None
 
     info.bot.send_message(chat_id=info.chat_id,
-                             text="***Come vuoi che sia il tuo post:***",
-                             reply_markup=get_settings_kb(),
-                             parse_mode=ParseMode.MARKDOWN_V2)
+                          text="***Come vuoi che sia il tuo post:***",
+                          reply_markup=get_settings_kb(),
+                          parse_mode=ParseMode.MARKDOWN_V2)
 
 
 def post_cmd(update: Update, context: CallbackContext) -> int:
@@ -123,8 +113,7 @@ def ban_cmd(update: Update, context: CallbackContext):
         pending_post = PendingPost.from_group(group_id=info.chat_id, g_message_id=g_message_id)
 
         if pending_post is None:
-            info.bot.send_message(chat_id=info.chat_id,
-                                     text="Per bannare qualcuno, rispondi al suo post con /ban")
+            info.bot.send_message(chat_id=info.chat_id, text="Per bannare qualcuno, rispondi al suo post con /ban")
             return
 
         user = User(pending_post.user_id)
@@ -182,7 +171,7 @@ def reply_cmd(update: Update, context: CallbackContext):
         pending_post = PendingPost.from_group(group_id=info.chat_id, g_message_id=g_message_id)
         if pending_post is not None:  # the message was a pending post
             info.bot.send_message(chat_id=pending_post.user_id,
-                                     text="COMUNICAZIONE DEGLI ADMIN SUL TUO ULTIMO POST:\n" + info.text[7:].strip())
+                                  text="COMUNICAZIONE DEGLI ADMIN SUL TUO ULTIMO POST:\n" + info.text[7:].strip())
             info.bot.send_message(chat_id=info.chat_id,
                                     text="L'utente ha ricevuto il seguente messaggio:\n"\
                                         "COMUNICAZIONE DEGLI ADMIN SUL TUO ULTIMO POST:\n" + info.text[7:].strip(),
@@ -191,8 +180,7 @@ def reply_cmd(update: Update, context: CallbackContext):
         report = Report.from_group(group_id=info.chat_id, g_message_id=g_message_id)
         if report is not None:  # the message was a report
             info.bot.send_message(chat_id=report.user_id,
-                                     text="COMUNICAZIONE DEGLI ADMIN SUL TUO ULTIMO REPORT:\n" +
-                                     info.text[7:].strip())
+                                  text="COMUNICAZIONE DEGLI ADMIN SUL TUO ULTIMO REPORT:\n" + info.text[7:].strip())
             info.bot.send_message(chat_id=info.chat_id,
                                     text="L'utente ha ricevuto il seguente messaggio:\n"\
                                         "COMUNICAZIONE DEGLI ADMIN SUL TUO ULTIMO REPORT:\n" + info.text[7:].strip(),
@@ -235,7 +223,7 @@ def cancel_cmd(update: Update, context: CallbackContext) -> int:
     if not info.is_private_chat:  # you can only cancel a post with a private message
         return STATE['end']
     pending_post = PendingPost.from_user(user_id=info.user_id)
-    if pending_post: # if the user has a pending post in evaluation, delete it
+    if pending_post:  # if the user has a pending post in evaluation, delete it
         group_id = pending_post.group_id
         g_message_id = pending_post.g_message_id
         pending_post.delete_post()
@@ -287,9 +275,9 @@ def post_msg(update: Update, context: CallbackContext) -> int:
         return STATE['posting']
 
     info.bot.send_message(chat_id=info.chat_id,
-                             text="Sei sicuro di voler publicare questo post?",
-                             reply_to_message_id=info.message_id,
-                             reply_markup=get_confirm_kb())
+                          text="Sei sicuro di voler publicare questo post?",
+                          reply_to_message_id=info.message_id,
+                          reply_markup=get_confirm_kb())
     return STATE['confirm']
 
 
@@ -304,13 +292,10 @@ def forwarded_post_msg(update: Update, context: CallbackContext):
     info = EventInfo.from_message(update, context)
     if update.message.forward_from_chat is None:
         return
-    forward_from_chat_id = update.message.forward_from_chat.id
-    forward_from_id = update.message.forward_from_message_id
+    forward_from_chat_id = info.message.forward_from_chat.id
 
     if info.chat_id == config_map['meme']['channel_group_id'] and forward_from_chat_id == config_map['meme']['channel_id']:
-        user_id = context.bot_data[f"{forward_from_chat_id},{forward_from_id}"]
-        send_post_to(message=update.message, bot=info.bot, destination="channel_group", user_id=user_id)
-        del context.bot_data[f"{forward_from_chat_id},{forward_from_id}"]
+        info.send_post_to_channel_group()
 
 
 # endregion
@@ -346,7 +331,7 @@ def report_post(update: Update, context: CallbackContext) -> int:
     info.bot.forward_message(chat_id=chat_id, from_chat_id=channel_id, message_id=target_message_id)
     admin_message = info.bot.sendMessage(chat_id=chat_id, text="🚨🚨 SEGNALAZIONE 🚨🚨\n\n" + info.text)
     info.bot.send_message(chat_id=info.chat_id,
-                             text="Gli admins verificheranno quanto accaduto. Grazie per la collaborazione!")
+                          text="Gli admins verificheranno quanto accaduto. Grazie per la collaborazione!")
 
     Report.create_post_report(user_id=info.user_id,
                               channel_id=channel_id,
@@ -445,11 +430,10 @@ def report_user_sent_msg(update: Update, context: CallbackContext) -> int:
 
     chat_id = config_map['meme']['group_id']  # should be admin group
     admin_message = info.bot.sendMessage(chat_id=chat_id,
-                                            text="🚨🚨 SEGNALAZIONE 🚨🚨\n\n" + "Username: " + target_username + "\n\n" +
-                                            info.text)
+                                         text="🚨🚨 SEGNALAZIONE 🚨🚨\n\n" + "Username: " + target_username + "\n\n" + info.text)
 
     info.bot.send_message(chat_id=info.chat_id,
-                             text="Gli admins verificheranno quanto accaduto. Grazie per la collaborazione!")
+                          text="Gli admins verificheranno quanto accaduto. Grazie per la collaborazione!")
 
     Report.create_user_report(user_id=info.user_id, target_username=target_username, admin_message=admin_message)
 

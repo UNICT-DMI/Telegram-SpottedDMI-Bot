@@ -1,6 +1,5 @@
 """Published post management"""
 from typing import Optional
-from telegram import Message
 from modules.data.db_manager import DbManager
 
 
@@ -12,17 +11,16 @@ class PublishedPost():
         self.c_message_id = c_message_id
 
     @classmethod
-    def create(cls, channel_message: Message):
+    def create(cls, channel_id: int, c_message_id: int):
         """Inserts a new post in the table of published posts
 
         Args:
-            channel_message (Message): message ready to be published
+            channel_id (int): id of the channel
+            c_message_id (int): id of the post in the channel
 
         Returns:
             PublishedPost: istance of the class
         """
-        c_message_id = channel_message.message_id
-        channel_id = channel_message.chat_id
         DbManager.insert_into(table_name="published_meme",
                               columns=("channel_id", "c_message_id"),
                               values=(channel_id, c_message_id))

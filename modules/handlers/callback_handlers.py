@@ -8,7 +8,6 @@ from modules.debug import logger
 from modules.data import config_map, PendingPost, PublishedPost, PostData, Report, User
 from modules.utils import EventInfo
 from modules.utils.keyboard_util import REACTION, update_approve_kb, update_vote_kb, get_stats_kb
-from modules.utils.post_util import send_post_to
 
 
 def old_reactions(data: str) -> str:
@@ -57,9 +56,7 @@ def meme_callback(update: Update, context: CallbackContext) -> int:
                                        text=message_text,
                                        reply_markup=reply_markup)
         elif reply_markup:  # if there is a valid reply_markup, edit the menu with the new reply_markup
-            info.bot.edit_message_reply_markup(chat_id=info.chat_id,
-                                               message_id=info.message_id,
-                                               reply_markup=reply_markup)
+            info.bot.edit_message_reply_markup(chat_id=info.chat_id, message_id=info.message_id, reply_markup=reply_markup)
     except RetryAfter as e:
         logger.warning(e)
 
@@ -83,8 +80,8 @@ def confirm_callback(info: EventInfo, arg: str) -> Tuple[str, InlineKeyboardMark
     if arg == "yes":  # if the the user wants to publish the post
         if User(info.user_id).is_pending:  # there is already a spot in pending by this user
             return None, None, STATE['end']
-        user_message = info.message.reply_to_message
-        if send_post_to(message=user_message, bot=info.bot, destination="admin"):
+
+        if info.send_post_to_admins():
             text = "Il tuo post è in fase di valutazione\n"\
                 "Una volta pubblicato, lo potrai trovare su @Spotted_DMI"
         else:
@@ -161,7 +158,7 @@ def approve_yes_callback(info: EventInfo, arg: None) -> Tuple[str, InlineKeyboar
     # The post passed the approval phase and is to be published
     if n_approve >= config_map['meme']['n_votes']:
         user_id = pending_post.user_id
-        send_post_to(message=info.message, bot=info.bot, destination="channel", user_id=user_id, bot_data=info.bot_data)
+        info.send_post_to_channel(user_id=user_id)
 
         try:
             info.bot.send_message(chat_id=user_id,
