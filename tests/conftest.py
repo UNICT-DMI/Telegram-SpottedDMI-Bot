@@ -1,17 +1,14 @@
 """Test configuration"""
-from threading import Thread
 import asyncio
 import warnings
 import pytest
 import yaml
 from telethon.sync import TelegramClient
 from telethon.sessions import StringSession
-from main import main
+from telegram.ext import Updater
+from main import add_commands, add_handlers, add_jobs
 from modules.data.db_manager import DbManager
 from modules.data import config_map
-
-warnings.filterwarnings("ignore",
-                        message="If 'per_message=False', 'CallbackQueryHandler' will not be tracked for every message.")
 
 api_id = config_map['test']['api_id']
 api_hash = config_map['test']['api_hash']
@@ -24,13 +21,6 @@ def get_session():
     """
     with TelegramClient(StringSession(), api_id, api_hash) as connection:
         print("Your session string is:", connection.session.save())
-
-
-def start_test_bot():
-    """Starts the bot with the test stettings
-    """
-    config_map['token'] = config_map['test']['token']
-    main()
 
 
 @pytest.fixture(scope="session")
@@ -46,7 +36,22 @@ def event_loop():
 
 
 @pytest.fixture(scope="session")
-async def bot():
+async def bot_initialize():
+    """Called at the beginning of the testing session.
+    Modifies the configuration of the bot to make it suited for testing
+
+    Yields:
+        None: wait for the testing session to end
+    """
+    config_map['token'] = config_map['test']['token']
+    config_map['meme']['n_votes'] = 1
+    warnings.filterwarnings("ignore",
+                            message="If 'per_message=False', 'CallbackQueryHandler' will not be tracked for every message.")
+    yield None
+
+
+@pytest.fixture(scope="session")
+async def bot(bot_initialize):
     """Called at the beginning of the testing session.
     Starts the bot with the testing setting in another thread
 
@@ -54,10 +59,15 @@ async def bot():
         None: wait for the testing session to end
     """
     print("[info] started telegram bot")
-    t = Thread(target=start_test_bot, daemon=True)
-    t.start()
-    await asyncio.sleep(2)
+    updater = Updater(config_map['token'], request_kwargs={'read_timeout': 20, 'connect_timeout': 20}, use_context=True)
+    add_commands(updater)
+    add_handlers(updater.dispatcher)
+    add_jobs(updater.dispatcher)
+    updater.start_polling()
+
     yield None
+
+    updater.stop()
     print("[info] closed telegram bot")
 
 
@@ -70,8 +80,7 @@ async def client(bot) -> TelegramClient:
         Iterator[TelegramClient]: telegram client that will simulate the user
     """
     print("[info] started telegram client")
-    tg_client = TelegramClient(StringSession(
-        session), api_id, api_hash, sequential_updates=True)
+    tg_client = TelegramClient(StringSession(session), api_id, api_hash, sequential_updates=True)
 
     await tg_client.connect()  # Connect to the server
     await tg_client.get_me()  # Issue a high level command to start receiving message
