@@ -9,9 +9,9 @@ from telegram import BotCommand
 from telegram.ext import Updater, CommandHandler, MessageHandler, CallbackQueryHandler, ConversationHandler,\
      Filters, Dispatcher
 # debug
-from modules.debug.log_manager import log_message, error_handler
+from modules.debug import log_message, error_handler
 # data
-from modules.data.data_reader import config_map
+from modules.data import config_map
 # handlers
 from modules.handlers.command_handlers import STATE, start_cmd, help_cmd, settings_cmd, post_cmd, ban_cmd, reply_cmd,\
     clean_pending_cmd, post_msg, rules_cmd, sban_cmd, cancel_cmd, stats_cmd, forwarded_post_msg, report_post, report_cmd, \

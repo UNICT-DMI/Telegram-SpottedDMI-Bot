@@ -3,7 +3,8 @@ Callback_data format: <callback_family>_<callback_name>,[arg]"""
 from typing import List
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 from modules.data import PendingPost, PublishedPost
-from modules.utils import REACTION
+
+REACTION = {'0': "👎", '1': "👍", '2': "🤣", '3': "😡", '4': "🥰"}
 
 
 def get_confirm_kb() -> InlineKeyboardMarkup:
