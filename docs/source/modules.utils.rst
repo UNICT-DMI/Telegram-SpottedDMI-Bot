@@ -23,11 +23,3 @@ keyboard\_util
    :members:
    :undoc-members:
    :show-inheritance:
-
-post\_util
--------------------------------
-
-.. automodule:: modules.utils.post_util
-   :members:
-   :undoc-members:
-   :show-inheritance:

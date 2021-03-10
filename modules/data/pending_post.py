@@ -8,7 +8,15 @@ from modules.data.data_reader import config_map
 
 class PendingPost():
     """Class that represents a pending post
+
+    Args:
+        user_id (:class:`int`): id of the user that sent the post
+        u_message_id (:class:`int`): id of the original message of the post
+        group_id (:class:`int`): id of the admin group
+        g_message_id (:class:`int`): id of the post in the group
+        date (:class:`datetime`): when the post was sent
     """
+
     def __init__(self, user_id: int, u_message_id: int, g_message_id: int, group_id: int, date: datetime):
         self.user_id = user_id
         self.u_message_id = u_message_id

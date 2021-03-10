@@ -5,7 +5,12 @@ from modules.data.db_manager import DbManager
 
 class PublishedPost():
     """Class that represents a published post
+
+    Args:
+        channel_id (:class:`int`): id of the channel
+        c_message_id (:class:`int`): id of the post in the channel
     """
+
     def __init__(self, channel_id: int, c_message_id: int):
         self.channel_id = channel_id
         self.c_message_id = c_message_id

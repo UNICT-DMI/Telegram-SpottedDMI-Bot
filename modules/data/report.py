@@ -6,7 +6,17 @@ from modules.data.db_manager import DbManager
 
 class Report():
     """Class that represents a report
+
+    Args:
+        user_id (:class:`int`): id of the user that reported
+        group_id (:class:`int`): id of the admin group
+        g_message_id (:class:`int`): id of the post in the group
+        channel_id (:class:`int`): id of the channel
+        c_message_id (:class:`int`): id of the post in question in the channel
+        target_username (:class:`str`): username of the reported user
+        date (:class:`datetime`): when the report happened
     """
+
     def __init__(self,
                  user_id: int,
                  group_id: int,
@@ -25,11 +35,7 @@ class Report():
 
     @property
     def minutes_passed(self) -> float:
-        """Calculates the ammount of minutes elapsed from when the report was submitted, if applicable
-
-        Returns:
-            float: how many minutes have enlapsed, if applicable, -1 otherwise
-        """
+        """:class:`float`:Ammount of minutes elapsed from when the report was submitted, if applicable"""
         if self.date is None:
             return -1
 
@@ -42,7 +48,7 @@ class Report():
 
         Args:
             user_id (int): id of the user that reported
-            c_message_id (int): id of the channel
+            channel_id (int): id of the channel
             c_message_id (int): id of the post in question in the channel
             admin_message (Message): message received in the admin group that references the report
 
@@ -100,7 +106,7 @@ class Report():
 
         Args:
             user_id (int): id of the user that reported
-            c_message_id (int): id of the channel
+            channel_id (int): id of the channel
             c_message_id (int): id of the post in question in the channel
 
         Returns:

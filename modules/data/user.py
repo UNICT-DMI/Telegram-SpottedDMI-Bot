@@ -5,35 +5,27 @@ from modules.data.pending_post import PendingPost
 
 class User():
     """Class that represents a user
+
+    Args:
+        user_id (:class:`int`): id of the user
     """
+
     def __init__(self, user_id):
         self.user_id = user_id
 
     @property
     def is_pending(self) -> bool:
-        """Checks if the user has a post already pending or not
-
-        Returns:
-            bool: whether the user has a post already pending or not
-        """
+        """:class:`bool`: If the user has a post already pending or not"""
         return bool(PendingPost.from_user(self.user_id))
 
     @property
     def is_banned(self) -> bool:
-        """Checks if the user is banned or not
-
-        Returns:
-            bool: whether the user is banned or not
-        """
+        """:class:`bool`: If the user is banned or not"""
         return DbManager.count_from(table_name="banned_users", where="user_id = %s", where_args=(self.user_id, )) > 0
 
     @property
     def is_credited(self) -> bool:
-        """Checks if the user is in the credited list
-
-        Returns:
-            bool: whether the user is to be credited or not
-        """
+        """:class:`bool`: If the user is in the credited list"""
         return DbManager.count_from(table_name="credited_users", where="user_id = %s", where_args=(self.user_id, )) == 1
 
     def ban(self):
