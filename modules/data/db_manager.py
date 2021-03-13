@@ -60,7 +60,7 @@ class DbManager():
         Args:
             file_path (str): path of the text file containing the queries
         """
-        conn, cur = DbManager.get_db()
+        conn, cur = cls.get_db()
         queries = read_file(*file_path).split("-----")
         for query in queries:
             cls.__query_execute(cur=cur, query=query, error_str="query_from_file")
@@ -76,7 +76,7 @@ class DbManager():
         Args:
             queries (str): tuple of queries
         """
-        conn, cur = DbManager.get_db()
+        conn, cur = cls.get_db()
         for query in queries:
             cls.__query_execute(cur=cur, query=query, error_str="query_from_string")
 
@@ -104,7 +104,7 @@ class DbManager():
         Returns:
             list: rows from the select
         """
-        conn, cur = DbManager.get_db()
+        conn, cur = cls.get_db()
 
         where = where.replace("%s", "?")
         where = f"WHERE {where}" if where else ""
@@ -135,7 +135,7 @@ class DbManager():
         Returns:
             int: number of rows
         """
-        conn, cur = DbManager.get_db()
+        conn, cur = cls.get_db()
 
         where = where.replace("%s", "?")
         where = f"WHERE {where}" if where else ""
@@ -162,7 +162,7 @@ class DbManager():
             columns (tuple, optional): columns that will be inserted, as a tuple of strings. Defaults to None.
             multiple_rows (bool): whether or not multiple rows will be inserted at the same time
         """
-        conn, cur = DbManager.get_db()
+        conn, cur = cls.get_db()
 
         if multiple_rows:
             placeholders = ", ".join(["?" for _ in values[0]])
@@ -192,7 +192,7 @@ class DbManager():
             where (str, optional): where clause, with %s placeholders for the where args. Defaults to "".
             where_args (tuple, optional): args used in the where clause. Defaults to None.
         """
-        conn, cur = DbManager.get_db()
+        conn, cur = cls.get_db()
 
         where = where.replace("%s", "?")
         where = f"WHERE {where}" if where else ""
