@@ -124,6 +124,15 @@ class EventInfo():
         return None
 
     @property
+    def user_name(self) -> str:
+        """:class:`str`: Name of the user that caused the update. Defaults to None"""
+        if self.__query is not None:
+            return self.__query.from_user.name
+        if self.__message is not None:
+            return self.__message.from_user.name
+        return None
+
+    @property
     def query_id(self) -> int:
         """:class:`int`: Id of the query that caused the update. Defaults to None"""
         if self.__query is None:
@@ -136,6 +145,20 @@ class EventInfo():
         if self.__query is None:
             return None
         return self.__query.data
+
+    @property
+    def forward_from_id(self) -> int:
+        """:class:`int`: Id of the original message that has been forwarded. Defaults to None"""
+        if self.__message is None:
+            return None
+        return self.__message.forward_from_message_id
+
+    @property
+    def forward_from_chat_id(self) -> int:
+        """:class:`int`: Id of the original chat the message has been forwarded from. Defaults to None"""
+        if self.__message is None or self.__message.forward_from_chat is None:
+            return None
+        return self.__message.forward_from_chat.id
 
     @classmethod
     def from_message(cls, update: Update, ctx: CallbackContext):
@@ -245,10 +268,8 @@ class EventInfo():
         """
         message = self.__message
         channel_group_id = config_map['meme']['channel_group_id']
-        forward_from_chat_id = message.forward_from_chat.id
-        forward_from_id = message.forward_from_message_id
-        user_id = self.bot_data[f"{forward_from_chat_id},{forward_from_id}"]
-        del self.bot_data[f"{forward_from_chat_id},{forward_from_id}"]
+        user_id = self.bot_data[f"{self.forward_from_chat_id},{self.forward_from_id}"]
+        del self.bot_data[f"{self.forward_from_chat_id},{self.forward_from_id}"]
 
         sign = self.get_user_sign(user_id=user_id)
         post_message_id = self.__bot.send_message(chat_id=channel_group_id,

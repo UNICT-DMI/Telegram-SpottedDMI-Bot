@@ -292,9 +292,10 @@ def forwarded_post_msg(update: Update, context: CallbackContext):
     info = EventInfo.from_message(update, context)
     if update.message.forward_from_chat is None:
         return
-    forward_from_chat_id = info.message.forward_from_chat.id
 
-    if info.chat_id == config_map['meme']['channel_group_id'] and forward_from_chat_id == config_map['meme']['channel_id']:
+    if info.chat_id == config_map['meme']['channel_group_id']\
+        and info.forward_from_chat_id == config_map['meme']['channel_id']\
+        and info.user_name == "Telegram":
         info.send_post_to_channel_group()
 
 
