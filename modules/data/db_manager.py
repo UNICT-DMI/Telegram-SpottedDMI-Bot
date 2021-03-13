@@ -100,19 +100,19 @@ class DbManager():
                 try:
                     cur.execute(sql_query, where_args)
                 except sqlite3.Error as e:
-                    logger.error(str(e))
+                    logger.error("DbManager.select_from: %s", e)
             else:
                 try:
                     cur.execute(sql_query)
                 except sqlite3.Error as e:
-                    logger.error(str(e))
+                    logger.error("DbManager.select_from: %s", e)
         else:
             if order_by:
                 sql_query += f"ORDER BY {order_by} "
             try:
                 cur.execute(sql_query)
             except sqlite3.Error as e:
-                logger.error(str(e))
+                logger.error("DbManager.select_from: %s", e)
 
         query_result = cur.fetchall()
         conn.commit()
@@ -142,45 +142,51 @@ class DbManager():
                 try:
                     cur.execute(f"SELECT COUNT({select}) as number FROM {table_name} WHERE {where}", where_args)
                 except sqlite3.Error as e:
-                    logger.error(str(e))
+                    logger.error("DbManager.count_from: %s", e)
             else:
                 try:
                     cur.execute(f"SELECT COUNT({select}) as number FROM {table_name} WHERE {where}")
                 except sqlite3.Error as e:
-                    logger.error(str(e))
+                    logger.error("DbManager.count_from: %s", e)
         else:
             try:
                 cur.execute(f"SELECT COUNT({select}) as number FROM {table_name}")
             except sqlite3.Error as e:
-                logger.error(str(e))
+                logger.error("DbManager.count_from: %s", e)
 
         query_result = cur.fetchall()
         conn.commit()
         cur.close()
         conn.close()
-        return query_result[0]['number']
+        return query_result[0]['number'] if len(query_result) > 0 else None
 
     @staticmethod
-    def insert_into(table_name: str, values: tuple, columns: tuple = ""):
+    def insert_into(table_name: str, values: tuple, columns: tuple = "", multiple_rows: bool = False):
         """Inserts the specified values in the database
 
         Args:
             table_name (str): name of the table used in the INSERT INTO
-            values (tuple): values to be inserted
+            values (tuple): values to be inserted. If multiple_rows is true, tuple of tuples of values to be inserted
             columns (tuple, optional): columns that will be inserted, as a tuple of strings. Defaults to None.
+            multiple_rows (bool): whether or not multiple rows will be inserted at the same time
         """
         conn, cur = DbManager.get_db()
 
-
-        placeholders = ", ".join(["?" for _ in values])
+        if multiple_rows:
+            placeholders = ", ".join(["?" for _ in values[0]])
+        else:
+            placeholders = ", ".join(["?" for _ in values])
 
         if columns:
             columns = "(" + ", ".join(columns) + ")"
 
         try:
-            cur.execute(f"INSERT INTO {table_name} {columns} VALUES ({placeholders})", values)
+            if multiple_rows:
+                cur.executemany(f"INSERT INTO {table_name} {columns} VALUES ({placeholders})", values)
+            else:
+                cur.execute(f"INSERT INTO {table_name} {columns} VALUES ({placeholders})", values)
         except sqlite3.Error as e:
-            print("[error] select_start_from_where: " + str(e))
+            logger.error("DbManager.insert_into: %s", e)
 
         conn.commit()
         cur.close()
@@ -205,17 +211,17 @@ class DbManager():
                 try:
                     cur.execute(f"DELETE FROM {table_name} WHERE {where}", where_args)
                 except sqlite3.Error as e:
-                    logger.error(str(e))
+                    logger.error("DbManager.delete_from: %s", e)
             else:
                 try:
                     cur.execute(f"DELETE FROM {table_name} WHERE {where}")
                 except sqlite3.Error as e:
-                    logger.error(str(e))
+                    logger.error("DbManager.delete_from: %s", e)
         else:
             try:
                 cur.execute(f"DELETE FROM {table_name}")
             except sqlite3.Error as e:
-                logger.error(str(e))
+                logger.error("DbManager.delete_from: %s", e)
 
         conn.commit()
         cur.close()
