@@ -29,6 +29,15 @@ class DbManager():
 
     @classmethod
     def __query_execute(cls, cur: sqlite3.Cursor, query: str, args: tuple = None, error_str: str = "", is_many: bool = False):
+        """Materially executes the requested query, while also catching and logging any exception that may be thrown
+
+        Args:
+            cur (sqlite3.Cursor): database cursor
+            query (str): query to execute. It may contain ? placehorders
+            args (tuple, optional): tuple of values that will replace the placeholders. Defaults to None.
+            error_str (str, optional): name of the method that caused the exception. Defaults to "".
+            is_many (bool, optional): whether to use the :func:`sqlite3.Cursor.executemany` function. Defaults to False.
+        """
         query_func = cur.executemany if is_many else cur.execute
 
         try:
