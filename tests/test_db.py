@@ -74,7 +74,11 @@ def test_insert_into(db_results):
     """
     DbManager.insert_into(table_name=TABLE_NAME, values=(10, "test_insert1", "none"))
     DbManager.insert_into(table_name=TABLE_NAME, values=(11, "test_insert2", "none"), columns=("id", "name", "surname"))
-    query_result = DbManager.select_from(table_name=TABLE_NAME, where="id >= %s", where_args=(10, ))
+    DbManager.insert_into(table_name=TABLE_NAME,
+                          values=((12, "test_insert3", "none"), (13, "test_insert4", "none")),
+                          columns=("id", "name", "surname"),
+                          multiple_rows=True)
+    query_result = DbManager.select_from(table_name=TABLE_NAME, where="id >= %s", where_args=(10,))
     DbManager.delete_from(table_name=TABLE_NAME, where=" id >= 10")
 
     assert query_to_string(query_result) == db_results['insert_into']

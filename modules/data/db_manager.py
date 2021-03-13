@@ -27,6 +27,18 @@ class DbManager():
     """Class that handles the management of databases
     """
 
+    @classmethod
+    def __query_execute(cls, cur: sqlite3.Cursor, query: str, args: tuple = None, error_str: str = "", is_many: bool = False):
+        query_func = cur.executemany if is_many else cur.execute
+
+        try:
+            if args:
+                query_func(query, args)
+            else:
+                query_func(query)
+        except sqlite3.Error as e:
+            logger.error("DbManager.%s(): %s", error_str, e)
+
     @staticmethod
     def get_db() -> Tuple[sqlite3.Connection, sqlite3.Cursor]:
         """Creates the connection to the database. It can be sqlite or postgres
@@ -40,8 +52,8 @@ class DbManager():
         cur = conn.cursor()
         return conn, cur
 
-    @staticmethod
-    def query_from_file(*file_path: str):
+    @classmethod
+    def query_from_file(cls, *file_path: str):
         """Commits all the queries in the specified file. The queries must be separated by a ----- string
         Should not be used to select something
 
@@ -51,13 +63,13 @@ class DbManager():
         conn, cur = DbManager.get_db()
         queries = read_file(*file_path).split("-----")
         for query in queries:
-            cur.execute(query)
+            cls.__query_execute(cur=cur, query=query, error_str="query_from_file")
         conn.commit()
         cur.close()
         conn.close()
 
-    @staticmethod
-    def query_from_string(*queries: str):
+    @classmethod
+    def query_from_string(cls, *queries: str):
         """Commits all the queries in the string
         Should not be used to select something
 
@@ -66,15 +78,21 @@ class DbManager():
         """
         conn, cur = DbManager.get_db()
         for query in queries:
-            cur.execute(query)
+            cls.__query_execute(cur=cur, query=query, error_str="query_from_string")
 
         conn.commit()
         cur.close()
         conn.close()
 
-    @staticmethod
-    def select_from(table_name: str, select: str = "*", where: str = "", where_args: tuple = None, order_by: str = "") -> list:
-        """Returns the result of a SELECT select FROM table_name [WHERE where (with where_args)]
+    @classmethod
+    def select_from(cls,
+                    table_name: str,
+                    select: str = "*",
+                    where: str = "",
+                    where_args: tuple = None,
+                    order_by: str = "") -> list:
+        """Returns the results of a query.
+        Executes "SELECT select FROM table_name [WHERE where (with where_args)] [ORDER BY order_by]"
 
         Args:
             table_name (str): name of the table used in the FROM
@@ -89,30 +107,13 @@ class DbManager():
         conn, cur = DbManager.get_db()
 
         where = where.replace("%s", "?")
+        where = f"WHERE {where}" if where else ""
+        order_by = f"ORDER BY {order_by}" if order_by else ""
 
-        sql_query = f"SELECT {select} FROM {table_name} "
-
-        if where:
-            sql_query += f"WHERE {where} "
-            if order_by:
-                sql_query += f"ORDER BY {order_by} "
-            if where_args:
-                try:
-                    cur.execute(sql_query, where_args)
-                except sqlite3.Error as e:
-                    logger.error("DbManager.select_from: %s", e)
-            else:
-                try:
-                    cur.execute(sql_query)
-                except sqlite3.Error as e:
-                    logger.error("DbManager.select_from: %s", e)
-        else:
-            if order_by:
-                sql_query += f"ORDER BY {order_by} "
-            try:
-                cur.execute(sql_query)
-            except sqlite3.Error as e:
-                logger.error("DbManager.select_from: %s", e)
+        cls.__query_execute(cur=cur,
+                            query=f"SELECT {select} FROM {table_name} {where} {order_by}",
+                            args=where_args,
+                            error_str="select_from")
 
         query_result = cur.fetchall()
         conn.commit()
@@ -120,9 +121,10 @@ class DbManager():
         conn.close()
         return query_result
 
-    @staticmethod
-    def count_from(table_name: str, select: str = "*", where: str = "", where_args: tuple = None) -> int:
-        """Returns the number of rows from SELECT COUNT(*) FROM table_name WHERE where
+    @classmethod
+    def count_from(cls, table_name: str, select: str = "*", where: str = "", where_args: tuple = None) -> int:
+        """Returns the number of rows found with the query.
+        Executes "SELECT COUNT(select) FROM table_name [WHERE where (with where_args)]"
 
         Args:
             table_name (str): name of the table used in the FROM
@@ -136,23 +138,12 @@ class DbManager():
         conn, cur = DbManager.get_db()
 
         where = where.replace("%s", "?")
+        where = f"WHERE {where}" if where else ""
 
-        if where:
-            if where_args:
-                try:
-                    cur.execute(f"SELECT COUNT({select}) as number FROM {table_name} WHERE {where}", where_args)
-                except sqlite3.Error as e:
-                    logger.error("DbManager.count_from: %s", e)
-            else:
-                try:
-                    cur.execute(f"SELECT COUNT({select}) as number FROM {table_name} WHERE {where}")
-                except sqlite3.Error as e:
-                    logger.error("DbManager.count_from: %s", e)
-        else:
-            try:
-                cur.execute(f"SELECT COUNT({select}) as number FROM {table_name}")
-            except sqlite3.Error as e:
-                logger.error("DbManager.count_from: %s", e)
+        cls.__query_execute(cur=cur,
+                            query=f"SELECT COUNT({select}) as number FROM {table_name} {where}",
+                            args=where_args,
+                            error_str="count_from")
 
         query_result = cur.fetchall()
         conn.commit()
@@ -160,9 +151,10 @@ class DbManager():
         conn.close()
         return query_result[0]['number'] if len(query_result) > 0 else None
 
-    @staticmethod
-    def insert_into(table_name: str, values: tuple, columns: tuple = "", multiple_rows: bool = False):
-        """Inserts the specified values in the database
+    @classmethod
+    def insert_into(cls, table_name: str, values: tuple, columns: tuple = "", multiple_rows: bool = False):
+        """Inserts the specified values in the database.
+        Executes "INSERT INTO table_name ([columns]) VALUES (placeholders)"
 
         Args:
             table_name (str): name of the table used in the INSERT INTO
@@ -180,22 +172,20 @@ class DbManager():
         if columns:
             columns = "(" + ", ".join(columns) + ")"
 
-        try:
-            if multiple_rows:
-                cur.executemany(f"INSERT INTO {table_name} {columns} VALUES ({placeholders})", values)
-            else:
-                cur.execute(f"INSERT INTO {table_name} {columns} VALUES ({placeholders})", values)
-        except sqlite3.Error as e:
-            logger.error("DbManager.insert_into: %s", e)
+        cls.__query_execute(cur=cur,
+                            query=f"INSERT INTO {table_name} {columns} VALUES ({placeholders})",
+                            args=values,
+                            error_str="insert_into",
+                            is_many=multiple_rows)
 
         conn.commit()
         cur.close()
         conn.close()
 
-    @staticmethod
-    def delete_from(table_name: str, where: str = "", where_args: tuple = None):
-        """Deletes the rows from the specified table, where the condition, when set, is satisfied
-        Execute "DELETE FROM table_name [WHERE where (with where_args)]"
+    @classmethod
+    def delete_from(cls, table_name: str, where: str = "", where_args: tuple = None):
+        """Deletes the rows from the specified table, where the condition, when set, is satisfied.
+        Executes "DELETE FROM table_name [WHERE where (with where_args)]"
 
         Args:
             table_name (str): name of the table used in the DELETE FROM
@@ -205,23 +195,9 @@ class DbManager():
         conn, cur = DbManager.get_db()
 
         where = where.replace("%s", "?")
+        where = f"WHERE {where}" if where else ""
 
-        if where:
-            if where_args:
-                try:
-                    cur.execute(f"DELETE FROM {table_name} WHERE {where}", where_args)
-                except sqlite3.Error as e:
-                    logger.error("DbManager.delete_from: %s", e)
-            else:
-                try:
-                    cur.execute(f"DELETE FROM {table_name} WHERE {where}")
-                except sqlite3.Error as e:
-                    logger.error("DbManager.delete_from: %s", e)
-        else:
-            try:
-                cur.execute(f"DELETE FROM {table_name}")
-            except sqlite3.Error as e:
-                logger.error("DbManager.delete_from: %s", e)
+        cls.__query_execute(cur=cur, query=f"DELETE FROM {table_name} {where}", args=where_args, error_str="delete_from")
 
         conn.commit()
         cur.close()
