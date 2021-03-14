@@ -99,15 +99,17 @@ class DbManager():
                     select: str = "*",
                     where: str = "",
                     where_args: tuple = None,
+                    group_by: str = "",
                     order_by: str = "") -> list:
         """Returns the results of a query.
-        Executes "SELECT select FROM table_name [WHERE where (with where_args)] [ORDER BY order_by]"
+        Executes "SELECT select FROM table_name [WHERE where (with where_args)] [GROUP_BY group_by] [ORDER BY order_by]"
 
         Args:
             table_name (str): name of the table used in the FROM
             select (str, optional): columns considered for the query. Defaults to "*".
             where (str, optional): where clause, with %s placeholders for the where_args. Defaults to "".
             where_args (tuple, optional): args used in the where clause. Defaults to None.
+            group_by (str, optional): group by clause. Defaults to "".
             order_by (str, optional): order by clause. Defaults to "".
 
         Returns:
@@ -117,10 +119,11 @@ class DbManager():
 
         where = where.replace("%s", "?")
         where = f"WHERE {where}" if where else ""
+        group_by = f"GROUP BY {group_by}" if group_by else ""
         order_by = f"ORDER BY {order_by}" if order_by else ""
 
         cls.__query_execute(cur=cur,
-                            query=f"SELECT {select} FROM {table_name} {where} {order_by}",
+                            query=f"SELECT {select} FROM {table_name} {where} {group_by} {order_by}",
                             args=where_args,
                             error_str="select_from")
 
