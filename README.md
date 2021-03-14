@@ -41,6 +41,7 @@ debug:
 meme:
   channel_group_id: id of the group associated with the channel. Required if comments are enabled
   channel_id: id of the channel to which the bot will send the approved memes
+  channel_tag: tag of the channel to which the bot will send the approved memes
   comments: whether or not the channel the bot will send the memes to has comments enabled
   group_id: id of the admin group the memebot will use
   n_votes: votes needed to approve/reject a pending post
@@ -57,7 +58,8 @@ test:
   tag: tag of the telegram bot used for testing. Include the '@' character
   token: token for the telegram bot used for testing
 
-token: the token for your telegram bot
+token: token of the telegram bot
+bot_tag: tag of the telegram bot
 ```
 - **Run** `python3 main.py`
 

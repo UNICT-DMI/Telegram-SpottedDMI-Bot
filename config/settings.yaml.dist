@@ -3,6 +3,7 @@ debug:
 meme:
   channel_group_id: 0
   channel_id: 0
+  channel_tag: ''
   comments: true
   group_id: 0
   n_votes: 1
@@ -17,3 +18,4 @@ test:
   tag: ''
   token: ''
 token: ''
+bot_tag: ''
