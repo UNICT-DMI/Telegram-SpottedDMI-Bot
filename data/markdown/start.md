@@ -2,7 +2,7 @@
 
 1\. _Di cosa si tratta?_
 
-Questo bot permette agli studenti di tutto l'ateneo di pubblicare un messaggio una foto o un video nel canale @Spotted\_DMI, restando totalmente anonimi\.
+Questo bot permette agli studenti di tutto l'ateneo di pubblicare un messaggio una foto o un video nel canale {channel_tag}, restando totalmente anonimi\.
 
 2\. _Come si usa?_
 

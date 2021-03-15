@@ -1,4 +1,7 @@
 """Users management"""
+from random import choice
+from telegram import Bot
+from modules.data.data_reader import read_md
 from modules.data.db_manager import DbManager
 from modules.data.pending_post import PendingPost
 
@@ -66,6 +69,23 @@ class User():
         if not already_credited:
             DbManager.insert_into(table_name="credited_users", columns=("user_id", ), values=(self.user_id, ))
         return already_credited
+
+    def get_user_sign(self, bot: Bot) -> str:
+        """Generates a sign for the user. It will be a random name for an anonym user
+
+        Args:
+            bot (Bot): telegram bot
+
+        Returns:
+            str: the sign of the user
+        """
+        sign = choice(read_md("anonym_names").split("\n"))  # random sign
+        if self.is_credited:  # the user wants to be credited
+            username = bot.get_chat(self.user_id).username
+            if username:
+                sign = "@" + username
+
+        return sign
 
     def __repr__(self):
         return f"User: [ user_id: {self.user_id}\n"\

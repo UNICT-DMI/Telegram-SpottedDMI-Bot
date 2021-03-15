@@ -83,7 +83,7 @@ def confirm_callback(info: EventInfo, arg: str) -> Tuple[str, InlineKeyboardMark
 
         if info.send_post_to_admins():
             text = "Il tuo post è in fase di valutazione\n"\
-                "Una volta pubblicato, lo potrai trovare su @Spotted_DMI"
+                f"Una volta pubblicato, lo potrai trovare su {config_map['meme']['channel_tag']}"
         else:
             text = "Si è verificato un problema\nAssicurati che il tipo di post sia fra quelli consentiti"
 
@@ -161,8 +161,9 @@ def approve_yes_callback(info: EventInfo, arg: None) -> Tuple[str, InlineKeyboar
         info.send_post_to_channel(user_id=user_id)
 
         try:
-            info.bot.send_message(chat_id=user_id,
-                                  text="Il tuo ultimo post è stato pubblicato su @Spotted_DMI")  # notify the user
+            info.bot.send_message(
+                chat_id=user_id,
+                text=f"Il tuo ultimo post è stato pubblicato su {config_map['meme']['channel_tag']}")  # notify the user
         except (BadRequest, Unauthorized) as e:
             logger.warning("Notifying the user on approve_yes: %s", e)
 
@@ -266,7 +267,7 @@ def report_spot_callback(info: EventInfo, args: str) -> Tuple[str, InlineKeyboar
                               text="Scrivi il motivo della segnalazione del post, altrimenti digita /cancel")
         info.answer_callback_query(text="Segnala in privato tramite il bot")
     except Unauthorized:
-        info.answer_callback_query(text="Assicurati di aver avviato la chat con @Spotted_DMI_Bot")
+        info.answer_callback_query(text=f"Assicurati di aver avviato la chat con {config_map['bot_tag']}")
         return None, None, None
 
     info.user_data['current_post_reported'] = abusive_message_id

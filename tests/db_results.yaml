@@ -19,3 +19,5 @@ count_from3: 5
 insert_into:
   - [10, test_insert1, none]
   - [11, test_insert2, none]
+  - [12, test_insert3, none]
+  - [13, test_insert4, none]

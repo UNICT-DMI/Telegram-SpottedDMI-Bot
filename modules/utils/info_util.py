@@ -1,10 +1,9 @@
 """Common info needed in both command and callback handlers"""
-from random import choice
 from telegram import Bot, Update, Message, CallbackQuery, ReplyMarkup, Chat
 from telegram.ext import CallbackContext
 from telegram.error import BadRequest
 from modules.debug.log_manager import logger
-from modules.data import config_map, read_md, PendingPost, PublishedPost, User
+from modules.data import config_map, PendingPost, PublishedPost, User
 from modules.utils.keyboard_util import get_approve_kb, get_vote_kb
 
 
@@ -124,6 +123,15 @@ class EventInfo():
         return None
 
     @property
+    def user_name(self) -> str:
+        """:class:`str`: Name of the user that caused the update. Defaults to None"""
+        if self.__query is not None:
+            return self.__query.from_user.name
+        if self.__message is not None:
+            return self.__message.from_user.name
+        return None
+
+    @property
     def query_id(self) -> int:
         """:class:`int`: Id of the query that caused the update. Defaults to None"""
         if self.__query is None:
@@ -136,6 +144,20 @@ class EventInfo():
         if self.__query is None:
             return None
         return self.__query.data
+
+    @property
+    def forward_from_id(self) -> int:
+        """:class:`int`: Id of the original message that has been forwarded. Defaults to None"""
+        if self.__message is None:
+            return None
+        return self.__message.forward_from_message_id
+
+    @property
+    def forward_from_chat_id(self) -> int:
+        """:class:`int`: Id of the original chat the message has been forwarded from. Defaults to None"""
+        if self.__message is None or self.__message.forward_from_chat is None:
+            return None
+        return self.__message.forward_from_chat.id
 
     @classmethod
     def from_message(cls, update: Update, ctx: CallbackContext):
@@ -221,6 +243,7 @@ class EventInfo():
     def send_post_to_channel(self, user_id: int):
         """Sends the post to  the channel, so it can be ejoyed by the users (and voted, if comments are disabled)
         """
+        user = User(user_id)
         message = self.__message
         channel_id = config_map['meme']['channel_id']
 
@@ -235,7 +258,7 @@ class EventInfo():
 
         if not config_map['meme']['comments']:  # if the user can vote directly on the post
             PublishedPost.create(c_message_id=c_message_id, channel_id=channel_id)
-            sign = self.get_user_sign(user_id=user_id)
+            sign = user.get_user_sign(bot=self.__bot)
             self.__bot.send_message(chat_id=channel_id, text=f"by: {sign}", reply_to_message_id=message.message_id)
         else:  # ... else, if comments are enabled, save the user_id, so the user can be credited
             self.bot_data[f"{channel_id},{c_message_id}"] = user_id
@@ -245,32 +268,13 @@ class EventInfo():
         """
         message = self.__message
         channel_group_id = config_map['meme']['channel_group_id']
-        forward_from_chat_id = message.forward_from_chat.id
-        forward_from_id = message.forward_from_message_id
-        user_id = self.bot_data[f"{forward_from_chat_id},{forward_from_id}"]
-        del self.bot_data[f"{forward_from_chat_id},{forward_from_id}"]
+        user_id = self.bot_data.pop(f"{self.forward_from_chat_id},{self.forward_from_id}")
+        user = User(user_id)
 
-        sign = self.get_user_sign(user_id=user_id)
+        sign = user.get_user_sign(bot=self.__bot)
         post_message_id = self.__bot.send_message(chat_id=channel_group_id,
                                                   text=f"by: {sign}",
                                                   reply_markup=get_vote_kb(),
                                                   reply_to_message_id=message.message_id).message_id
 
         PublishedPost.create(channel_id=channel_group_id, c_message_id=post_message_id)
-
-    def get_user_sign(self, user_id: int) -> str:
-        """Generates a sign for the user. It will be a random name for an anonym user
-
-        Args:
-            user_id (int): id of the user that originated the post
-
-        Returns:
-            str: the sign of the user
-        """
-        sign = choice(read_md("anonym_names").split("\n"))  # random sign
-        if User(user_id).is_credited:  # the user wants to be credited
-            username = self.__bot.getChat(user_id).username
-            if username:
-                sign = "@" + username
-
-        return sign

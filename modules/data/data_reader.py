@@ -1,6 +1,7 @@
 """Read data from files"""
 import os
 import yaml
+from telegram.utils.helpers import escape_markdown
 
 
 def get_abs_path(*root_file_path: str) -> str:
@@ -31,7 +32,12 @@ def read_file(*root_file_path: str) -> str:
 
 
 def read_md(file_name: str) -> str:
-    """Read the contens of a markdown file. The path is data/markdown
+    """Read the contens of a markdown file.
+    The path is data/markdown.
+    It also will replace the following parts of the text:
+
+    - {channel_tag} -> config_map['meme']['channel_tag']
+    - {bot_tag} -> config_map['bot_tag']
 
     Args:
         file_name (str): name of the file
@@ -39,7 +45,10 @@ def read_md(file_name: str) -> str:
     Returns:
         str: contents of the file
     """
-    return read_file("data", "markdown", file_name + ".md")
+    text = read_file("data", "markdown", file_name + ".md")
+    text = text.replace("{channel_tag}", escape_markdown(config_map['meme']['channel_tag'], version=2))
+    text = text.replace("{bot_tag}", escape_markdown(config_map['bot_tag'], version=2))
+    return text
 
 
 with open(get_abs_path("config", "settings.yaml"), 'r') as yaml_config:
