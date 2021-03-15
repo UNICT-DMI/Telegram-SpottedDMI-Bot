@@ -1,6 +1,7 @@
 """Modules that handle the events the bot recognizes and reacts to"""
+from modules.data import config_map
 
-CHAT_PRIVATE_ERROR = "Non puoi usare quest comando ora\nChatta con @tendTo_bot in privato"
+CHAT_PRIVATE_ERROR = f"Non puoi usare quest comando ora\nChatta con {config_map['bot_tag']} in privato"
 INVALID_MESSAGE_TYPE_ERROR = "Questo tipo di messaggio non è supportato\n"\
                                 "È consentito solo testo, stikers, immagini, audio, video o poll\n"\
                                 "Invia il post che vuoi pubblicare\n"\
