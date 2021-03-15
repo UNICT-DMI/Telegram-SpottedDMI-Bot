@@ -125,3 +125,4 @@ config/*.yaml
 module/*.pyc
 .vscode
 test.py
+data/yaml/reactions.yaml

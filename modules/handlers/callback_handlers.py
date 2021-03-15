@@ -7,7 +7,7 @@ from modules.handlers import STATE
 from modules.debug import logger
 from modules.data import config_map, PendingPost, PublishedPost, PostData, Report, User
 from modules.utils import EventInfo
-from modules.utils.keyboard_util import REACTION, update_approve_kb, update_vote_kb, get_stats_kb
+from modules.utils.keyboard_util import REACTION, update_approve_kb, get_vote_kb, get_stats_kb
 
 
 def old_reactions(data: str) -> str:
@@ -238,8 +238,7 @@ def vote_callback(info: EventInfo, arg: str) -> Tuple[str, InlineKeyboardMarkup,
     else:
         info.answer_callback_query(text=f"Hai tolto il {REACTION[arg]}")
 
-    keyboard = info.reply_markup.inline_keyboard
-    return None, update_vote_kb(keyboard=keyboard, published_post=publishedPost), None
+    return None, get_vote_kb(published_post=publishedPost), None
 
 
 def report_spot_callback(info: EventInfo, args: str) -> Tuple[str, InlineKeyboardMarkup, int]:  # pylint: disable=unused-argument
