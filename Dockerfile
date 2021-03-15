@@ -18,6 +18,7 @@ COPY . .
 #Setup settings and databases
 RUN mv data/db/sqlite.db.dist data/db/sqlite.db &&\
   mv config/settings.yaml.dist config/settings.yaml &&\
+  mv data/yaml/reactions.yaml.dist data/yaml/reactions.yaml &&\
   python3 settings.py ${TOKEN} ${GROUP_ID} ${CHANNEL_ID} ${CHANNEL_GROUP_ID}
 
 #Cleanup

@@ -28,6 +28,7 @@ jobs:
         run: |
           mv data/db/sqlite.db.dist data/db/sqlite.db
           mv config/settings.yaml.dist config/settings.yaml
+          mv data/yaml/reactions.yaml.dist data/yaml/reactions.yaml
           python3 settings.py uselessToken 1 2 3
       - name: Lint with flake8
         run: |

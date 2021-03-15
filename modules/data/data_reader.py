@@ -51,5 +51,7 @@ def read_md(file_name: str) -> str:
     return text
 
 
-with open(get_abs_path("config", "settings.yaml"), 'r') as yaml_config:
+with open(get_abs_path("config", "settings.yaml"), 'r', encoding="utf-8") as yaml_config:
     config_map = yaml.load(yaml_config, Loader=yaml.SafeLoader)
+with open(get_abs_path("data", "yaml", "reactions.yaml"), 'r', encoding="utf-8") as yaml_config:
+    config_reactions = yaml.load(yaml_config, Loader=yaml.SafeLoader)

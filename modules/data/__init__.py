@@ -1,5 +1,5 @@
 """Modules that work with the data section"""
-from .data_reader import config_map, read_md
+from .data_reader import config_map, config_reactions, read_md
 from .db_manager import DbManager
 from .pending_post import PendingPost
 from .published_post import PublishedPost

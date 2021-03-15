@@ -33,6 +33,7 @@ Listed in requirements.txt
 ### Steps:
 - Clone this repository
 - Rename "data/db/sqlite.db.dist" in "data/db/sqlite.db"
+- Rename "data/yaml/reactions.yaml.dist" in "data/yaml/reactions.yaml" and edit the desired parameters.
 - Rename "config/settings.yaml.dist" in "config/settings.yaml" and edit the desired parameters:
 ```yaml
 debug:
