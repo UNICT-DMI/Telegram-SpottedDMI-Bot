@@ -227,6 +227,11 @@ class EventInfo():
                                                     allows_multiple_answers=poll.allows_multiple_answers,
                                                     correct_option_id=poll.correct_option_id,
                                                     reply_markup=get_approve_kb()).message_id
+            elif message.text and message.entities:  # mantains the previews, if present
+                g_message_id = self.__bot.send_message(chat_id=group_id,
+                                                       text=message.text,
+                                                       entities=message.entities,
+                                                       reply_markup=get_approve_kb()).message_id
             else:
                 g_message_id = self.__bot.copy_message(chat_id=group_id,
                                                        from_chat_id=message.chat_id,
@@ -251,10 +256,16 @@ class EventInfo():
         if not config_map['meme']['comments']:  # ... append the voting Inline Keyboard, if comments are not to be supported
             reply_markup = get_vote_kb()
 
-        c_message_id = self.__bot.copy_message(chat_id=channel_id,
-                                               from_chat_id=message.chat_id,
-                                               message_id=message.message_id,
-                                               reply_markup=reply_markup).message_id
+        if message.text and message.entities:  # mantains the previews, if present
+            c_message_id = self.__bot.send_message(chat_id=channel_id,
+                                                   text=message.text,
+                                                   entities=message.entities,
+                                                   reply_markup=reply_markup).message_id
+        else:
+            c_message_id = self.__bot.copy_message(chat_id=channel_id,
+                                                   from_chat_id=message.chat_id,
+                                                   message_id=message.message_id,
+                                                   reply_markup=reply_markup).message_id
 
         if not config_map['meme']['comments']:  # if the user can vote directly on the post
             PublishedPost.create(c_message_id=c_message_id, channel_id=channel_id)
