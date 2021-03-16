@@ -268,7 +268,7 @@ class EventInfo():
         """
         message = self.__message
         channel_group_id = config_map['meme']['channel_group_id']
-        user_id = self.bot_data.pop(f"{self.forward_from_chat_id},{self.forward_from_id}")
+        user_id = self.bot_data.pop(f"{self.forward_from_chat_id},{self.forward_from_id}", -1)
         user = User(user_id)
 
         sign = user.get_user_sign(bot=self.__bot)
