@@ -15,7 +15,7 @@ test:
   api_hash: ''
   api_id: -1
   session: ''
-  tag: ''
+  bot_tag: ''
   token: ''
 token: ''
 bot_tag: ''

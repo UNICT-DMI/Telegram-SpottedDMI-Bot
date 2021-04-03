@@ -1,0 +1,71 @@
+name: Production
+
+on:
+  push:
+    branches: [upgrade]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python 3.8.5
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.8.5
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install flake8
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+          if [ -f requirements_dev.txt ]; then pip install -r requirements_dev.txt; fi
+      - name: Setup enviroment
+        run: |
+          mv data/db/sqlite.db.dist data/db/sqlite.db
+          mv config/settings.yaml.dist config/settings.yaml
+          mv data/yaml/reactions.yaml.dist data/yaml/reactions.yaml
+          python3 settings.py uselessToken 1 2 3
+      - name: Lint with flake8
+        run: |
+          # stop the build if there are Python syntax errors or undefined names
+          flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+          # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
+          flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+      - name: Test with pytest
+        run: |
+          pytest
+
+  doc:
+    needs: test
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python 3.9.0
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.9.0
+      - name: Install dependencies for requirements and testing
+        run: |
+          python -m pip install --upgrade pip
+          pip install sphinx sphinx_rtd_theme sphinx_autodoc_typehints
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+          if [ -f requirements_dev.txt ]; then pip install -r requirements_dev.txt; fi
+      - name: Setup enviroment
+        run: |
+          mv data/db/sqlite.db.dist data/db/sqlite.db
+          mv config/settings.yaml.dist config/settings.yaml
+          mv data/yaml/reactions.yaml.dist data/yaml/reactions.yaml
+          python3 settings.py uselessToken 1 2 3
+      - name: Sphinx build
+        run: |
+          sphinx-build -b html docs/source docs/build/docs
+      - name: Deploy to GitHub Pages
+        uses: JamesIves/github-pages-deploy-action@4.1.0
+        with:
+          branch: gh-pages
+          folder: docs/build
+          clean-exclude: |
+            img/*
+            README.md
