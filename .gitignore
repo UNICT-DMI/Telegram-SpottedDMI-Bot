@@ -114,15 +114,14 @@ dmypy.json
 # Pyre type checker
 .pyre/
 
-# Custom
-*.db
-config/token.conf
-config/one_liner.py
-logs/errors.txt
-logs/logs.txt
-logs/chatid.txt
+# Config and data
 config/*.yaml
-module/*.pyc
-.vscode
-test.py
 data/yaml/reactions.yaml
+logs/*.log
+*.db
+
+# VsCode
+.vscode
+
+# Dev
+test.py
