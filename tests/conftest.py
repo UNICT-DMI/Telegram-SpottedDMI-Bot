@@ -90,6 +90,7 @@ async def db_results() -> dict:
     Yields:
         Iterator[dict]: dictionary containing the results for the test queries
     """
+    DbManager.row_factory = lambda cursor, row: list(row) if cursor.description[0][0] != "number" else {"number": row[0]}
     DbManager.query_from_file("data/db/db_test.sql")
 
     with open("tests/db_results.yaml", 'r') as yaml_config:
