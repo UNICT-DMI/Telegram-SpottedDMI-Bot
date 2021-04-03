@@ -13,6 +13,7 @@ CREATE TABLE IF NOT EXISTS published_meme
 (
   channel_id BIGINT NOT NULL,
   c_message_id BIGINT NOT NULL,
+  g_message_id BIGINT NOT NULL,
   PRIMARY KEY (channel_id, c_message_id)
 );
 -----

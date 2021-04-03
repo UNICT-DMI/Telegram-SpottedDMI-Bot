@@ -11,12 +11,13 @@ class PublishedPost():
         c_message_id (:class:`int`): id of the post in the channel
     """
 
-    def __init__(self, channel_id: int, c_message_id: int):
+    def __init__(self, channel_id: int, c_message_id: int, g_message_id: int):
         self.channel_id = channel_id
         self.c_message_id = c_message_id
+        self.g_message_id = g_message_id
 
     @classmethod
-    def create(cls, channel_id: int, c_message_id: int):
+    def create(cls, channel_id: int, c_message_id: int, g_message_id: int = None):
         """Inserts a new post in the table of published posts
 
         Args:
@@ -27,9 +28,21 @@ class PublishedPost():
             PublishedPost: istance of the class
         """
         DbManager.insert_into(table_name="published_meme",
-                              columns=("channel_id", "c_message_id"),
-                              values=(channel_id, c_message_id))
-        return cls(channel_id=channel_id, c_message_id=c_message_id)
+                              columns=("channel_id", "c_message_id", "g_message_id"),
+                              values=(channel_id, c_message_id, g_message_id))
+
+        return cls(channel_id=channel_id, c_message_id=c_message_id, g_message_id=g_message_id)
+
+    @classmethod
+    def update_group_id(cls, channel_id: int, c_message_id: int, g_message_id: int):
+        DbManager.delete_from(table_name="published_meme",
+                                          where="channel_id = %s and c_message_id = %s",
+                                          where_args=(channel_id, c_message_id))
+
+        DbManager.insert_into(table_name="published_meme",
+                              columns=("channel_id", "c_message_id", "g_message_id"),
+                              values=(channel_id, c_message_id, g_message_id))
+
 
     @classmethod
     def from_channel(cls, channel_id: int, c_message_id: int):
@@ -48,7 +61,13 @@ class PublishedPost():
         if not is_present:
             return None
 
-        return cls(channel_id=channel_id, c_message_id=c_message_id)
+        results = DbManager.select_from(table_name="published_meme",
+                                          where="channel_id = %s and c_message_id = %s",
+                                          where_args=(channel_id, c_message_id))
+
+        result = results[0]
+
+        return cls(channel_id=result["channel_id"], c_message_id=result["c_message_id"], g_message_id=result["g_message_id"])
 
     def __get_user_vote(self, user_id: int) -> Optional[str]:
         """Gets the vote of a specific user on the post

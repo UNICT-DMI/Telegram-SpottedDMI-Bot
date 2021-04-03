@@ -3,10 +3,9 @@ from telegram import Update, ParseMode
 from telegram.ext import CallbackContext
 from modules.handlers import STATE, CHAT_PRIVATE_ERROR, INVALID_MESSAGE_TYPE_ERROR
 from modules.handlers.job_handlers import clean_pending_job
-from modules.data import config_map, read_md, PendingPost, Report, User
+from modules.data import config_map, read_md, PublishedPost, PendingPost, Report, User
 from modules.utils import EventInfo
-from modules.utils.keyboard_util import get_confirm_kb, get_settings_kb, get_stats_kb
-
+from modules.utils.keyboard_util import get_confirm_kb, get_settings_kb, get_stats_kb, get_vote_kb
 
 # region cmd
 def start_cmd(update: Update, context: CallbackContext):
@@ -296,8 +295,19 @@ def forwarded_post_msg(update: Update, context: CallbackContext):
     if info.chat_id == config_map['meme']['channel_group_id']\
         and info.forward_from_chat_id == config_map['meme']['channel_id']\
         and info.user_name == "Telegram":
-        info.send_post_to_channel_group()
+        # info.send_post_to_channel_group()
 
+        PublishedPost.update_group_id(
+            channel_id=info.forward_from_chat_id, 
+            c_message_id=info.forward_from_id, 
+            g_message_id=info.message_id
+        )
+
+        info.bot.edit_message_reply_markup(
+            chat_id = info.forward_from_chat_id,
+            message_id=info.forward_from_id,
+            reply_markup=get_vote_kb(group_message_id=info.message_id)
+        )
 
 # endregion
 

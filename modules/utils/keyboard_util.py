@@ -78,7 +78,7 @@ def get_approve_kb() -> InlineKeyboardMarkup:
     ]])
 
 
-def get_vote_kb(published_post: PublishedPost = None) -> InlineKeyboardMarkup:
+def get_vote_kb(published_post: PublishedPost = None, group_message_id: int = None) -> InlineKeyboardMarkup:
     """Generates the InlineKeyboard for the published post and updates the correct number of reactions
 
     Args:
@@ -97,6 +97,10 @@ def get_vote_kb(published_post: PublishedPost = None) -> InlineKeyboardMarkup:
         keyboard.append(new_row)
     # the last button in the last row will be the report button
     keyboard[-1].append(InlineKeyboardButton("🚩 Report", callback_data="meme_report_spot,"))
+    if group_message_id:
+        keyboard[-2].append(InlineKeyboardButton("Commenta", 
+            url=f"https://t.me/c/1191261944/{group_message_id}?thread={group_message_id}"))
+
     return InlineKeyboardMarkup(keyboard)
 
 

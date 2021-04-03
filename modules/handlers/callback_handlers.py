@@ -378,5 +378,20 @@ def close_callback(arg: None) -> str:  # pylint: disable=unused-argument
     """
     return None
 
+def comment_callback(info: EventInfo, args: str) -> Tuple[str, InlineKeyboardMarkup, int]:  # pylint: disable=unused-argument
+    """Handles the comment callback
+    Opens the thread regarding the post
+
+    Returns:
+    """
+    print(f"{info.chat_id} {info.message_id}")
+
+    published_post = PublishedPost.from_channel(channel_id=info.chat_id, c_message_id=info.message_id)
+
+    message_id = published_post.g_message_id
+
+    info.answer_callback_query(url=f"https://t.me/c/1191261944/{message_id}?thread={message_id}")
+
+    return None, None, STATE['end']
 
 # endregion

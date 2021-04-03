@@ -197,14 +197,16 @@ class EventInfo():
         """
         return cls(bot=ctx.bot, ctx=ctx)
 
-    def answer_callback_query(self, text: str = None):
+    def answer_callback_query(self, text: str = None, url: str = None):
         """Calls the answer_callback_query method of the bot class, while also handling the exception
 
         Args:
             text (str, optional): Text to show to the user. Defaults to None.
         """
+
+        print(url)
         try:
-            self.__bot.answer_callback_query(callback_query_id=self.query_id, text=text)
+            self.__bot.answer_callback_query(callback_query_id=self.query_id, text=text, url=url)
         except BadRequest as e:
             logger.warning("On answer_callback_query: %s", e)
 
@@ -251,21 +253,26 @@ class EventInfo():
         user = User(user_id)
         message = self.__message
         channel_id = config_map['meme']['channel_id']
+        channel_group_id = config_map['meme']['channel_group_id']
 
-        reply_markup = None
-        if not config_map['meme']['comments']:  # ... append the voting Inline Keyboard, if comments are not to be supported
-            reply_markup = get_vote_kb()
+        # reply_markup = None
+        # if not config_map['meme']['comments']:  # ... append the voting Inline Keyboard, if comments are not to be supported
+        reply_markup = get_vote_kb()
 
         if message.text and message.entities:  # mantains the previews, if present
-            c_message_id = self.__bot.send_message(chat_id=channel_id,
+            sent_message = self.__bot.send_message(chat_id=channel_id,
                                                    text=message.text,
                                                    entities=message.entities,
-                                                   reply_markup=reply_markup).message_id
+                                                   reply_markup=reply_markup)
         else:
-            c_message_id = self.__bot.copy_message(chat_id=channel_id,
+            sent_message = self.__bot.copy_message(chat_id=channel_id,
                                                    from_chat_id=message.chat_id,
                                                    message_id=message.message_id,
-                                                   reply_markup=reply_markup).message_id
+                                                   reply_markup=reply_markup)
+
+        c_message_id = sent_message.message_id
+
+        PublishedPost.create(c_message_id=c_message_id, channel_id=channel_id)
 
         if not config_map['meme']['comments']:  # if the user can vote directly on the post
             PublishedPost.create(c_message_id=c_message_id, channel_id=channel_id)
@@ -273,19 +280,3 @@ class EventInfo():
             self.__bot.send_message(chat_id=channel_id, text=f"by: {sign}", reply_to_message_id=message.message_id)
         else:  # ... else, if comments are enabled, save the user_id, so the user can be credited
             self.bot_data[f"{channel_id},{c_message_id}"] = user_id
-
-    def send_post_to_channel_group(self):
-        """Sends the post to the group associated to the channel, so that users can vote the post (if comments are enabled)
-        """
-        message = self.__message
-        channel_group_id = config_map['meme']['channel_group_id']
-        user_id = self.bot_data.pop(f"{self.forward_from_chat_id},{self.forward_from_id}", -1)
-        user = User(user_id)
-
-        sign = user.get_user_sign(bot=self.__bot)
-        post_message_id = self.__bot.send_message(chat_id=channel_group_id,
-                                                  text=f"by: {sign}",
-                                                  reply_markup=get_vote_kb(),
-                                                  reply_to_message_id=message.message_id).message_id
-
-        PublishedPost.create(channel_id=channel_group_id, c_message_id=post_message_id)
