@@ -56,8 +56,9 @@ test:
   api_id: id of the telegram app used for testing
   remote:  whether you want to test the remote database, the local one or both
   session: session of the telegram app used for testing
-  tag: tag of the telegram bot used for testing. Include the '@' character
+  bot_tag: tag of the telegram bot used for testing. Include the '@' character
   token: token for the telegram bot used for testing
+  #... all the tags above. They will be overwritten when testing
 
 token: token of the telegram bot
 bot_tag: tag of the telegram bot

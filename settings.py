@@ -59,7 +59,7 @@ def main():
     config_map['test']['api_id'] = args['test_api_id']
     config_map['test']['api_hash'] = args['test_api_hash']
     config_map['test']['session'] = args['test_session']
-    config_map['test']['tag'] = args['test_tag']
+    config_map['test']['bot_tag'] = args['test_tag']
     config_map['test']['token'] = args['test_token']
 
 

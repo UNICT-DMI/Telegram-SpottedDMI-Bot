@@ -36,30 +36,22 @@ def event_loop():
 
 
 @pytest.fixture(scope="session")
-async def bot_initialize():
-    """Called at the beginning of the testing session.
-    Modifies the configuration of the bot to make it suited for testing
-
-    Yields:
-        None: wait for the testing session to end
-    """
-    config_map['token'] = config_map['test']['token']
-    config_map['meme']['n_votes'] = 1
-    warnings.filterwarnings("ignore",
-                            message="If 'per_message=False', 'CallbackQueryHandler' will not be tracked for every message.")
-    yield None
-
-
-@pytest.fixture(scope="session")
-async def bot(bot_initialize):
+async def bot():
     """Called at the beginning of the testing session.
     Starts the bot with the testing setting in another thread
 
     Yields:
         None: wait for the testing session to end
     """
-    print("[info] started telegram bot")
-    updater = Updater(config_map['token'], request_kwargs={'read_timeout': 20, 'connect_timeout': 20}, use_context=True)
+    warnings.filterwarnings("ignore",
+                            message="If 'per_message=False', 'CallbackQueryHandler' will not be tracked for every message.")
+    for test_key in config_map['test']:
+        if test_key in config_map:
+            config_map[test_key] = config_map['test'][test_key]
+        if test_key in config_map['meme']:
+            config_map['meme'][test_key] = config_map['test'][test_key]
+
+    updater = Updater(config_map['token'])
     add_commands(updater)
     add_handlers(updater.dispatcher)
     add_jobs(updater.dispatcher)
@@ -68,7 +60,6 @@ async def bot(bot_initialize):
     yield None
 
     updater.stop()
-    print("[info] closed telegram bot")
 
 
 @pytest.fixture(scope="session")
@@ -79,7 +70,6 @@ async def client(bot) -> TelegramClient:
     Yields:
         Iterator[TelegramClient]: telegram client that will simulate the user
     """
-    print("[info] started telegram client")
     tg_client = TelegramClient(StringSession(session), api_id, api_hash, sequential_updates=True)
 
     await tg_client.connect()  # Connect to the server
@@ -91,8 +81,6 @@ async def client(bot) -> TelegramClient:
     await tg_client.disconnect()
     await tg_client.disconnected
 
-    print("[info] closed telegram client")
-
 
 @pytest.fixture(scope="session")
 async def db_results() -> dict:
@@ -102,8 +90,6 @@ async def db_results() -> dict:
     Yields:
         Iterator[dict]: dictionary containing the results for the test queries
     """
-    print("[info] initialized the db")
-
     DbManager.query_from_file("data/db/db_test.sql")
 
     with open("tests/db_results.yaml", 'r') as yaml_config:
@@ -112,8 +98,6 @@ async def db_results() -> dict:
     yield results
 
     DbManager.query_from_string("DROP TABLE IF EXISTS test_table;")
-
-    print("[info] closed db")
 
 
 if __name__ == "__main__":
