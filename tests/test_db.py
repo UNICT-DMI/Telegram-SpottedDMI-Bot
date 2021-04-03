@@ -17,10 +17,11 @@ class TestDB:
     def test_query_from_string(self, db_results):
         """Tests the query_from_string function for the database
         """
-        DbManager.query_from_string("DROP TABLE IF EXISTS temp;", "CREATE TABLE temp(id int NOT NULL, PRIMARY KEY (id));",
-                                    "DROP TABLE temp;")
+        DbManager.query_from_string("DROP TABLE IF EXISTS temp;", "CREATE TABLE temp(id int NOT NULL, PRIMARY KEY (id));")
 
-        assert True
+        assert DbManager.count_from(table_name="temp") == 0
+
+        DbManager.query_from_string("DROP TABLE temp;")
 
 
     def test_select_from(self, db_results):
@@ -86,4 +87,4 @@ class TestDB:
         count = DbManager.count_from(table_name="temp", where="id >= %s", where_args=(-1, ))
         assert count == 0
 
-        DbManager.query_from_string("""DROP TABLE temp;""")
+        DbManager.query_from_string("DROP TABLE temp;")

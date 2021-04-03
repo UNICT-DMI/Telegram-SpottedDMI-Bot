@@ -28,20 +28,11 @@ def create_argparser() -> argparse.ArgumentParser:
     return parser
 
 
-def check_args(args: dict):
-    """Makes sure eventual dependencies among args are respected
-
-    Args:
-        args (dict): the args passed by the user
-    """
-    return True
-
 def main():
     """Main function
     """
     parser = create_argparser()
     args = vars(parser.parse_args())
-    check_args(args)
 
     try:
         with open(args['path'], "r") as yaml_file:
@@ -61,7 +52,6 @@ def main():
     config_map['test']['session'] = args['test_session']
     config_map['test']['bot_tag'] = args['test_tag']
     config_map['test']['token'] = args['test_token']
-
 
     with open(args['path'], "w") as yaml_file:
         yaml.dump(config_map, yaml_file)
