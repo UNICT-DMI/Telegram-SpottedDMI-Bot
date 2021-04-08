@@ -325,9 +325,8 @@ def report_post(update: Update, context: CallbackContext) -> int:
         return STATE['reporting_spot']
 
     chat_id = config_map['meme']['group_id']  # should be admin group
-    channel_id = config_map['meme']['channel_group_id']  # should be users group
 
-    target_message_id = context.user_data['current_post_reported']
+    channel_id, target_message_id = context.user_data['current_post_reported'].split(",")
 
     info.bot.forward_message(chat_id=chat_id, from_chat_id=channel_id, message_id=target_message_id)
     admin_message = info.bot.sendMessage(chat_id=chat_id, text="🚨🚨 SEGNALAZIONE 🚨🚨\n\n" + info.text)
