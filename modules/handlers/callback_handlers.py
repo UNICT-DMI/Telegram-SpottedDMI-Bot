@@ -251,11 +251,10 @@ def report_spot_callback(info: EventInfo, args: str) -> Tuple[str, InlineKeyboar
     Returns:
         Tuple[str, InlineKeyboardMarkup, int]: text and replyMarkup that make up the reply, new conversation state
     """
-
     abusive_message_id = info.message.reply_to_message.message_id
 
     report = Report.get_post_report(user_id=info.user_id,
-                                    channel_id=config_map['meme']['channel_id'],
+                                    channel_id=info.chat_id,
                                     c_message_id=abusive_message_id)
     if report is not None:  # this user has already reported this post
         info.answer_callback_query(text="Hai già segnalato questo spot.")
@@ -269,8 +268,7 @@ def report_spot_callback(info: EventInfo, args: str) -> Tuple[str, InlineKeyboar
         info.answer_callback_query(text=f"Assicurati di aver avviato la chat con {config_map['bot_tag']}")
         return None, None, None
 
-    info.user_data['current_post_reported'] = abusive_message_id
-
+    info.user_data['current_post_reported'] = f"{info.chat_id},{abusive_message_id}"
     return None, None, STATE['reporting_spot']
 
 
