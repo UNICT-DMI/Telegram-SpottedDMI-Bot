@@ -75,7 +75,7 @@ def get_approve_kb() -> InlineKeyboardMarkup:
     return InlineKeyboardMarkup([[
         InlineKeyboardButton("🟢 0", callback_data="meme_approve_yes,"),
         InlineKeyboardButton("🔴 0", callback_data="meme_approve_no,")
-    ]])
+    ], [InlineKeyboardButton("⏹ Stop", callback_data="meme_approve_status,pause")]])
 
 
 def get_vote_kb(published_post: PublishedPost = None) -> InlineKeyboardMarkup:
