@@ -1,13 +1,13 @@
 """Handles the execution of callbacks by the bot"""
 from typing import Tuple
-from telegram import Update, InlineKeyboardMarkup
+from telegram import Update, InlineKeyboardMarkup, InlineKeyboardButton
 from telegram.ext import CallbackContext
 from telegram.error import BadRequest, RetryAfter, Unauthorized
 from modules.handlers import STATE
 from modules.debug import logger
 from modules.data import config_map, PendingPost, PublishedPost, PostData, Report, User
 from modules.utils import EventInfo
-from modules.utils.keyboard_util import REACTION, update_approve_kb, get_vote_kb, get_stats_kb
+from modules.utils.keyboard_util import REACTION, get_approve_kb, update_approve_kb, get_vote_kb, get_stats_kb
 
 
 def old_reactions(data: str) -> str:
@@ -135,6 +135,29 @@ def settings_callback(info: EventInfo, arg: str) -> Tuple[str, InlineKeyboardMar
         logger.error("settings_callback: invalid arg '%s'", arg)
 
     return text, None, None
+
+
+def approve_status_callback(info: EventInfo, arg: None) -> Tuple[str, InlineKeyboardMarkup, int]:  # pylint: disable=unused-argument
+    """Handles the approve_status callback.
+    Pauses or resume voting on a specific pending post
+
+    Args:
+        info (dict): information about the callback
+        arg (str): [ pause | play ]
+
+    Returns:
+        Tuple[str, InlineKeyboardMarkup, int]: text and replyMarkup that make up the reply, new conversation state
+    """
+    if arg == "pause":  # if the the admin wants to pause approval of the post
+        keyboard = InlineKeyboardMarkup([[InlineKeyboardButton(text="▶️ Resume", callback_data="meme_approve_status,play")]])
+    elif arg == "play":  # if the the admin wants to resume approval of the post
+        pending_post = PendingPost.from_group(group_id=info.chat_id, g_message_id=info.message_id)
+        keyboard = update_approve_kb(get_approve_kb().inline_keyboard, pending_post)
+    else:
+        keyboard = None
+        logger.error("confirm_callback: invalid arg '%s'", arg)
+
+    return None, keyboard, STATE['end']
 
 
 def approve_yes_callback(info: EventInfo, arg: None) -> Tuple[str, InlineKeyboardMarkup, int]:  # pylint: disable=unused-argument
