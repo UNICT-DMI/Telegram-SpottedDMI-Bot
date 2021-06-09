@@ -56,7 +56,7 @@ def meme_callback(update: Update, context: CallbackContext) -> int:
                                        text=message_text,
                                        reply_markup=reply_markup)
         elif reply_markup:  # if there is a valid reply_markup, edit the menu with the new reply_markup
-            info.bot.edit_message_reply_markup(chat_id=info.chat_id, message_id=info.message_id, reply_markup=reply_markup)
+            info.edit_inline_keyboard(new_keyboard=reply_markup)
     except RetryAfter as e:
         logger.warning(e)
 
@@ -321,7 +321,7 @@ def stats_callback(update: Update, context: CallbackContext):
                                    text=message_text,
                                    reply_markup=get_stats_kb())
     else:  # remove the reply markup
-        info.bot.edit_message_reply_markup(chat_id=info.chat_id, message_id=info.message_id, reply_markup=None)
+        info.edit_inline_keyboard()
 
 
 # region handle stats_callback
