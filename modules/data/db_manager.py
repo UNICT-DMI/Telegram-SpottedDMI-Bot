@@ -1,4 +1,5 @@
 """Handles the management of databases"""
+import os
 import logging
 from typing import Tuple
 import sqlite3
@@ -10,6 +11,7 @@ logger = logging.getLogger(__name__)
 class DbManager():
     """Class that handles the management of databases
     """
+    db_path = ("data", "db", "db.sqlite3")
     row_factory = lambda cursor, row: {col[0]: row[idx] for idx, col in enumerate(cursor.description)}
 
     @classmethod
@@ -40,7 +42,9 @@ class DbManager():
         Returns:
             Tuple[sqlite3.Connection, sqlite3.Cursor]: sqlite database connection and cursor
         """
-        db_path = get_abs_path("data", "db", "sqlite.db")
+        db_path = get_abs_path(*cls.db_path)
+        if not os.path.exists(db_path):
+            open(db_path, 'w').close()
         conn = sqlite3.connect(db_path)
         conn.row_factory = cls.row_factory
         cur = conn.cursor()

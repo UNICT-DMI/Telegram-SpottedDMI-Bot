@@ -1,6 +1,7 @@
 """Read data from files"""
 import os
 import yaml
+import shutil
 from telegram.utils.helpers import escape_markdown
 
 
@@ -50,8 +51,15 @@ def read_md(file_name: str) -> str:
     text = text.replace("{bot_tag}", escape_markdown(config_map['bot_tag'], version=2))
     return text
 
+reaction_path = get_abs_path("data", "yaml", "reactions.yaml")
+settings_path = get_abs_path("config", "settings.yaml")
 
-with open(get_abs_path("config", "settings.yaml"), 'r', encoding="utf-8") as yaml_config:
+# Read the local configuration
+with open(settings_path, 'r', encoding="utf-8") as yaml_config:
     config_map = yaml.load(yaml_config, Loader=yaml.SafeLoader)
-with open(get_abs_path("data", "yaml", "reactions.yaml"), 'r', encoding="utf-8") as yaml_config:
+
+# Read the local reactions and create it if not present
+if not os.path.exists(reaction_path):
+    shutil.copyfile(f"{reaction_path}.dist", reaction_path)
+with open(reaction_path, 'r', encoding="utf-8") as yaml_config:
     config_reactions = yaml.load(yaml_config, Loader=yaml.SafeLoader)
