@@ -1,5 +1,5 @@
 """Common info needed in both command and callback handlers"""
-from telegram import Bot, Update, Message, CallbackQuery, ReplyMarkup, Chat
+from telegram import Bot, Update, Message, CallbackQuery, ReplyMarkup, Chat, InlineKeyboardMarkup
 from telegram.ext import CallbackContext
 from telegram.error import BadRequest
 from modules.debug.log_manager import logger
@@ -207,6 +207,21 @@ class EventInfo():
             self.__bot.answer_callback_query(callback_query_id=self.query_id, text=text)
         except BadRequest as e:
             logger.warning("On answer_callback_query: %s", e)
+
+    def edit_inline_keyboard(self, chat_id: int = None, message_id: int = None, new_keyboard: InlineKeyboardMarkup = None):
+        """Generic wrapper used to edit the inline keyboard of a message with the telegram bot, while also handling the exception
+        
+        Args:
+            chat_id (int, optional): id of the chat the message to edit belongs to. It is the current chat if left None. Defaults to None.
+            message_id (int, optional): id of the message to edit. It is the current message if left None. Defaults to None.
+            new_keyboard (InlineKeyboardMarkup, optional): new inline keyboard to assign to the message. Defaults to None.
+        """
+        chat_id = chat_id if chat_id is not None else self.chat_id
+        message_id = message_id if message_id is not None else self.message_id
+        try:
+            self.__bot.edit_message_reply_markup(chat_id=chat_id, message_id=message_id, reply_markup=new_keyboard)
+        except (BadRequest) as e:
+            logger.error("EventInfo.edit_inline_keyboard: %s", e)
 
     def send_post_to_admins(self) -> bool:
         """Sends the post to the admin group, so it can be approved

@@ -119,7 +119,7 @@ def ban_cmd(update: Update, context: CallbackContext):
         user = User(pending_post.user_id)
         user.ban()
         pending_post.delete_post()
-        info.bot.edit_message_reply_markup(chat_id=info.chat_id, message_id=g_message_id)
+        info.edit_inline_keyboard(message_id=g_message_id)
         info.bot.send_message(chat_id=info.chat_id, text="L'utente è stato bannato")
 
 
@@ -290,7 +290,7 @@ def forwarded_post_msg(update: Update, context: CallbackContext):
         context (CallbackContext): context passed by the handler
     """
     info = EventInfo.from_message(update, context)
-    if update.message.forward_from_chat is None:
+    if update.message is None or update.message.forward_from_chat is None:
         return
 
     if info.chat_id == config_map['meme']['channel_group_id']\

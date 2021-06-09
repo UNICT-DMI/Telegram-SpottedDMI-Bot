@@ -24,12 +24,12 @@ pyparsing==2.4.7
 python-telegram-bot==13.3
 pytz==2020.1
 PyYAML==5.4.1
-requests==2.24.0
+requests==2.25.1
 rsa==4.7.2
 six==1.15.0
 toml==0.10.1
 tornado==6.0.4
 tzlocal==2.1
-urllib3==1.25.10
+urllib3==1.26.5
 wrapt==1.12.1
 yapf==0.30.0
