@@ -51,15 +51,34 @@ def read_md(file_name: str) -> str:
     text = text.replace("{bot_tag}", escape_markdown(config_map['bot_tag'], version=2))
     return text
 
-reaction_path = get_abs_path("data", "yaml", "reactions.yaml")
+
+def load_configuration(path: str, default_load: bool = True, force_override: bool = False) -> dict:
+    """Loads the configuration from the .yaml file specified in the path and stores it as a dict.
+    If default_load is True, it will first look for any file with the same name and the .dist extension.
+    Then the values will be overwritten by the specified file, if present.
+    If force_override is True, the program will crash if the file specified is not present
+    
+    Args:
+        path (str): path of the configuration .yaml file
+        default_load (bool, optional): whether to look for the .dist file first for the default configuration. Defaults to True.
+        force_override (bool, optional): whether to force the presence of the specified file. Defaults to False.
+    
+    Returns:
+        dict: configuration dictionary
+    """
+    conf = {}
+    if default_load and os.path.exists(f"{path}.dist"):
+        with open(f"{path}.dist", 'r', encoding="utf-8") as conf_file:
+            conf.update(yaml.load(conf_file, Loader=yaml.SafeLoader))
+    if force_override or os.path.exists(path):
+        with open(path, 'r', encoding="utf-8") as conf_file:
+            conf.update(yaml.load(conf_file, Loader=yaml.SafeLoader))
+    return conf
+
+
+# Read the local configuration. First, load the .dist file, than override it with any non .dist file
 settings_path = get_abs_path("config", "settings.yaml")
+config_map = load_configuration(settings_path, force_override=True)
 
-# Read the local configuration
-with open(settings_path, 'r', encoding="utf-8") as yaml_config:
-    config_map = yaml.load(yaml_config, Loader=yaml.SafeLoader)
-
-# Read the local reactions and create it if not present
-if not os.path.exists(reaction_path):
-    shutil.copyfile(f"{reaction_path}.dist", reaction_path)
-with open(reaction_path, 'r', encoding="utf-8") as yaml_config:
-    config_reactions = yaml.load(yaml_config, Loader=yaml.SafeLoader)
+reaction_path = get_abs_path("data", "yaml", "reactions.yaml")
+config_reactions = load_configuration(reaction_path)

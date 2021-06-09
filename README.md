@@ -32,9 +32,8 @@ Listed in requirements.txt
 
 ### Steps:
 - Clone this repository
-- Rename "data/db/sqlite.db.dist" in "data/db/sqlite.db"
-- Rename "data/yaml/reactions.yaml.dist" in "data/yaml/reactions.yaml" and edit the desired parameters.
-- Rename "config/settings.yaml.dist" in "config/settings.yaml" and edit the desired parameters:
+- \[_OPTIONAL_\] Rename "data/yaml/reactions.yaml.dist" in "data/yaml/reactions.yaml" or simply create the latter and edit the desired parameters. 
+-  Rename "config/settings.yaml.dist" in "config/settings.yaml" or simply create the latter and edit the desired parameters. **Make sure to add a valid _token_ setting**.
 ```yaml
 debug:
   local_log: save each and every message in a log file. Make sure the path "logs/messages.log" is valid before putting it to 1
