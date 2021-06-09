@@ -6,6 +6,7 @@ from modules.data.db_manager import DbManager
 class PostData():
     """Class that handles the management of persistent data fetch or manipulation in the meme bot
     """
+
     @staticmethod
     def get_n_posts() -> int:
         """Gets the total number of posts
@@ -39,7 +40,8 @@ class PostData():
         Returns:
             int: average number of votes
         """
-        avg = PostData.get_n_votes(vote) / PostData.get_n_posts()
+        tot_posts = PostData.get_n_posts()
+        avg = PostData.get_n_votes(vote) / (tot_posts if tot_posts != 0 else 1)
         return round(avg, 2)
 
     @staticmethod
