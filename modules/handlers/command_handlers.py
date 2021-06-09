@@ -290,7 +290,7 @@ def forwarded_post_msg(update: Update, context: CallbackContext):
         context (CallbackContext): context passed by the handler
     """
     info = EventInfo.from_message(update, context)
-    if update.message.forward_from_chat is None:
+    if update.message is None or update.message.forward_from_chat is None:
         return
 
     if info.chat_id == config_map['meme']['channel_group_id']\
