@@ -235,7 +235,7 @@ def purge_cmd(update: Update, context: CallbackContext):
                 sleep(0.2)
         info.bot.send_message(
             info.chat_id,
-            text=f"Of the {total_posts} spots, {lost_posts} have not been found. The rateo is {round(lost_posts/total_posts, 3)}")
+            text=f"Dei {total_posts} totali, {lost_posts} sono andati persi. Il rapporto è {round(lost_posts/total_posts, 3)}")
 
 
 def cancel_cmd(update: Update, context: CallbackContext) -> int:
