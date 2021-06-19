@@ -115,8 +115,6 @@ dmypy.json
 .pyre/
 
 # Config and data
-config/*.yaml
-data/yaml/reactions.yaml
 logs/*.log
 *.db
 

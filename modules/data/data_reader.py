@@ -1,7 +1,7 @@
 """Read data from files"""
 import os
 import yaml
-import shutil
+import re
 from telegram.utils.helpers import escape_markdown
 
 
@@ -76,9 +76,54 @@ def load_configuration(path: str, load_default: bool = True, force_load: bool = 
     return conf
 
 
+def read_env(config: dict):
+    """Reads the enviroment variables and stores the values in the config dict.
+    Any key already present will be overwritten
+
+    Args:
+        config: configuration dictionary
+    """
+    new_vars = {}
+    config['test'] = config['test'] if config.get('test', False) else {}
+    config['meme'] = config['meme'] if config.get('meme', False) else {}
+    if os.path.exists(get_abs_path(".env")):
+        envre = re.compile(r'''^([^\s=]+)=(?:[\s"']*)(.+?)(?:[\s"']*)$''')
+        with open(get_abs_path(".env")) as env:
+            for line in env:
+                match = envre.match(line)
+                if match is not None:
+                    new_vars[match.group(1).lower()] = match.group(2)
+
+    for key in os.environ:
+        new_vars[key.lower()] = os.getenv(key)
+
+    for key in new_vars:
+        if key.startswith("test_"):
+            config['test'][key[5:]] = new_vars[key]
+        elif key.startswith("meme_"):
+            config['meme'][key[5:]] = new_vars[key]
+        else:
+            config[key] = new_vars[key]
+
+
+def validate_config_types(config: dict):
+    """Validates the enviroment variables, casting them when necessary
+
+    Args:
+        config: config_map
+    """
+    meme_confs = ((int, 'channel_group_id'), (int, 'channel_id'), (bool, 'comments'), (int, 'group_id'), (int, 'n_votes'),
+                 (int, 'remove_after_h'), (bool, 'reset_on_load'), (int, 'report_wait_mins'), (bool, 'tag'))
+    for meme_conf in meme_confs:
+        config['meme'][meme_conf[1]] = meme_conf[0](config['meme'][meme_conf[1]])
+
+
 # Read the local configuration. First, load the .dist file, than override it with any non .dist file
 settings_path = get_abs_path("config", "settings.yaml")
 config_map = load_configuration(settings_path, force_load=True)
 
 reaction_path = get_abs_path("data", "yaml", "reactions.yaml")
 config_reactions = load_configuration(reaction_path)
+
+read_env(config_map)
+validate_config_types(config_map)
