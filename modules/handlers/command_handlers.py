@@ -1,4 +1,6 @@
 """Handles the execution of commands by the bot"""
+from time import sleep
+from modules.data.db_manager import DbManager
 from telegram import Update, ParseMode
 from telegram.ext import CallbackContext
 from modules.handlers import STATE, CHAT_PRIVATE_ERROR, INVALID_MESSAGE_TYPE_ERROR
@@ -206,6 +208,34 @@ def clean_pending_cmd(update: Update, context: CallbackContext):
     info = EventInfo.from_message(update, context)
     if info.chat_id == config_map['meme']['group_id']:  # you have to be in the admin group
         clean_pending_job(context=context)
+
+
+def purge_cmd(update: Update, context: CallbackContext):
+    """Handles the /purge command.
+    Deletes all posts and the related votes in the database whose actual telegram message could not be found
+
+    Args:
+        update (Update): update event
+        context (CallbackContext): context passed by the handler
+    """
+    info = EventInfo.from_message(update, context)
+    if info.chat_id == config_map['meme']['group_id']:  # you have to be in the admin group
+        published_memes = DbManager.select_from("published_meme")
+        total_posts = len(published_memes)
+        lost_posts = 0
+        for published_meme in published_memes:
+            try:
+                message = info.bot.forward_message(info.chat_id,
+                                                   from_chat_id=published_meme['channel_id'],
+                                                   message_id=published_meme['c_message_id'])
+                message.delete()
+            except Exception as e:
+                lost_posts += 1
+            finally:
+                sleep(0.2)
+        info.bot.send_message(
+            info.chat_id,
+            text=f"Of the {total_posts} spots, {lost_posts} have not been found. The rateo is {round(lost_posts/total_posts, 3)}")
 
 
 def cancel_cmd(update: Update, context: CallbackContext) -> int:
