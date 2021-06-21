@@ -1,9 +1,10 @@
 """Handles the execution of commands by the bot"""
 from time import sleep
+import threading
 from modules.data.db_manager import DbManager
 from telegram import Update, ParseMode
 from telegram.ext import CallbackContext
-from modules.handlers import STATE, CHAT_PRIVATE_ERROR, INVALID_MESSAGE_TYPE_ERROR
+from modules.handlers import STATE, CHAT_PRIVATE_ERROR, INVALID_MESSAGE_TYPE_ERROR, purge_flag
 from modules.handlers.job_handlers import clean_pending_job
 from modules.data import config_map, read_md, PendingPost, Report, User
 from modules.utils import EventInfo
@@ -218,24 +219,36 @@ def purge_cmd(update: Update, context: CallbackContext):
         update (Update): update event
         context (CallbackContext): context passed by the handler
     """
+    global purge_flag
     info = EventInfo.from_message(update, context)
-    if info.chat_id == config_map['meme']['group_id']:  # you have to be in the admin group
-        published_memes = DbManager.select_from("published_meme")
-        total_posts = len(published_memes)
-        lost_posts = 0
-        for published_meme in published_memes:
-            try:
-                message = info.bot.forward_message(info.chat_id,
-                                                   from_chat_id=published_meme['channel_id'],
-                                                   message_id=published_meme['c_message_id'])
-                message.delete()
-            except Exception as e:
-                lost_posts += 1
-            finally:
-                sleep(0.2)
-        info.bot.send_message(
-            info.chat_id,
-            text=f"Dei {total_posts} totali, {lost_posts} sono andati persi. Il rapporto è {round(lost_posts/total_posts, 3)}")
+    if info.chat_id == config_map['meme']['group_id'] and not purge_flag:  # you have to be in the admin group
+
+        def purge():
+            global purge_flag
+            info.bot.send_message(info.chat_id, text="Avvio del comando /purge")
+            published_memes = DbManager.select_from("published_meme")
+            total_posts = len(published_memes)
+            lost_posts = 0
+            for published_meme in published_memes:
+                try:
+                    message = info.bot.forward_message(info.chat_id,
+                                                       from_chat_id=published_meme['channel_id'],
+                                                       message_id=published_meme['c_message_id'],
+                                                       disable_notification=True)
+                    message.delete()
+                except Exception as e:
+                    lost_posts += 1
+                finally:
+                    sleep(0.2)
+            info.bot.send_message(
+                info.chat_id,
+                text=
+                f"Dei {total_posts} totali, {lost_posts} sono andati persi. Il rapporto è {round(lost_posts/total_posts, 3)}")
+            purge_flag = False
+
+        purge_flag = True
+        thread = threading.Thread(target=purge)
+        thread.start()
 
 
 def cancel_cmd(update: Update, context: CallbackContext) -> int:
