@@ -15,7 +15,7 @@ from modules.data import config_map
 # handlers
 from modules.handlers.command_handlers import STATE, start_cmd, help_cmd, settings_cmd, post_cmd, ban_cmd, reply_cmd,\
     clean_pending_cmd, post_msg, rules_cmd, sban_cmd, cancel_cmd, stats_cmd, forwarded_post_msg, report_post, report_cmd, \
-    report_user_msg, report_user_sent_msg
+    report_user_msg, report_user_sent_msg, purge_cmd
 from modules.handlers.callback_handlers import meme_callback, stats_callback
 from modules.handlers.job_handlers import clean_pending_job
 # endregion
@@ -89,6 +89,7 @@ def add_handlers(dp: Dispatcher):
     dp.add_handler(CommandHandler("settings", settings_cmd))
     dp.add_handler(CommandHandler("sban", sban_cmd))
     dp.add_handler(CommandHandler("clean_pending", clean_pending_cmd))
+    dp.add_handler(CommandHandler("purge", purge_cmd))
     dp.add_handler(CommandHandler("cancel", cancel_cmd))  # it must be after the conversation handler's 'cancel'
 
     # MessageHandler

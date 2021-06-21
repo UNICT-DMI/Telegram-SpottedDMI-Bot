@@ -15,3 +15,5 @@ STATE = {
     'sending_user_report': 7,
     'end': -1
 }
+
+purge_flag = False

@@ -33,34 +33,35 @@ Listed in requirements.txt
 ### Steps:
 - Clone this repository
 - \[_OPTIONAL_\] Rename "data/yaml/reactions.yaml.dist" in "data/yaml/reactions.yaml" or simply create the latter and edit the desired parameters. 
--  Rename "config/settings.yaml.dist" in "config/settings.yaml" or simply create the latter and edit the desired parameters. **Make sure to add a valid _token_ setting**.
+-  Rename "config/settings.yaml.dist" in "config/settings.yaml" or simply create the latter and edit the desired parameters. **Make sure to add a valid _token_ setting**.  
+What follows are some example settings with explaination for each:
 ```yaml
 debug:
-  local_log: save each and every message in a log file. Make sure the path "logs/messages.log" is valid before putting it to 1
+  local_log: false        # save each and every message in a log file. Make sure the path "logs/messages.log" is valid when enabled
 
 meme:
-  channel_group_id: id of the group associated with the channel. Required if comments are enabled
-  channel_id: id of the channel to which the bot will send the approved memes
-  channel_tag: tag of the channel to which the bot will send the approved memes
-  comments: whether or not the channel the bot will send the memes to has comments enabled
-  group_id: id of the admin group the memebot will use
-  n_votes: votes needed to approve/reject a pending post
-  remove_after_h: number of hours after wich pending posts will be automatically by /clean_pending
-  reset_on_load: whether or not the database should reset every time the bot launches. USE CAREFULLY
-  report_wait_mins: number of minutes the user has to wait before being able to report another user again
-  tag: whether or not the bot should tag the admins or just write their usernames
+  channel_group_id: -100  # id of the group associated with the channel. Required if comments are enabled
+  channel_id: -200        # id of the channel to which the bot will send the approved memes
+  channel_tag: '@channel' # tag of the channel to which the bot will send the approved memes
+  comments: true          # whether or not the channel the bot will send the memes to has comments enabled
+  group_id: -300          # id of the admin group the memebot will use
+  n_votes: 2              # votes needed to approve/reject a pending post
+  remove_after_h: 12      # number of hours after wich pending posts will be automatically by /clean_pending
+  reset_on_load: false    # whether or not the database should reset every time the bot launches. USE CAREFULLY
+  report_wait_mins: 30    # number of minutes the user has to wait before being able to report another user again
+  tag: false              # whether or not the bot should tag the admins or just write their usernames
 
 test:
-  api_hash: hash of the telegram app used for testing
-  api_id: id of the telegram app used for testing
-  remote:  whether you want to test the remote database, the local one or both
-  session: session of the telegram app used for testing
-  bot_tag: tag of the telegram bot used for testing. Include the '@' character
-  token: token for the telegram bot used for testing
+  api_hash: XXXXXXXXXXX   # hash of the telegram app used for testing
+  api_id: 123456          # id of the telegram app used for testing
+  remote: false           # whether you want to test the remote database, the local one or both
+  session: XXXXXXXXXXXX   # session of the telegram app used for testing
+  bot_tag: '@test_bot'    # tag of the telegram bot used for testing. Include the '@' character
+  token: xxxxxxxxxxxx     # token for the telegram bot used for testing
   #... all the tags above. They will be overwritten when testing
 
-token: token of the telegram bot
-bot_tag: tag of the telegram bot
+token: xxxxxxxxxxxx       # token of the telegram bot
+bot_tag: '@bot'           # tag of the telegram bot
 ```
 - **Run** `python3 main.py`
 
@@ -72,16 +73,12 @@ bot_tag: tag of the telegram bot
 
 ### Steps:
 - Clone this repository
-- In "config/settings.yaml.dist", edit the desired values. Be mindful that the one listed below will overwrite the ones in "config/settings.yaml.dist", even if they aren't used in the command line
-- **Run** `docker build --tag botimage --build-arg TOKEN=<token_arg> <...> .` 
-
-| In the command line <br>(after each --build-arg) | Type | Function | Optional |
-| --- | --- | --- | --- |
-| **TOKEN=<token_args>** | string | the token for your telegram bot | REQUIRED |
-| **GROUP_ID=<group_id>** | int | id of the admin group the memebot will use | REQUIRED |
-| **CHANNEL_ID=<channel_id>** | int | id of the channel to which the bot will send the approved memes  | REQUIRED |
-| **CHANNEL_GROUP_ID=<channel_id>** | int | id of the group associated with the channel | REQUIRED IF<br>comments = true |
-- **Run** `docker run -d --name botcontainer botimage`
+- In _config/settings.yaml.dist_, edit the desired values. You can also rename it to _config/settings.yaml_ and edit the values there.
+- You can also leave the settings files alone, and instead use the environment variables on the container.  
+All the env vars with the same name (case insensitive) will override the ones in the settings file.
+To update the **meme** settings, prefix the env var name with **MEME_**. The same is true for the **test** settings, that have to be prefixed with **TEST_**.
+- **Run** `docker build --tag botimage .` 
+- **Run** `docker run -d --name botcontainer -e TOKEN=<token_arg> [other env vars] botimage`
 
 ### To stop/remove the container:
 - **Run** `docker stop botcontainer` to stop the container

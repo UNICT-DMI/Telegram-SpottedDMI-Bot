@@ -6,3 +6,4 @@
 \- per bannare un utente, rispondere al post che ha causato il ban con "/ban"
 \- per sbannare un utente, utilizzare il comando "/sban <id utente\>"
 \- utilizzare il comando "/clean\_pending" per rifiutare automaticamente tutti i post abbastanza vecchi
+\- utilizzare il comando "/purge" per eliminare dal database tutti i post e i rispettivi voti di cui si è perso il messaggio
