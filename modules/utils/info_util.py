@@ -132,6 +132,13 @@ class EventInfo():
         return None
 
     @property
+    def inline_keyboard(self) -> InlineKeyboardMarkup:
+        """:class:`InlineKeyboardMarkup`: InlineKeyboard attached to the message. Defaults to None"""
+        if self.__message is None:
+            return None
+        return self.__message.reply_markup
+
+    @property
     def query_id(self) -> int:
         """:class:`int`: Id of the query that caused the update. Defaults to None"""
         if self.__query is None:

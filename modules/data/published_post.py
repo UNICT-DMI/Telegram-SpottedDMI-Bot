@@ -1,5 +1,6 @@
 """Published post management"""
 from typing import Optional
+from telegram.inline.inlinekeyboardmarkup import InlineKeyboardMarkup
 from modules.data.db_manager import DbManager
 
 
@@ -108,6 +109,27 @@ class PublishedPost():
         return DbManager.count_from(table_name="votes",
                                     where="c_message_id = %s and channel_id = %s and vote = %s",
                                     where_args=(self.c_message_id, self.channel_id, vote))
+
+    def set_votes(self, keyboard: InlineKeyboardMarkup) -> None:
+        """Sets all the votes of the post based on the inline keyboard.
+        This means that all previous votes associated with this post, if present, will be replaced
+
+        Args:
+            keyboard (InlineKeyboardMarkup): posts inline keyboard
+        """
+        DbManager.delete_from(table_name="votes",
+                              where="c_message_id = %s and channel_id = %s",
+                              where_args=(self.c_message_id, self.channel_id))
+        ids = -1
+        for row in keyboard.inline_keyboard:
+            for column in row:
+                data = column.callback_data
+                if data.startswith("meme_vote,"):
+                    n_votes = int(column.text.split(" ")[1])
+                    vote = data.split(",")[1]
+                    for _ in range(n_votes):
+                        self.set_user_vote(user_id=ids, vote=vote)
+                        ids -= 1
 
     def __repr__(self):
         return f"PublishedPost: [ channel_id: {self.channel_id}\n"\

@@ -254,6 +254,10 @@ def vote_callback(info: EventInfo, arg: str) -> Tuple[str, InlineKeyboardMarkup,
         Tuple[str, InlineKeyboardMarkup, int]: text and replyMarkup that make up the reply, new conversation state
     """
     publishedPost = PublishedPost.from_channel(channel_id=info.chat_id, c_message_id=info.message_id)
+    if publishedPost is None:
+        publishedPost = PublishedPost.create(channel_id=info.chat_id, c_message_id=info.message_id)
+        publishedPost.set_votes(info.inline_keyboard)
+
     was_added = publishedPost.set_user_vote(user_id=info.user_id, vote=arg)
 
     if was_added:
