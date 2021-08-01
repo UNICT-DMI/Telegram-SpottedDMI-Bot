@@ -13,8 +13,9 @@ from modules.debug import log_message, error_handler
 # data
 from modules.data import config_map
 # handlers
-from modules.handlers.command_handlers import STATE, start_cmd, help_cmd, settings_cmd, post_cmd, ban_cmd, reply_cmd,\
-    clean_pending_cmd, post_msg, rules_cmd, sban_cmd, cancel_cmd, stats_cmd, forwarded_post_msg, report_post, report_cmd, \
+from modules.handlers import start_cmd, help_cmd, rules_cmd
+from modules.handlers.command_handlers import STATE, settings_cmd, post_cmd, ban_cmd, reply_cmd,\
+    clean_pending_cmd, post_msg, sban_cmd, cancel_cmd, stats_cmd, forwarded_post_msg, report_post, report_cmd, \
     report_user_msg, report_user_sent_msg, purge_cmd
 from modules.handlers.callback_handlers import meme_callback, stats_callback
 from modules.handlers.job_handlers import clean_pending_job

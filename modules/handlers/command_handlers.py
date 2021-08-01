@@ -6,52 +6,9 @@ from telegram import Update, ParseMode
 from telegram.ext import CallbackContext
 from modules.handlers import STATE, CHAT_PRIVATE_ERROR, INVALID_MESSAGE_TYPE_ERROR, purge_flag
 from modules.handlers.job_handlers import clean_pending_job
-from modules.data import config_map, read_md, PendingPost, Report, User
+from modules.data import config_map, PendingPost, Report, User
 from modules.utils import EventInfo
 from modules.utils.keyboard_util import get_confirm_kb, get_settings_kb, get_stats_kb
-
-
-# region cmd
-def start_cmd(update: Update, context: CallbackContext):
-    """Handles the /start command.
-    Sends a welcoming message
-
-    Args:
-        update (Update): update event
-        context (CallbackContext): context passed by the handler
-    """
-    info = EventInfo.from_message(update, context)
-    text = read_md("start")
-    info.bot.send_message(chat_id=info.chat_id, text=text, parse_mode=ParseMode.MARKDOWN_V2, disable_web_page_preview=True)
-
-
-def help_cmd(update: Update, context: CallbackContext):
-    """Handles the /help command.
-    Sends an help message
-
-    Args:
-        update (Update): update event
-        context (CallbackContext): context passed by the handler
-    """
-    info = EventInfo.from_message(update, context)
-    if info.chat_id == config_map['meme']['group_id']:  # if you are in the admin group
-        text = read_md("instructions")
-    else:  # you are NOT in the admin group
-        text = read_md("help")
-    info.bot.send_message(chat_id=info.chat_id, text=text, parse_mode=ParseMode.MARKDOWN_V2, disable_web_page_preview=True)
-
-
-def rules_cmd(update: Update, context: CallbackContext):
-    """Handles the /rules command.
-    Sends a message containing the rules
-
-    Args:
-        update (Update): update event
-        context (CallbackContext): context passed by the handler
-    """
-    info = EventInfo.from_message(update, context)
-    text = read_md("rules")
-    info.bot.send_message(chat_id=info.chat_id, text=text, parse_mode=ParseMode.MARKDOWN_V2, disable_web_page_preview=True)
 
 
 def settings_cmd(update: Update, context: CallbackContext):
