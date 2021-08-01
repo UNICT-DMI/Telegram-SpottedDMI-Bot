@@ -1,31 +1,33 @@
 # pylint: disable=unused-argument,protected-access,no-value-for-parameter
 """TelegramSimulator class"""
 from datetime import datetime
-from typing import Callable, List, Optional, Union
-from telegram import Message, ReplyMarkup, MessageEntity, User, Chat, Update
+from typing import List, Optional, Union
+from telegram import Message, ReplyMarkup, MessageEntity, User, Chat, Update, CallbackQuery, update
 from telegram.ext import Updater
 from telegram.inline.inlinekeyboardmarkup import InlineKeyboardMarkup
-from modules.utils import Singleton
+from main import add_handlers
 
 
-class TelegramSimulator(metaclass=Singleton):
+class TelegramSimulator():
     """Weaves the standard bot class to intercept any contact with the telegram api and store the message"""
     __name = "BOT"
     __bot_id = 1234567890
     __current_id = 0
-    __default_chat = Chat(id=1, type='')
+    __default_chat = Chat(id=1, type='private')
     __default_user = User(id=1, first_name='User', is_bot=False)
     __chat = __default_chat
     __user = __default_user
 
-    def __init__(self, updater: Updater):
+    def __init__(self):
         self.messages: List[Message] = []
-        self.updater = updater
-        self.bot = updater.bot
+        self.updater = Updater("1234567890:qY9gv7pRJgFj4EVmN3Z1gfJOgQpCbh0vmp5")
+        add_handlers(self.updater.dispatcher)
+        self.bot = self.updater.bot
         self.bot._bot = User(self.__bot_id, self.__name, is_bot=True, username=self.__name)
         self.bot._message = self.weaved_message().__get__(self.bot, self.bot.__class__)
         self.bot._post = self.weaved_post().__get__(self.bot, self.bot.__class__)
         self.bot.delete_webhook = self.weaved_delete_webhook().__get__(self.bot, self.bot.__class__)
+        self.bot.copy_message = self.weaved_copy_message().__get__(self.bot, self.bot.__class__)
 
     @property
     def current_id(self) -> int:
@@ -74,6 +76,22 @@ class TelegramSimulator(metaclass=Singleton):
         """
         return next(filter(lambda message: message.message_id == message_id, self.messages), None)
 
+    def get_callback_query_data(self, text: str, message: Message) -> str:
+        """Returs the data of the callback query from the inline button with the given text from the given message
+
+        Args:
+            text: text of the inline button
+            message: message to extract the data from
+
+        Returns:
+            data of the callback query, or an empty string if no data was found
+        """
+        for inline_keyboard in message.reply_markup.inline_keyboard:
+            for button in inline_keyboard:
+                if button.text == text:
+                    return button.callback_data
+        return ""
+
     def send_command(self,
                      text: str = None,
                      message: Message = None,
@@ -81,7 +99,7 @@ class TelegramSimulator(metaclass=Singleton):
                      chat: Chat = None,
                      date: datetime = None,
                      reply_markup: InlineKeyboardMarkup = None,
-                     **kwargs):
+                     **kwargs) -> Message:
         """Sends a command to the bot on behalf of the user
 
         Args:
@@ -92,6 +110,9 @@ class TelegramSimulator(metaclass=Singleton):
             date: date when the message was sent. Defaults to None.
             reply_markup: reply markup to use. Defaults to None.
             **kwargs: additional parameters to be passed to the message. Defaults to None.
+
+        Returns:
+            message sent
         """
         if message is None:
             message = self.make_message(text=text, user=user, chat=chat, date=date, reply_markup=reply_markup, **kwargs)
@@ -105,7 +126,7 @@ class TelegramSimulator(metaclass=Singleton):
                      chat: Chat = None,
                      date: datetime = None,
                      reply_markup: InlineKeyboardMarkup = None,
-                     **kwargs):
+                     **kwargs) -> Message:
         """Sends a message to the bot on behalf of the user
 
         Args:
@@ -116,6 +137,9 @@ class TelegramSimulator(metaclass=Singleton):
             date: date when the message was sent. Defaults to None.
             reply_markup: reply markup to use. Defaults to None.
             **kwargs: additional parameters to be passed to the message. Defaults to None.
+
+        Returns:
+            message sent
         """
         if message is None:
             message = self.make_message(text=text, user=user, chat=chat, date=date, reply_markup=reply_markup, **kwargs)
@@ -123,6 +147,36 @@ class TelegramSimulator(metaclass=Singleton):
         update = self.make_update(message)
         self.updater.dispatcher.process_update(update)
         return message
+
+    def send_callback_query(self,
+                            data: str = None,
+                            message: Message = None,
+                            text: str = None,
+                            query: CallbackQuery = None,
+                            user: User = None,
+                            chat: Chat = None,
+                            **kwargs) -> CallbackQuery:
+        """Sends a callback query on an inline keyboard button to the bot on behalf of the user
+
+        Args:
+            data: data of the callback query. Must be specified is message is None. Defaults to None
+            query: query to send. Must be specified is text is None. Defaults to None
+            user: user who sent the message. Defaults to None.
+            chat: chat where the message was sent. Defaults to None.
+            message: message the callback query belongs to. Defaults to None.
+            **kwargs: additional parameters to be passed to the message. Defaults to None.
+
+        Returns:
+            callback query answered
+        """
+        message = message if message is not None else self.last_message
+        if data is None and text is not None:
+            data = self.get_callback_query_data(text, message)
+        if query is None:
+            query = self.make_callback_query(user=user, chat=chat, data=data, message=message, **kwargs)
+        update = self.make_update(query)
+        self.updater.dispatcher.process_update(update)
+        return query
 
     def make_message(self,
                      text: str,
@@ -153,24 +207,47 @@ class TelegramSimulator(metaclass=Singleton):
                        reply_markup=reply_markup,
                        **kwargs)
 
-    def make_update(self, message: Union[str, Message], message_factory: Callable = None, edited: bool = False, **kwargs):
-        """Testing utility factory to create an update from a message, as either a
-        ``telegram.Message`` or a string. In the latter case ``message_factory``
-        is used to convert ``message`` to a ``telegram.Message``
+    def make_callback_query(self,
+                            message: Message,
+                            user: User = None,
+                            chat: Chat = None,
+                            data: str = None,
+                            **kwargs) -> Message:
+        """Creates a telegram message from the given parameters
 
         Args:
-            message: either a ``telegram.Message`` or a string with the message text
-            message_factory: function to convert the message text into a ``telegram.Message``
-            edited: whether the message should be stored as ``edited_message`` (vs. ``message``)
+            text: message text
+            user: user who sent the message. Defaults to None.
+            chat: chat where the message was sent. Defaults to None.
+            data: data contained in the callback query. Defaults to None.
+            message: message the callback query belongs to. Defaults to None.
+            **kwargs: additional parameters to be passed to the message. Defaults to None.
+
+        Returns:
+            message created from the given parameters
+        """
+        return CallbackQuery(id=0,
+                             from_user=user if user is not None else self.user,
+                             chat_instance=str(chat.id) if chat is not None else str(self.chat.id),
+                             message=message,
+                             data=data,
+                             **kwargs)
+
+    def make_update(self, event: Union[CallbackQuery, Message], edited: bool = False, **kwargs):
+        """Testing utility factory to create an update from a user event, as either a
+        :class:`Message`` or a :class:`CallbackQuery` from an inline keyboard
+
+        Args:
+            message: either a :class:`Message` or a :class:`CallbackQuery` from an inline keyboard
+            edited: whether the message should be stored as an edited message
 
         Returns:
             update with the given message
         """
-        if message_factory is None:
-            message_factory = self.make_message
-        if not isinstance(message, Message):
-            message = message_factory(message, **kwargs)
-        update_kwargs = {'message' if not edited else 'edited_message': message}
+        if isinstance(event, Message):
+            update_kwargs = {'message' if not edited else 'edited_message': event}
+        elif isinstance(event, CallbackQuery):
+            update_kwargs = {'callback_query': event}
         return Update(0, **update_kwargs)
 
     def weaved_message(self):
@@ -192,6 +269,7 @@ class TelegramSimulator(metaclass=Singleton):
                 reply_to_message_id) if reply_to_message_id is not None else None
             message.reply_markup = reply_markup
             message.from_user = bot_self._bot
+            message.chat = Chat(id=data['chat_id'], type="")
 
             self.add_message(message)
             return message
@@ -205,6 +283,20 @@ class TelegramSimulator(metaclass=Singleton):
     def weaved_post(self):
         """Weaves the post method in the bot object to intercept telegram's api requests"""
         return lambda *_, **__: []
+
+    def weaved_copy_message(self):
+        """Weaves the post method in the bot object to intercept telegram's api requests"""
+
+        def copy_message(bot_self, chat_id: Union[int, str], from_chat_id: Union[str, int], message_id: Union[str, int], *args,
+                         **kwargs) -> int:
+            message_to_copy: Optional[Message] = next(
+                filter(lambda message: message.message_id == message_id and message.chat_id == from_chat_id, self.messages),
+                None)
+            chat = Chat(id=chat_id, type='')
+            message = self.make_message(text=message_to_copy.text, reply_markup=message_to_copy.reply_markup, chat=chat)
+            return message
+
+        return copy_message
 
     def add_message(self, message: Message):
         """Adds a message to the list of messages
