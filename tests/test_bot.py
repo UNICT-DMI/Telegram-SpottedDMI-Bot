@@ -1,200 +1,107 @@
+# pylint: disable=unused-argument,redefined-outer-name
 """Tests the bot functionality"""
+import warnings
+import os
+import pytest
+from telegram import Chat
+from telegram.ext import Updater
+from tests.utils import TelegramSimulator
+from modules.data import config_map, read_md, get_abs_path, DbManager
+from main import add_handlers
 
-# This test isn't currently used, but it is ready if someone wants to actually implement this
 
-# import pytest
-# from telethon.sync import TelegramClient
-# from telethon.tl.custom.message import Message
-# from telethon.tl.custom.conversation import Conversation
-# from modules.data.data_reader import config_map
+@pytest.fixture(scope="class")
+def init_local_table() -> DbManager:
+    """Called once per at the beginning of this class.
+    Creates and initializes the local database
+    """
+    DbManager.db_path = ('data', 'db', 'test_db.sqlite3')
+    DbManager.query_from_file("data", "db", "meme_db_del.sql")
+    DbManager.query_from_file("data", "db", "meme_db_init.sql")
+    yield DbManager
+    os.remove(get_abs_path('data', 'db', 'test_db.sqlite3'))
 
-# TIMEOUT = 8
-# bot_tag = config_map['test']['bot_tag']
 
-# class TestBot:
+@pytest.fixture(scope="function")
+def local_table(init_local_table: DbManager) -> str:
+    """Called once per at the beginning of each function.
+    Resets the state of the database
+    """
+    init_local_table.query_from_file("data", "db", "meme_db_del.sql")
+    init_local_table.query_from_file("data", "db", "meme_db_init.sql")
 
-#     class TestMarkdownCommands:
 
-#         @pytest.mark.asyncio
-#         async def test_start_cmd(self, client: TelegramClient):
-#             """Tests the start command
+@pytest.fixture(scope="class")
+def weave_telegram_library() -> TelegramSimulator:
+    """Called once per at the beginning of this class.
+    Weaves the telegram library to intercept the message sent by the bot
 
-#             Args:
-#                 client (TelegramClient): client used to simulate the user
-#             """
-#             async with client.conversation(bot_tag, timeout=TIMEOUT) as conv:
-#                 await conv.send_message("/start")  # send a command
-#                 resp: Message = await conv.get_response()
-#                 assert resp.text
+    Yields:
+        telegram weaver
+    """
+    # The telegram token is invented, is not valid, and it does not need to be
+    updater = Updater("1234567890:qY9gv7pRJgFj4EVmN3Z1gfJOgQpCbh0vmp5")
+    add_handlers(updater.dispatcher)
 
-#         @pytest.mark.asyncio
-#         async def test_help_cmd(self, client: TelegramClient):
-#             """Tests the help command
+    telegram = TelegramSimulator(updater=updater)
 
-#             Args:
-#                 client (TelegramClient): client used to simulate the user
-#             """
-#             async with client.conversation(bot_tag, timeout=TIMEOUT) as conv:
-#                 await conv.send_message("/help")  # send a command
-#                 resp: Message = await conv.get_response()
+    return telegram
 
-#                 assert resp.text
 
-#         @pytest.mark.asyncio
-#         async def test_rules_cmd(self, client: TelegramClient):
-#             """Tests the rules command
+@pytest.fixture(scope="function")
+def telegram(weave_telegram_library: TelegramSimulator) -> TelegramSimulator:
+    """Called once per at the beginning of each function.
+    Resets the telegram weaver object
 
-#             Args:
-#                 client (TelegramClient): client used to simulate the user
-#             """
-#             async with client.conversation(bot_tag, timeout=TIMEOUT) as conv:
-#                 await conv.send_message("/rules")  # send a command
-#                 resp: Message = await conv.get_response()
+    Yields:
+        telegram weaver
+    """
+    weave_telegram_library.reset()
+    return weave_telegram_library
 
-#                 assert resp.text
 
-#     class TestSpot:
+@pytest.fixture(scope="function")
+def admin_group(weave_telegram_library: TelegramSimulator) -> Chat:
+    """Called once per at the beginning of each function.
+    Returns an admin user
 
-#         async def user_spot(self, conv: Conversation) -> Message:
-#             await conv.send_message("/cancel")  # send a command
-#             await conv.get_response()
+    Yields:
+        admin user
+    """
+    group_id = config_map['meme']['group_id']
+    return Chat(id=group_id, type="group")
 
-#             await conv.send_message("/spot")  # send a command
-#             resp: Message = await conv.get_response()
 
-#             assert resp.text
+class TestBot:
+    """Tests the bot simulating the telegram API's responses"""
 
-#             await conv.send_message("Testing spot")  # send a message
-#             resp: Message = await conv.get_response()
+    class TestBotCommand:
+        """Tests the bot commands"""
 
-#             assert resp.text
+        def test_start_cmd(self, telegram: TelegramSimulator):
+            """Tests the /start command.
+            The bot sends the start response to the user
+            """
+            telegram.send_command("/start")
+            assert telegram.last_message.text == read_md("start")
 
-#             await resp.click(data="meme_confirm,yes")  # click inline keyboard
-#             resp: Message = await conv.get_edit()
+        def test_help_user_cmd(self, telegram: TelegramSimulator):
+            """Tests the /help command.
+            The bot sends the help response to the user
+            """
+            telegram.send_command("/help")
+            assert telegram.last_message.text == read_md("help")
 
-#             assert resp.text
+        def test_help_admin_cmd(self, telegram: TelegramSimulator, admin_group: Chat):
+            """Tests the /help command.
+            The bot sends the help response to the admins
+            """
+            telegram.send_command("/help", chat=admin_group)
+            assert telegram.last_message.text == read_md("instructions")
 
-#             resp: Message = await conv.get_response()
-#             assert resp.text
-#             return resp
-
-#         @pytest.mark.asyncio
-#         async def test_post_conversation_yes(self, client: TelegramClient):
-#             """Tests the whole flow of the create conversation with the default image
-#             The image creation is handled by the main thread
-
-#             Args:
-#                 client (TelegramClient): client used to simulate the user
-#             """
-#             async with client.conversation(bot_tag, timeout=TIMEOUT) as conv:
-#                 await self.user_spot(conv)
-
-#         @pytest.mark.asyncio
-#         async def test_post_conversation_no(self, client: TelegramClient):
-#             """Tests the whole flow of the create conversation with the default image
-#             The image creation is handled by the main thread
-
-#             Args:
-#                 client (TelegramClient): client used to simulate the user
-#             """
-#             async with client.conversation(bot_tag, timeout=TIMEOUT) as conv:
-#                 await conv.send_message("/cancel")  # send a command
-#                 await conv.get_response()
-
-#                 await conv.send_message("/spot")  # send a command
-#                 resp: Message = await conv.get_response()
-
-#                 assert resp.text
-
-#                 await conv.send_message("Testing spot")  # send a message
-#                 resp: Message = await conv.get_response()
-
-#                 assert resp.text
-
-#                 await resp.click(data="meme_confirm,no")  # click inline keyboard
-#                 resp: Message = await conv.get_edit()
-
-#                 assert resp.text
-
-#         @pytest.mark.asyncio
-#         async def test_settings_anonym(self, client: TelegramClient):
-#             """Tests the whole flow of the create conversation with the default image
-#             The image creation is handled by the main thread
-
-#             Args:
-#                 client (TelegramClient): client used to simulate the user
-#             """
-#             async with client.conversation(bot_tag, timeout=TIMEOUT) as conv:
-#                 await conv.send_message("/settings")  # send a command
-#                 resp: Message = await conv.get_response()
-
-#                 assert resp.text
-
-#                 await resp.click(data="meme_settings,anonimo")  # click inline keyboard
-#                 resp: Message = await conv.get_edit()
-
-#                 assert resp.text
-
-#         @pytest.mark.asyncio
-#         async def test_settings_credit(self, client: TelegramClient):
-#             """Tests the whole flow of the create conversation with the default image
-#             The image creation is handled by the main thread
-
-#             Args:
-#                 client (TelegramClient): client used to simulate the user
-#             """
-#             async with client.conversation(bot_tag, timeout=TIMEOUT) as conv:
-#                 await conv.send_message("/settings")  # send a command
-#                 resp: Message = await conv.get_response()
-
-#                 assert resp.text
-
-#                 await resp.click(data="meme_settings,credit")  # click inline keyboard
-#                 resp: Message = await conv.get_edit()
-
-#                 assert resp.text
-
-#         @pytest.mark.asyncio
-#         async def test_approve_yes(self, client: TelegramClient):
-#             """Tests the whole flow of the create conversation with the default image
-#             The image creation is handled by the main thread
-
-#             Args:
-#                 client (TelegramClient): client used to simulate the user
-#             """
-#             async with client.conversation(bot_tag, timeout=TIMEOUT) as conv:
-#                 resp = await self.user_spot(conv)
-
-#                 await resp.click(data="meme_approve_yes,")  # approve the spot
-#                 resp: Message = await conv.get_edit()
-
-#                 assert resp.reply_markup is None
-
-#                 resp: Message = await conv.get_response()
-#                 assert resp.reply_markup is not None
-
-#         @pytest.mark.asyncio
-#         async def test_approve_no(self, client: TelegramClient):
-#             """Tests the whole flow of the create conversation with the default image
-#             The image creation is handled by the main thread
-
-#             Args:
-#                 client (TelegramClient): client used to simulate the user
-#             """
-#             async with client.conversation(bot_tag, timeout=TIMEOUT) as conv:
-#                 resp = await self.user_spot(conv)
-
-#                 await resp.click(data="meme_approve_no,")  # approve the spot
-#                 resp: Message = await conv.get_edit()
-
-#                 assert resp.reply_markup is None
-
-#         @pytest.mark.asyncio
-#         async def test_reply_cmd(self, client: TelegramClient):
-#             """Tests the whole flow of the create conversation with the default image
-#             The image creation is handled by the main thread
-
-#             Args:
-#                 client (TelegramClient): client used to simulate the user
-#             """
-#             pass
+        def test_rules_cmd(self, telegram: TelegramSimulator):
+            """Tests the /rules command.
+            The bot sends the rules response to the user
+            """
+            telegram.send_command("/rules")
+            assert telegram.last_message.text == read_md("rules")

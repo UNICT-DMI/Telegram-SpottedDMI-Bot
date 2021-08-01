@@ -86,46 +86,12 @@ To update the **meme** settings, prefix the env var name with **MEME_**. The sam
 
 ## :bar_chart: _[Optional]_ Setting up testing
 
-### Create a Telegram app:
-
-#### Steps:
-- Sign in your Telegram account with your phone number **[here](https://my.telegram.org/auth)**. Then choose “API development tools”
-- If it is your first time doing so, it will ask you for an app name and a short name, you can change both of them later if you need to. Submit the form when you have completed it
-- You will then see the **api_id** and **api_hash** for your app. These are unique to your app, and not revocable.
-- Put those values in the _conf/settings.yaml_ file for local or in the _conf/settings.yaml.dist_ file if you are setting up a docker container
-```yaml
-test:
-    api_hash: HERE
-    api_id: HERE
-...
-```
-- Copy the file _tests/conftest.py_ in the root folder and **Run** `python3 conftest.py `. Follow the procedure and copy the session string it provides in the settings file:
-```yaml
-test:
-...
-    session: HERE
-...
-```
-- You can then delete the _conftest.py_ file present in the root folder, you won't need it again
-- Edit the remaining values in the file as you see fit
-
-**Check [here](https://dev.to/blueset/how-to-write-integration-tests-for-a-telegram-bot-4c0e) you you want to have more information on the steps above**
-
-### In local:
-
 #### Install with *pip3*
-- [telethon](https://pypi.org/project/Telethon/)
+Listed in requirements_dev.txt
 - [pytest](https://pypi.org/project/pytest/)
-- [pytest-asyncio](https://pypi.org/project/pytest-asyncio/)
 
 #### Steps:
 - **Run** `pytest`
-
-### In a docker container:
-
-#### Steps:
-- Add telethon, pytest and pytest-asyncio to the requirements.txt file
-- Access the container and **Run** `pytest` or edit the Dockerfile to do so
 
 ## :books: Documentation
 Check the gh-pages branch
