@@ -23,3 +23,11 @@ keyboard\_util
    :members:
    :undoc-members:
    :show-inheritance:
+
+conversation\_util
+-----------------------------------
+
+.. automodule:: modules.utils.conversation_util
+   :members:
+   :undoc-members:
+   :show-inheritance:
