@@ -38,8 +38,7 @@ def pending_post_message(local_table: DbManager, admin_group: Chat) -> Message:
         telegram weaver
     """
     PendingPost(1, 0, 0, config_map['meme']['group_id'], datetime.now()).save_post()
-    message = Message(message_id=0, date=datetime.now(), chat=admin_group)
-    return message
+    return Message(message_id=0, date=datetime.now(), chat=admin_group)
 
 
 @pytest.fixture(scope="function")
@@ -51,8 +50,7 @@ def report_user_message(local_table: DbManager, admin_group: Chat) -> Message:
         telegram weaver
     """
     Report(1, config_map['meme']['group_id'], 0, target_username='BadUser', date=datetime.now()).save_report()
-    message = Message(message_id=0, date=datetime.now(), chat=admin_group)
-    return message
+    return Message(message_id=0, date=datetime.now(), chat=admin_group)
 
 
 @pytest.fixture(scope="function")

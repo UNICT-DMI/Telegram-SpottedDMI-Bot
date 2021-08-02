@@ -36,7 +36,6 @@ jobs:
         run: |
           mv config/settings.yaml.dist config/settings.yaml
           mv data/yaml/reactions.yaml.dist data/yaml/reactions.yaml
-          python3 settings.py uselessToken 1 2 3
       - name: Lint with flake8
         run: |
           # stop the build if there are Python syntax errors or undefined names
