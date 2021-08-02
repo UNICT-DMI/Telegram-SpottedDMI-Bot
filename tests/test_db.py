@@ -8,22 +8,24 @@ TABLE_NAME = "test_table"
 
 
 @pytest.fixture(scope="class")
-def db_results() -> dict:
+def db_results(init_local_test_db: DbManager) -> dict:
     """Called at the beginning of the testing session.
     Creates initializes the database
 
     Yields:
         Iterator[dict]: dictionary containing the results for the test queries
     """
-    DbManager.row_factory = lambda cursor, row: list(row) if cursor.description[0][0] != "number" else {"number": row[0]}
-    DbManager.query_from_file("data/db/db_test.sql")
+    init_local_test_db.row_factory = lambda cursor, row: list(row) if cursor.description[0][0] != "number" else {
+        "number": row[0]
+    }
+    init_local_test_db.query_from_file("data/db/db_test.sql")
 
     with open("tests/db_results.yaml", 'r') as yaml_config:
         results = yaml.load(yaml_config, Loader=yaml.SafeLoader)
 
     yield results
 
-    DbManager.query_from_string("DROP TABLE IF EXISTS test_table;")
+    init_local_test_db.query_from_string("DROP TABLE IF EXISTS test_table;")
 
 
 class TestDB:

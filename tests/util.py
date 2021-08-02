@@ -2,7 +2,7 @@
 """TelegramSimulator class"""
 from datetime import datetime
 from typing import List, Optional, Union
-from telegram import Message, ReplyMarkup, MessageEntity, User, Chat, Update, CallbackQuery, update
+from telegram import Message, ReplyMarkup, MessageEntity, User, Chat, Update, CallbackQuery
 from telegram.ext import Updater
 from telegram.inline.inlinekeyboardmarkup import InlineKeyboardMarkup
 from main import add_handlers
@@ -14,7 +14,7 @@ class TelegramSimulator():
     __bot_id = 1234567890
     __current_id = 0
     __default_chat = Chat(id=1, type='private')
-    __default_user = User(id=1, first_name='User', is_bot=False)
+    __default_user = User(id=1, first_name='User', username="Username", is_bot=False)
     __chat = __default_chat
     __user = __default_user
 
@@ -116,7 +116,8 @@ class TelegramSimulator():
         """
         if message is None:
             message = self.make_message(text=text, user=user, chat=chat, date=date, reply_markup=reply_markup, **kwargs)
-            message.entities.append(MessageEntity(type=MessageEntity.BOT_COMMAND, offset=0, length=len(text)))
+            command_len = len(text.split(" ")[0])
+            message.entities.append(MessageEntity(type=MessageEntity.BOT_COMMAND, offset=0, length=command_len))
         self.send_message(message=message)
 
     def send_message(self,
@@ -126,6 +127,7 @@ class TelegramSimulator():
                      chat: Chat = None,
                      date: datetime = None,
                      reply_markup: InlineKeyboardMarkup = None,
+                     reply_to_message: Union[Message, int] = None,
                      **kwargs) -> Message:
         """Sends a message to the bot on behalf of the user
 
@@ -136,13 +138,20 @@ class TelegramSimulator():
             chat: chat where the message was sent. Defaults to None.
             date: date when the message was sent. Defaults to None.
             reply_markup: reply markup to use. Defaults to None.
+            reply_to_message: message (or message_id of said message) to reply to. Defaults to None.
             **kwargs: additional parameters to be passed to the message. Defaults to None.
 
         Returns:
             message sent
         """
         if message is None:
-            message = self.make_message(text=text, user=user, chat=chat, date=date, reply_markup=reply_markup, **kwargs)
+            message = self.make_message(text=text,
+                                        user=user,
+                                        chat=chat,
+                                        date=date,
+                                        reply_markup=reply_markup,
+                                        reply_to_message=reply_to_message,
+                                        **kwargs)
         self.add_message(message)
         update = self.make_update(message)
         self.updater.dispatcher.process_update(update)
@@ -184,6 +193,7 @@ class TelegramSimulator():
                      chat: Chat = None,
                      date: datetime = None,
                      reply_markup: InlineKeyboardMarkup = None,
+                     reply_to_message: Union[Message, int] = None,
                      **kwargs) -> Message:
         """Creates a telegram message from the given parameters
 
@@ -193,11 +203,14 @@ class TelegramSimulator():
             chat: chat where the message was sent. Defaults to None.
             date: date when the message was sent. Defaults to None.
             reply_markup: reply markup to use. Defaults to None.
+            reply_to_message: message (or message_id of said message) to reply to. Defaults to None.
             **kwargs: additional parameters to be passed to the message. Defaults to None.
 
         Returns:
             message created from the given parameters
         """
+        if isinstance(reply_to_message, int):
+            reply_to_message = self.get_message_with_id(reply_to_message)
         return Message(message_id=self.current_id,
                        from_user=user if user is not None else self.user,
                        date=date if date is not None else datetime.now(),
@@ -205,6 +218,7 @@ class TelegramSimulator():
                        text=text,
                        bot=self.bot,
                        reply_markup=reply_markup,
+                       reply_to_message=reply_to_message,
                        **kwargs)
 
     def make_callback_query(self,
@@ -265,8 +279,11 @@ class TelegramSimulator():
             data.update({'message_id': self.current_id, 'date': datetime.now().timestamp()})
 
             message = Message.de_json(data, bot_self)
-            message.reply_to_message = self.get_message_with_id(
-                reply_to_message_id) if reply_to_message_id is not None else None
+            if reply_to_message_id is not None:
+                if isinstance(reply_to_message_id, int):
+                    message.reply_to_message = self.get_message_with_id(reply_to_message_id)
+                else:
+                    message.reply_to_message = reply_to_message_id
             message.reply_markup = reply_markup
             message.from_user = bot_self._bot
             message.chat = Chat(id=data['chat_id'], type="")
