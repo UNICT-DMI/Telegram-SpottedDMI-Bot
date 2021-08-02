@@ -5,7 +5,16 @@ name: Development
 
 on:
   pull_request:
-    branches: [upgrade]
+    paths-ignore:
+      - ".gitignore"
+      - "README.md"
+      - "docs/**"
+  push:
+    branches-ignore: [upgrade]
+    paths-ignore:
+      - ".gitignore"
+      - "README.md"
+      - "docs/**"
 
 jobs:
   test:
