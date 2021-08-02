@@ -35,6 +35,9 @@ jobs:
           pytest -p no:warnings --cov=./ --cov-report=xml
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v1
+        with:
+          files: ./coverage.xml
+          directory: .
   doc:
     needs: test
     runs-on: ubuntu-latest
