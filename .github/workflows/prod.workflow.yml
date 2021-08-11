@@ -58,7 +58,6 @@ jobs:
         run: |
           mv config/settings.yaml.dist config/settings.yaml
           mv data/yaml/reactions.yaml.dist data/yaml/reactions.yaml
-          python3 settings.py uselessToken 1 2 3
       - name: Sphinx build
         run: |
           sphinx-build -b html docs/source docs/build/docs
