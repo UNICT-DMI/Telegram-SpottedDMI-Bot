@@ -7,6 +7,7 @@ from modules.utils import EventInfo
 
 purge_in_progress = False
 
+
 def purge_cmd(update: Update, context: CallbackContext):
     """Handles the /purge command.
     Deletes all posts and the related votes in the database whose actual telegram message could not be found
@@ -35,8 +36,8 @@ def purge_cmd(update: Update, context: CallbackContext):
                 sleep(10)
             finally:
                 sleep(0.2)
-        info.bot.send_message(
-            info.chat_id,
-            text=
-            f"Dei {total_posts} totali, {lost_posts} sono andati persi. Il rapporto è {round(lost_posts/total_posts, 3)}")
+
+        avg = round(lost_posts / (total_posts if total_posts != 0 else 1), 3)
+        info.bot.send_message(info.chat_id,
+                              text=f"Dei {total_posts} totali, {lost_posts} sono andati persi. Il rapporto è {avg}")
         purge_in_progress = False
