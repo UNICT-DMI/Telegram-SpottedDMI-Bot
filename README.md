@@ -33,7 +33,8 @@ Listed in requirements.txt
 ### Steps:
 - Clone this repository
 - \[_OPTIONAL_\] Rename "data/yaml/reactions.yaml.dist" in "data/yaml/reactions.yaml" or simply create the latter and edit the desired parameters. 
--  Rename "config/settings.yaml.dist" in "config/settings.yaml" or simply create the latter and edit the desired parameters. **Make sure to add a valid _token_ setting**.  
+- Rename "config/settings.yaml.dist" in "config/settings.yaml" or simply create the latter and edit the desired parameters. **Make sure to add a valid _token_ setting**.  
+- Make sure the bot is in present both in the admin group and in the spot channel. It may need to have admin privileges. If comments are enabled, the bot has to be in the comment group too as an admin.
 What follows are some example settings with explaination for each:
 ```yaml
 debug:
@@ -75,6 +76,7 @@ bot_tag: '@bot'           # tag of the telegram bot
 - Clone this repository
 - In _config/settings.yaml.dist_, edit the desired values. You can also rename it to _config/settings.yaml_ and edit the values there.
 - You can also leave the settings files alone, and instead use the environment variables on the container.  
+- Make sure the bot is in present both in the admin group and in the spot channel. It may need to have admin privileges. If comments are enabled, the bot has to be in the comment group too as an admin.
 All the env vars with the same name (case insensitive) will override the ones in the settings file.
 To update the **meme** settings, prefix the env var name with **MEME_**. The same is true for the **test** settings, that have to be prefixed with **TEST_**.
 - **Run** `docker build --tag botimage .` 
