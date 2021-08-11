@@ -3,11 +3,10 @@ from typing import Tuple
 from telegram import Update, InlineKeyboardMarkup, InlineKeyboardButton
 from telegram.ext import CallbackContext
 from telegram.error import BadRequest, RetryAfter, Unauthorized
-from modules.handlers import STATE
 from modules.debug import logger
-from modules.data import config_map, PendingPost, PublishedPost, PostData, Report, User
+from modules.data import config_map, PendingPost, PublishedPost, User
 from modules.utils import EventInfo
-from modules.utils.keyboard_util import REACTION, get_approve_kb, update_approve_kb, get_vote_kb, get_stats_kb
+from modules.utils.keyboard_util import REACTION, get_approve_kb, update_approve_kb, get_vote_kb
 
 
 def old_reactions(data: str) -> str:
@@ -64,39 +63,6 @@ def meme_callback(update: Update, context: CallbackContext) -> int:
 
 
 # region handle meme_callback
-def confirm_callback(info: EventInfo, arg: str) -> Tuple[str, InlineKeyboardMarkup, int]:
-    """Handles the confirm,[ yes | no ] callback.
-
-    - yes: Saves the post as pending and sends it to the admins for them to check.
-    - no: cancel the current spot conversation
-
-    Args:
-        info (dict): information about the callback
-        arg (str): [ yes | no ]
-
-    Returns:
-        Tuple[str, InlineKeyboardMarkup, int]: text and replyMarkup that make up the reply, new conversation state
-    """
-    if arg == "yes":  # if the the user wants to publish the post
-        if User(info.user_id).is_pending:  # there is already a spot in pending by this user
-            return None, None, STATE['end']
-
-        if info.send_post_to_admins():
-            text = "Il tuo post è in fase di valutazione\n"\
-                f"Una volta pubblicato, lo potrai trovare su {config_map['meme']['channel_tag']}"
-        else:
-            text = "Si è verificato un problema\nAssicurati che il tipo di post sia fra quelli consentiti"
-
-    elif arg == "no":  # if the the user changed his mind
-        text = "Va bene, alla prossima 🙃"
-
-    else:
-        text = None
-        logger.error("confirm_callback: invalid arg '%s'", arg)
-
-    return text, None, STATE['end']
-
-
 def settings_callback(info: EventInfo, arg: str) -> Tuple[str, InlineKeyboardMarkup, int]:
     """Handles the settings,[ anonimo | credit ] callback.
 
@@ -157,7 +123,7 @@ def approve_status_callback(info: EventInfo, arg: None) -> Tuple[str, InlineKeyb
         keyboard = None
         logger.error("confirm_callback: invalid arg '%s'", arg)
 
-    return None, keyboard, STATE['end']
+    return None, keyboard, None
 
 
 def approve_yes_callback(info: EventInfo, arg: None) -> Tuple[str, InlineKeyboardMarkup, int]:  # pylint: disable=unused-argument
@@ -268,140 +234,12 @@ def vote_callback(info: EventInfo, arg: str) -> Tuple[str, InlineKeyboardMarkup,
     return None, get_vote_kb(published_post=publishedPost), None
 
 
-def report_spot_callback(info: EventInfo, args: str) -> Tuple[str, InlineKeyboardMarkup, int]:  # pylint: disable=unused-argument
-    """Handles the report callback.
-
-    Args:
-        info (dict): information about the callback
-        arg (str): unused
-
-    Returns:
-        Tuple[str, InlineKeyboardMarkup, int]: text and replyMarkup that make up the reply, new conversation state
-    """
-    abusive_message_id = info.message.reply_to_message.message_id
-
-    report = Report.get_post_report(user_id=info.user_id,
-                                    channel_id=info.chat_id,
-                                    c_message_id=abusive_message_id)
-    if report is not None:  # this user has already reported this post
-        info.answer_callback_query(text="Hai già segnalato questo spot.")
-        return None, None, STATE['end']
-    try:
-        info.bot.forward_message(chat_id=info.user_id, from_chat_id=info.chat_id, message_id=abusive_message_id)
-        info.bot.send_message(chat_id=info.user_id,
-                              text="Scrivi il motivo della segnalazione del post, altrimenti digita /cancel")
-        info.answer_callback_query(text="Segnala in privato tramite il bot")
-    except Unauthorized:
-        info.answer_callback_query(text=f"Assicurati di aver avviato la chat con {config_map['bot_tag']}")
-        return None, None, None
-
-    info.user_data['current_post_reported'] = f"{info.chat_id},{abusive_message_id}"
-    return None, None, STATE['reporting_spot']
 
 
 # endregion
 
 
-def stats_callback(update: Update, context: CallbackContext):
-    """Passes the stats callback to the correct handler
 
-    Args:
-        update (Update): update event
-        context (CallbackContext): context passed by the handler
-    """
-    info = EventInfo.from_callback(update, context)
-    info.answer_callback_query()  # end the spinning progress bar
-    # the callback data indicates the correct callback and the arg to pass to it separated by ,
-    data = info.query_data.split(",")
-    try:
-        message_text = globals()[f'{data[0][6:]}_callback'](data[1])  # call the function based on its name
-    except KeyError as e:
-        logger.error("stats_callback: %s", e)
-        return
-
-    if message_text:  # if there is a valid text, edit the menu with the new text
-        info.bot.edit_message_text(chat_id=info.chat_id,
-                                   message_id=info.message_id,
-                                   text=message_text,
-                                   reply_markup=get_stats_kb())
-    else:  # remove the reply markup
-        info.edit_inline_keyboard()
-
-
-# region handle stats_callback
-def avg_callback(arg: str) -> str:
-    """Handles the avg_[ votes | 0 | 1 ] callback.
-    Shows the average of the %arg per post
-
-    Args:
-        arg (str): [ votes | 0 | 1 ]
-
-    Returns:
-        str: text for the reply
-    """
-    if arg == "votes":
-        avg_votes = PostData.get_avg()
-        text = f"Gli spot ricevono in media {avg_votes} voti"
-    else:
-        avg_votes = PostData.get_avg(arg)
-        text = f"Gli spot ricevono in media {avg_votes} {REACTION[arg]}"
-
-    return text
-
-
-def max_callback(arg: str) -> str:
-    """Handles the max_[ votes | 0 | 1 ] callback
-    Shows the post with the most %arg
-
-    Args:
-        arg (str): [ votes | 0 | 1 ]
-
-    Returns:
-        str: text for the reply
-    """
-    if arg == "votes":
-        max_votes, message_id, channel_id = PostData.get_max_id()
-        text = f"Lo spot con più voti ne ha {max_votes}\n"\
-            f"Lo trovi a questo link: https://t.me/c/{channel_id[4:]}/{message_id}"
-    else:
-        max_votes, message_id, channel_id = PostData.get_max_id(arg)
-        text = f"Lo spot con più {REACTION[arg]} ne ha {max_votes}\n" \
-            f"Lo trovi a questo link: https://t.me/c/{channel_id[4:]}/{message_id}"
-
-    return text
-
-
-def tot_callback(arg: str) -> str:
-    """Handles the tot_[ posts | votes | 0 | 1 ] callback
-    Shows the total number of %arg
-
-    Args:
-        arg (str): [ posts | votes | 0 | 1 ]
-
-    Returns:
-        str: text for the reply
-    """
-    if arg == "posts":
-        n_posts = PostData.get_n_posts()
-        text = f"Sono stati pubblicati {n_posts} spot nel canale fin'ora.\nPotresti ampliare questo numero..."
-    elif arg == "votes":
-        n_votes = PostData.get_n_votes()
-        text = f"Il totale dei voti ammonta a {n_votes}"
-    else:
-        n_votes = PostData.get_n_votes(arg)
-        text = f"Il totale dei {REACTION[arg]} ammonta a {n_votes}"
-
-    return text
-
-
-def close_callback(arg: None) -> str:  # pylint: disable=unused-argument
-    """Handles the close callback
-    Closes the stats menu
-
-    Returns:
-        str: text and replyMarkup that make up the reply
-    """
-    return None
 
 
 # endregion

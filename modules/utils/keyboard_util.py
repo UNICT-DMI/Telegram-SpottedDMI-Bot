@@ -15,8 +15,8 @@ def get_confirm_kb() -> InlineKeyboardMarkup:
         InlineKeyboardMarkup: new inline keyboard
     """
     return InlineKeyboardMarkup([[
-        InlineKeyboardButton(text="Si", callback_data="meme_confirm,yes"),
-        InlineKeyboardButton(text="No", callback_data="meme_confirm,no")
+        InlineKeyboardButton(text="Si", callback_data="meme_confirm,submit"),
+        InlineKeyboardButton(text="No", callback_data="meme_confirm,cancel")
     ]])
 
 

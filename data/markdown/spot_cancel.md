@@ -1,0 +1,1 @@
+La creazione dello spot è stata annullata

@@ -16,6 +16,7 @@ For the complete source code, check this github `repo <https://github.com/UNICT-
    main
    modules
    dbschema
+   tests
 
 Indices and tables
 ==================

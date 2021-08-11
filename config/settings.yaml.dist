@@ -1,11 +1,11 @@
 debug:
   local_log: false
 meme:
-  channel_group_id: 0
-  channel_id: 0
+  channel_group_id: -1
+  channel_id: -2
   channel_tag: ''
   comments: true
-  group_id: 0
+  group_id: -3
   n_votes: 1
   remove_after_h: 12
   reset_on_load: false
