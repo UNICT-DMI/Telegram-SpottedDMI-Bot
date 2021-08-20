@@ -39,3 +39,12 @@ def clean_pending_job(context: CallbackContext):
             pending_post.delete_post()
 
     info.bot.send_message(chat_id=admin_group_id, text=f"Sono stati eliminati {removed} messaggi rimasti in sospeso")
+
+
+def db_backup_job(context: CallbackContext):
+    path = "./data/db/db.sqlite3"
+    admin_group_id = config_map['meme']['group_id']
+    try:
+        context.bot.send_document(chat_id=admin_group_id, document=open(path, 'rb'), timeout=600, caption="✅ Backup effettuato con successo")
+    except Exception as e:
+        context.bot.send_message(chat_id=admin_group_id, text=f"✖️ Impossibile effetturare il backup\n\n{e}")

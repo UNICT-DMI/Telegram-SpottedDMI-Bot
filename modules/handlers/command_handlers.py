@@ -5,7 +5,7 @@ from modules.data.db_manager import DbManager
 from telegram import Update, ParseMode
 from telegram.ext import CallbackContext
 from modules.handlers import STATE, CHAT_PRIVATE_ERROR, INVALID_MESSAGE_TYPE_ERROR, purge_flag
-from modules.handlers.job_handlers import clean_pending_job
+from modules.handlers.job_handlers import clean_pending_job, db_backup_job
 from modules.data import config_map, read_md, PendingPost, Report, User
 from modules.utils import EventInfo
 from modules.utils.keyboard_util import get_confirm_kb, get_settings_kb, get_stats_kb
@@ -209,6 +209,19 @@ def clean_pending_cmd(update: Update, context: CallbackContext):
     info = EventInfo.from_message(update, context)
     if info.chat_id == config_map['meme']['group_id']:  # you have to be in the admin group
         clean_pending_job(context=context)
+
+def db_backup_cmd(update: Update, context: CallbackContext):
+    """Handles the /db_backup command.
+    Automatically upload and send current version of db for backup
+
+    Args:
+        update (Update): update event
+        context (CallbackContext): context passed by the handler
+    """
+    info = EventInfo.from_message(update, context)
+    if info.chat_id == config_map['meme']['group_id']:  # you have to be in the admin group
+        db_backup_job(context=context)
+
 
 
 def purge_cmd(update: Update, context: CallbackContext):

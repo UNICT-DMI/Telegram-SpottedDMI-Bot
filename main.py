@@ -14,10 +14,10 @@ from modules.debug import log_message, error_handler
 from modules.data import config_map
 # handlers
 from modules.handlers.command_handlers import STATE, start_cmd, help_cmd, settings_cmd, post_cmd, ban_cmd, reply_cmd,\
-    clean_pending_cmd, post_msg, rules_cmd, sban_cmd, cancel_cmd, stats_cmd, forwarded_post_msg, report_post, report_cmd, \
+    clean_pending_cmd, db_backup_cmd, post_msg, rules_cmd, sban_cmd, cancel_cmd, stats_cmd, forwarded_post_msg, report_post, report_cmd, \
     report_user_msg, report_user_sent_msg, purge_cmd
 from modules.handlers.callback_handlers import meme_callback, stats_callback
-from modules.handlers.job_handlers import clean_pending_job
+from modules.handlers.job_handlers import clean_pending_job,db_backup_job
 # endregion
 
 
@@ -89,6 +89,7 @@ def add_handlers(dp: Dispatcher):
     dp.add_handler(CommandHandler("settings", settings_cmd))
     dp.add_handler(CommandHandler("sban", sban_cmd))
     dp.add_handler(CommandHandler("clean_pending", clean_pending_cmd))
+    dp.add_handler(CommandHandler("db_backup", db_backup_cmd))
     dp.add_handler(CommandHandler("purge", purge_cmd))
     dp.add_handler(CommandHandler("cancel", cancel_cmd))  # it must be after the conversation handler's 'cancel'
 
@@ -111,6 +112,7 @@ def add_jobs(dp: Dispatcher):
         dp (Dispatcher): supplyed dispatcher
     """
     dp.job_queue.run_daily(clean_pending_job, time=time(hour=5, tzinfo=utc))  # run each day at 05:00 utc
+    dp.job_queue.run_daily(db_backup_job, time=time(hour=5, tzinfo=utc))  # run each day at 05:00 utc
 
 
 def main():
