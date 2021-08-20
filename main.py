@@ -67,7 +67,7 @@ def add_handlers(dp: Dispatcher):
     dp.add_handler(CommandHandler("sban", sban_cmd))
     dp.add_handler(CommandHandler("clean_pending", clean_pending_cmd))
     dp.add_handler(CommandHandler("db_backup", db_backup_cmd))
-    dp.add_handler(CommandHandler("purge", purge_cmd))
+    dp.add_handler(CommandHandler("purge", purge_cmd, run_async=True))
     dp.add_handler(CommandHandler("cancel", cancel_cmd))  # it must be after the conversation handler's 'cancel'
 
     # MessageHandler
