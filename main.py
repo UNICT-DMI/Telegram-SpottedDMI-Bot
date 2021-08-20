@@ -6,18 +6,17 @@ from datetime import time
 from pytz import utc
 # telegram
 from telegram import BotCommand
-from telegram.ext import Updater, CommandHandler, MessageHandler, CallbackQueryHandler, ConversationHandler,\
-     Filters, Dispatcher
-# debug
-from modules.debug import log_message, error_handler
+from telegram.ext import CallbackQueryHandler, CommandHandler, Dispatcher, Filters, MessageHandler, Updater
 # data
 from modules.data import config_map
+# debug
+from modules.debug import error_handler, log_message
 # handlers
-from modules.handlers.command_handlers import STATE, start_cmd, help_cmd, settings_cmd, post_cmd, ban_cmd, reply_cmd,\
-    clean_pending_cmd, db_backup_cmd, post_msg, rules_cmd, sban_cmd, cancel_cmd, stats_cmd, forwarded_post_msg, report_post, report_cmd, \
-    report_user_msg, report_user_sent_msg, purge_cmd
-from modules.handlers.callback_handlers import meme_callback, stats_callback
-from modules.handlers.job_handlers import clean_pending_job,db_backup_job
+from modules.handlers import (ban_cmd, cancel_cmd, clean_pending_cmd, clean_pending_job, forwarded_post_msg, help_cmd,
+                              purge_cmd, reply_cmd, rules_cmd, sban_cmd, settings_cmd, spot_conv_handler, start_cmd,
+                              stats_callback, stats_cmd, report_user_conv_handler, report_spot_conv_handler)
+from modules.handlers.callback_handlers import meme_callback
+
 # endregion
 
 
@@ -54,33 +53,11 @@ def add_handlers(dp: Dispatcher):
     dp.add_error_handler(error_handler)
 
     # Conversation handler
-    dp.add_handler(
-        ConversationHandler(entry_points=[CommandHandler("spot", post_cmd)],
-                            states={
-                                STATE['posting']: [MessageHandler(~Filters.command, post_msg)],
-                                STATE['confirm']: [CallbackQueryHandler(meme_callback, pattern=r"^meme_confirm\.*")]
-                            },
-                            fallbacks=[CommandHandler("cancel", cancel_cmd)],
-                            allow_reentry=False))
+    dp.add_handler(spot_conv_handler())
 
-    dp.add_handler(
-        ConversationHandler(entry_points=[CommandHandler("report", report_cmd)],
-                            states={
-                                STATE['reporting_user']: [MessageHandler(~Filters.command, report_user_msg)],
-                                STATE['reporting_user_reason']: [MessageHandler(~Filters.command, report_user_msg)],
-                                STATE['sending_user_report']: [MessageHandler(~Filters.command, report_user_sent_msg)]
-                            },
-                            fallbacks=[CommandHandler("cancel", cancel_cmd)],
-                            allow_reentry=False))
+    dp.add_handler(report_user_conv_handler())
 
-    dp.add_handler(
-        ConversationHandler(entry_points=[CallbackQueryHandler(meme_callback, pattern=r"^meme_report\.*")],
-                            states={
-                                STATE['reporting_spot']: [MessageHandler(~Filters.command, report_post)],
-                            },
-                            fallbacks=[CommandHandler("cancel", cancel_cmd)],
-                            allow_reentry=False,
-                            per_chat=False))
+    dp.add_handler(report_spot_conv_handler())
     # Command handlers
     dp.add_handler(CommandHandler("start", start_cmd))
     dp.add_handler(CommandHandler("help", help_cmd))

@@ -40,10 +40,8 @@ class PendingPost():
         u_message_id = user_message.message_id
         date = datetime.now(tz=timezone.utc)
 
-        DbManager.insert_into(table_name="pending_meme",
-                              columns=("user_id", "u_message_id", "g_message_id", "group_id", "message_date"),
-                              values=(user_id, u_message_id, g_message_id, group_id, date))
-        return cls(user_id=user_id, u_message_id=u_message_id, g_message_id=g_message_id, group_id=group_id, date=date)
+        return cls(user_id=user_id, u_message_id=u_message_id, g_message_id=g_message_id, group_id=group_id, date=date) \
+                .save_post()
 
     @classmethod
     def from_group(cls, g_message_id: int, group_id: int):
@@ -121,6 +119,13 @@ class PendingPost():
             g_message_id = int(post['g_message_id'])
             pending_posts.append(PendingPost.from_group(group_id=group_id, g_message_id=g_message_id))
         return pending_posts
+
+    def save_post(self):
+        """Saves the pending_post in the database"""
+        DbManager.insert_into(table_name="pending_meme",
+                              columns=("user_id", "u_message_id", "g_message_id", "group_id", "message_date"),
+                              values=(self.user_id, self.u_message_id, self.g_message_id, self.group_id, self.date))
+        return self
 
     def get_votes(self, vote: bool):
         """Gets all the votes of a specific kind (approve or reject)

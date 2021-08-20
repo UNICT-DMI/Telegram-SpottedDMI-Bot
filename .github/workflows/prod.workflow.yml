@@ -24,7 +24,6 @@ jobs:
         run: |
           mv config/settings.yaml.dist config/settings.yaml
           mv data/yaml/reactions.yaml.dist data/yaml/reactions.yaml
-          python3 settings.py uselessToken 1 2 3
       - name: Lint with flake8
         run: |
           # stop the build if there are Python syntax errors or undefined names
@@ -33,8 +32,12 @@ jobs:
           flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
       - name: Test with pytest
         run: |
-          pytest
-
+          pytest -p no:warnings --cov=./ --cov-report=xml
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v1
+        with:
+          files: ./coverage.xml
+          directory: .
   doc:
     needs: test
     runs-on: ubuntu-latest
@@ -55,7 +58,6 @@ jobs:
         run: |
           mv config/settings.yaml.dist config/settings.yaml
           mv data/yaml/reactions.yaml.dist data/yaml/reactions.yaml
-          python3 settings.py uselessToken 1 2 3
       - name: Sphinx build
         run: |
           sphinx-build -b html docs/source docs/build/docs

@@ -64,14 +64,11 @@ class Report():
         if current_report:  # there is already a report, the creation fails
             return None
 
-        DbManager.insert_into(table_name="spot_report",
-                              columns=("user_id", "channel_id", "c_message_id", "group_id", "g_message_id"),
-                              values=(user_id, channel_id, c_message_id, group_id, g_message_id))
         return cls(user_id=user_id,
                    channel_id=channel_id,
                    c_message_id=c_message_id,
                    group_id=group_id,
-                   g_message_id=g_message_id)
+                   g_message_id=g_message_id).save_report()
 
     @classmethod
     def create_user_report(cls, user_id: int, target_username: str, admin_message: Message):
@@ -90,15 +87,8 @@ class Report():
         group_id = admin_message.chat_id
         date = datetime.now()
 
-        DbManager.insert_into(table_name="user_report",
-                              columns=("user_id", "target_username", "message_date", "group_id", "g_message_id"),
-                              values=(user_id, target_username, date, group_id, g_message_id))
-
-        return cls(user_id=user_id,
-                   group_id=group_id,
-                   g_message_id=g_message_id,
-                   target_username=target_username,
-                   date=date)
+        return cls(user_id=user_id, group_id=group_id, g_message_id=g_message_id, target_username=target_username, date=date) \
+                .save_report()
 
     @classmethod
     def get_post_report(cls, user_id: int, channel_id: int, c_message_id: int):
@@ -140,7 +130,7 @@ class Report():
         reports = DbManager.select_from(select="*",
                                         table_name="user_report",
                                         where="user_id = %s",
-                                        where_args=(user_id, ),
+                                        where_args=(user_id,),
                                         order_by="message_date DESC")
 
         if len(reports) == 0:  # the vote is not present
@@ -189,6 +179,18 @@ class Report():
                        g_message_id=report['g_message_id'])
 
         return None
+
+    def save_report(self):
+        """Saves the report in the database"""
+        if self.c_message_id is not None:
+            DbManager.insert_into(table_name="spot_report",
+                                  columns=("user_id", "channel_id", "c_message_id", "group_id", "g_message_id"),
+                                  values=(self.user_id, self.channel_id, self.c_message_id, self.group_id, self.g_message_id))
+        else:
+            DbManager.insert_into(table_name="user_report",
+                                  columns=("user_id", "target_username", "message_date", "group_id", "g_message_id"),
+                                  values=(self.user_id, self.target_username, self.date, self.group_id, self.g_message_id))
+        return self
 
     def __repr__(self):
         if self.c_message_id is not None:

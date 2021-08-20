@@ -33,7 +33,8 @@ Listed in requirements.txt
 ### Steps:
 - Clone this repository
 - \[_OPTIONAL_\] Rename "data/yaml/reactions.yaml.dist" in "data/yaml/reactions.yaml" or simply create the latter and edit the desired parameters. 
--  Rename "config/settings.yaml.dist" in "config/settings.yaml" or simply create the latter and edit the desired parameters. **Make sure to add a valid _token_ setting**.  
+- Rename "config/settings.yaml.dist" in "config/settings.yaml" or simply create the latter and edit the desired parameters. **Make sure to add a valid _token_ setting**.  
+- Make sure the bot is in present both in the admin group and in the spot channel. It may need to have admin privileges. If comments are enabled, the bot has to be in the comment group too as an admin.
 What follows are some example settings with explaination for each:
 ```yaml
 debug:
@@ -75,6 +76,7 @@ bot_tag: '@bot'           # tag of the telegram bot
 - Clone this repository
 - In _config/settings.yaml.dist_, edit the desired values. You can also rename it to _config/settings.yaml_ and edit the values there.
 - You can also leave the settings files alone, and instead use the environment variables on the container.  
+- Make sure the bot is in present both in the admin group and in the spot channel. It may need to have admin privileges. If comments are enabled, the bot has to be in the comment group too as an admin.
 All the env vars with the same name (case insensitive) will override the ones in the settings file.
 To update the **meme** settings, prefix the env var name with **MEME_**. The same is true for the **test** settings, that have to be prefixed with **TEST_**.
 - **Run** `docker build --tag botimage .` 
@@ -86,46 +88,12 @@ To update the **meme** settings, prefix the env var name with **MEME_**. The sam
 
 ## :bar_chart: _[Optional]_ Setting up testing
 
-### Create a Telegram app:
-
-#### Steps:
-- Sign in your Telegram account with your phone number **[here](https://my.telegram.org/auth)**. Then choose “API development tools”
-- If it is your first time doing so, it will ask you for an app name and a short name, you can change both of them later if you need to. Submit the form when you have completed it
-- You will then see the **api_id** and **api_hash** for your app. These are unique to your app, and not revocable.
-- Put those values in the _conf/settings.yaml_ file for local or in the _conf/settings.yaml.dist_ file if you are setting up a docker container
-```yaml
-test:
-    api_hash: HERE
-    api_id: HERE
-...
-```
-- Copy the file _tests/conftest.py_ in the root folder and **Run** `python3 conftest.py `. Follow the procedure and copy the session string it provides in the settings file:
-```yaml
-test:
-...
-    session: HERE
-...
-```
-- You can then delete the _conftest.py_ file present in the root folder, you won't need it again
-- Edit the remaining values in the file as you see fit
-
-**Check [here](https://dev.to/blueset/how-to-write-integration-tests-for-a-telegram-bot-4c0e) you you want to have more information on the steps above**
-
-### In local:
-
 #### Install with *pip3*
-- [telethon](https://pypi.org/project/Telethon/)
+Listed in requirements_dev.txt
 - [pytest](https://pypi.org/project/pytest/)
-- [pytest-asyncio](https://pypi.org/project/pytest-asyncio/)
 
 #### Steps:
 - **Run** `pytest`
-
-### In a docker container:
-
-#### Steps:
-- Add telethon, pytest and pytest-asyncio to the requirements.txt file
-- Access the container and **Run** `pytest` or edit the Dockerfile to do so
 
 ## :books: Documentation
 Check the gh-pages branch

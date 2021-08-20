@@ -27,10 +27,7 @@ class PublishedPost():
         Returns:
             PublishedPost: istance of the class
         """
-        DbManager.insert_into(table_name="published_meme",
-                              columns=("channel_id", "c_message_id"),
-                              values=(channel_id, c_message_id))
-        return cls(channel_id=channel_id, c_message_id=c_message_id)
+        return cls(channel_id=channel_id, c_message_id=c_message_id).save_post()
 
     @classmethod
     def from_channel(cls, channel_id: int, c_message_id: int):
@@ -50,6 +47,13 @@ class PublishedPost():
             return None
 
         return cls(channel_id=channel_id, c_message_id=c_message_id)
+
+    def save_post(self):
+        """Saves the published_post in the database"""
+        DbManager.insert_into(table_name="published_meme",
+                              columns=("channel_id", "c_message_id"),
+                              values=(self.channel_id, self.c_message_id))
+        return self
 
     def __get_user_vote(self, user_id: int) -> Optional[str]:
         """Gets the vote of a specific user on the post
