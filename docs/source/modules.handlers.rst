@@ -40,6 +40,14 @@ clean\_pending
    :undoc-members:
    :show-inheritance:
 
+db\_backup
+--------------------------------------
+
+.. automodule:: modules.handlers.db_backup
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 constants
 ---------------------------------
 

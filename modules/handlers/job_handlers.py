@@ -42,6 +42,12 @@ def clean_pending_job(context: CallbackContext):
 
 
 def db_backup_job(context: CallbackContext):
+    """Job called each day at 05:00 utc.
+    Automatically upload and send last version of db for backup
+
+    Args:
+        context (CallbackContext): context passed by the jobqueue
+    """
     path = "./data/db/db.sqlite3"
     admin_group_id = config_map['meme']['group_id']
     try:
