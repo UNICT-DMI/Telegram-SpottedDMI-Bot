@@ -12,7 +12,7 @@ from modules.data import config_map
 # debug
 from modules.debug import error_handler, log_message
 # handlers
-from modules.handlers import (ban_cmd, cancel_cmd, clean_pending_cmd, clean_pending_job, forwarded_post_msg, help_cmd,
+from modules.handlers import (ban_cmd, cancel_cmd, clean_pending_cmd, clean_pending_job, db_backup_cmd, db_backup_job, forwarded_post_msg, help_cmd,
                               purge_cmd, reply_cmd, rules_cmd, sban_cmd, settings_cmd, spot_conv_handler, start_cmd,
                               stats_callback, stats_cmd, report_user_conv_handler, report_spot_conv_handler)
 from modules.handlers.callback_handlers import meme_callback
@@ -66,6 +66,7 @@ def add_handlers(dp: Dispatcher):
     dp.add_handler(CommandHandler("settings", settings_cmd))
     dp.add_handler(CommandHandler("sban", sban_cmd))
     dp.add_handler(CommandHandler("clean_pending", clean_pending_cmd))
+    dp.add_handler(CommandHandler("db_backup", db_backup_cmd, run_async=True))
     dp.add_handler(CommandHandler("purge", purge_cmd, run_async=True))
     dp.add_handler(CommandHandler("cancel", cancel_cmd))  # it must be after the conversation handler's 'cancel'
 
@@ -88,6 +89,7 @@ def add_jobs(dp: Dispatcher):
         dp (Dispatcher): supplyed dispatcher
     """
     dp.job_queue.run_daily(clean_pending_job, time=time(hour=5, tzinfo=utc))  # run each day at 05:00 utc
+    dp.job_queue.run_daily(db_backup_job, time=time(hour=5, tzinfo=utc))  # run each day at 05:00 utc
 
 
 def main():

@@ -2,9 +2,10 @@
 from .ban import ban_cmd
 from .cancel import cancel_cmd
 from .clean_pending import clean_pending_cmd
+from .db_backup import db_backup_cmd
 from .forwarded_post import forwarded_post_msg
 from .help import help_cmd
-from .job_handlers import clean_pending_job
+from .job_handlers import clean_pending_job, db_backup_job
 from .purge import purge_cmd
 from .reply import reply_cmd
 from .report_spot import report_spot_conv_handler
