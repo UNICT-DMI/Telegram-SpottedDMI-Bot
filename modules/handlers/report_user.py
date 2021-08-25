@@ -13,11 +13,11 @@ def report_user_conv_handler() -> CommandHandler:
     """Creates the /report (user) conversation handler.
     The states are:
 
-    - reporting_user: submit the username to report. Expects text starting with @
+    - reporting_user: submit the username to report. Expects text starting with @ and without spaces in between
     - reporting_user_reason: submit the reason of the report. Expects text
 
     Returns:
-        conversaton handler
+        CommandHandler: conversaton handler
     """
     return ConversationHandler(entry_points=[CommandHandler("report", report_cmd)],
                                states={
@@ -73,14 +73,14 @@ def report_user_msg(update: Update, context: CallbackContext) -> int:
     info = EventInfo.from_message(update, context)
     if not info.is_valid_message_type \
     or not info.text.startswith('@') \
-    or info.text.find(' ') != -1:  # the type is NOT supported
+    or info.text.strip().find(' ') != -1:  # the type is NOT supported
         info.bot.send_message(
             chat_id=info.chat_id,
             text="Questo tipo di messaggio non è supportato\n"\
                 "È consentito solo username telegram. Puoi annullare il processo con /cancel")
         return STATE['reporting_user']
 
-    context.user_data['current_report_target'] = info.text
+    context.user_data['current_report_target'] = info.text.strip()
 
     info.bot.send_message(
         chat_id=info.chat_id,
@@ -89,7 +89,7 @@ def report_user_msg(update: Update, context: CallbackContext) -> int:
             f"dopo {config_map['meme']['report_wait_mins']} minuti.\n"\
             "Puoi annullare il processo con /cancel")
 
-    return STATE['sending_user_report']
+    return STATE['reporting_user_reason']
 
 
 def report_user_sent_msg(update: Update, context: CallbackContext) -> int:
@@ -106,7 +106,7 @@ def report_user_sent_msg(update: Update, context: CallbackContext) -> int:
     info = EventInfo.from_message(update, context)
     if not info.is_valid_message_type:  # the type is NOT supported
         info.bot.send_message(chat_id=info.chat_id, text=INVALID_MESSAGE_TYPE_ERROR)
-        return STATE['sending_user_report']
+        return STATE['reporting_user_reason']
 
     target_username = context.user_data['current_report_target']
 

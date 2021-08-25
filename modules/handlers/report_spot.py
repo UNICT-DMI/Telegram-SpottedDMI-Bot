@@ -17,7 +17,7 @@ def report_spot_conv_handler() -> CommandHandler:
     - reporting_spot: submit the reason of the report. Expects text
 
     Returns:
-        conversaton handler
+        CommandHandler: conversaton handler
     """
     return ConversationHandler(entry_points=[CallbackQueryHandler(report_spot_callback, pattern=r"^meme_report\.*")],
                                states={
@@ -28,16 +28,17 @@ def report_spot_conv_handler() -> CommandHandler:
                                per_chat=False)
 
 
-def report_spot_callback(info: EventInfo, args: str) -> int:  # pylint: disable=unused-argument
+def report_spot_callback(update: Update, context: CallbackContext) -> int:
     """Handles the report callback.
 
     Args:
-        info (dict): information about the callback
-        arg (str): unused
+        update (Update): update event
+        context (CallbackContext): context passed by the handler
 
     Returns:
-        int: new conversation state
+        int: next state of the conversation
     """
+    info = EventInfo.from_callback(update, context)
     abusive_message_id = info.message.reply_to_message.message_id
 
     report = Report.get_post_report(user_id=info.user_id, channel_id=info.chat_id, c_message_id=abusive_message_id)
