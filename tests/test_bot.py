@@ -133,7 +133,7 @@ def channel_group() -> Chat:
     Returns:
         admin user
     """
-    channel_group_id = config_map['meme']['group_id']
+    channel_group_id = config_map['meme']['channel_group_id']
     return Chat(id=channel_group_id, type=Chat.GROUP)
 
 
@@ -499,7 +499,7 @@ class TestBot:
 
             telegram.send_callback_query(text="🟢 0", message=g_message)
             telegram.send_callback_query(text="🟢 1", message=g_message, user=user.User(2, first_name="Test2", is_bot=False))
-            print([f"t: {mes.text} - id: {mes.message_id} - chat: {mes.chat_id}" for mes in telegram.messages])
+
             assert telegram.messages[-4].text == "Test spot"
             assert telegram.messages[-3].text.startswith("Il tuo ultimo post è stato pubblicato")
             assert telegram.last_message.text.startswith("Approvato da:")
