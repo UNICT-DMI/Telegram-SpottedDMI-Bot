@@ -12,7 +12,7 @@ class TelegramSimulator():
     """Weaves the standard bot class to intercept any contact with the telegram api and store the message"""
     __name = "BOT"
     __bot_id = 1234567890
-    __current_id = 0
+    __current_id = 200
     __default_chat = Chat(id=1, type='private')
     __default_user = User(id=1, first_name='User', username="Username", is_bot=False)
     __chat = __default_chat

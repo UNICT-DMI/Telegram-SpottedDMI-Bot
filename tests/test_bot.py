@@ -1,10 +1,11 @@
 # pylint: disable=unused-argument,redefined-outer-name
 """Tests the bot functionality"""
 from datetime import datetime
+from typing import Tuple
 import pytest
 from telegram import Chat, Message
 from tests.util import TelegramSimulator
-from modules.data import config_map, read_md, DbManager, User, PendingPost, Report
+from modules.data import config_map, read_md, DbManager, User, PendingPost, PublishedPost, Report
 from modules.handlers.constants import CHAT_PRIVATE_ERROR
 
 
@@ -21,9 +22,9 @@ def local_table(init_local_test_db: DbManager) -> DbManager:
 @pytest.fixture(scope="function")
 def telegram(local_table: DbManager) -> TelegramSimulator:
     """Called once per at the beginning of each function.
-    Resets the telegram weaver object
+    Creates a telegram simulator object
 
-    Yields:
+    Returns:
         telegram weaver
     """
     return TelegramSimulator()
@@ -32,34 +33,62 @@ def telegram(local_table: DbManager) -> TelegramSimulator:
 @pytest.fixture(scope="function")
 def pending_post_message(local_table: DbManager, admin_group: Chat) -> Message:
     """Called once per at the beginning of each function.
-    Resets the telegram weaver object
+    Simulates an existing pending post
 
-    Yields:
-        telegram weaver
+    Returns:
+        pending post message
     """
     PendingPost(1, 0, 0, config_map['meme']['group_id'], datetime.now()).save_post()
     return Message(message_id=0, date=datetime.now(), chat=admin_group)
 
 
 @pytest.fixture(scope="function")
+def published_post_message(telegram: TelegramSimulator, channel: Chat, channel_group: Chat) -> Message:
+    """Called once per at the beginning of each function.
+    Simulates an existing published post
+
+    Returns:
+        published post message
+    """
+    c_message = Message(message_id=0, date=datetime.now(), chat=channel)
+    telegram.add_message(c_message)
+
+    if config_map['meme']['comments']:
+        f_message = Message(message_id=1,
+                            date=datetime.now(),
+                            chat=channel_group,
+                            forward_from_message_id=0,
+                            forward_from_chat=channel)
+        g_message = Message(message_id=2, date=datetime.now(), chat=channel_group, reply_to_message=f_message)
+        PublishedPost(channel_group.id, g_message.message_id).save_post()
+        telegram.add_message(f_message)
+        telegram.add_message(g_message)
+        return g_message
+
+    PublishedPost(channel.id, c_message.message_id).save_post()
+    telegram.add_message(c_message)
+    return c_message
+
+
+@pytest.fixture(scope="function")
 def report_user_message(local_table: DbManager, admin_group: Chat) -> Message:
     """Called once per at the beginning of each function.
-    Resets the telegram weaver object
+    Simulates an existing user report
 
-    Yields:
-        telegram weaver
+    Returns:
+        user report message
     """
     Report(1, config_map['meme']['group_id'], 0, target_username='BadUser', date=datetime.now()).save_report()
     return Message(message_id=0, date=datetime.now(), chat=admin_group)
 
 
 @pytest.fixture(scope="function")
-def report_spot_message(local_table: DbManager, admin_group: Chat, channel: Chat) -> Message:
+def report_spot_message(local_table: DbManager, admin_group: Chat, channel: Chat) -> Tuple[Message, Message]:
     """Called once per at the beginning of each function.
-    Resets the telegram weaver object
+    Simulates an existing spot report
 
-    Yields:
-        telegram weaver
+    Returns:
+        spot report in the admin group and post in the channel
     """
     Report(1,
            config_map['meme']['group_id'],
@@ -75,9 +104,9 @@ def report_spot_message(local_table: DbManager, admin_group: Chat, channel: Chat
 @pytest.fixture(scope="class")
 def channel() -> Chat:
     """Called once per at the beginning of each function.
-    Returns an admin user
+    Returns the channel chat
 
-    Yields:
+    Returns:
         admin user
     """
     group_id = config_map['meme']['channel_id']
@@ -87,9 +116,9 @@ def channel() -> Chat:
 @pytest.fixture(scope="class")
 def admin_group() -> Chat:
     """Called once per at the beginning of each function.
-    Returns an admin user
+    Returns the admin group chat
 
-    Yields:
+    Returns:
         admin user
     """
     group_id = config_map['meme']['group_id']
@@ -97,15 +126,15 @@ def admin_group() -> Chat:
 
 
 @pytest.fixture(scope="class")
-def public_group() -> Chat:
+def channel_group() -> Chat:
     """Called once per at the beginning of each function.
-    Returns an admin user
+    Returns the chat of the public group with the comments
 
-    Yields:
+    Returns:
         admin user
     """
-    group_id = 1
-    return Chat(id=group_id, type=Chat.GROUP)
+    channel_group_id = config_map['meme']['group_id']
+    return Chat(id=channel_group_id, type=Chat.GROUP)
 
 
 class TestBot:
@@ -143,6 +172,7 @@ class TestBot:
             assert telegram.last_message.text == read_md("rules")
 
     class TestBotAdminCommand:
+        """Tests the bot commands reserved for admins"""
 
         def test_ban_cmd(self, telegram: TelegramSimulator, admin_group: Chat, pending_post_message: Message):
             """Tests the /ban command.
@@ -224,11 +254,11 @@ class TestBot:
     class TestBotSpotConversation:
         """Tests the spot conversation"""
 
-        def test_spot_no_private_cmd(self, telegram: TelegramSimulator, public_group: Chat):
+        def test_spot_no_private_cmd(self, telegram: TelegramSimulator, channel_group: Chat):
             """Tests the /spot command.
             Spot is not allowed in groups
             """
-            telegram.send_command("/spot", chat=public_group)
+            telegram.send_command("/spot", chat=channel_group)
             assert telegram.last_message.text == CHAT_PRIVATE_ERROR
 
         def test_spot_banned_cmd(self, telegram: TelegramSimulator):
@@ -360,3 +390,88 @@ class TestBot:
                                                     f"I tuoi post avranno come credit @{telegram.user.username}"
 
             assert User(1).is_credited
+
+    class TestReportUser:
+        """Tests the report user commands"""
+
+        def test_report_user_invalid_username_cmd(self, telegram: TelegramSimulator):
+            """Tests the /report user command.
+            The username submitted is not a valid Telegram username
+            """
+            telegram.send_command("/report")
+            assert telegram.last_message.text == "Invia l'username di chi vuoi segnalare. Es. @massimobene"
+
+            telegram.send_message("massimobene")
+            assert telegram.last_message.text.startswith("Questo tipo di messaggio non è supportato\n")
+
+            telegram.send_message("@massimo bene")
+            assert telegram.last_message.text.startswith("Questo tipo di messaggio non è supportato\n")
+
+        def test_report_user_cmd(self, telegram: TelegramSimulator):
+            """Tests the /report user command.
+            The bot sends the report from the user to the admins
+            """
+            telegram.send_command("/report")
+            assert telegram.last_message.text == "Invia l'username di chi vuoi segnalare. Es. @massimobene"
+
+            telegram.send_message("@massimobene")
+            assert telegram.last_message.text.startswith("Scrivi il motivo della tua segnalazione.\n")
+
+            telegram.send_message("Motivo segnalazione")
+
+            assert telegram.messages[-2].text.startswith("🚨🚨 SEGNALAZIONE 🚨🚨\n\n")
+            assert telegram.last_message.text == "Gli admins verificheranno quanto accaduto. Grazie per la collaborazione!"
+            assert Report.get_last_user_report(telegram.user.id) is not None
+
+        def test_report_user_cooldown_cmd(self, telegram: TelegramSimulator):
+            """Tests the /report user command's cooldown timer.
+            The user cannot report again for the amount of time enstablished in the settings
+            """
+            telegram.send_command("/report")
+            assert telegram.last_message.text == "Invia l'username di chi vuoi segnalare. Es. @massimobene"
+
+            telegram.send_message("@massimobene")
+            assert telegram.last_message.text.startswith("Scrivi il motivo della tua segnalazione.\n")
+
+            telegram.send_message("Motivo segnalazione")
+
+            assert telegram.messages[-2].text.startswith("🚨🚨 SEGNALAZIONE 🚨🚨\n\n")
+            assert telegram.last_message.text == "Gli admins verificheranno quanto accaduto. Grazie per la collaborazione!"
+            assert Report.get_last_user_report(telegram.user.id) is not None
+
+            telegram.send_command("/report")
+            assert telegram.last_message.text == f"Aspetta {config_map['meme']['report_wait_mins'] - 1} minuti"
+
+    class TestReportSpot:
+        """Tests the report spot commands"""
+
+        def test_report_post_query(self, telegram: TelegramSimulator, published_post_message: Message):
+            """Tests the /report user query.
+            The user successfully reports a post already published in the channel
+            """
+            telegram.send_callback_query(data="meme_report_spot,", message=published_post_message)
+            assert telegram.last_message.text == "Scrivi il motivo della segnalazione del post, altrimenti digita /cancel"
+
+            telegram.send_message("Motivo segnalazione")
+            assert telegram.messages[-2].text.startswith("🚨🚨 SEGNALAZIONE 🚨🚨\n\n")
+            assert telegram.last_message.text == "Gli admins verificheranno quanto accaduto. Grazie per la collaborazione!"
+            assert Report.get_post_report(telegram.user.id, published_post_message.chat_id,
+                                          published_post_message.reply_to_message.message_id) is not None
+
+        def test_report_post_again_query(self, telegram: TelegramSimulator, published_post_message: Message):
+            """Tests the /report user query.
+            The user cannot report again a post already published in the channel
+            """
+            telegram.send_callback_query(data="meme_report_spot,", message=published_post_message)
+            assert telegram.last_message.text == "Scrivi il motivo della segnalazione del post, altrimenti digita /cancel"
+
+            telegram.send_message("Motivo segnalazione")
+            assert telegram.messages[-2].text.startswith("🚨🚨 SEGNALAZIONE 🚨🚨\n\n")
+            assert telegram.last_message.text == "Gli admins verificheranno quanto accaduto. Grazie per la collaborazione!"
+            assert Report.get_post_report(telegram.user.id, published_post_message.chat_id,
+                                          published_post_message.reply_to_message.message_id) is not None
+
+            telegram.send_callback_query(data="meme_report_spot,", message=published_post_message)
+            # The next message is the same as the last, because if the user try to report again
+            # the query will be answered with a warning but no new messages will be sent by the bot
+            assert telegram.last_message.text == "Gli admins verificheranno quanto accaduto. Grazie per la collaborazione!"

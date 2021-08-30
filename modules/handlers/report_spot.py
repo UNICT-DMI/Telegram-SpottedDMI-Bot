@@ -43,7 +43,7 @@ def report_spot_callback(update: Update, context: CallbackContext) -> int:
 
     report = Report.get_post_report(user_id=info.user_id, channel_id=info.chat_id, c_message_id=abusive_message_id)
     if report is not None:  # this user has already reported this post
-        info.answer_callback_query(text="Hai già segnalato questo spot.")
+        info.answer_callback_query(text="Hai già segnalato questo spot")
         return STATE['end']
     try:
         info.bot.forward_message(chat_id=info.user_id, from_chat_id=info.chat_id, message_id=abusive_message_id)

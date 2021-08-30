@@ -51,7 +51,7 @@ def report_cmd(update: Update, context: CallbackContext) -> int:
         remain_minutes = int(config_map['meme']['report_wait_mins'] - minutes_enlapsed)
 
         if remain_minutes > 0:
-            info.bot.send_message(chat_id=info.chat_id, text=f"Aspetta {remain_minutes} minuti.")
+            info.bot.send_message(chat_id=info.chat_id, text=f"Aspetta {remain_minutes} minuti")
             return STATE['end']
 
     info.bot.send_message(chat_id=info.chat_id, text="Invia l'username di chi vuoi segnalare. Es. @massimobene")
