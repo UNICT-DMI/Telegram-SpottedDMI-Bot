@@ -3,7 +3,7 @@
 from datetime import datetime
 from typing import Tuple
 import pytest
-from telegram import Chat, Message
+from telegram import Chat, Message, user
 from tests.util import TelegramSimulator
 from modules.data import config_map, read_md, DbManager, User, PendingPost, PublishedPost, Report
 from modules.handlers.constants import CHAT_PRIVATE_ERROR
@@ -475,3 +475,38 @@ class TestBot:
             # The next message is the same as the last, because if the user try to report again
             # the query will be answered with a warning but no new messages will be sent by the bot
             assert telegram.last_message.text == "Gli admins verificheranno quanto accaduto. Grazie per la collaborazione!"
+
+    class TestPublishSpot:
+        """Tests the complete publishing spot pipeline"""
+
+        def test_spot_pipeline(self, telegram: TelegramSimulator, admin_group: Chat, channel: Chat, channel_group: Chat):
+            """Tests the /spot command.
+            Complete with yes the spot conversation
+            """
+            telegram.send_command("/spot")
+            assert telegram.last_message.text == "Invia il post che vuoi pubblicare"
+
+            telegram.send_message("Test spot")
+            assert telegram.last_message.text == "Sei sicuro di voler publicare questo post?"
+            assert telegram.last_message.reply_to_message is not None
+
+            telegram.send_callback_query(text="Si")
+            g_message = telegram.messages[-2]
+            assert g_message.text == "Test spot"
+            assert telegram.last_message.text == "Il tuo post è in fase di valutazione\n"\
+                f"Una volta pubblicato, lo potrai trovare su {config_map['meme']['channel_tag']}"
+            assert PendingPost.from_group(g_message_id=g_message.message_id, group_id=admin_group.id) is not None
+
+            telegram.send_callback_query(text="🟢 0", message=g_message)
+            telegram.send_callback_query(text="🟢 1", message=g_message, user=user.User(2, first_name="Test2", is_bot=False))
+            print([f"t: {mes.text} - id: {mes.message_id} - chat: {mes.chat_id}" for mes in telegram.messages])
+            assert telegram.messages[-4].text == "Test spot"
+            assert telegram.messages[-3].text.startswith("Il tuo ultimo post è stato pubblicato")
+            assert telegram.last_message.text.startswith("Approvato da:")
+            assert PendingPost.from_group(g_message_id=g_message.message_id, group_id=admin_group.id) is None
+
+            telegram.send_forward_message(forward_message=telegram.messages[-4],
+                                          chat=channel_group,
+                                          user=user.User(1, first_name="Telegram", is_bot=False))
+            assert telegram.last_message.text.startswith("by: ")
+            assert PublishedPost(channel_id=channel.id, c_message_id=telegram.last_message.message_id)
