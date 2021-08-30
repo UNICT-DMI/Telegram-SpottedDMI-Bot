@@ -12,7 +12,7 @@ class TelegramSimulator():
     """Weaves the standard bot class to intercept any contact with the telegram api and store the message"""
     __name = "BOT"
     __bot_id = 1234567890
-    __current_id = 0
+    __current_id = 200
     __default_chat = Chat(id=1, type='private')
     __default_user = User(id=1, first_name='User', username="Username", is_bot=False)
     __chat = __default_chat
@@ -28,6 +28,7 @@ class TelegramSimulator():
         self.bot._post = self.weaved_post().__get__(self.bot, self.bot.__class__)
         self.bot.delete_webhook = self.weaved_delete_webhook().__get__(self.bot, self.bot.__class__)
         self.bot.copy_message = self.weaved_copy_message().__get__(self.bot, self.bot.__class__)
+        self.bot.get_chat = self.weaved_get_chat().__get__(self.bot, self.bot.__class__)
 
     @property
     def current_id(self) -> int:
@@ -187,6 +188,48 @@ class TelegramSimulator():
         self.updater.dispatcher.process_update(update)
         return query
 
+    def send_forward_message(self,
+                             forward_message: Message = None,
+                             message: Message = None,
+                             user: User = None,
+                             chat: Chat = None,
+                             date: datetime = None,
+                             reply_markup: InlineKeyboardMarkup = None,
+                             reply_to_message: Union[Message, int] = None,
+                             **kwargs) -> Message:
+        """Sends a message to the bot on behalf of the user
+
+        Args:
+            forward_message: message to forward. Must be specified is message is None. Defaults to None
+            message: message to send. Must be specified is text is None. Defaults to None
+            user: user who sent the message. Defaults to None.
+            chat: chat where the message was sent. Defaults to None.
+            date: date when the message was sent. Defaults to None.
+            reply_markup: reply markup to use. Defaults to None.
+            reply_to_message: message (or message_id of said message) to reply to. Defaults to None.
+            **kwargs: additional parameters to be passed to the message. Defaults to None.
+
+        Returns:
+            message sent
+        """
+        if message is None:
+            message = self.make_message(text=forward_message.text,
+                                        forward_from_chat=forward_message.chat,
+                                        forward_from=forward_message.from_user,
+                                        forward_message=forward_message,
+                                        forward_from_message_id=forward_message.message_id,
+                                        forward_date=forward_message.date,
+                                        user=user,
+                                        chat=chat,
+                                        date=date,
+                                        reply_markup=reply_markup,
+                                        reply_to_message=reply_to_message,
+                                        **kwargs)
+        self.add_message(message)
+        update = self.make_update(message)
+        self.updater.dispatcher.process_update(update)
+        return message
+
     def make_message(self,
                      text: str,
                      user: User = None,
@@ -304,16 +347,41 @@ class TelegramSimulator():
     def weaved_copy_message(self):
         """Weaves the post method in the bot object to intercept telegram's api requests"""
 
-        def copy_message(bot_self, chat_id: Union[int, str], from_chat_id: Union[str, int], message_id: Union[str, int], *args,
+        def copy_message(bot_self,
+                         chat_id: Union[int, str],
+                         from_chat_id: Union[str, int],
+                         message_id: Union[str, int],
+                         *args,
+                         reply_markup: ReplyMarkup = None,
                          **kwargs) -> int:
             message_to_copy: Optional[Message] = next(
                 filter(lambda message: message.message_id == message_id and message.chat_id == from_chat_id, self.messages),
                 None)
             chat = Chat(id=chat_id, type='')
-            message = self.make_message(text=message_to_copy.text, reply_markup=message_to_copy.reply_markup, chat=chat)
+            message = self.make_message(
+                text=message_to_copy.text,
+                reply_markup=reply_markup if reply_markup is not None else message_to_copy.reply_markup,
+                chat=chat)
+
+            self.add_message(message)
             return message
 
         return copy_message
+
+    def weaved_get_chat(self):
+        """Weaves the get_chat method in the bot object to intercept telegram's api requests"""
+
+        def get_chat(
+            self,
+            chat_id: Union[str, int],
+            timeout: float = None,
+            api_kwargs: dict = None,
+        ) -> Chat:
+            str_chat_id = str(chat_id)
+            return Chat(id=chat_id, type=Chat.PRIVATE, username=str_chat_id, first_name=str_chat_id,
+                        last_name=str_chat_id)  # type: ignore
+
+        return get_chat
 
     def add_message(self, message: Message):
         """Adds a message to the list of messages
