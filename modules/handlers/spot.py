@@ -39,6 +39,9 @@ def spot_cmd(update: Update, context: CallbackContext) -> int:
     Returns:
         int: next state of the conversation
     """
+    if not update.message:
+        return STATE['posting']
+
     info = EventInfo.from_message(update, context)
     user = User(info.user_id)
     if not info.is_private_chat:  # you can only post from a private chat
@@ -68,6 +71,9 @@ def spot_msg(update: Update, context: CallbackContext) -> int:
     Returns:
         int: next state of the conversation
     """
+    if not update.message:
+        return STATE['posting']
+
     info = EventInfo.from_message(update, context)
 
     if not info.is_valid_message_type:  # the type is NOT supported
