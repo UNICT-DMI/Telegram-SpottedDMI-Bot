@@ -21,7 +21,7 @@ def spot_conv_handler() -> CommandHandler:
     """
     return ConversationHandler(entry_points=[CommandHandler("spot", spot_cmd)],
                                states={
-                                   STATE['posting']: [MessageHandler(~Filters.command, spot_msg)],
+                                   STATE['posting']: [MessageHandler(~Filters.command & ~Filters.update.edited_message, spot_msg)],
                                    STATE['confirm']: [CallbackQueryHandler(spot_confirm_query, pattern=r"^meme_confirm,.+")]
                                },
                                fallbacks=[CommandHandler("cancel", conv_cancel("spot"))],
@@ -39,8 +39,6 @@ def spot_cmd(update: Update, context: CallbackContext) -> int:
     Returns:
         int: next state of the conversation
     """
-    if not update.message:
-        return STATE['posting']
 
     info = EventInfo.from_message(update, context)
     user = User(info.user_id)
@@ -71,9 +69,6 @@ def spot_msg(update: Update, context: CallbackContext) -> int:
     Returns:
         int: next state of the conversation
     """
-    if not update.message:
-        return STATE['posting']
-
     info = EventInfo.from_message(update, context)
 
     if not info.is_valid_message_type:  # the type is NOT supported
