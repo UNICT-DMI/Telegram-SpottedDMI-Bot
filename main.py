@@ -59,16 +59,16 @@ def add_handlers(dp: Dispatcher):
 
     dp.add_handler(report_spot_conv_handler())
     # Command handlers
-    dp.add_handler(CommandHandler("start", start_cmd))
-    dp.add_handler(CommandHandler("help", help_cmd))
-    dp.add_handler(CommandHandler("rules", rules_cmd))
-    dp.add_handler(CommandHandler("stats", stats_cmd))
-    dp.add_handler(CommandHandler("settings", settings_cmd))
-    dp.add_handler(CommandHandler("sban", sban_cmd))
-    dp.add_handler(CommandHandler("clean_pending", clean_pending_cmd))
-    dp.add_handler(CommandHandler("db_backup", db_backup_cmd, run_async=True))
-    dp.add_handler(CommandHandler("purge", purge_cmd, run_async=True))
-    dp.add_handler(CommandHandler("cancel", cancel_cmd))  # it must be after the conversation handler's 'cancel'
+    dp.add_handler(CommandHandler("start", start_cmd, Filters.command))
+    dp.add_handler(CommandHandler("help", help_cmd, Filters.command))
+    dp.add_handler(CommandHandler("rules", rules_cmd, Filters.command))
+    dp.add_handler(CommandHandler("stats", stats_cmd, Filters.command))
+    dp.add_handler(CommandHandler("settings", settings_cmd, Filters.command))
+    dp.add_handler(CommandHandler("sban", sban_cmd, Filters.command))
+    dp.add_handler(CommandHandler("clean_pending", clean_pending_cmd, Filters.command))
+    dp.add_handler(CommandHandler("db_backup", db_backup_cmd, Filters.command, run_async=True))
+    dp.add_handler(CommandHandler("purge", purge_cmd, Filters.command, run_async=True))
+    dp.add_handler(CommandHandler("cancel", cancel_cmd, Filters.command))  # it must be after the conversation handler's 'cancel'
 
     # MessageHandler
     dp.add_handler(MessageHandler(Filters.reply & Filters.regex(r"^/ban$"), ban_cmd))
