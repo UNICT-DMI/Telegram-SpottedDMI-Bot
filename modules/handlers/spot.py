@@ -19,12 +19,12 @@ def spot_conv_handler() -> CommandHandler:
     Returns:
         conversaton handler
     """
-    return ConversationHandler(entry_points=[CommandHandler("spot", spot_cmd, Filters.command)],
+    return ConversationHandler(entry_points=[CommandHandler("spot", spot_cmd)],
                                states={
                                    STATE['posting']: [MessageHandler(~Filters.command & ~Filters.update.edited_message, spot_msg)],
                                    STATE['confirm']: [CallbackQueryHandler(spot_confirm_query, pattern=r"^meme_confirm,.+")]
                                },
-                               fallbacks=[CommandHandler("cancel", conv_cancel("spot"), Filters.command)],
+                               fallbacks=[CommandHandler("cancel", conv_cancel("spot"))],
                                allow_reentry=False)
 
 

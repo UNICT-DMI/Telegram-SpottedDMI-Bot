@@ -23,7 +23,7 @@ def report_spot_conv_handler() -> CommandHandler:
                                states={
                                    STATE['reporting_spot']: [MessageHandler(~Filters.command & ~Filters.update.edited_message, report_spot_msg)],
                                },
-                               fallbacks=[CommandHandler("cancel", conv_cancel("report"), Filters.command)],
+                               fallbacks=[CommandHandler("cancel", conv_cancel("report"))],
                                allow_reentry=False,
                                per_chat=False)
 
