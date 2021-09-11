@@ -21,7 +21,7 @@ def report_spot_conv_handler() -> CommandHandler:
     """
     return ConversationHandler(entry_points=[CallbackQueryHandler(report_spot_callback, pattern=r"^meme_report\.*")],
                                states={
-                                   STATE['reporting_spot']: [MessageHandler(~Filters.command & ~Filters.update.edited_message, report_spot_msg)],
+                                   STATE['reporting_spot']: [MessageHandler(~Filters.command, report_spot_msg)],
                                },
                                fallbacks=[CommandHandler("cancel", conv_cancel("report"))],
                                allow_reentry=False,

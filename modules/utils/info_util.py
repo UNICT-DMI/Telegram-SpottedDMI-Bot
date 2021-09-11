@@ -177,7 +177,8 @@ class EventInfo():
         Returns:
             EventInfo: istance of the class
         """
-        return cls(bot=ctx.bot, ctx=ctx, update=update, message=update.message)
+        message = update.message if update.message is not None else update.edited_message
+        return cls(bot=ctx.bot, ctx=ctx, update=update, message=message)
 
     @classmethod
     def from_callback(cls, update: Update, ctx: CallbackContext):
