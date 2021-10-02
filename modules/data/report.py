@@ -199,9 +199,8 @@ class Report():
                     f"c_message_id: {self.c_message_id}\n"\
                     f"group_id: {self.group_id}\n"\
                     f"g_message_id: {self.g_message_id} ]"
-        else:
-            return f"UserReport: [ user_id: {self.user_id}\n"\
-                    f"target_username: {self.target_username}\n"\
-                    f"date: {self.date}\n"\
-                    f"group_id: {self.group_id}\n"\
-                    f"g_message_id: {self.g_message_id} ]"
+        return f"UserReport: [ user_id: {self.user_id}\n"\
+                f"target_username: {self.target_username}\n"\
+                f"date: {self.date}\n"\
+                f"group_id: {self.group_id}\n"\
+                f"g_message_id: {self.g_message_id} ]"
