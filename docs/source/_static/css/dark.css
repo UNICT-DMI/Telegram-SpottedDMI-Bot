@@ -1500,7 +1500,6 @@
     }
 
     .rst-content tt,
-    .rst-content tt,
     .rst-content code {
         color: rgb(232, 230, 227);
     }
@@ -1551,8 +1550,6 @@
         color: rgb(192, 186, 178);
     }
 
-    .rst-content dl:not(.docutils) tt.descname,
-    .rst-content dl:not(.docutils) tt.descclassname,
     .rst-content dl:not(.docutils) tt.descname,
     .rst-content dl:not(.docutils) code.descname,
     .rst-content dl:not(.docutils) tt.descclassname,
