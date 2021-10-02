@@ -17,4 +17,4 @@ pip install --upgrade pip
 pip3 install -r $LOC/requirements.txt
 pip3 install -r $LOC/requirements_dev.txt
 
-echo "$(pip3 --version)"
+pip3 --version
