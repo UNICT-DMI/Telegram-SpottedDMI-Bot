@@ -21,3 +21,10 @@ insert_into:
   - [11, test_insert2, none]
   - [12, test_insert3, none]
   - [13, test_insert4, none]
+
+update_from:
+  - [1, modif, none]
+  - [2, Test2, none]
+  - [3, Test3, none]
+  - [4, modif, none]
+  - [5, Test5, none]

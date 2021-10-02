@@ -27,7 +27,7 @@ class PostData():
             int: number of votes of the specified type
         """
         if vote is not None:
-            return DbManager.count_from(table_name="votes", where="vote = %s", where_args=(vote, ))
+            return DbManager.count_from(table_name="votes", where="vote = %s", where_args=(vote,))
         return DbManager.count_from(table_name="votes")
 
     @staticmethod
@@ -55,8 +55,10 @@ class PostData():
             Tuple[int, int, int]: number of votes, id of the message, id of the channel
         """
         where = ""
+        where_args = None
         if vote is not None:
-            where = f"WHERE v.vote = {vote}"
+            where = "WHERE v.vote = ?"  # ? placeholder
+            where_args = (vote,)
 
         sub_select = f"""(
                             SELECT COUNT(*) as n_votes, v.c_message_id as message_id, v.channel_id as channel_id
@@ -65,8 +67,10 @@ class PostData():
                             GROUP BY v.c_message_id, v.channel_id
                             ORDER BY v.c_message_id DESC
                         )"""
-        max_message = DbManager.select_from(select="MAX(n_votes) as max, message_id, channel_id", table_name=sub_select)
+        max_message = DbManager.select_from(select="MAX(n_votes) as max, message_id, channel_id",
+                                            table_name=sub_select,
+                                            where_args=where_args)
 
-        if max_message[0]['max'] is None:  # there is no post with the requested vote
+        if len(max_message) == 0 or max_message[0]['max'] is None:  # there is no post with the requested vote
             return 0, 0, "0"
         return int(max_message[0]['max']), int(max_message[0]['message_id']), str(max_message[0]['channel_id'])

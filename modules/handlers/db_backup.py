@@ -17,4 +17,3 @@ def db_backup_cmd(update: Update, context: CallbackContext):
     info = EventInfo.from_message(update, context)
     if info.chat_id == config_map['meme']['group_id']:  # you have to be in the admin group
         db_backup_job(context=context)
-

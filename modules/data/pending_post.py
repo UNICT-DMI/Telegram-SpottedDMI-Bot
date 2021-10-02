@@ -213,10 +213,10 @@ class PendingPost():
                                   values=(admin_id, self.g_message_id, self.group_id, approval))
             number_of_votes = self.get_votes(vote=approval)
         elif bool(vote) != approval:  # the vote was different from the approval
-            DbManager.query_from_string(f"UPDATE admin_votes SET is_upvote = {approval}\
-                                    WHERE admin_id = '{admin_id}'\
-                                        and g_message_id = '{self.g_message_id}'\
-                                        and group_id = '{self.group_id}'")
+            DbManager.update_from(table_name="admin_votes",
+                                  set_clause="is_upvote = %s",
+                                  where="admin_id = %s and g_message_id = %s and group_id = %s",
+                                  args=(approval, admin_id, self.g_message_id, self.group_id))
             number_of_votes = self.get_votes(vote=approval)
         else:
             return -1

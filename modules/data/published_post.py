@@ -89,10 +89,10 @@ class PublishedPost():
                                   columns=("user_id", "c_message_id", "channel_id", "vote"),
                                   values=(user_id, self.c_message_id, self.channel_id, vote))
         elif current_vote != vote:  # the old vote was different from the new vote
-            DbManager.query_from_string(f"UPDATE votes SET vote = {vote}\
-                                        WHERE user_id = '{user_id}'\
-                                        and c_message_id = '{self.c_message_id}'\
-                                        and channel_id = '{self.channel_id}'")
+            DbManager.update_from(table_name="votes",
+                                  set_clause="vote = %s",
+                                  where="user_id = %s and c_message_id = %s and channel_id = %s",
+                                  args=(vote, user_id, self.c_message_id, self.channel_id))
         else:  # the user wants to remove his vote
             DbManager.delete_from(table_name="votes",
                                   where="user_id = %s and c_message_id = %s and channel_id = %s",

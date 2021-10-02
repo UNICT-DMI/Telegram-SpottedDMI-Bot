@@ -184,6 +184,29 @@ class DbManager():
         conn.close()
 
     @classmethod
+    def update_from(cls, table_name: str, set_clause: str, where: str = "", args: tuple = None):
+        """Updates the rows from the specified table, where the condition, when set, is satisfied.
+        Executes "UPDATE table_name SET set_clause (with args) [WHERE where (with args)]"
+
+        Args:
+            table_name (str): name of the table used in the DELETE FROM
+            set_clause (str): set clause, with %s placeholders
+            where (str, optional): where clause, with %s placeholders for the where args. Defaults to ""
+            args (tuple, optional): args used both in the set clause and in the where clause, in this order. Defaults to None
+        """
+        conn, cur = cls.get_db()
+
+        set_clause = set_clause.replace("%s", "?")
+        where = where.replace("%s", "?")
+        where = f"WHERE {where}" if where else ""
+
+        cls.__query_execute(cur=cur, query=f"UPDATE {table_name} SET {set_clause} {where}", args=args, error_str="update_from")
+
+        conn.commit()
+        cur.close()
+        conn.close()
+
+    @classmethod
     def delete_from(cls, table_name: str, where: str = "", where_args: tuple = None):
         """Deletes the rows from the specified table, where the condition, when set, is satisfied.
         Executes "DELETE FROM table_name [WHERE where (with where_args)]"
