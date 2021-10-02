@@ -85,6 +85,14 @@ class TestDB:
 
         assert query_result == db_results['insert_into']
 
+    def test_update_from(self, db_results):
+        """Tests the update_from function of the database"""
+        DbManager.update_from(table_name=TABLE_NAME, set_clause="surname = %s", args=("none",))
+        DbManager.update_from(table_name=TABLE_NAME, set_clause="name = %s", where="id IN (%s, %s)", args=("modif", 1, 4))
+        query_result = DbManager.select_from(table_name=TABLE_NAME, order_by="id")
+
+        assert query_result == db_results['update_from']
+
     def test_delete_from(self, db_results):
         """Tests the delete_from function of the database
         """
