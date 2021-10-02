@@ -4,16 +4,8 @@
     }
 
     html, body, input, textarea, select, button {
-        background-color: #181a1b;
-    }
-
-    html, body, input, textarea, select, button {
         border-color: #736b5e;
         color: #e8e6e3;
-    }
-
-    a {
-        color: #3391ff;
     }
 
     table {
@@ -22,6 +14,7 @@
 
     ::placeholder {
         color: #b2aba1;
+        opacity: 0.5 !important;
     }
 
     input:-webkit-autofill,
@@ -51,10 +44,6 @@
         background-color: #7b5300 !important;
         border-color: #d8b013 !important;
         color: #f3e8c8 !important;
-    }
-
-    ::placeholder {
-        opacity: 0.5 !important;
     }
 
     /* Variables Style */
@@ -99,14 +88,6 @@
     }
 
     img {
-        border-color: initial;
-    }
-
-    fieldset {
-        border-color: initial;
-    }
-
-    legend {
         border-color: initial;
     }
 
@@ -483,7 +464,7 @@
         background-image: initial;
         background-color: transparent;
         color: rgb(232, 230, 227);
-        box-shadow: rgba(0, 0, 0, 0.1) 0px 5px 5px 0px;
+        box-shadow: rgba(0, 0, 0, 0.1) 0 5px 5px 0;
     }
 
     .wy-tray-container li.wy-tray-item-success {
@@ -511,8 +492,8 @@
         border-color: rgba(140, 130, 115, 0.1);
         background-color: rgb(31, 139, 77);
         text-decoration-color: initial;
-        box-shadow: rgba(24, 26, 27, 0.5) 0px 1px 2px -1px inset,
-        rgba(0, 0, 0, 0.1) 0px -2px 0px 0px inset;
+        box-shadow: rgba(24, 26, 27, 0.5) 0 1px 2px -1px inset,
+        rgba(0, 0, 0, 0.1) 0 -2px 0 0 inset;
     }
 
     .btn-hover {
@@ -534,8 +515,8 @@
     }
 
     .btn:active {
-        box-shadow: rgba(0, 0, 0, 0.05) 0px -1px 0px 0px inset,
-        rgba(0, 0, 0, 0.1) 0px 2px 0px 0px inset;
+        box-shadow: rgba(0, 0, 0, 0.05) 0 -1px 0 0 inset,
+        rgba(0, 0, 0, 0.1) 0 2px 0 0 inset;
     }
 
     .btn:visited {
@@ -640,7 +621,7 @@
         background-image: initial;
         background-color: rgb(26, 28, 29);
         border-color: rgb(60, 65, 67);
-        box-shadow: rgba(0, 0, 0, 0.1) 0px 2px 2px 0px;
+        box-shadow: rgba(0, 0, 0, 0.1) 0 2px 2px 0;
     }
 
     .wy-dropdown-menu > dd > a {
@@ -714,7 +695,7 @@
 
     input[type="text"], input[type="password"], input[type="email"], input[type="url"], input[type="date"], input[type="month"], input[type="time"], input[type="datetime"], input[type="datetime-local"], input[type="week"], input[type="number"], input[type="search"], input[type="tel"], input[type="color"] {
         border-color: rgb(62, 68, 70);
-        box-shadow: rgb(43, 47, 49) 0px 1px 3px inset;
+        box-shadow: rgb(43, 47, 49) 0 1px 3px inset;
     }
 
     input[type="text"]:focus, input[type="password"]:focus, input[type="email"]:focus, input[type="url"]:focus, input[type="date"]:focus, input[type="month"]:focus, input[type="time"]:focus, input[type="datetime"]:focus, input[type="datetime-local"]:focus, input[type="week"]:focus, input[type="number"]:focus, input[type="search"]:focus, input[type="tel"]:focus, input[type="color"]:focus {
@@ -754,7 +735,7 @@
     select,
     textarea {
         border-color: rgb(62, 68, 70);
-        box-shadow: rgb(43, 47, 49) 0px 1px 3px inset;
+        box-shadow: rgb(43, 47, 49) 0 1px 3px inset;
     }
 
     select {
@@ -1333,12 +1314,7 @@
         color: rgb(152, 143, 129);
     }
 
-    .wy-body-for-nav {
-        background-image: initial;
-        background-color: rgb(26, 28, 29);
-    }
-
-    @media screen and (min-width: 1100px) {
+    @media screen and (min-width: 1100) {
         .wy-nav-content-wrap {
             background-image: initial;
             background-color: rgba(0, 0, 0, 0.05);
@@ -1530,21 +1506,17 @@
     }
 
     .rst-content tt.literal,
-    .rst-content tt.literal,
     .rst-content code.literal {
         color: rgb(233, 88, 73);
     }
 
-    .rst-content tt.xref,
     a .rst-content tt,
     .rst-content tt.xref,
     .rst-content code.xref,
-    a .rst-content tt,
     a .rst-content code {
         color: rgb(192, 186, 178);
     }
 
-    .rst-content a tt,
     .rst-content a tt,
     .rst-content a code {
         color: rgb(84, 164, 217);
