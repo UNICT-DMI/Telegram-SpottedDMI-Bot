@@ -49,7 +49,8 @@ def meme_callback(update: Update, context: CallbackContext) -> int:
         logger.error("meme_callback: %s", e)
 
     try:
-        if message_text:  # if there is a valid text, edit the menu with the new text
+        # if there is a valid text, edit the menu with the new text
+        if message_text and message_text != info.text:
             info.bot.edit_message_text(chat_id=info.chat_id,
                                        message_id=info.message_id,
                                        text=message_text,
@@ -234,12 +235,6 @@ def vote_callback(info: EventInfo, arg: str) -> Tuple[str, InlineKeyboardMarkup,
     return None, get_vote_kb(published_post=publishedPost), None
 
 
-
-
 # endregion
-
-
-
-
 
 # endregion
