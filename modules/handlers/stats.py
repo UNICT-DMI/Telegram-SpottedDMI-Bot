@@ -39,11 +39,13 @@ def stats_callback(update: Update, context: CallbackContext):
         logger.error("stats_callback: %s", e)
         return
 
-    if message_text:  # if there is a valid text, edit the menu with the new text
-        info.bot.edit_message_text(chat_id=info.chat_id,
-                                   message_id=info.message_id,
-                                   text=message_text,
-                                   reply_markup=get_stats_kb())
+    # if there is a valid text, edit the menu with the new text
+    if message_text:
+        if message_text != info.text:
+            info.bot.edit_message_text(chat_id=info.chat_id,
+                                    message_id=info.message_id,
+                                    text=message_text,
+                                    reply_markup=get_stats_kb())
     else:  # remove the reply markup
         info.edit_inline_keyboard()
 
