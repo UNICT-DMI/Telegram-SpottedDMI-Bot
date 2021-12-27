@@ -18,6 +18,5 @@ def forwarded_post_msg(update: Update, context: CallbackContext):
         return
 
     if info.chat_id == config_map['meme']['channel_group_id']\
-        and info.forward_from_chat_id == config_map['meme']['channel_id']\
-        and info.message.is_automatic_forward:
+        and info.forward_from_chat_id == config_map['meme']['channel_id']:
         info.send_post_to_channel_group()
