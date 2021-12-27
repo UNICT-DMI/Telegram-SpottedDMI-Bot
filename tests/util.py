@@ -196,6 +196,7 @@ class TelegramSimulator():
                              date: datetime = None,
                              reply_markup: InlineKeyboardMarkup = None,
                              reply_to_message: Union[Message, int] = None,
+                             is_automatic_forward: bool = False,
                              **kwargs) -> Message:
         """Sends a message to the bot on behalf of the user
 
@@ -207,6 +208,7 @@ class TelegramSimulator():
             date: date when the message was sent. Defaults to None.
             reply_markup: reply markup to use. Defaults to None.
             reply_to_message: message (or message_id of said message) to reply to. Defaults to None.
+            is_automatic_forward: whether the message was forwarded automatically by telegram. Defaults to False.
             **kwargs: additional parameters to be passed to the message. Defaults to None.
 
         Returns:
@@ -225,6 +227,7 @@ class TelegramSimulator():
                                         reply_markup=reply_markup,
                                         reply_to_message=reply_to_message,
                                         **kwargs)
+            message.is_automatic_forward = is_automatic_forward
         self.add_message(message)
         update = self.make_update(message)
         self.updater.dispatcher.process_update(update)

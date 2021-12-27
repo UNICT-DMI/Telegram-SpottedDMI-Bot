@@ -103,7 +103,7 @@ def report_spot_message(local_table: DbManager, admin_group: Chat, channel: Chat
 
 @pytest.fixture(scope="class")
 def channel() -> Chat:
-    """Called once per at the beginning of each function.
+    """Called once per at the beginning of each class.
     Returns the channel chat
 
     Returns:
@@ -115,7 +115,7 @@ def channel() -> Chat:
 
 @pytest.fixture(scope="class")
 def admin_group() -> Chat:
-    """Called once per at the beginning of each function.
+    """Called once per at the beginning of each class.
     Returns the admin group chat
 
     Returns:
@@ -127,7 +127,7 @@ def admin_group() -> Chat:
 
 @pytest.fixture(scope="class")
 def channel_group() -> Chat:
-    """Called once per at the beginning of each function.
+    """Called once per at the beginning of each class.
     Returns the chat of the public group with the comments
 
     Returns:
@@ -507,6 +507,7 @@ class TestBot:
 
             telegram.send_forward_message(forward_message=telegram.messages[-4],
                                           chat=channel_group,
+                                          is_automatic_forward=True,
                                           user=user.User(1, first_name="Telegram", is_bot=False))
             assert telegram.last_message.text.startswith("by: ")
             assert PublishedPost(channel_id=channel.id, c_message_id=telegram.last_message.message_id)
