@@ -55,6 +55,9 @@ The main ones are:
     reset_on_load: false    # whether or not the database should reset every time the bot launches. USE CAREFULLY
     report_wait_mins: 30    # number of minutes the user has to wait before being able to report another user again
     tag: false              # whether or not the bot should tag the admins or just write their usernames
+     # whether the bot should replace any anonymous comment with a message by itself. 
+     # The bots must have delete permission in the group and comments must be enabled
+    replace_anonymous_comments: true
 
   test:
     api_hash: XXXXXXXXXXX   # hash of the telegram app used for testing
