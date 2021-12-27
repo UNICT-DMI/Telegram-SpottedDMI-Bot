@@ -5,7 +5,7 @@ from modules.data import config_map
 from modules.utils import EventInfo
 
 
-def anonymus_comment_msg(update: Update, context: CallbackContext):
+def anonymous_comment_msg(update: Update, context: CallbackContext):
     """Handles a new anonym comment on a post in the comment group.
     Deletes the original post and sends a message with the same text, to avoid any abuse.
 
