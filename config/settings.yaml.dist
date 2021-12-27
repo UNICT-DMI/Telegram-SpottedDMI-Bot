@@ -11,11 +11,13 @@ meme:
   reset_on_load: false
   tag: false
   report_wait_mins: 30
+  replace_anonymous_comments: true
 test:
   api_hash: ''
   api_id: -1
   session: ''
   bot_tag: ''
   token: ''
+  replace_anonymous_comments: true
 token: ''
 bot_tag: ''

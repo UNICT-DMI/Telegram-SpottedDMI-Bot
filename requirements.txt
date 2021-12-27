@@ -1,5 +1,5 @@
 APScheduler==3.6.3
-astroid==2.4.2
+astroid==2.6.6
 atomicwrites==1.4.0
 attrs==20.2.0
 certifi==2020.6.20
@@ -21,15 +21,15 @@ pyasn1==0.4.8
 pycodestyle==2.6.0
 pycparser==2.20
 pyparsing==2.4.7
-python-telegram-bot==13.3
+python-telegram-bot==13.9
 pytz==2020.1
 PyYAML==5.4.1
 requests==2.25.1
 rsa==4.7.2
 six==1.15.0
 toml==0.10.1
-tornado==6.0.4
+tornado==6.1
 tzlocal==2.1
 urllib3==1.26.5
 wrapt==1.12.1
-yapf==0.30.0
+yapf==0.31.0

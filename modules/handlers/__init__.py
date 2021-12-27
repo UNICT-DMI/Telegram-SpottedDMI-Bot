@@ -1,4 +1,5 @@
 """Modules that handle the events the bot recognizes and reacts to"""
+from .anonym_comment import anonymous_comment_msg
 from .ban import ban_cmd
 from .cancel import cancel_cmd
 from .clean_pending import clean_pending_cmd

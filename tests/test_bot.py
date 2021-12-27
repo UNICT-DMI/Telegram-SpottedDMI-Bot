@@ -54,19 +54,14 @@ def published_post_message(telegram: TelegramSimulator, channel: Chat, channel_g
     telegram.add_message(c_message)
 
     if config_map['meme']['comments']:
-        f_message = Message(message_id=1,
-                            date=datetime.now(),
-                            chat=channel_group,
-                            forward_from_message_id=0,
-                            forward_from_chat=channel)
-        g_message = Message(message_id=2, date=datetime.now(), chat=channel_group, reply_to_message=f_message)
-        PublishedPost(channel_group.id, g_message.message_id).save_post()
-        telegram.add_message(f_message)
-        telegram.add_message(g_message)
-        return g_message
+        telegram.send_forward_message(forward_message=c_message,
+                                      chat=channel_group,
+                                      is_automatic_forward=True,
+                                      user=user.User(1, first_name="Telegram", is_bot=False))
+        assert PublishedPost(channel_id=channel_group, c_message_id=telegram.last_message.message_id)
+        return telegram.last_message
 
     PublishedPost(channel.id, c_message.message_id).save_post()
-    telegram.add_message(c_message)
     return c_message
 
 
@@ -103,7 +98,7 @@ def report_spot_message(local_table: DbManager, admin_group: Chat, channel: Chat
 
 @pytest.fixture(scope="class")
 def channel() -> Chat:
-    """Called once per at the beginning of each function.
+    """Called once per at the beginning of each class.
     Returns the channel chat
 
     Returns:
@@ -115,7 +110,7 @@ def channel() -> Chat:
 
 @pytest.fixture(scope="class")
 def admin_group() -> Chat:
-    """Called once per at the beginning of each function.
+    """Called once per at the beginning of each class.
     Returns the admin group chat
 
     Returns:
@@ -127,7 +122,7 @@ def admin_group() -> Chat:
 
 @pytest.fixture(scope="class")
 def channel_group() -> Chat:
-    """Called once per at the beginning of each function.
+    """Called once per at the beginning of each class.
     Returns the chat of the public group with the comments
 
     Returns:
@@ -507,6 +502,39 @@ class TestBot:
 
             telegram.send_forward_message(forward_message=telegram.messages[-4],
                                           chat=channel_group,
+                                          is_automatic_forward=True,
                                           user=user.User(1, first_name="Telegram", is_bot=False))
             assert telegram.last_message.text.startswith("by: ")
             assert PublishedPost(channel_id=channel.id, c_message_id=telegram.last_message.message_id)
+
+    class TestComments:
+        """Tests the comments feature in the channel group"""
+
+        def test_non_anonymous_comment_msg(self, telegram: TelegramSimulator, published_post_message: Message,
+                                           channel_group: Chat):
+            """Tests a public comment.
+            The bot should not react to the message if the user is not anonymous
+            """
+            public_comment = telegram.send_message("Public comment",
+                                                   chat=channel_group,
+                                                   reply_to_message=published_post_message.reply_to_message,
+                                                   user=user.User(10, first_name="user", is_bot=False))
+
+            assert telegram.get_message_with_id(public_comment.message_id) is not None
+            assert telegram.last_message.text == "Public comment"
+            assert telegram.last_message.from_user.is_bot is False
+
+        def test_anonymous_comment_msg(self, telegram: TelegramSimulator, published_post_message: Message, channel: Chat,
+                                       channel_group: Chat):
+            """Tests the replacement of an anonymous comment.
+            Copies the message and deletes the original
+            """
+            anonymous_comment = telegram.send_message("Anonymous comment",
+                                                      chat=channel_group,
+                                                      reply_to_message=published_post_message.reply_to_message,
+                                                      user=user.User(10, first_name="user", is_bot=False),
+                                                      sender_chat=channel)
+
+            assert telegram.get_message_with_id(anonymous_comment.message_id) is None # the anonymous comment is deleted
+            assert telegram.last_message.text == "Anonymous comment"
+            assert telegram.last_message.from_user.is_bot is True

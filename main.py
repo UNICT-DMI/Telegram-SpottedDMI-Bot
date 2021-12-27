@@ -12,9 +12,10 @@ from modules.data import config_map
 # debug
 from modules.debug import error_handler, log_message
 # handlers
-from modules.handlers import (ban_cmd, cancel_cmd, clean_pending_cmd, clean_pending_job, db_backup_cmd, db_backup_job, forwarded_post_msg, help_cmd,
-                              purge_cmd, reply_cmd, rules_cmd, sban_cmd, settings_cmd, spot_conv_handler, start_cmd,
-                              stats_callback, stats_cmd, report_user_conv_handler, report_spot_conv_handler)
+from modules.handlers import (anonymous_comment_msg, ban_cmd, cancel_cmd, clean_pending_cmd, clean_pending_job, db_backup_cmd,
+                              db_backup_job, forwarded_post_msg, help_cmd, purge_cmd, reply_cmd, report_spot_conv_handler,
+                              report_user_conv_handler, rules_cmd, sban_cmd, settings_cmd, spot_conv_handler, start_cmd,
+                              stats_callback, stats_cmd)
 from modules.handlers.callback_handlers import meme_callback
 
 # endregion
@@ -79,7 +80,13 @@ def add_handlers(dp: Dispatcher):
     dp.add_handler(CallbackQueryHandler(stats_callback, pattern=r"^stats_\.*"))
 
     if config_map['meme']['comments']:
-        dp.add_handler(MessageHandler(Filters.forwarded, forwarded_post_msg))
+        dp.add_handler(
+            MessageHandler(Filters.forwarded & Filters.chat_type.groups & Filters.is_automatic_forward, forwarded_post_msg))
+        if config_map['meme']['replace_anonymous_comments']:
+            dp.add_handler(
+                MessageHandler(Filters.reply & Filters.sender_chat.channel & Filters.chat_type.groups,
+                               anonymous_comment_msg,
+                               run_async=True))
 
 
 def add_jobs(dp: Dispatcher):

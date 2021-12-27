@@ -22,6 +22,9 @@ class TelegramSimulator():
         self.messages: List[Message] = []
         self.updater = Updater("1234567890:qY9gv7pRJgFj4EVmN3Z1gfJOgQpCbh0vmp5")
         add_handlers(self.updater.dispatcher)
+        for group in self.updater.dispatcher.groups:
+            for handler in self.updater.dispatcher.handlers[group]:
+                handler.run_async = False
         self.bot = self.updater.bot
         self.bot._bot = User(self.__bot_id, self.__name, is_bot=True, username=self.__name)
         self.bot._message = self.weaved_message().__get__(self.bot, self.bot.__class__)
@@ -196,6 +199,7 @@ class TelegramSimulator():
                              date: datetime = None,
                              reply_markup: InlineKeyboardMarkup = None,
                              reply_to_message: Union[Message, int] = None,
+                             is_automatic_forward: bool = False,
                              **kwargs) -> Message:
         """Sends a message to the bot on behalf of the user
 
@@ -207,6 +211,7 @@ class TelegramSimulator():
             date: date when the message was sent. Defaults to None.
             reply_markup: reply markup to use. Defaults to None.
             reply_to_message: message (or message_id of said message) to reply to. Defaults to None.
+            is_automatic_forward: whether the message was forwarded automatically by telegram. Defaults to False.
             **kwargs: additional parameters to be passed to the message. Defaults to None.
 
         Returns:
@@ -225,6 +230,7 @@ class TelegramSimulator():
                                         reply_markup=reply_markup,
                                         reply_to_message=reply_to_message,
                                         **kwargs)
+            message.is_automatic_forward = is_automatic_forward
         self.add_message(message)
         update = self.make_update(message)
         self.updater.dispatcher.process_update(update)
@@ -342,7 +348,18 @@ class TelegramSimulator():
 
     def weaved_post(self):
         """Weaves the post method in the bot object to intercept telegram's api requests"""
-        return lambda *_, **__: []
+
+        def _post(bot_self,
+                  endpoint: str,
+                  data: dict = None,
+                  timeout: float = None,
+                  api_kwargs: dict = None) -> Union[bool, dict, None]:
+            if endpoint == "deleteMessage":
+                self.messages = [m for m in self.messages if m.message_id != data['message_id']]
+
+            return True
+
+        return _post
 
     def weaved_copy_message(self):
         """Weaves the post method in the bot object to intercept telegram's api requests"""
@@ -361,7 +378,8 @@ class TelegramSimulator():
             message = self.make_message(
                 text=message_to_copy.text,
                 reply_markup=reply_markup if reply_markup is not None else message_to_copy.reply_markup,
-                chat=chat)
+                chat=chat,
+                user=bot_self._bot)
 
             self.add_message(message)
             return message
