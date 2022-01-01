@@ -55,7 +55,7 @@ def anonymous_comment_msg(update: Update, context: CallbackContext):
                                       reply_to_message_id=info.message.reply_to_message.message_id if info.message.reply_to_message else None)
 																			
         except (BadRequest) as e:
-            Logger.error("Sending the post on send_post_to: %s", e)
+            Logger.error("Sending the comment on anonymous_comment_msg: %s", e)
             return False
 
         info.message.delete()
