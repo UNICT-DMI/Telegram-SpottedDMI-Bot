@@ -21,10 +21,10 @@ def anonymous_comment_msg(update: Update, context: CallbackContext):
 
     if info.chat_id == config_map['meme']['channel_group_id'] and info.message.via_bot is None:
         message = info.message
-        poll = message.poll  # if the message is a poll, get its reference
+        poll = message.poll
         anon_credits = 'by: ' + choice(read_md("anonym_names").split("\n"))
         try:
-            if poll or message.sticker:  # makes sure the poll is anonym
+            if poll or message.sticker:
               if poll:
                 sent_message_id = info.bot.send_poll(chat_id=info.chat_id,
                                                   question=f'{poll.question}\n\n{anon_credits}',
