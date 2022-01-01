@@ -536,5 +536,5 @@ class TestBot:
                                                       sender_chat=channel)
 
             assert telegram.get_message_with_id(anonymous_comment.message_id) is None # the anonymous comment is deleted
-            assert telegram.last_message.text == "Anonymous comment"
+            assert telegram.last_message.text.startswith("Anonymous comment")
             assert telegram.last_message.from_user.is_bot is True
