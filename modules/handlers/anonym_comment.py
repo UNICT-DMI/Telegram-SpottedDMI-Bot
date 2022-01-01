@@ -51,7 +51,7 @@ def anonymous_comment_msg(update: Update, context: CallbackContext):
                 info.bot.copy_message(chat_id=info.chat_id,
                                       from_chat_id=message.chat_id,
                                       message_id=message.message_id,
-																			caption=f'{message.caption}\n\n{anon_credits}' if message.caption else anon_credits,
+                                      caption=f'{message.caption}\n\n{anon_credits}' if message.caption else anon_credits,
                                       reply_to_message_id=info.message.reply_to_message.message_id if info.message.reply_to_message else None)
 																			
         except (BadRequest) as e:
