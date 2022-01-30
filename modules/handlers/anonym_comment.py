@@ -16,5 +16,5 @@ def anonymous_comment_msg(update: Update, context: CallbackContext):
     info = EventInfo.from_message(update, context)
 
     if info.chat_id == config_map['meme']['channel_group_id'] and info.message.via_bot is None:
-        info.message.copy(chat_id=info.chat_id, reply_to_message_id=info.message.reply_to_message.message_id)
+        info.message.copy(chat_id=info.chat_id, reply_to_message_id=info.message.reply_to_message.message_id if info.message.reply_to_message else None)
         info.message.delete()
