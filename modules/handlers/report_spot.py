@@ -39,7 +39,7 @@ def report_spot_callback(update: Update, context: CallbackContext) -> int:
         int: next state of the conversation
     """
     info = EventInfo.from_callback(update, context)
-    abusive_message_id = info.message.reply_to_message.message_id
+    abusive_message_id = info.message.reply_to_message.message_id if config_map['meme']['comments'] else info.message_id
 
     report = Report.get_post_report(user_id=info.user_id, channel_id=info.chat_id, c_message_id=abusive_message_id)
     if report is not None:  # this user has already reported this post

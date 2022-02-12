@@ -271,7 +271,6 @@ class EventInfo():
     def send_post_to_channel(self, user_id: int):
         """Sends the post to  the channel, so it can be ejoyed by the users (and voted, if comments are disabled)
         """
-        user = User(user_id)
         message = self.__message
         channel_id = config_map['meme']['channel_id']
 
@@ -292,8 +291,6 @@ class EventInfo():
 
         if not config_map['meme']['comments']:  # if the user can vote directly on the post
             PublishedPost.create(c_message_id=c_message_id, channel_id=channel_id)
-            sign = user.get_user_sign(bot=self.__bot)
-            self.__bot.send_message(chat_id=channel_id, text=f"by: {sign}", reply_to_message_id=message.message_id)
         else:  # ... else, if comments are enabled, save the user_id, so the user can be credited
             self.bot_data[f"{channel_id},{c_message_id}"] = user_id
 

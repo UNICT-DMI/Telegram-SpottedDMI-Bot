@@ -10,6 +10,7 @@ meme:
   remove_after_h: 12
   reset_on_load: false
   tag: false
+  report: true
   report_wait_mins: 30
   replace_anonymous_comments: true
 test:
@@ -19,5 +20,7 @@ test:
   bot_tag: ''
   token: ''
   replace_anonymous_comments: true
+  comments: true
+  report: true
 token: ''
 bot_tag: ''
