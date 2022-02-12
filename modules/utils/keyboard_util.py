@@ -2,7 +2,7 @@
 Callback_data format: <callback_family>_<callback_name>,[arg]"""
 from typing import List
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
-from modules.data import PendingPost, PublishedPost, config_reactions
+from modules.data import PendingPost, PublishedPost, config_reactions, config_map
 
 REACTION = config_reactions['reactions']
 ROWS = config_reactions['rows']
@@ -96,7 +96,11 @@ def get_vote_kb(published_post: PublishedPost = None) -> InlineKeyboardMarkup:
                                                 callback_data=f"meme_vote,{reaction_id}"))
         keyboard.append(new_row)
     # the last button in the last row will be the report button
-    keyboard[-1].append(InlineKeyboardButton("🚩 Report", callback_data="meme_report_spot,"))
+    if config_map['meme']['report']:
+        if len(keyboard) > 0:
+            keyboard[-1].append(InlineKeyboardButton("🚩 Report", callback_data="meme_report_spot,"))
+        else:
+            keyboard.append([InlineKeyboardButton("🚩 Report", callback_data="meme_report_spot,")])
     return InlineKeyboardMarkup(keyboard)
 
 

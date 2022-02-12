@@ -82,11 +82,9 @@ def add_handlers(dp: Dispatcher):
     if config_map['meme']['comments']:
         dp.add_handler(
             MessageHandler(Filters.forwarded & Filters.chat_type.groups & Filters.is_automatic_forward, forwarded_post_msg))
-        if config_map['meme']['replace_anonymous_comments']:
-            dp.add_handler(
-                MessageHandler(Filters.sender_chat.channel & Filters.chat_type.groups,
-                               anonymous_comment_msg,
-                               run_async=True))
+    if config_map['meme']['replace_anonymous_comments']:
+        dp.add_handler(
+            MessageHandler(Filters.sender_chat.channel & Filters.chat_type.groups, anonymous_comment_msg, run_async=True))
 
 
 def add_jobs(dp: Dispatcher):

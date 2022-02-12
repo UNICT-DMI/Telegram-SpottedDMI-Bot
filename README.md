@@ -54,6 +54,7 @@ The main ones are:
     remove_after_h: 12      # number of hours after wich pending posts will be automatically by /clean_pending
     reset_on_load: false    # whether or not the database should reset every time the bot launches. USE CAREFULLY
     report_wait_mins: 30    # number of minutes the user has to wait before being able to report another user again
+    report: true            # whether to add a report button as an inline keyboard after each post
     tag: false              # whether or not the bot should tag the admins or just write their usernames
      # whether the bot should replace any anonymous comment with a message by itself. 
      # The bots must have delete permission in the group and comments must be enabled
