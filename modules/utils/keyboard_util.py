@@ -95,12 +95,14 @@ def get_vote_kb(published_post: PublishedPost = None) -> InlineKeyboardMarkup:
             new_row.append(InlineKeyboardButton(f"{REACTION[reaction_id]} {n_votes}",
                                                 callback_data=f"meme_vote,{reaction_id}"))
         keyboard.append(new_row)
+
     # the last button in the last row will be the report button
+    report_button = InlineKeyboardButton("🚩 Report", callback_data="meme_report_spot,")
     if config_map['meme']['report']:
         if len(keyboard) > 0:
-            keyboard[-1].append(InlineKeyboardButton("🚩 Report", callback_data="meme_report_spot,"))
+            keyboard[-1].append(report_button)
         else:
-            keyboard.append([InlineKeyboardButton("🚩 Report", callback_data="meme_report_spot,")])
+            keyboard.append([report_button])
     return InlineKeyboardMarkup(keyboard)
 
 
