@@ -1,6 +1,6 @@
 """Creates the inlinekeyboard sent by the bot in its messages.
 Callback_data format: <callback_family>_<callback_name>,[arg]"""
-from typing import List
+from typing import List, Optional
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 from modules.data import PendingPost, PublishedPost, config_reactions, config_map
 
@@ -78,14 +78,14 @@ def get_approve_kb() -> InlineKeyboardMarkup:
     ], [InlineKeyboardButton("⏹ Stop", callback_data="meme_approve_status,pause")]])
 
 
-def get_vote_kb(published_post: PublishedPost = None) -> InlineKeyboardMarkup:
+def get_vote_kb(published_post: PublishedPost = None) -> Optional[InlineKeyboardMarkup]:
     """Generates the InlineKeyboard for the published post and updates the correct number of reactions
 
     Args:
         published_post (PublishedPost, optional): published post to which the keyboard is attached. Defaults to None
 
     Returns:
-        InlineKeyboardMarkup: new inline keyboard
+        Optional[InlineKeyboardMarkup]: new inline keyboard
     """
     keyboard = []
     for row in ROWS:  # for each ROW or the keyboard...
@@ -97,13 +97,14 @@ def get_vote_kb(published_post: PublishedPost = None) -> InlineKeyboardMarkup:
         keyboard.append(new_row)
 
     # the last button in the last row will be the report button
-    report_button = InlineKeyboardButton("🚩 Report", callback_data="meme_report_spot,")
+    report_button = InlineKeyboardButton("🚩 Report", callback_data="meme_report_spot")
     if config_map['meme']['report']:
         if len(keyboard) > 0:
             keyboard[-1].append(report_button)
         else:
             keyboard.append([report_button])
-    return InlineKeyboardMarkup(keyboard)
+
+    return InlineKeyboardMarkup(keyboard) if keyboard else None
 
 
 def update_approve_kb(keyboard: List[List[InlineKeyboardButton]],
