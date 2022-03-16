@@ -12,7 +12,8 @@ meme:
   tag: false
   report: true
   report_wait_mins: 30
-  replace_anonymous_comments: true
+  replace_anonymous_comments: false
+  delete_anonymous_comments: true
 test:
   api_hash: ''
   api_id: -1
@@ -20,6 +21,7 @@ test:
   bot_tag: ''
   token: ''
   replace_anonymous_comments: true
+  delete_anonymous_comments: true
   comments: true
   report: true
 token: ''
