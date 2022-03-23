@@ -1,0 +1,24 @@
+debug:
+  local_log: bool
+  reset_on_load: bool
+meme:
+  channel_group_id: int
+  channel_id: int
+  channel_tag: str
+  comments: bool
+  group_id: int
+  n_votes: int
+  remove_after_h: int
+  tag: bool
+  report: bool
+  report_wait_mins: int
+  replace_anonymous_comments: bool
+  delete_anonymous_comments: bool
+test:
+  api_hash: str
+  api_id: int
+  session: str
+  bot_tag: str
+  token: str
+token: str
+bot_tag: str

@@ -5,10 +5,10 @@ from typing import Any, Literal, Union
 import yaml
 
 SettingsKeys = Literal["debug", "meme", "test", "token", "bot_tag"]
-SettingsDebugKeys = Literal["local_log"]
+SettingsDebugKeys = Literal["local_log", "reset_on_load"]
 SettingsMemeKeys = Literal["channel_group_id", "channel_id", "channel_tag", "comments", "group_id", "n_votes",
-                           "remove_after_h", "reset_on_load", "tag", "report", "report_wait_mins",
-                           "replace_anonymous_comments", "delete_anonymous_comments",]
+                           "remove_after_h", "tag", "report", "report_wait_mins", "replace_anonymous_comments",
+                           "delete_anonymous_comments",]
 SettingsTestKeys = Literal[Literal["api_hash", "api_id", "session", "bot_tag", "token"], SettingsMemeKeys]
 SettingsKeyType = Union[SettingsKeys, tuple[Literal["debug", "meme", "test"], Literal[SettingsMemeKeys, SettingsDebugKeys,
                                                                                       SettingsTestKeys]]]
@@ -19,7 +19,14 @@ ReactionKeyType = Union[ReactionKeys, tuple[Literal["reactions"], int]]
 
 class Config():
     """Configurations"""
+    SETTINGS_PATH = ("config", "settings.yaml")
+    REACTION_PATH = ("data", "yaml", "reactions.yaml")
     __instance: 'Config' = None
+
+    @classmethod
+    def reset_settings(cls):
+        """Reset the configuration"""
+        cls.__instance = None
 
     @staticmethod
     def __get(config: dict, key: str, default: Any = None) -> Any:
@@ -117,8 +124,8 @@ class Config():
 
         Config.__instance = self
         root_path = os.path.join(os.path.dirname(__file__), "..", "..")
-        self.settings_path = os.path.join(root_path, "config", "settings.yaml")
-        self.reaction_path = os.path.join(root_path, "data", "yaml", "reactions.yaml")
+        self.settings_path = os.path.join(root_path, *self.SETTINGS_PATH)
+        self.reaction_path = os.path.join(root_path, *self.REACTION_PATH)
 
         # Read the local configuration.
         # First, load the .default file, than override it with any non .default file
@@ -183,7 +190,27 @@ class Config():
     def __validate_types_settings(self):
         """Validates the settings values in the 'meme' section, casting them when necessary
         """
-        meme_confs = ((int, 'channel_group_id'), (int, 'channel_id'), (bool, 'comments'), (int, 'group_id'), (int, 'n_votes'),
-                      (int, 'remove_after_h'), (bool, 'reset_on_load'), (int, 'report_wait_mins'), (bool, 'tag'))
-        for meme_conf in meme_confs:
-            self.settings['meme'][meme_conf[1]] = meme_conf[0](self.settings['meme'][meme_conf[1]])
+        if not os.path.exists(f"{self.settings_path}.types"):
+            return
+        with open(f"{self.settings_path}.types", 'r', encoding="utf-8") as conf_file:
+            types = yaml.load(conf_file, Loader=yaml.SafeLoader)
+            self.__apply_type_validation(types, self.settings)
+
+    def __apply_type_validation(self, types: dict, conf: dict):
+        for key in types:
+            if isinstance(types[key], dict):
+                self.__apply_type_validation(types[key], conf[key])
+            else:
+                if key in conf:
+                    if types[key] == "bool":
+                        if isinstance(conf[key], str):
+                            conf[key] = conf[key].lower() not in ("false", "0", "no", "")
+                        else:
+                            conf[key] = bool(conf[key])
+                    elif types[key] == "int":
+                        conf[key] = int(conf[key])
+                    elif types[key] == "array":
+                        if isinstance(conf[key], str):
+                            conf[key] = conf[key].split(",")
+                    else:
+                        conf[key] = str(conf[key])

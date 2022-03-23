@@ -8,6 +8,6 @@ from .published_post import PublishedPost
 from .report import Report
 from .user import User
 
-if Config.meme_get('reset_on_load'):
+if Config.settings_get(('debug', 'reset_on_load')):
     DbManager.query_from_file("data", "db", "meme_db_del.sql")
 DbManager.query_from_file("data", "db", "meme_db_init.sql")

@@ -1,5 +1,6 @@
 debug:
   local_log: false
+  reset_on_load: false
 meme:
   channel_group_id: -1
   channel_id: -2
@@ -8,7 +9,6 @@ meme:
   group_id: -3
   n_votes: 1
   remove_after_h: 12
-  reset_on_load: false
   tag: false
   report: true
   report_wait_mins: 30

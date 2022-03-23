@@ -43,6 +43,7 @@ The main ones are:
   ```yaml
   debug:
     local_log: false        # save each and every message in a log file. Make sure the path "logs/messages.log" is valid when enabled
+    reset_on_load: false    # whether or not the database should reset every time the bot launches. USE CAREFULLY
 
   meme:
     channel_group_id: -100  # id of the group associated with the channel. Required if comments are enabled
@@ -52,7 +53,6 @@ The main ones are:
     group_id: -300          # id of the admin group the memebot will use
     n_votes: 2              # votes needed to approve/reject a pending post
     remove_after_h: 12      # number of hours after wich pending posts will be automatically by /clean_pending
-    reset_on_load: false    # whether or not the database should reset every time the bot launches. USE CAREFULLY
     report_wait_mins: 30    # number of minutes the user has to wait before being able to report another user again
     report: true            # whether to add a report button as an inline keyboard after each post
     tag: false              # whether or not the bot should tag the admins or just write their usernames
