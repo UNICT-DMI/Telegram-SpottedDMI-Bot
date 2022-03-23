@@ -1,7 +1,7 @@
 """Message forwarded by the telegram channel"""
 from telegram import Update
 from telegram.ext import CallbackContext
-from modules.data import config_map
+from modules.data import Config
 from modules.utils import EventInfo
 
 
@@ -17,6 +17,6 @@ def forwarded_post_msg(update: Update, context: CallbackContext):
     if update.message is None or update.message.forward_from_chat is None:
         return
 
-    if info.chat_id == config_map['meme']['channel_group_id']\
-        and info.forward_from_chat_id == config_map['meme']['channel_id']:
+    if info.chat_id == Config.meme_get('channel_group_id')\
+        and info.forward_from_chat_id == Config.meme_get('channel_id'):
         info.send_post_to_channel_group()

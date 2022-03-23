@@ -4,7 +4,7 @@ from telegram import Update, InlineKeyboardMarkup, InlineKeyboardButton
 from telegram.ext import CallbackContext
 from telegram.error import BadRequest, RetryAfter, Unauthorized
 from modules.debug import logger
-from modules.data import config_map, PendingPost, PublishedPost, User
+from modules.data import Config, PendingPost, PublishedPost, User
 from modules.utils import EventInfo
 from modules.utils.keyboard_util import REACTION, get_approve_kb, update_approve_kb, get_vote_kb
 
@@ -146,14 +146,14 @@ def approve_yes_callback(info: EventInfo, arg: None) -> Tuple[str, InlineKeyboar
     n_approve = pending_post.set_admin_vote(info.user_id, True)
 
     # The post passed the approval phase and is to be published
-    if n_approve >= config_map['meme']['n_votes']:
+    if n_approve >= Config.meme_get('n_votes'):
         user_id = pending_post.user_id
         info.send_post_to_channel(user_id=user_id)
 
         try:
             info.bot.send_message(
                 chat_id=user_id,
-                text=f"Il tuo ultimo post è stato pubblicato su {config_map['meme']['channel_tag']}")  # notify the user
+                text=f"Il tuo ultimo post è stato pubblicato su {Config.meme_get('channel_tag')}")  # notify the user
         except (BadRequest, Unauthorized) as e:
             logger.warning("Notifying the user on approve_yes: %s", e)
 
@@ -187,7 +187,7 @@ def approve_no_callback(info: EventInfo, arg: None) -> Tuple[str, InlineKeyboard
     n_reject = pending_post.set_admin_vote(info.user_id, False)
 
     # The post has been refused
-    if n_reject >= config_map['meme']['n_votes']:
+    if n_reject >= Config.meme_get('n_votes'):
         user_id = pending_post.user_id
 
         try:

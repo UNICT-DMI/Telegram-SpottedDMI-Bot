@@ -1,7 +1,7 @@
 """/reply command"""
 from telegram import Update
 from telegram.ext import CallbackContext
-from modules.data import config_map, PendingPost, Report
+from modules.data import Config, PendingPost, Report
 from modules.utils import EventInfo
 
 
@@ -14,7 +14,7 @@ def reply_cmd(update: Update, context: CallbackContext):
         context (CallbackContext): context passed by the handler
     """
     info = EventInfo.from_message(update, context)
-    if info.chat_id == config_map['meme']['group_id']:  # you have to be in the admin group
+    if info.chat_id == Config.meme_get('group_id'):  # you have to be in the admin group
 
         if len(info.text) <= 7:  # the reply is empty
             info.bot.send_message(

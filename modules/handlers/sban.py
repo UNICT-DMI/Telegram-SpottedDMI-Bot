@@ -1,7 +1,7 @@
 """/sban command"""
 from telegram import Update
 from telegram.ext import CallbackContext
-from modules.data import config_map, User
+from modules.data import Config, User
 from modules.utils import EventInfo
 
 
@@ -14,7 +14,7 @@ def sban_cmd(update: Update, context: CallbackContext):
         context (CallbackContext): context passed by the handler
     """
     info = EventInfo.from_message(update, context)
-    if info.chat_id == config_map['meme']['group_id']:  # you have to be in the admin group
+    if info.chat_id == Config.meme_get('group_id'):  # you have to be in the admin group
         if len(context.args) == 0:  # if no args have been passed
             info.bot.send_message(chat_id=info.chat_id, text="[uso]: /sban <user_id1> [...user_id2]")
             return

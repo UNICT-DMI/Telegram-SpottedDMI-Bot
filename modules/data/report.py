@@ -1,7 +1,7 @@
 """Reports management"""
 from datetime import datetime
 from telegram import Message
-from modules.data.db_manager import DbManager
+from modules.data import DbManager
 
 
 class Report():

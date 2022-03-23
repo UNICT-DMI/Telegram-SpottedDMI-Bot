@@ -2,8 +2,7 @@
 from typing import Optional, Tuple
 from datetime import datetime, timezone
 from telegram import Message, Bot
-from modules.data.db_manager import DbManager
-from modules.data.data_reader import config_map
+from modules.data import DbManager, Config
 
 
 class PendingPost():
@@ -169,7 +168,7 @@ class PendingPost():
         """
         admins = self.get_list_admin_votes(vote=approve)
         text = "Approvato da:\n" if approve else "Rifiutato da:\n"
-        tag = '@' if config_map['meme']['tag'] else ''
+        tag = '@' if Config.meme_get('tag') else ''
         for admin in admins:
             username = bot.get_chat(admin).username
             text += f"{tag}{username}\n" if username else f"{bot.get_chat(admin).first_name}\n"

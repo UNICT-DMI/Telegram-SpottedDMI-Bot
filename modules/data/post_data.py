@@ -1,6 +1,6 @@
 """Data management for the bot"""
 from typing import Tuple
-from modules.data.db_manager import DbManager
+from modules.data import DbManager
 
 
 class PostData():

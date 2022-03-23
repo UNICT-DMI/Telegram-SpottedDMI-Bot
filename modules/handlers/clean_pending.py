@@ -2,7 +2,7 @@
 from telegram import Update
 from telegram.ext import CallbackContext
 from modules.handlers.job_handlers import clean_pending_job
-from modules.data import config_map
+from modules.data import Config
 from modules.utils import EventInfo
 
 
@@ -15,5 +15,5 @@ def clean_pending_cmd(update: Update, context: CallbackContext):
         context (CallbackContext): context passed by the handler
     """
     info = EventInfo.from_message(update, context)
-    if info.chat_id == config_map['meme']['group_id']:  # you have to be in the admin group
+    if info.chat_id == Config.meme_get('group_id'):  # you have to be in the admin group
         clean_pending_job(context=context)

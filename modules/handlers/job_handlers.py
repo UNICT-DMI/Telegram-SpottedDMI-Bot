@@ -3,7 +3,7 @@ from datetime import datetime, timezone, timedelta
 from telegram.ext import CallbackContext
 from telegram.error import BadRequest, Unauthorized
 from modules.debug import logger
-from modules.data import config_map, PendingPost
+from modules.data import Config, PendingPost
 from modules.utils import EventInfo
 
 
@@ -15,9 +15,9 @@ def clean_pending_job(context: CallbackContext):
         context (CallbackContext): context passed by the jobqueue
     """
     info = EventInfo.from_job(context)
-    admin_group_id = config_map['meme']['group_id']
+    admin_group_id = Config.meme_get('group_id')
 
-    before_time = datetime.now(tz=timezone.utc) - timedelta(hours=config_map['meme']['remove_after_h'])
+    before_time = datetime.now(tz=timezone.utc) - timedelta(hours=Config.meme_get('remove_after_h'))
     pending_posts = PendingPost.get_all_pending_memes(group_id=admin_group_id, before=before_time)
 
     # For each pending meme older than before_time
@@ -49,7 +49,7 @@ def db_backup_job(context: CallbackContext):
         context (CallbackContext): context passed by the jobqueue
     """
     path = "./data/db/db.sqlite3"
-    admin_group_id = config_map['meme']['group_id']
+    admin_group_id = Config.meme_get('group_id')
     try:
         context.bot.send_document(chat_id=admin_group_id, document=open(path, 'rb'), timeout=600, caption="✅ Backup effettuato con successo")
     except Exception as e:

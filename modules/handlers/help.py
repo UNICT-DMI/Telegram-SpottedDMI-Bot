@@ -1,7 +1,7 @@
 """/help command"""
 from telegram import Update, ParseMode
 from telegram.ext import CallbackContext
-from modules.data import config_map, read_md
+from modules.data import Config, read_md
 from modules.utils import EventInfo
 
 
@@ -14,7 +14,7 @@ def help_cmd(update: Update, context: CallbackContext):
         context (CallbackContext): context passed by the handler
     """
     info = EventInfo.from_message(update, context)
-    if info.chat_id == config_map['meme']['group_id']:  # if you are in the admin group
+    if info.chat_id == Config.meme_get('group_id'):  # if you are in the admin group
         text = read_md("instructions")
     else:  # you are NOT in the admin group
         text = read_md("help")

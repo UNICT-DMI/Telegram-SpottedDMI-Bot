@@ -5,7 +5,7 @@ import html
 from datetime import datetime
 from telegram import Update, ParseMode
 from telegram.ext import CallbackContext
-from modules.data.data_reader import config_map, get_abs_path
+from modules.data import Config, get_abs_path
 
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -57,7 +57,7 @@ def notify_error_admin(context: CallbackContext, traceback_str: str):
         context (CallbackContext): context passed by the handler
     """
     text = (f'An exception was raised:\n' f'<pre>{html.escape(traceback_str)}</pre>')
-    context.bot.send_message(chat_id=config_map['meme']['group_id'], text=text, parse_mode=ParseMode.HTML)
+    context.bot.send_message(chat_id=Config.meme_get('group_id'), text=text, parse_mode=ParseMode.HTML)
 
 
 def log_message(update, context):  # pylint: disable=unused-argument

@@ -4,7 +4,7 @@ from telegram.ext import CallbackContext, ConversationHandler, CommandHandler, M
 from modules.data import User
 from modules.utils import EventInfo, conv_cancel, get_confirm_kb
 from modules.handlers.constants import CHAT_PRIVATE_ERROR, INVALID_MESSAGE_TYPE_ERROR
-from modules.data import config_map
+from modules.data import Config
 
 STATE = {'posting': 1, 'confirm': 2, 'end': -1}
 
@@ -103,7 +103,7 @@ def spot_confirm_query(update: Update, context: CallbackContext):
             text = "Hai già un post in approvazione 🧐"
         elif info.send_post_to_admins():
             text = "Il tuo post è in fase di valutazione\n"\
-                f"Una volta pubblicato, lo potrai trovare su {config_map['meme']['channel_tag']}"
+                f"Una volta pubblicato, lo potrai trovare su {Config.meme_get('channel_tag')}"
         else:
             text = "Si è verificato un problema\nAssicurati che il tipo di post sia fra quelli consentiti"
 

@@ -1,9 +1,7 @@
 """Users management"""
 from random import choice
 from telegram import Bot
-from modules.data.data_reader import read_md
-from modules.data.db_manager import DbManager
-from modules.data.pending_post import PendingPost
+from modules.data import read_md, DbManager, PendingPost
 
 
 class User():
@@ -24,18 +22,18 @@ class User():
     @property
     def is_banned(self) -> bool:
         """:class:`bool`: If the user is banned or not"""
-        return DbManager.count_from(table_name="banned_users", where="user_id = %s", where_args=(self.user_id, )) > 0
+        return DbManager.count_from(table_name="banned_users", where="user_id = %s", where_args=(self.user_id,)) > 0
 
     @property
     def is_credited(self) -> bool:
         """:class:`bool`: If the user is in the credited list"""
-        return DbManager.count_from(table_name="credited_users", where="user_id = %s", where_args=(self.user_id, )) == 1
+        return DbManager.count_from(table_name="credited_users", where="user_id = %s", where_args=(self.user_id,)) == 1
 
     def ban(self):
         """Adds the user to the banned list
         """
         if not self.is_banned:
-            DbManager.insert_into(table_name="banned_users", columns=("user_id", ), values=(self.user_id, ))
+            DbManager.insert_into(table_name="banned_users", columns=("user_id",), values=(self.user_id,))
 
     def sban(self) -> bool:
         """Removes the user from the banned list
@@ -44,7 +42,7 @@ class User():
             bool: whether the user was present in the banned list before the sban or not
         """
         if self.is_banned:
-            DbManager.delete_from(table_name="banned_users", where="user_id = %s", where_args=(self.user_id, ))
+            DbManager.delete_from(table_name="banned_users", where="user_id = %s", where_args=(self.user_id,))
             return True
         return False
 
@@ -56,7 +54,7 @@ class User():
         """
         already_anonym = not self.is_credited
         if not already_anonym:
-            DbManager.delete_from(table_name="credited_users", where="user_id = %s", where_args=(self.user_id, ))
+            DbManager.delete_from(table_name="credited_users", where="user_id = %s", where_args=(self.user_id,))
         return already_anonym
 
     def become_credited(self) -> bool:
@@ -67,7 +65,7 @@ class User():
         """
         already_credited = self.is_credited
         if not already_credited:
-            DbManager.insert_into(table_name="credited_users", columns=("user_id", ), values=(self.user_id, ))
+            DbManager.insert_into(table_name="credited_users", columns=("user_id",), values=(self.user_id,))
         return already_credited
 
     def get_user_sign(self, bot: Bot) -> str:

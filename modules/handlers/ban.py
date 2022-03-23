@@ -1,7 +1,7 @@
 """/ban command"""
 from telegram import Update
 from telegram.ext import CallbackContext
-from modules.data import config_map, PendingPost, User
+from modules.data import Config, PendingPost, User
 from modules.utils import EventInfo
 
 
@@ -14,7 +14,7 @@ def ban_cmd(update: Update, context: CallbackContext):
         context (CallbackContext): context passed by the handler
     """
     info = EventInfo.from_message(update, context)
-    if info.chat_id == config_map['meme']['group_id']:  # you have to be in the admin group
+    if info.chat_id == Config.meme_get('group_id'):  # you have to be in the admin group
         g_message_id = update.message.reply_to_message.message_id
         pending_post = PendingPost.from_group(group_id=info.chat_id, g_message_id=g_message_id)
 
