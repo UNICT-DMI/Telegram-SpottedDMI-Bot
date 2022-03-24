@@ -47,7 +47,7 @@ def add_handlers(dp: Dispatcher):
     Args:
         dp (Dispatcher): supplyed dispatcher
     """
-    if Config.settings_get(("debug", "local_log")):  # add MessageHandler only if log_message is enabled
+    if Config.settings_get('debug', 'local_log'):  # add MessageHandler only if log_message is enabled
         dp.add_handler(MessageHandler(Filters.all, log_message), 1)
 
     # Error handler

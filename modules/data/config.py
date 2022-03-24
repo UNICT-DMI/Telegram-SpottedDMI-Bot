@@ -1,7 +1,7 @@
 """Read the bot configuration from the settings.yaml and the reactions.yaml files"""
 import os
 import re
-from typing import Any, Literal, Union
+from typing import Any, Iterable, Literal
 import yaml
 
 SettingsKeys = Literal["debug", "meme", "test", "token", "bot_tag"]
@@ -10,11 +10,9 @@ SettingsMemeKeys = Literal["channel_group_id", "channel_id", "channel_tag", "com
                            "remove_after_h", "tag", "report", "report_wait_mins", "replace_anonymous_comments",
                            "delete_anonymous_comments",]
 SettingsTestKeys = Literal[Literal["api_hash", "api_id", "session", "bot_tag", "token"], SettingsMemeKeys]
-SettingsKeyType = Union[SettingsKeys, tuple[Literal["debug", "meme", "test"], Literal[SettingsMemeKeys, SettingsDebugKeys,
-                                                                                      SettingsTestKeys]]]
+SettingsKeysType = Literal[SettingsKeys, SettingsMemeKeys, SettingsDebugKeys, SettingsTestKeys]
 
-ReactionKeys = Literal["reactions", "rows"]
-ReactionKeyType = Union[ReactionKeys, tuple[Literal["reactions"], int]]
+ReactionKeysType = Literal["reactions", "rows"]
 
 
 class Config():
@@ -29,7 +27,7 @@ class Config():
         cls.__instance = None
 
     @staticmethod
-    def __get(config: dict, key: str, default: Any = None) -> Any:
+    def __get(config: dict, *keys: str, default: Any = None) -> Any:
         """Get the value of the specified key in the configuration.
         If the key is a tuple, it will return the value of the nested key.
         If the key is not present, it will return the default value.
@@ -42,14 +40,12 @@ class Config():
         Returns:
             Any: value of the key or default value
         """
-        if isinstance(key, tuple):
-            for k in key:
-                if k in config:
-                    config = config[k]
-                else:
-                    return default
-            return config
-        return config.get(key, default)
+        for k in keys:
+            if isinstance(config, Iterable) and k in config:
+                config = config[k]
+            else:
+                return default
+        return config
 
     @classmethod
     def __get_instance(cls) -> 'Config':
@@ -74,10 +70,10 @@ class Config():
         Returns:
             Any: value of the key or default value
         """
-        return cls.settings_get(("meme", key), default)
+        return cls.settings_get("meme", key, default=default)
 
     @classmethod
-    def settings_get(cls, key: SettingsKeyType, default: Any = None) -> Any:
+    def settings_get(cls, *keys: SettingsKeysType, default: Any = None) -> Any:
         """Get the value of the specified key in the configuration.
         If the key is a tuple, it will return the value of the nested key.
         If the key is not present, it will return the default value.
@@ -90,10 +86,10 @@ class Config():
             Any: value of the key or default value
         """
         instance = cls.__get_instance()
-        return cls.__get(instance.settings, key, default)
+        return cls.__get(instance.settings, *keys, default=default)
 
     @classmethod
-    def reactions_get(cls, key: ReactionKeyType, default: Any = None) -> Any:
+    def reactions_get(cls, *keys: ReactionKeysType, default: Any = None) -> Any:
         """Get the value of the specified key in the reactions configuration dictionary.
         If the key is a tuple, it will return the value of the nested key.
         If the key is not present, it will return the default value.
@@ -106,7 +102,7 @@ class Config():
             Any: value of the key or default value
         """
         instance = cls.__get_instance()
-        return cls.__get(instance.reactions, key, default)
+        return cls.__get(instance.reactions, *keys, default=default)
 
     @classmethod
     def override_test_settings(cls):
@@ -114,9 +110,9 @@ class Config():
         instance = cls.__get_instance()
         for test_key in cls.settings_get("test"):
             if test_key in instance.settings:
-                instance.settings[test_key] = cls.settings_get(("test", test_key))
+                instance.settings[test_key] = cls.settings_get("test", test_key)
             if test_key in instance.settings["meme"]:
-                instance.settings['meme'][test_key] = cls.settings_get(("test", test_key))
+                instance.settings['meme'][test_key] = cls.settings_get("test", test_key)
 
     def __init__(self):
         if Config.__instance is not None:
