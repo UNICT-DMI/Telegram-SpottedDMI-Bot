@@ -24,7 +24,7 @@ Please note that the commands and their answers are in Italian.
 ## :wrench: Setting up a local istance
 
 #### System requirements
-- [Python 3 (3.8.5)](https://www.python.org/downloads/)
+- [Python 3 (3.9)](https://www.python.org/downloads/)
 - python-pip3
 
 #### Install with *pip3*
