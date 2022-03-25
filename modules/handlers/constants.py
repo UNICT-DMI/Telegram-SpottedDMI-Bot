@@ -1,7 +1,7 @@
 """Constants used by the bot handlers"""
-from modules.data import config_map
+from modules.data import Config
 
-CHAT_PRIVATE_ERROR = f"Non puoi usare quest comando ora\nChatta con {config_map['bot_tag']} in privato"
+CHAT_PRIVATE_ERROR = f"Non puoi usare quest comando ora\nChatta con {Config.settings_get('bot_tag')} in privato"
 INVALID_MESSAGE_TYPE_ERROR = "Questo tipo di messaggio non è supportato\n"\
                                 "È consentito solo testo, stikers, immagini, audio, video o poll\n"\
                                 "Invia il post che vuoi pubblicare\n"\

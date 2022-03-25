@@ -2,7 +2,7 @@
 """Test all the modules related to data management"""
 import pytest
 import yaml
-from modules.data.db_manager import DbManager
+from modules.data import DbManager
 
 TABLE_NAME = "test_table"
 

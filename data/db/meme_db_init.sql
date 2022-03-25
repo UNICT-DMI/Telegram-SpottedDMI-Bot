@@ -68,10 +68,3 @@ CREATE TABLE IF NOT EXISTS user_report
   message_date TIMESTAMP NOT NULL,
   PRIMARY KEY (user_id, target_username, message_date)
 );
-/*
-CREATE VIEW approved AS
-    SELECT COUNT(is_upvote) as number, a_group_id, a_message_id 
-    FROM admin_votes
-    WHERE is_upvote = true
-    GROUP BY group_id, g_message_id;
-*/

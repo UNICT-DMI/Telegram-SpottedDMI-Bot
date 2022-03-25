@@ -1,7 +1,7 @@
 """Published post management"""
 from typing import Optional
 from telegram.inline.inlinekeyboardmarkup import InlineKeyboardMarkup
-from modules.data.db_manager import DbManager
+from modules.data import DbManager
 
 
 class PublishedPost():

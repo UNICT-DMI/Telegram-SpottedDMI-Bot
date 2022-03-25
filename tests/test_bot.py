@@ -5,7 +5,7 @@ from typing import Tuple
 import pytest
 from telegram import Chat, Message, user
 from tests.util import TelegramSimulator
-from modules.data import config_map, read_md, DbManager, User, PendingPost, PublishedPost, Report
+from modules.data import Config, read_md, DbManager, User, PendingPost, PublishedPost, Report
 from modules.handlers.constants import CHAT_PRIVATE_ERROR
 
 
@@ -38,7 +38,7 @@ def pending_post_message(local_table: DbManager, admin_group: Chat) -> Message:
     Returns:
         pending post message
     """
-    PendingPost(1, 0, 0, config_map['meme']['group_id'], datetime.now()).save_post()
+    PendingPost(1, 0, 0, Config.meme_get('group_id'), datetime.now()).save_post()
     return Message(message_id=0, date=datetime.now(), chat=admin_group)
 
 
@@ -53,7 +53,7 @@ def published_post_message(telegram: TelegramSimulator, channel: Chat, channel_g
     c_message = Message(message_id=0, date=datetime.now(), chat=channel)
     telegram.add_message(c_message)
 
-    if config_map['meme']['comments']:
+    if Config.meme_get('comments'):
         telegram.send_forward_message(forward_message=c_message,
                                       chat=channel_group,
                                       is_automatic_forward=True,
@@ -73,7 +73,7 @@ def report_user_message(local_table: DbManager, admin_group: Chat) -> Message:
     Returns:
         user report message
     """
-    Report(1, config_map['meme']['group_id'], 0, target_username='BadUser', date=datetime.now()).save_report()
+    Report(1, Config.meme_get('group_id'), 0, target_username='BadUser', date=datetime.now()).save_report()
     return Message(message_id=0, date=datetime.now(), chat=admin_group)
 
 
@@ -85,11 +85,7 @@ def report_spot_message(local_table: DbManager, admin_group: Chat, channel: Chat
     Returns:
         spot report in the admin group and post in the channel
     """
-    Report(1,
-           config_map['meme']['group_id'],
-           0,
-           channel_id=config_map['meme']['channel_id'],
-           c_message_id=1,
+    Report(1, Config.meme_get('group_id'), 0, channel_id=Config.meme_get('channel_id'), c_message_id=1,
            date=datetime.now()).save_report()
     group_message = Message(message_id=0, date=datetime.now(), chat=admin_group)
     channel_message = Message(message_id=1, date=datetime.now(), chat=channel)
@@ -104,7 +100,7 @@ def channel() -> Chat:
     Returns:
         admin user
     """
-    group_id = config_map['meme']['channel_id']
+    group_id = Config.meme_get('channel_id')
     return Chat(id=group_id, type=Chat.CHANNEL)
 
 
@@ -116,7 +112,7 @@ def admin_group() -> Chat:
     Returns:
         admin user
     """
-    group_id = config_map['meme']['group_id']
+    group_id = Config.meme_get('group_id')
     return Chat(id=group_id, type=Chat.GROUP)
 
 
@@ -128,7 +124,7 @@ def channel_group() -> Chat:
     Returns:
         admin user
     """
-    channel_group_id = config_map['meme']['channel_group_id']
+    channel_group_id = Config.meme_get('channel_group_id')
     return Chat(id=channel_group_id, type=Chat.GROUP)
 
 
@@ -237,8 +233,8 @@ class TestBot:
             The bot cleans the old pending posts, while ignoring the more recent ones
             """
             # An old an a recent pending posts are present
-            PendingPost(1, 1, 1, config_map['meme']['group_id'], datetime.fromtimestamp(1)).save_post()
-            PendingPost(2, 2, 2, config_map['meme']['group_id'], datetime.now()).save_post()
+            PendingPost(1, 1, 1, Config.meme_get('group_id'), datetime.fromtimestamp(1)).save_post()
+            PendingPost(2, 2, 2, Config.meme_get('group_id'), datetime.now()).save_post()
             telegram.send_command("/clean_pending", chat=admin_group)
             assert telegram.messages[
                 -2].text == "Gli admin erano sicuramente molto impegnati e non sono riusciti a valutare lo spot in tempo"
@@ -315,7 +311,7 @@ class TestBot:
 
             telegram.send_callback_query(text="Si")
             assert telegram.last_message.text == "Il tuo post è in fase di valutazione\n"\
-                f"Una volta pubblicato, lo potrai trovare su {config_map['meme']['channel_tag']}"
+                f"Una volta pubblicato, lo potrai trovare su {Config.meme_get('channel_tag')}"
 
             telegram.send_command("/spot")
             assert telegram.last_message.text == "Hai già un post in approvazione 🧐"
@@ -435,7 +431,7 @@ class TestBot:
             assert Report.get_last_user_report(telegram.user.id) is not None
 
             telegram.send_command("/report")
-            assert telegram.last_message.text == f"Aspetta {config_map['meme']['report_wait_mins'] - 1} minuti"
+            assert telegram.last_message.text == f"Aspetta {Config.meme_get('report_wait_mins') - 1} minuti"
 
     class TestReportSpot:
         """Tests the report spot commands"""
@@ -489,7 +485,7 @@ class TestBot:
             g_message = telegram.messages[-2]
             assert g_message.text == "Test spot"
             assert telegram.last_message.text == "Il tuo post è in fase di valutazione\n"\
-                f"Una volta pubblicato, lo potrai trovare su {config_map['meme']['channel_tag']}"
+                f"Una volta pubblicato, lo potrai trovare su {Config.meme_get('channel_tag')}"
             assert PendingPost.from_group(g_message_id=g_message.message_id, group_id=admin_group.id) is not None
 
             telegram.send_callback_query(text="🟢 0", message=g_message)
@@ -535,6 +531,6 @@ class TestBot:
                                                       user=user.User(10, first_name="user", is_bot=False),
                                                       sender_chat=channel)
 
-            assert telegram.get_message_with_id(anonymous_comment.message_id) is None # the anonymous comment is deleted
+            assert telegram.get_message_with_id(anonymous_comment.message_id) is None  # the anonymous comment is deleted
             assert telegram.last_message.text == "Anonymous comment"
             assert telegram.last_message.from_user.is_bot is True

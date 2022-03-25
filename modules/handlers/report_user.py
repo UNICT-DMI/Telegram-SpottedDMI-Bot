@@ -4,7 +4,7 @@ from telegram.ext import CallbackContext, ConversationHandler, CommandHandler, M
 from modules.data import Report
 from modules.utils import EventInfo, conv_cancel
 from modules.handlers.constants import CHAT_PRIVATE_ERROR, INVALID_MESSAGE_TYPE_ERROR
-from modules.data import config_map
+from modules.data import Config
 
 STATE = {'reporting_user': 1, 'reporting_user_reason': 2, 'end': -1}
 
@@ -48,7 +48,7 @@ def report_cmd(update: Update, context: CallbackContext) -> int:
 
     if user_report is not None:
         minutes_enlapsed = user_report.minutes_passed
-        remain_minutes = int(config_map['meme']['report_wait_mins'] - minutes_enlapsed)
+        remain_minutes = int(Config.meme_get('report_wait_mins') - minutes_enlapsed)
 
         if remain_minutes > 0:
             info.bot.send_message(chat_id=info.chat_id, text=f"Aspetta {remain_minutes} minuti")
@@ -86,7 +86,7 @@ def report_user_msg(update: Update, context: CallbackContext) -> int:
         chat_id=info.chat_id,
         text="Scrivi il motivo della tua segnalazione.\n"\
             "Cerca di essere esaustivo, potrai inviare un altro report "\
-            f"dopo {config_map['meme']['report_wait_mins']} minuti.\n"\
+            f"dopo {Config.meme_get('report_wait_mins')} minuti.\n"\
             "Puoi annullare il processo con /cancel")
 
     return STATE['reporting_user_reason']
@@ -110,7 +110,7 @@ def report_user_sent_msg(update: Update, context: CallbackContext) -> int:
 
     target_username = context.user_data['current_report_target']
 
-    chat_id = config_map['meme']['group_id']  # should be admin group
+    chat_id = Config.meme_get('group_id')  # should be admin group
     admin_message = info.bot.sendMessage(chat_id=chat_id,
                                          text="🚨🚨 SEGNALAZIONE 🚨🚨\n\n" + "Username: " + target_username + "\n\n" + info.text)
 

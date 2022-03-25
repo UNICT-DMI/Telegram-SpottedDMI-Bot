@@ -8,7 +8,7 @@ from pytz import utc
 from telegram import BotCommand
 from telegram.ext import CallbackQueryHandler, CommandHandler, Dispatcher, Filters, MessageHandler, Updater
 # data
-from modules.data import config_map
+from modules.data import Config
 # debug
 from modules.debug import error_handler, log_message
 # handlers
@@ -47,7 +47,7 @@ def add_handlers(dp: Dispatcher):
     Args:
         dp (Dispatcher): supplyed dispatcher
     """
-    if config_map['debug']['local_log']:  # add MessageHandler only if log_message is enabled
+    if Config.settings_get('debug', 'local_log'):  # add MessageHandler only if log_message is enabled
         dp.add_handler(MessageHandler(Filters.all, log_message), 1)
 
     # Error handler
@@ -79,10 +79,10 @@ def add_handlers(dp: Dispatcher):
     dp.add_handler(CallbackQueryHandler(meme_callback, pattern=r"^meme_\.*"))
     dp.add_handler(CallbackQueryHandler(stats_callback, pattern=r"^stats_\.*"))
 
-    if config_map['meme']['comments']:
+    if Config.meme_get('comments'):
         dp.add_handler(
             MessageHandler(Filters.forwarded & Filters.chat_type.groups & Filters.is_automatic_forward, forwarded_post_msg))
-    if config_map['meme']['delete_anonymous_comments']:
+    if Config.meme_get('delete_anonymous_comments'):
         dp.add_handler(
             MessageHandler(Filters.sender_chat.channel & Filters.chat_type.groups & ~Filters.is_automatic_forward,
                            anonymous_comment_msg,
@@ -102,7 +102,7 @@ def add_jobs(dp: Dispatcher):
 def main():
     """Main function
     """
-    updater = Updater(config_map['token'], request_kwargs={'read_timeout': 20, 'connect_timeout': 20}, use_context=True)
+    updater = Updater(Config.settings_get('token'), request_kwargs={'read_timeout': 20, 'connect_timeout': 20}, use_context=True)
     add_commands(updater)
     add_handlers(updater.dispatcher)
     add_jobs(updater.dispatcher)

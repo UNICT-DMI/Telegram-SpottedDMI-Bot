@@ -324,7 +324,8 @@ class TelegramSimulator():
                      reply_markup: ReplyMarkup = None,
                      allow_sending_without_reply: bool = None,
                      timeout: float = None,
-                     api_kwargs: dict = None) -> Union[bool, Message]:
+                     api_kwargs: dict = None,
+                     protect_content: bool = None) -> Union[bool, Message]:
             data.update({'message_id': self.current_id, 'date': datetime.now().timestamp()})
 
             message = Message.de_json(data, bot_self)

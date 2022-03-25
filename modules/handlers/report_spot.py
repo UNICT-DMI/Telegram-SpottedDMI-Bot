@@ -5,7 +5,7 @@ from telegram.error import Unauthorized
 from modules.data import Report
 from modules.utils import EventInfo, conv_cancel
 from modules.handlers.constants import INVALID_MESSAGE_TYPE_ERROR
-from modules.data import config_map
+from modules.data import Config
 
 STATE = {'reporting_spot': 1, 'end': -1}
 
@@ -39,7 +39,7 @@ def report_spot_callback(update: Update, context: CallbackContext) -> int:
         int: next state of the conversation
     """
     info = EventInfo.from_callback(update, context)
-    abusive_message_id = info.message.reply_to_message.message_id if config_map['meme']['comments'] else info.message_id
+    abusive_message_id = info.message.reply_to_message.message_id if Config.meme_get('comments') else info.message_id
 
     report = Report.get_post_report(user_id=info.user_id, channel_id=info.chat_id, c_message_id=abusive_message_id)
     if report is not None:  # this user has already reported this post
@@ -51,7 +51,7 @@ def report_spot_callback(update: Update, context: CallbackContext) -> int:
                               text="Scrivi il motivo della segnalazione del post, altrimenti digita /cancel")
         info.answer_callback_query(text="Segnala in privato tramite il bot")
     except Unauthorized:
-        info.answer_callback_query(text=f"Assicurati di aver avviato la chat con {config_map['bot_tag']}")
+        info.answer_callback_query(text=f"Assicurati di aver avviato la chat con {Config.settings_get('bot_tag')}")
         return STATE['end']
 
     info.user_data['current_post_reported'] = f"{info.chat_id},{abusive_message_id}"
@@ -78,7 +78,7 @@ def report_spot_msg(update: Update, context: CallbackContext) -> int:
         info.bot.send_message(chat_id=info.chat_id, text=INVALID_MESSAGE_TYPE_ERROR)
         return STATE['reporting_spot']
 
-    chat_id = config_map['meme']['group_id']  # should be admin group
+    chat_id = Config.meme_get('group_id')  # should be admin group
 
     channel_id, target_message_id = context.user_data['current_post_reported'].split(",")
 

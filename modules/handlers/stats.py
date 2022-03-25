@@ -3,9 +3,9 @@ import logging
 from telegram import Update
 from telegram.ext import CallbackContext
 from modules.utils import EventInfo, get_stats_kb
-from modules.data import PostData, config_reactions
+from modules.data import PostData, Config
 
-REACTION = config_reactions['reactions']
+REACTION = Config.reactions_get('reactions')
 logger = logging.getLogger(__name__)
 
 
@@ -43,9 +43,9 @@ def stats_callback(update: Update, context: CallbackContext):
     if message_text:
         if message_text != info.text:
             info.bot.edit_message_text(chat_id=info.chat_id,
-                                    message_id=info.message_id,
-                                    text=message_text,
-                                    reply_markup=get_stats_kb())
+                                       message_id=info.message_id,
+                                       text=message_text,
+                                       reply_markup=get_stats_kb())
     else:  # remove the reply markup
         info.edit_inline_keyboard()
 

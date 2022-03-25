@@ -2,7 +2,7 @@
 import os
 import warnings
 import pytest
-from modules.data import config_map, get_abs_path, DbManager
+from modules.data import Config, get_abs_path, DbManager
 
 
 @pytest.fixture(scope="session", autouse=True)
@@ -12,12 +12,7 @@ def setup():
     """
     # Disable the Conversation handler warnings
     warnings.filterwarnings("ignore", category=UserWarning)
-
-    for test_key in config_map['test']:
-        if test_key in config_map:
-            config_map[test_key] = config_map['test'][test_key]
-        if test_key in config_map['meme']:
-            config_map['meme'][test_key] = config_map['test'][test_key]
+    Config.override_test_settings()
 
 
 @pytest.fixture(scope="session")

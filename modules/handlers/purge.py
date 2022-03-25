@@ -2,7 +2,7 @@
 from time import sleep
 from telegram import Update
 from telegram.ext import CallbackContext
-from modules.data import config_map, DbManager
+from modules.data import Config, DbManager
 from modules.utils import EventInfo
 
 purge_in_progress = False
@@ -18,7 +18,7 @@ def purge_cmd(update: Update, context: CallbackContext):
     """
     global purge_in_progress
     info = EventInfo.from_message(update, context)
-    if info.chat_id == config_map['meme']['group_id'] and not purge_in_progress:  # you have to be in the admin group
+    if info.chat_id == Config.meme_get('group_id') and not purge_in_progress:  # you have to be in the admin group
         purge_in_progress = True
         info.bot.send_message(info.chat_id, text="Avvio del comando /purge")
         published_memes = DbManager.select_from("published_meme")

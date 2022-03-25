@@ -3,7 +3,7 @@ from telegram import Bot, Update, Message, CallbackQuery, ReplyMarkup, Chat, Inl
 from telegram.ext import CallbackContext
 from telegram.error import BadRequest
 from modules.debug.log_manager import logger
-from modules.data import config_map, PendingPost, PublishedPost, User
+from modules.data import Config, PendingPost, PublishedPost, User
 from modules.utils.keyboard_util import get_approve_kb, get_vote_kb
 
 
@@ -238,7 +238,7 @@ class EventInfo():
             bool: whether or not the operation was successful
         """
         message = self.__message.reply_to_message
-        group_id = config_map['meme']['group_id']
+        group_id = Config.meme_get('group_id')
         poll = message.poll  # if the message is a poll, get its reference
 
         try:
@@ -272,10 +272,10 @@ class EventInfo():
         """Sends the post to  the channel, so it can be ejoyed by the users (and voted, if comments are disabled)
         """
         message = self.__message
-        channel_id = config_map['meme']['channel_id']
+        channel_id = Config.meme_get('channel_id')
 
         reply_markup = None
-        if not config_map['meme']['comments']:  # ... append the voting Inline Keyboard, if comments are not to be supported
+        if not Config.meme_get('comments'):  # ... append the voting Inline Keyboard, if comments are not to be supported
             reply_markup = get_vote_kb()
 
         if message.text and message.entities:  # mantains the previews, if present
@@ -289,7 +289,7 @@ class EventInfo():
                                                    message_id=message.message_id,
                                                    reply_markup=reply_markup).message_id
 
-        if not config_map['meme']['comments']:  # if the user can vote directly on the post
+        if not Config.meme_get('comments'):  # if the user can vote directly on the post
             PublishedPost.create(c_message_id=c_message_id, channel_id=channel_id)
         else:  # ... else, if comments are enabled, save the user_id, so the user can be credited
             self.bot_data[f"{channel_id},{c_message_id}"] = user_id
@@ -298,7 +298,7 @@ class EventInfo():
         """Sends the post to the group associated to the channel, so that users can vote the post (if comments are enabled)
         """
         message = self.__message
-        channel_group_id = config_map['meme']['channel_group_id']
+        channel_group_id = Config.meme_get('channel_group_id')
         user_id = self.bot_data.pop(f"{self.forward_from_chat_id},{self.forward_from_id}", -1)
 
         sign = User(user_id).get_user_sign(bot=self.__bot)
