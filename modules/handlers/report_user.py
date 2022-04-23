@@ -21,8 +21,10 @@ def report_user_conv_handler() -> CommandHandler:
     """
     return ConversationHandler(entry_points=[CommandHandler("report", report_cmd)],
                                states={
-                                   STATE['reporting_user']: [MessageHandler(~Filters.command, report_user_msg)],
-                                   STATE['reporting_user_reason']: [MessageHandler(~Filters.command, report_user_sent_msg)],
+                                   STATE['reporting_user']: [MessageHandler(~Filters.command & ~Filters.update.edited_message,
+                                   report_user_msg)],
+                                   STATE['reporting_user_reason']: [MessageHandler(~Filters.command & ~Filters.update.edited_message,
+                                   report_user_sent_msg)],
                                },
                                fallbacks=[CommandHandler("cancel", conv_cancel("report"))],
                                allow_reentry=False)
