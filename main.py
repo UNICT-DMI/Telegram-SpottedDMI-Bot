@@ -1,24 +1,9 @@
 """Main module"""
-# region imports
-# libs
 import warnings
-from datetime import time
-from pytz import utc
-# telegram
 from telegram import BotCommand
-from telegram.ext import CallbackQueryHandler, CommandHandler, Dispatcher, Filters, MessageHandler, Updater
-# data
+from telegram.ext import Updater
 from modules.data import Config
-# debug
-from modules.debug import error_handler, log_message
-# handlers
-from modules.handlers import (anonymous_comment_msg, ban_cmd, cancel_cmd, clean_pending_cmd, clean_pending_job, db_backup_cmd,
-                              db_backup_job, forwarded_post_msg, help_cmd, purge_cmd, reply_cmd, report_spot_conv_handler,
-                              report_user_conv_handler, rules_cmd, sban_cmd, settings_cmd, spot_conv_handler, start_cmd,
-                              stats_callback, stats_cmd)
-from modules.handlers.callback_handlers import meme_callback
-
-# endregion
+from modules.handlers import add_handlers, add_jobs
 
 
 def add_commands(up: Updater):
@@ -41,68 +26,15 @@ def add_commands(up: Updater):
     up.bot.set_my_commands(commands=commands)
 
 
-def add_handlers(dp: Dispatcher):
-    """Adds all the needed handlers to the dispatcher
-
-    Args:
-        dp (Dispatcher): supplyed dispatcher
-    """
-    if Config.settings_get('debug', 'local_log'):  # add MessageHandler only if log_message is enabled
-        dp.add_handler(MessageHandler(Filters.all, log_message), 1)
-
-    # Error handler
-    dp.add_error_handler(error_handler)
-
-    # Conversation handler
-    dp.add_handler(spot_conv_handler())
-
-    dp.add_handler(report_user_conv_handler())
-
-    dp.add_handler(report_spot_conv_handler())
-    # Command handlers
-    dp.add_handler(CommandHandler("start", start_cmd))
-    dp.add_handler(CommandHandler("help", help_cmd))
-    dp.add_handler(CommandHandler("rules", rules_cmd))
-    dp.add_handler(CommandHandler("stats", stats_cmd))
-    dp.add_handler(CommandHandler("settings", settings_cmd))
-    dp.add_handler(CommandHandler("sban", sban_cmd))
-    dp.add_handler(CommandHandler("clean_pending", clean_pending_cmd))
-    dp.add_handler(CommandHandler("db_backup", db_backup_cmd, run_async=True))
-    dp.add_handler(CommandHandler("purge", purge_cmd, run_async=True))
-    dp.add_handler(CommandHandler("cancel", cancel_cmd))  # it must be after the conversation handler's 'cancel'
-
-    # MessageHandler
-    dp.add_handler(MessageHandler(Filters.reply & Filters.regex(r"^/ban$"), ban_cmd))
-    dp.add_handler(MessageHandler(Filters.reply & Filters.regex(r"^/reply"), reply_cmd))
-
-    # Callback handlers
-    dp.add_handler(CallbackQueryHandler(meme_callback, pattern=r"^meme_\.*"))
-    dp.add_handler(CallbackQueryHandler(stats_callback, pattern=r"^stats_\.*"))
-
-    if Config.meme_get('comments'):
-        dp.add_handler(
-            MessageHandler(Filters.forwarded & Filters.chat_type.groups & Filters.is_automatic_forward, forwarded_post_msg))
-    if Config.meme_get('delete_anonymous_comments'):
-        dp.add_handler(
-            MessageHandler(Filters.sender_chat.channel & Filters.chat_type.groups & ~Filters.is_automatic_forward,
-                           anonymous_comment_msg,
-                           run_async=True))
-
-
-def add_jobs(dp: Dispatcher):
-    """Adds all the jobs to be scheduled to the dispatcher
-
-    Args:
-        dp (Dispatcher): supplyed dispatcher
-    """
-    dp.job_queue.run_daily(clean_pending_job, time=time(hour=5, tzinfo=utc))  # run each day at 05:00 utc
-    dp.job_queue.run_daily(db_backup_job, time=time(hour=5, tzinfo=utc))  # run each day at 05:00 utc
-
-
 def main():
     """Main function
     """
-    updater = Updater(Config.settings_get('token'), request_kwargs={'read_timeout': 20, 'connect_timeout': 20}, use_context=True)
+    updater = Updater(Config.settings_get('token'),
+                      request_kwargs={
+                          'read_timeout': 20,
+                          'connect_timeout': 20
+                      },
+                      use_context=True)
     add_commands(updater)
     add_handlers(updater.dispatcher)
     add_jobs(updater.dispatcher)
