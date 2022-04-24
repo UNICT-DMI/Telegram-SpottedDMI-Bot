@@ -132,8 +132,26 @@ class Config():
         self.__read_env_settings()
         self.__validate_types_settings()
 
-    @staticmethod
-    def __load_configuration(path: str, load_default: bool = True, force_load: bool = False) -> dict:
+    @classmethod
+    def __merge_settings(cls, d: dict, u: dict) -> dict:
+        """Merges two configuration dictionaries.
+
+        Args:
+            d (dict): dict to merge. It will be modified
+            u (dict): dict to merge with
+
+        Returns:
+            dict: merged dictionaries
+        """
+        for k, v in u.items():
+            if isinstance(v, dict):
+                d[k] = cls.__merge_settings(d.get(k, {}), v)
+            else:
+                d[k] = v
+        return d
+
+    @classmethod
+    def __load_configuration(cls, path: str, load_default: bool = True, force_load: bool = False) -> dict:
         """Loads the configuration from the .yaml file specified in the path and stores it as a dict.
         If load_default is True, it will first look for any file with the same name and the .default extension.
         Then the values will be overwritten by the specified file, if present.
@@ -150,10 +168,10 @@ class Config():
         conf = {}
         if load_default and os.path.exists(f"{path}.default"):
             with open(f"{path}.default", 'r', encoding="utf-8") as conf_file:
-                conf.update(yaml.load(conf_file, Loader=yaml.SafeLoader))
+                conf = cls.__merge_settings(conf, yaml.load(conf_file, Loader=yaml.SafeLoader))
         if force_load or os.path.exists(path):
             with open(path, 'r', encoding="utf-8") as conf_file:
-                conf.update(yaml.load(conf_file, Loader=yaml.SafeLoader))
+                conf = cls.__merge_settings(conf, yaml.load(conf_file, Loader=yaml.SafeLoader))
         return conf
 
     def __read_env_settings(self):
@@ -166,7 +184,7 @@ class Config():
         env_path = os.path.join(os.path.dirname(__file__), "..", "..", ".env")
         if os.path.exists(env_path):
             envre = re.compile(r'''^([^\s=]+)=(?:[\s"']*)(.+?)(?:[\s"']*)$''')
-            with open(env_path) as env:
+            with open(env_path, "r", encoding="utf-8") as env:
                 for line in env:
                     match = envre.match(line)
                     if match is not None:
@@ -175,13 +193,13 @@ class Config():
         for key in os.environ:
             new_vars[key.lower()] = os.getenv(key)
 
-        for key in new_vars:
+        for key, value in new_vars.items():
             if key.startswith("test_"):
-                self.settings['test'][key[5:]] = new_vars[key]
+                self.settings['test'][key[5:]] = value
             elif key.startswith("meme_"):
-                self.settings['meme'][key[5:]] = new_vars[key]
+                self.settings['meme'][key[5:]] = value
             else:
-                self.settings[key] = new_vars[key]
+                self.settings[key] = value
 
     def __validate_types_settings(self):
         """Validates the settings values in the 'meme' section, casting them when necessary

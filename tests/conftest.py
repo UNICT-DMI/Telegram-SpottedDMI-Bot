@@ -1,6 +1,5 @@
 """Test configuration"""
 import os
-import warnings
 import pytest
 from modules.data import Config, get_abs_path, DbManager
 
@@ -10,8 +9,6 @@ def setup():
     """Called at the beginning of the testing session.
     Sets up the test configuration
     """
-    # Disable the Conversation handler warnings
-    warnings.filterwarnings("ignore", category=UserWarning)
     Config.override_test_settings()
 
 

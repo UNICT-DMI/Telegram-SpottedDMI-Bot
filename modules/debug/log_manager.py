@@ -55,12 +55,15 @@ def notify_error_admin(context: CallbackContext, traceback_str: str):
 
     Args:
         context (CallbackContext): context passed by the handler
+        traceback_str (str): the traceback text
     """
-    text = (f'An exception was raised:\n' f'<pre>{html.escape(traceback_str)}</pre>')
+    traceback_str = traceback_str.replace(Config.settings_get("token"), "[bot_token]")
+    text = (f'An exception was raised:\n'
+            f'<pre>{html.escape(traceback_str)}</pre>')
     context.bot.send_message(chat_id=Config.meme_get('group_id'), text=text, parse_mode=ParseMode.HTML)
 
 
-def log_message(update, context):  # pylint: disable=unused-argument
+def log_message(update: Update, context: CallbackContext):  # pylint: disable=unused-argument
     """Log the message that caused the update
 
     Args:
