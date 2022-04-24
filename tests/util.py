@@ -2,6 +2,7 @@
 """TelegramSimulator class"""
 from datetime import datetime
 from typing import List, Optional, Union
+import warnings
 from telegram import Message, ReplyMarkup, MessageEntity, User, Chat, Update, CallbackQuery
 from telegram.ext import Updater
 from telegram.inline.inlinekeyboardmarkup import InlineKeyboardMarkup
@@ -19,6 +20,7 @@ class TelegramSimulator():
     __user = __default_user
 
     def __init__(self):
+        warnings.filterwarnings("ignore", message=r"Setting custom attributes such as .*")
         self.messages: List[Message] = []
         self.updater = Updater("1234567890:qY9gv7pRJgFj4EVmN3Z1gfJOgQpCbh0vmp5")
         add_handlers(self.updater.dispatcher)

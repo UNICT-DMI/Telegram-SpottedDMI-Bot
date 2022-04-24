@@ -137,8 +137,11 @@ class Config():
         """Merges two configuration dictionaries.
 
         Args:
-            d (dict): dict to merge
+            d (dict): dict to merge. It will be modified
             u (dict): dict to merge with
+
+        Returns:
+            dict: merged dictionaries
         """
         for k, v in u.items():
             if isinstance(v, dict):
