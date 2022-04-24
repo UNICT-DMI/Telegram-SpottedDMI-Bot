@@ -1,5 +1,4 @@
 """Main module"""
-import warnings
 from telegram import BotCommand
 from telegram.ext import Updater
 from modules.data import Config
@@ -43,7 +42,5 @@ def main():
     updater.idle()
 
 
-warnings.filterwarnings("ignore",
-                        message="If 'per_message=False', 'CallbackQueryHandler' will not be tracked for every message.")
 if __name__ == "__main__":
     main()

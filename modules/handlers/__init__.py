@@ -1,5 +1,6 @@
 """Modules that handle the events the bot recognizes and reacts to"""
 from datetime import time
+import warnings
 from pytz import utc
 from telegram.ext import CallbackQueryHandler, CommandHandler, Dispatcher, Filters, MessageHandler
 from modules.data.config import Config
@@ -31,6 +32,8 @@ def add_handlers(dp: Dispatcher):
     Args:
         dp (Dispatcher): supplyed dispatcher
     """
+    warnings.filterwarnings("ignore",
+                            message="If 'per_message=False', 'CallbackQueryHandler' will not be tracked for every message.")
     if Config.settings_get('debug', 'local_log'):  # add MessageHandler only if log_message is enabled
         dp.add_handler(MessageHandler(Filters.all, log_message), 1)
 
