@@ -293,7 +293,7 @@ class TestBot:
             assert telegram.last_message.reply_to_message is not None
 
             telegram.send_callback_query(text="No")
-            assert telegram.last_message.text == "Va bene, alla prossima 🙃"
+            assert telegram.last_message.text in read_md("no_strings").split("\n")
 
             telegram.send_command("/spot")
             assert telegram.last_message.text == "Invia il post che vuoi pubblicare"

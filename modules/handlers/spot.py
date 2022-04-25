@@ -5,6 +5,8 @@ from modules.data import User
 from modules.utils import EventInfo, conv_cancel, get_confirm_kb
 from modules.handlers.constants import CHAT_PRIVATE_ERROR, INVALID_MESSAGE_TYPE_ERROR
 from modules.data import Config
+from random import choice
+from modules.data.data_reader import read_md
 
 STATE = {'posting': 1, 'confirm': 2, 'end': -1}
 
@@ -108,7 +110,7 @@ def spot_confirm_query(update: Update, context: CallbackContext):
             text = "Si è verificato un problema\nAssicurati che il tipo di post sia fra quelli consentiti"
 
     elif arg == "cancel":  # if the the user changed his mind
-        text = "Va bene, alla prossima 🙃"
+        text = choice(read_md("no_strings").split("\n"))
 
     info.bot.edit_message_text(chat_id=info.chat_id, message_id=info.message_id, text=text)
     return STATE['end']
