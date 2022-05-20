@@ -145,7 +145,8 @@ Listed in requirements_dev.txt
 
 #### Steps:
 
-- **Run** `pytest`
+- **Run** `pytest tests/unit` to run the unit tests
+- **Run** `pytest tests/e2e` to run the e2e tests (this requires test configurations)
 
 ## 📚 Documentation
 

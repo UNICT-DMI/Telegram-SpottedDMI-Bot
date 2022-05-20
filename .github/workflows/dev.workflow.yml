@@ -22,7 +22,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
-        python-version: [ '3.9', '3.10' ]
+        python-version: ["3.9", "3.10"]
 
     steps:
       - uses: actions/checkout@v2
@@ -48,4 +48,4 @@ jobs:
           flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
       - name: Test with pytest
         run: |
-          pytest -p no:warnings
+          pytest tests/unit/
