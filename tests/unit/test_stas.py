@@ -3,7 +3,6 @@ from modules.handlers.stats import REACTION, avg_callback
 
 from pytest_mock import MockerFixture
 
-
 def test_avg_callback(mocker: MockerFixture) -> None:
     # arrange
     mock_return = 1
