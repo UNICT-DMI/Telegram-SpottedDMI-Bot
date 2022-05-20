@@ -24,7 +24,7 @@ def conv_fail(family: str) -> Callable:
              return_value: int = None,
              **kwargs) -> int:
         """Handles an invalid message in the bid conversation.
-        The filename is expected to be in the format of <family>\_error\_<fail\_file>.md.
+        The filename is expected to be in the format of <family>_error_<fail_file>.md.
         Returns a warning message
 
         Args:
