@@ -13,7 +13,7 @@ Tests modules
 conftest
 ---------------------
 
-.. automodule:: tests.conftest
+.. automodule:: tests.unit.unit.conftest
    :members:
    :undoc-members:
    :show-inheritance:
@@ -21,15 +21,15 @@ conftest
 test\_bot
 ----------------------
 
-.. automodule:: tests.test_bot
+.. automodule:: tests.unit.test_bot
    :members:
    :undoc-members:
    :show-inheritance:
 
-tests.test\_db
+tests.unit.test\_db
 ---------------------
 
-.. automodule:: tests.test_db
+.. automodule:: tests.unit.test_db
    :members:
    :undoc-members:
    :show-inheritance:
@@ -37,7 +37,7 @@ tests.test\_db
 test\_util
 -----------------------
 
-.. automodule:: tests.test_util
+.. automodule:: tests.unit.test_util
    :members:
    :undoc-members:
    :show-inheritance:
@@ -45,7 +45,7 @@ test\_util
 util
 -----------------
 
-.. automodule:: tests.util
+.. automodule:: tests.unit.util
    :members:
    :undoc-members:
    :show-inheritance:
