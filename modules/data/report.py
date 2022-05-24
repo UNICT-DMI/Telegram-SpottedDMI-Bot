@@ -10,13 +10,13 @@ class Report():
     """Class that represents a report
 
     Args:
-        user_id (:class:`int`): id of the user that reported
-        group_id (:class:`int`): id of the admin group
-        g_message_id (:class:`int`): id of the post in the group
-        channel_id (:class:`int`): id of the channel
-        c_message_id (:class:`int`): id of the post in question in the channel
-        target_username (:class:`str`): username of the reported user
-        date (:class:`datetime`): when the report happened
+        user_id: id of the user that reported
+        group_id: id of the admin group
+        g_message_id: id of the post in the group
+        channel_id: id of the channel
+        c_message_id: id of the post in question in the channel
+        target_username: username of the reported user
+        date: when the report happened
     """
     user_id: int
     group_id: int
@@ -40,13 +40,13 @@ class Report():
         """Adds the report of the user on a specific post
 
         Args:
-            user_id (int): id of the user that reported
-            channel_id (int): id of the channel
-            c_message_id (int): id of the post in question in the channel
-            admin_message (Message): message received in the admin group that references the report
+            user_id: id of the user that reported
+            channel_id: id of the channel
+            c_message_id: id of the post in question in the channel
+            admin_message: message received in the admin group that references the report
 
         Returns:
-            Report: istance of the class or None if the report was not created
+            istance of the class or None if the report was not created
         """
 
         g_message_id = admin_message.message_id
@@ -68,12 +68,12 @@ class Report():
         """Adds the report of the user targetting another user
 
         Args:
-            user_id (int): id of the user that reported
-            target_username (str): username of reported user
-            admin_message (Message): message received in the admin group that references the report
+            user_id: id of the user that reported
+            target_username: username of reported user
+            admin_message: message received in the admin group that references the report
 
         Returns:
-            Report: istance of the class
+            istance of the class
         """
 
         g_message_id = admin_message.message_id
@@ -88,12 +88,12 @@ class Report():
         """Gets the report of a specific user on a published post
 
         Args:
-            user_id (int): id of the user that reported
-            channel_id (int): id of the channel
-            c_message_id (int): id of the post in question in the channel
+            user_id: id of the user that reported
+            channel_id: id of the channel
+            c_message_id: id of the post in question in the channel
 
         Returns:
-            Report: istance of the class or None if the report was not present
+            istance of the class or None if the report was not present
         """
 
         reports = DbManager.select_from(select="*",
@@ -115,10 +115,10 @@ class Report():
         """Gets the last user report of a specific user
 
         Args:
-            user_id (int): id of the user that reported
+            user_id: id of the user that reported
 
         Returns:
-            Report: istance of the class or None if the report was not present
+            istance of the class or None if the report was not present
         """
         reports = DbManager.select_from(select="*",
                                         table_name="user_report",
@@ -140,11 +140,11 @@ class Report():
         """Gets a report of any type related to the specified message in the admin group
 
         Args:
-            group_id (int): id of the admin group
-            g_message_id (int): id of the report in the group
+            group_id: id of the admin group
+            g_message_id: id of the report in the group
 
         Returns:
-            Report: istance of the class or None if the report was not present
+            istance of the class or None if the report was not present
         """
         reports = DbManager.select_from(select="*",
                                         table_name="user_report",

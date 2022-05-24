@@ -36,11 +36,11 @@ def spot_cmd(update: Update, context: CallbackContext) -> int:
     Checks that the user is in a private chat and it's not banned and start the post conversation
 
     Args:
-        update (Update): update event
-        context (CallbackContext): context passed by the handler
+        update: update event
+        context: context passed by the handler
 
     Returns:
-        int: next state of the conversation
+        next state of the conversation
     """
     info = EventInfo.from_message(update, context)
     user = User(info.user_id)
@@ -65,11 +65,11 @@ def spot_msg(update: Update, context: CallbackContext) -> int:
     Checks the message the user wants to post, and goes to the final step
 
     Args:
-        update (Update): update event
-        context (CallbackContext): context passed by the handler
+        update: update event
+        context: context passed by the handler
 
     Returns:
-        int: next state of the conversation
+        next state of the conversation
     """
     info = EventInfo.from_message(update, context)
 
@@ -92,11 +92,11 @@ def spot_confirm_query(update: Update, context: CallbackContext):
     - cancel: cancels the current spot conversation
 
     Args:
-        update (Update): update event
-        context (CallbackContext): context passed by the handler
+        update: update event
+        context: context passed by the handler
 
     Returns:
-        int: next state of the conversation
+        next state of the conversation
     """
     info = EventInfo.from_callback(update, context)
     arg = info.query_data.split(",")[1]

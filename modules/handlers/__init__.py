@@ -30,7 +30,7 @@ def add_handlers(disp: Dispatcher):
     """Adds all the needed handlers to the dispatcher
 
     Args:
-        dp (Dispatcher): supplyed dispatcher
+        disp: supplyed dispatcher
     """
     warnings.filterwarnings("ignore",
                             message="If 'per_message=False', 'CallbackQueryHandler' will not be tracked for every message.")
@@ -80,7 +80,7 @@ def add_jobs(disp: Dispatcher):
     """Adds all the jobs to be scheduled to the dispatcher
 
     Args:
-        dp (Dispatcher): supplyed dispatcher
+        disp: supplyed dispatcher
     """
     disp.job_queue.run_daily(clean_pending_job, time=time(hour=5, tzinfo=utc))  # run each day at 05:00 utc
     disp.job_queue.run_daily(db_backup_job, time=time(hour=5, tzinfo=utc))  # run each day at 05:00 utc

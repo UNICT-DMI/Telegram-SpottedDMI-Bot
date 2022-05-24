@@ -14,8 +14,8 @@ def stats_cmd(update: Update, context: CallbackContext):
     Lets the user choose what stats they want to see
 
     Args:
-        update (Update): update event
-        context (CallbackContext): context passed by the handler
+        update: update event
+        context: context passed by the handler
     """
     info = EventInfo.from_message(update, context)
 
@@ -26,8 +26,8 @@ def stats_callback(update: Update, context: CallbackContext):
     """Passes the stats callback to the correct handler
 
     Args:
-        update (Update): update event
-        context (CallbackContext): context passed by the handler
+        update: update event
+        context: context passed by the handler
     """
     info = EventInfo.from_callback(update, context)
     info.answer_callback_query()  # end the spinning progress bar
@@ -56,10 +56,10 @@ def avg_callback(arg: str) -> str:
     Shows the average of the %arg per post
 
     Args:
-        arg (str): [ votes | 0 | 1 ]
+        arg: [ votes | 0 | 1 ]
 
     Returns:
-        str: text for the reply
+        text for the reply
     """
     if arg == "votes":
         avg_votes = PostData.get_avg()
@@ -76,10 +76,10 @@ def max_callback(arg: str) -> str:
     Shows the post with the most %arg
 
     Args:
-        arg (str): [ votes | 0 | 1 ]
+        arg: [ votes | 0 | 1 ]
 
     Returns:
-        str: text for the reply
+        text for the reply
     """
     if arg == "votes":
         max_votes, message_id, channel_id = PostData.get_max_id()
@@ -98,10 +98,10 @@ def tot_callback(arg: str) -> str:
     Shows the total number of %arg
 
     Args:
-        arg (str): [ posts | votes | 0 | 1 ]
+        arg: [ posts | votes | 0 | 1 ]
 
     Returns:
-        str: text for the reply
+        text for the reply
     """
     if arg == "posts":
         n_posts = PostData.get_n_posts()
@@ -121,6 +121,6 @@ def close_callback(arg: None) -> str:  # pylint: disable=unused-argument
     Closes the stats menu
 
     Returns:
-        str: text and replyMarkup that make up the reply
+        text and replyMarkup that make up the reply
     """
     return None

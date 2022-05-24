@@ -16,8 +16,8 @@ def error_handler(update: Update, context: CallbackContext):  # pylint: disable=
     """Logs the error and notifies the admins.
 
     Args:
-        update (Update): update event
-        context (CallbackContext): context passed by the handler
+        update: update event
+        context: context passed by the handler
     """
     logger.error(msg="Exception while handling an update:", exc_info=context.error)
 
@@ -54,8 +54,8 @@ def notify_error_admin(context: CallbackContext, traceback_str: str):
     """Sends a telegram message to notify the admins.
 
     Args:
-        context (CallbackContext): context passed by the handler
-        traceback_str (str): the traceback text
+        context: context passed by the handler
+        traceback_str: the traceback text
     """
     traceback_str = traceback_str.replace(Config.settings_get("token"), "[bot_token]")
     text = (f'An exception was raised:\n'
@@ -67,8 +67,8 @@ def log_message(update: Update, context: CallbackContext):  # pylint: disable=un
     """Log the message that caused the update
 
     Args:
-        update (Update): update event
-        context (CallbackContext): context passed by the handler
+        update: update event
+        context: context passed by the handler
     """
     if update.message:
         try:

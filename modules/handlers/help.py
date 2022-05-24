@@ -10,8 +10,8 @@ def help_cmd(update: Update, context: CallbackContext):
     Sends an help message
 
     Args:
-        update (Update): update event
-        context (CallbackContext): context passed by the handler
+        update: update event
+        context: context passed by the handler
     """
     info = EventInfo.from_message(update, context)
     if info.chat_id == Config.meme_get('group_id'):  # if you are in the admin group

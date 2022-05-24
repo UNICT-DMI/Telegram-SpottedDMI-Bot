@@ -13,8 +13,8 @@ def purge_cmd(update: Update, context: CallbackContext):
     Deletes all posts and the related votes in the database whose actual telegram message could not be found
 
     Args:
-        update (Update): update event
-        context (CallbackContext): context passed by the handler
+        update: update event
+        context: context passed by the handler
     """
     global purge_in_progress  # pylint: disable=global-statement,invalid-name
     info = EventInfo.from_message(update, context)

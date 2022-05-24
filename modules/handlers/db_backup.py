@@ -11,8 +11,8 @@ def db_backup_cmd(update: Update, context: CallbackContext):
     Automatically upload and send current version of db for backup
 
     Args:
-        update (Update): update event
-        context (CallbackContext): context passed by the handler
+        update: update event
+        context: context passed by the handler
     """
     info = EventInfo.from_message(update, context)
     if info.chat_id == Config.meme_get('group_id'):  # you have to be in the admin group

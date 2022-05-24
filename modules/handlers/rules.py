@@ -10,8 +10,8 @@ def rules_cmd(update: Update, context: CallbackContext):
     Sends a message containing the rules
 
     Args:
-        update (Update): update event
-        context (CallbackContext): context passed by the handler
+        update: update event
+        context: context passed by the handler
     """
     info = EventInfo.from_message(update, context)
     text = read_md("rules")

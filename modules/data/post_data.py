@@ -11,7 +11,7 @@ class PostData():
         """Gets the total number of posts
 
         Returns:
-            int: total number of posts
+            total number of posts
         """
         return DbManager.count_from(table_name="published_meme")
 
@@ -20,10 +20,10 @@ class PostData():
         """Gets the total number of votes of the specified
 
         Args:
-            vote (str, optional): type of votes to consider. None means all. Defaults to None.
+            vote: type of votes to consider. None means all. Defaults to None.
 
         Returns:
-            int: number of votes of the specified type
+            number of votes of the specified type
         """
         if vote is not None:
             return DbManager.count_from(table_name="votes", where="vote = %s", where_args=(vote,))
@@ -34,10 +34,10 @@ class PostData():
         """Shows the average number of votes of the specified type per post
 
         Args:
-            vote (str, optional): type of votes to consider. None means all. Defaults to None.
+            vote: type of votes to consider. None means all. Defaults to None.
 
         Returns:
-            int: average number of votes
+            average number of votes
         """
         tot_posts = PostData.get_n_posts()
         avg = PostData.get_n_votes(vote) / (tot_posts if tot_posts != 0 else 1)
@@ -48,7 +48,7 @@ class PostData():
         """Gets the id of the post with the most votes of the specified type
 
         Args:
-            vote (str, optional): type of votes to consider. None means all. Defaults to None.
+            vote: type of votes to consider. None means all. Defaults to None.
 
         Returns:
             Tuple[int, int, int]: number of votes, id of the message, id of the channel

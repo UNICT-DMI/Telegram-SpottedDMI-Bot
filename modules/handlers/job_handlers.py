@@ -12,7 +12,7 @@ def clean_pending_job(context: CallbackContext):
     Automatically rejects all pending posts that are older than the chosen amount of hours
 
     Args:
-        context (CallbackContext): context passed by the jobqueue
+        context: context passed by the jobqueue
     """
     info = EventInfo.from_job(context)
     admin_group_id = Config.meme_get('group_id')
@@ -46,7 +46,7 @@ def db_backup_job(context: CallbackContext):
     Automatically upload and send last version of db for backup
 
     Args:
-        context (CallbackContext): context passed by the jobqueue
+        context: context passed by the jobqueue
     """
     path = get_abs_path(*DbManager.db_path)
     admin_group_id = Config.meme_get('group_id')

@@ -12,7 +12,7 @@ class User():
     """Class that represents a user
 
     Args:
-        user_id (:class:`int`): id of the user
+        user_id: id of the user
     """
     user_id: int
 
@@ -41,7 +41,7 @@ class User():
         """Removes the user from the banned list
 
         Returns:
-            bool: whether the user was present in the banned list before the sban or not
+            whether the user was present in the banned list before the sban or not
         """
         if self.is_banned:
             DbManager.delete_from(table_name="banned_users", where="user_id = %s", where_args=(self.user_id,))
@@ -52,7 +52,7 @@ class User():
         """Removes the user from the credited list, if he was present
 
         Returns:
-            bool: whether the user was already anonym
+            whether the user was already anonym
         """
         already_anonym = not self.is_credited
         if not already_anonym:
@@ -63,7 +63,7 @@ class User():
         """Adds the user to the credited list, if he wasn't already credited
 
         Returns:
-            bool: whether the user was already credited
+            whether the user was already credited
         """
         already_credited = self.is_credited
         if not already_credited:
@@ -74,10 +74,10 @@ class User():
         """Generates a sign for the user. It will be a random name for an anonym user
 
         Args:
-            bot (Bot): telegram bot
+            bot: telegram bot
 
         Returns:
-            str: the sign of the user
+            the sign of the user
         """
         sign = choice(read_md("anonym_names").split("\n"))  # random sign
         if self.is_credited:  # the user wants to be credited

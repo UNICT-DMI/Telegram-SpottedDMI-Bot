@@ -10,8 +10,8 @@ def sban_cmd(update: Update, context: CallbackContext):
     Sban a user by using this command and listing all the user_id to sban
 
     Args:
-        update (Update): update event
-        context (CallbackContext): context passed by the handler
+        update: update event
+        context: context passed by the handler
     """
     info = EventInfo.from_message(update, context)
     if info.chat_id == Config.meme_get('group_id'):  # you have to be in the admin group

@@ -10,8 +10,8 @@ def reply_cmd(update: Update, context: CallbackContext):
     Send a message to a user by replying to one of his pending posts with /reply + the message you want to send
 
     Args:
-        update (Update): update event
-        context (CallbackContext): context passed by the handler
+        update: update event
+        context: context passed by the handler
     """
     info = EventInfo.from_message(update, context)
     if info.chat_id == Config.meme_get('group_id'):  # you have to be in the admin group

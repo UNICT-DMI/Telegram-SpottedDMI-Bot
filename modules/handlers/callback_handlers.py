@@ -14,10 +14,10 @@ def old_reactions(data: str) -> str:
     Can be removed later
 
     Args:
-        data (str): callback data
+        data: callback data
 
     Returns:
-        str: new reaction data corrisponding with the old reaction
+        new reaction data corrisponding with the old reaction
     """
     if data == "meme_vote_yes":
         return "meme_vote,1"
@@ -30,11 +30,11 @@ def meme_callback(update: Update, context: CallbackContext) -> int:
     """Passes the meme callback to the correct handler
 
     Args:
-        update (Update): update event
-        context (CallbackContext): context passed by the handler
+        update: update event
+        context: context passed by the handler
 
     Returns:
-        int: value to return to the handler, if requested
+        value to return to the handler, if requested
     """
     info = EventInfo.from_callback(update, context)
     data = old_reactions(info.query_data)
@@ -71,8 +71,8 @@ def settings_callback(info: EventInfo, arg: str) -> Tuple[str, InlineKeyboardMar
     - credit: Adds the user_id to the table of credited users, if it wasn't already there.
 
     Args:
-        info (dict): information about the callback
-        arg (str): [ anonimo | credit ]
+        info: information about the callback
+        arg: [ anonimo | credit ]
 
     Returns:
         Tuple[str, InlineKeyboardMarkup, int]: text and replyMarkup that make up the reply, new conversation state
@@ -109,8 +109,8 @@ def approve_status_callback(info: EventInfo, arg: None) -> Tuple[str, InlineKeyb
     Pauses or resume voting on a specific pending post
 
     Args:
-        info (dict): information about the callback
-        arg (str): [ pause | play ]
+        info: information about the callback
+        arg: [ pause | play ]
 
     Returns:
         Tuple[str, InlineKeyboardMarkup, int]: text and replyMarkup that make up the reply, new conversation state
@@ -133,7 +133,7 @@ def approve_yes_callback(info: EventInfo, arg: None) -> Tuple[str, InlineKeyboar
     and putting it in the published post table
 
     Args:
-        info (dict): information about the callback
+        info: information about the callback
 
     Returns:
         Tuple[str, InlineKeyboardMarkup, int]: text and replyMarkup that make up the reply, new conversation state
@@ -174,7 +174,7 @@ def approve_no_callback(info: EventInfo, arg: None) -> Tuple[str, InlineKeyboard
     Rejects the post, deleting it from the pending_post table
 
     Args:
-        info (dict): information about the callback
+        info: information about the callback
 
     Returns:
         Tuple[str, InlineKeyboardMarkup, int]: text and replyMarkup that make up the reply, new conversation state
@@ -213,8 +213,8 @@ def vote_callback(info: EventInfo, arg: str) -> Tuple[str, InlineKeyboardMarkup,
     """Handles the vote,[ 0 | 1 | 2 | 3 | 4 ] callback.
 
     Args:
-        info (dict): information about the callback
-        arg (str): [ 0 | 1 | 2 | 3 | 4 ]
+        info: information about the callback
+        arg: [ 0 | 1 | 2 | 3 | 4 ]
 
 
     Returns:

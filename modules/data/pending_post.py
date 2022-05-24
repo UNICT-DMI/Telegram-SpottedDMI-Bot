@@ -12,11 +12,11 @@ class PendingPost():
     """Class that represents a pending post
 
     Args:
-        user_id (:class:`int`): id of the user that sent the post
-        u_message_id (:class:`int`): id of the original message of the post
-        g_message_id (:class:`int`): id of the post in the group
-        group_id (:class:`int`): id of the admin group
-        date (:class:`datetime`): when the post was sent
+        user_id: id of the user that sent the post
+        u_message_id: id of the original message of the post
+        g_message_id: id of the post in the group
+        group_id: id of the admin group
+        date: when the post was sent
     """
     user_id: int
     u_message_id: int
@@ -29,12 +29,12 @@ class PendingPost():
         """Creates a new post and inserts it in the table of pending posts
 
         Args:
-            user_message (Message): message sent by the user that contains the post
-            g_message_id (int): id of the post in the group
-            group_id (int): id of the admin group
+            user_message: message sent by the user that contains the post
+            g_message_id: id of the post in the group
+            group_id: id of the admin group
 
         Returns:
-            PendingPost: istance of the class
+            istance of the class
         """
         user_id = user_message.from_user.id
         u_message_id = user_message.message_id
@@ -48,11 +48,11 @@ class PendingPost():
         """Retrieves a pending post from the info related to the admin group
 
         Args:
-            g_message_id (int): id of the post in the group
-            group_id (int): id of the admin group
+            g_message_id: id of the post in the group
+            group_id: id of the admin group
 
         Returns:
-            PendingPost: istance of the class
+            istance of the class
         """
         pending_post_arr = DbManager.select_from(select="*",
                                                  table_name="pending_meme",
@@ -73,10 +73,10 @@ class PendingPost():
         """Retrieves a pending post from the user_id
 
         Args:
-            user_id (int): id of the author of the post
+            user_id: id of the author of the post
 
         Returns:
-            PendingPost: istance of the class
+            istance of the class
         """
         pending_post_arr = DbManager.select_from(select="*",
                                                  table_name="pending_meme",
@@ -98,8 +98,8 @@ class PendingPost():
         If before is specified, returns only the one sent before that timestamp
 
         Args:
-            group_id (int): id of the admin group
-            before (datetime, optional): timestamp before wich messages will be considered. Defaults to None.
+            group_id: id of the admin group
+            before: timestamp before wich messages will be considered. Defaults to None.
 
         Returns:
             List[type(PendingPost)]: list of ids of pending memes
@@ -131,10 +131,10 @@ class PendingPost():
         """Gets all the votes of a specific kind (approve or reject)
 
         Args:
-            vote (bool): whether you look for the approve or reject votes
+            vote: whether you look for the approve or reject votes
 
         Returns:
-            int: number of votes
+            number of votes
         """
         return DbManager.count_from(table_name="admin_votes",
                                     where="g_message_id = %s and group_id = %s and is_upvote = %s",
@@ -144,10 +144,10 @@ class PendingPost():
         """Gets the list of admins that approved or rejected the post
 
         Args:
-            vote (bool): whether you look for the approve or reject votes
+            vote: whether you look for the approve or reject votes
 
         Returns:
-            Tuple[str]: tuple of admins that approved or rejected a pending post
+            tuple of admins that approved or rejected a pending post
         """
         votes = DbManager.select_from(select="admin_id",
                                       table_name="admin_votes",
@@ -164,8 +164,8 @@ class PendingPost():
             and edit the message to delete the reply_markup
 
         Args:
-            bot (Bot): bot
-            approve (bool): whether the vote is approve or reject
+            bot: bot
+            approve: whether the vote is approve or reject
         """
         admins = self.get_list_admin_votes(vote=approve)
         text = "Approvato da:\n" if approve else "Rifiutato da:\n"
@@ -181,10 +181,10 @@ class PendingPost():
         """Gets the vote of a specific admin on a pending post
 
         Args:
-            admin_id (int): id of the admin that voted
+            admin_id: id of the admin that voted
 
         Returns:
-            Optional[bool]: a bool representing the vote or None if a vote was not yet made
+            a bool representing the vote or None if a vote was not yet made
         """
         vote = DbManager.select_from(select="is_upvote",
                                      table_name="admin_votes",
@@ -200,11 +200,11 @@ class PendingPost():
         """Adds the vote of the admin on a specific post, or update the existing vote, if needed
 
         Args:
-            admin_id (int): id of the admin that voted
-            approval (bool): whether the vote is approval or reject
+            admin_id: id of the admin that voted
+            approval: whether the vote is approval or reject
 
         Returns:
-            int: number of similar votes (all the approve or the reject), or -1 if the vote wasn't updated
+            number of similar votes (all the approve or the reject), or -1 if the vote wasn't updated
         """
         vote = self.__get_admin_vote(admin_id)
         if vote is None:  # there isn't a vote yet

@@ -10,8 +10,8 @@ def anonymous_comment_msg(update: Update, context: CallbackContext):
     Deletes the original post and sends a message with the same text, to avoid any abuse.
 
     Args:
-        update (Update): update event
-        context (CallbackContext): context passed by the handler
+        update: update event
+        context: context passed by the handler
     """
     info = EventInfo.from_message(update, context)
 

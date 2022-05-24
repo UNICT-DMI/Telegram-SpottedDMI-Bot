@@ -33,12 +33,12 @@ class Config():
         If the key is not present, it will return the default value.
 
         Args:
-            config (dict): configuration dict to search
-            key (str): key to search
-            default (Any, optional): default value to return if the key is not present. Defaults to None.
+            config: configuration dict to search
+            key: key to search
+            default: default value to return if the key is not present. Defaults to None.
 
         Returns:
-            Any: value of the key or default value
+            value of the key or default value
         """
         for k in keys:
             if isinstance(config, Iterable) and k in config:
@@ -52,7 +52,7 @@ class Config():
         """Singleton getter
 
         Returns:
-            Config: instance of the Config class
+            instance of the Config class
         """
         if cls.__instance is None:
             cls()
@@ -64,11 +64,11 @@ class Config():
         If the key is not present, it will return the default value.
 
         Args:
-            key (SettingsMemeKeys): key to get
-            default (Any, optional): default value to return if the key is not present. Defaults to None.
+            key: key to get
+            default: default value to return if the key is not present. Defaults to None.
 
         Returns:
-            Any: value of the key or default value
+            value of the key or default value
         """
         return cls.settings_get("meme", key, default=default)
 
@@ -79,11 +79,11 @@ class Config():
         If the key is not present, it will return the default value.
 
         Args:
-            key (SettingsKeyType): key to get
-            default (Any, optional): default value to return if the key is not present. Defaults to None.
+            key: key to get
+            default: default value to return if the key is not present. Defaults to None.
 
         Returns:
-            Any: value of the key or default value
+            value of the key or default value
         """
         instance = cls.__get_instance()
         return cls.__get(instance.settings, *keys, default=default)
@@ -95,11 +95,11 @@ class Config():
         If the key is not present, it will return the default value.
 
         Args:
-            key (ReactionKeyType): key to get
-            default (Any, optional): default value to return if the key is not present. Defaults to None.
+            key: key to get
+            default: default value to return if the key is not present. Defaults to None.
 
         Returns:
-            Any: value of the key or default value
+            value of the key or default value
         """
         instance = cls.__get_instance()
         return cls.__get(instance.reactions, *keys, default=default)
@@ -137,11 +137,11 @@ class Config():
         """Merges two configuration dictionaries.
 
         Args:
-            base (dict): dict to merge. It will be modified
-            update (dict): dict to merge with
+            base: dict to merge. It will be modified
+            update: dict to merge with
 
         Returns:
-            dict: merged dictionaries
+            merged dictionaries
         """
         for key, value in update.items():
             if isinstance(value, dict):
@@ -158,12 +158,12 @@ class Config():
         If force_load is True, the program will crash if the specified file is not present
 
         Args:
-            path (str): path of the configuration .yaml file
-            load_default (bool, optional): whether to look for the .default file first for the default configuration. Defaults to True.
-            force_load (bool, optional): whether to force the presence of the specified file. Defaults to False.
+            path: path of the configuration .yaml file
+            load_default: whether to look for the .default file first for the default configuration. Defaults to True.
+            force_load: whether to force the presence of the specified file. Defaults to False.
 
         Returns:
-            dict: configuration dictionary
+            configuration dictionary
         """
         conf = {}
         if load_default and os.path.exists(f"{path}.default"):

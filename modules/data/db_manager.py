@@ -19,11 +19,11 @@ class DbManager():
         """Materially executes the requested query, while also catching and logging any exception that may be thrown
 
         Args:
-            cur (sqlite3.Cursor): database cursor
-            query (str): query to execute. It may contain ? placehorders
-            args (tuple, optional): tuple of values that will replace the placeholders. Defaults to None.
-            error_str (str, optional): name of the method that caused the exception. Defaults to "".
-            is_many (bool, optional): whether to use the :func:`sqlite3.Cursor.executemany` function. Defaults to False.
+            cur: database cursor
+            query: query to execute. It may contain ? placehorders
+            args: tuple of values that will replace the placeholders. Defaults to None.
+            error_str: name of the method that caused the exception. Defaults to "".
+            is_many: whether to use the :func:`sqlite3.Cursor.executemany` function. Defaults to False.
         """
         query_func = cur.executemany if is_many else cur.execute
 
@@ -57,7 +57,7 @@ class DbManager():
         Should not be used to select something
 
         Args:
-            file_path (str): path of the text file containing the queries
+            file_path: path of the text file containing the queries
         """
         conn, cur = cls.get_db()
         queries = read_file(*file_path).split("-----")
@@ -73,7 +73,7 @@ class DbManager():
         Should not be used to select something
 
         Args:
-            queries (str): tuple of queries
+            queries: tuple of queries
         """
         conn, cur = cls.get_db()
         for query in queries:
@@ -95,15 +95,15 @@ class DbManager():
         Executes "SELECT select FROM table_name [WHERE where (with where_args)] [GROUP_BY group_by] [ORDER BY order_by]"
 
         Args:
-            table_name (str): name of the table used in the FROM
-            select (str, optional): columns considered for the query. Defaults to "*".
-            where (str, optional): where clause, with %s placeholders for the where_args. Defaults to "".
-            where_args (tuple, optional): args used in the where clause. Defaults to None.
-            group_by (str, optional): group by clause. Defaults to "".
-            order_by (str, optional): order by clause. Defaults to "".
+            table_name: name of the table used in the FROM
+            select: columns considered for the query. Defaults to "*".
+            where: where clause, with %s placeholders for the where_args. Defaults to "".
+            where_args: args used in the where clause. Defaults to None.
+            group_by: group by clause. Defaults to "".
+            order_by: order by clause. Defaults to "".
 
         Returns:
-            list: rows from the select
+            rows from the select
         """
         conn, cur = cls.get_db()
 
@@ -129,13 +129,13 @@ class DbManager():
         Executes "SELECT COUNT(select) FROM table_name [WHERE where (with where_args)]"
 
         Args:
-            table_name (str): name of the table used in the FROM
-            select (str, optional): columns considered for the query. Defaults to "*".
-            where (str, optional): where clause, with %s placeholders for the where_args. Defaults to "".
-            where_args (tuple, optional): args used in the where clause. Defaults to None.
+            table_name: name of the table used in the FROM
+            select: columns considered for the query. Defaults to "*".
+            where: where clause, with %s placeholders for the where_args. Defaults to "".
+            where_args: args used in the where clause. Defaults to None.
 
         Returns:
-            int: number of rows
+            number of rows
         """
         conn, cur = cls.get_db()
 
@@ -159,10 +159,10 @@ class DbManager():
         Executes "INSERT INTO table_name ([columns]) VALUES (placeholders)"
 
         Args:
-            table_name (str): name of the table used in the INSERT INTO
-            values (tuple): values to be inserted. If multiple_rows is true, tuple of tuples of values to be inserted
-            columns (tuple, optional): columns that will be inserted, as a tuple of strings. Defaults to None.
-            multiple_rows (bool): whether or not multiple rows will be inserted at the same time
+            table_name: name of the table used in the INSERT INTO
+            values: values to be inserted. If multiple_rows is true, tuple of tuples of values to be inserted
+            columns: columns that will be inserted, as a tuple of strings. Defaults to None.
+            multiple_rows: whether or not multiple rows will be inserted at the same time
         """
         conn, cur = cls.get_db()
 
@@ -190,10 +190,10 @@ class DbManager():
         Executes "UPDATE table_name SET set_clause (with args) [WHERE where (with args)]"
 
         Args:
-            table_name (str): name of the table used in the DELETE FROM
-            set_clause (str): set clause, with %s placeholders
-            where (str, optional): where clause, with %s placeholders for the where args. Defaults to ""
-            args (tuple, optional): args used both in the set clause and in the where clause, in this order. Defaults to None
+            table_name: name of the table used in the DELETE FROM
+            set_clause: set clause, with %s placeholders
+            where: where clause, with %s placeholders for the where args. Defaults to ""
+            args: args used both in the set clause and in the where clause, in this order. Defaults to None
         """
         conn, cur = cls.get_db()
 
@@ -213,9 +213,9 @@ class DbManager():
         Executes "DELETE FROM table_name [WHERE where (with where_args)]"
 
         Args:
-            table_name (str): name of the table used in the DELETE FROM
-            where (str, optional): where clause, with %s placeholders for the where args. Defaults to "".
-            where_args (tuple, optional): args used in the where clause. Defaults to None.
+            table_name: name of the table used in the DELETE FROM
+            where: where clause, with %s placeholders for the where args. Defaults to "".
+            where_args: args used in the where clause. Defaults to None.
         """
         conn, cur = cls.get_db()
 
