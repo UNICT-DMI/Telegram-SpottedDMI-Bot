@@ -31,6 +31,7 @@ extensions = [
     'sphinx.ext.napoleon',  # to use NumPy and Google style docstrings
     'sphinx.ext.githubpages',  # generates the .nojekyll file
     'sphinx.ext.viewcode',  # add source code links to the documentation
+    'sphinx_rtd_dark_mode',  # dark mode for ReadTheDocs
     'sphinx_autodoc_typehints',  # improves the type hinting
 ]
 
@@ -53,7 +54,13 @@ html_theme = 'sphinx_rtd_theme'  # [optional, to use the far superior Read the D
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
 html_static_path = ['_static']
+html_css_files = [
+    'css/dark.css',
+]
 
 html_logo = "_static/img/spotted-logo.jpg"
 
 # -- Extension configuration -------------------------------------------------
+
+# Configuration of "sphinx_autodoc_typehints"
+typehints_defaults = "comma"

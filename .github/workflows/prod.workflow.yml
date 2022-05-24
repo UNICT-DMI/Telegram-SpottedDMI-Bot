@@ -48,7 +48,7 @@ jobs:
       - name: Install dependencies for requirements and testing
         run: |
           python -m pip install --upgrade pip
-          pip install sphinx sphinx_rtd_theme sphinx_autodoc_typehints
+          pip3 install sphinx sphinx_rtd_theme sphinx_autodoc_typehints sphinx-rtd-dark-mode
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
           if [ -f requirements_dev.txt ]; then pip install -r requirements_dev.txt; fi
       - name: Setup enviroment

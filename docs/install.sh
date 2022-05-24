@@ -1,5 +1,5 @@
 #!/bin/bash
-pip3 install sphinx sphinx_rtd_theme sphinx_autodoc_typehints
+pip3 install sphinx sphinx_rtd_theme sphinx_autodoc_typehints sphinx-rtd-dark-mode
 
 #######################
 # Build .rts files:

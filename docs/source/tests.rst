@@ -2,7 +2,6 @@ Tests modules
 =============
 
 **Description**
----------------
 
 .. automodule:: tests
    :members:
