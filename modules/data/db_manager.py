@@ -3,7 +3,7 @@ import os
 import logging
 from typing import Tuple
 import sqlite3
-from modules.data.data_reader import get_abs_path, read_file
+from .data_reader import get_abs_path, read_file
 
 logger = logging.getLogger(__name__)
 

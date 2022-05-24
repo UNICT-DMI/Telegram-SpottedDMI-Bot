@@ -2,7 +2,9 @@
 from random import choice
 from attr import dataclass
 from telegram import Bot
-from modules.data import read_md, DbManager, PendingPost
+from .data_reader import read_md
+from .db_manager import DbManager
+from .pending_post import PendingPost
 
 
 @dataclass(slots=True)

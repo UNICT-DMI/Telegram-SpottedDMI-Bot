@@ -2,7 +2,7 @@
 from dataclasses import dataclass
 from datetime import datetime
 from telegram import Message
-from modules.data import DbManager
+from .db_manager import DbManager
 
 
 @dataclass(slots=True)

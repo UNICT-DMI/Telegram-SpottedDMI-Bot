@@ -1,7 +1,7 @@
 """Read data from files"""
 import os
 from telegram.utils.helpers import escape_markdown
-from modules.data.config import Config
+from .config import Config
 
 
 def get_abs_path(*root_file_path: str) -> str:

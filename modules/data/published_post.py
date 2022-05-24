@@ -2,7 +2,7 @@
 from dataclasses import dataclass
 from typing import Optional
 from telegram.inline.inlinekeyboardmarkup import InlineKeyboardMarkup
-from modules.data import DbManager
+from .db_manager import DbManager
 
 
 @dataclass(slots=True)

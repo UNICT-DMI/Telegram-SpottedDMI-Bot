@@ -3,7 +3,8 @@ from dataclasses import dataclass
 from typing import Optional, Tuple
 from datetime import datetime, timezone
 from telegram import Message, Bot
-from modules.data import DbManager, Config
+from .db_manager import DbManager
+from .config import Config
 
 
 @dataclass(slots=True)
