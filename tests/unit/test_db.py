@@ -20,7 +20,7 @@ def db_results(init_local_test_db: DbManager) -> dict:
     }
     init_local_test_db.query_from_file("data/db/db_test.sql")
 
-    with open("tests/db_results.yaml", 'r') as yaml_config:
+    with open("tests/unit/db_results.yaml", 'r') as yaml_config:
         results = yaml.load(yaml_config, Loader=yaml.SafeLoader)
 
     yield results

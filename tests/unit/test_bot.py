@@ -4,7 +4,7 @@ from datetime import datetime
 from typing import Tuple
 import pytest
 from telegram import Chat, Message, user
-from tests.util import TelegramSimulator
+from tests.unit.util import TelegramSimulator
 from modules.data import Config, read_md, DbManager, User, PendingPost, PublishedPost, Report
 from modules.handlers.constants import CHAT_PRIVATE_ERROR
 
