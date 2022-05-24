@@ -12,7 +12,7 @@ logger = logging.getLogger(__name__)
 logger.info("Logger enabled")
 
 
-def error_handler(update: Update, context: CallbackContext):  # pylint: disable=unused-argument
+def error_handler(update: Update, context: CallbackContext):
     """Logs the error and notifies the admins.
 
     Args:
@@ -63,7 +63,7 @@ def notify_error_admin(context: CallbackContext, traceback_str: str):
     context.bot.send_message(chat_id=Config.meme_get('group_id'), text=text, parse_mode=ParseMode.HTML)
 
 
-def log_message(update: Update, context: CallbackContext):  # pylint: disable=unused-argument
+def log_message(update: Update, _: CallbackContext):
     """Log the message that caused the update
 
     Args:

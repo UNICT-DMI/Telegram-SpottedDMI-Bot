@@ -17,7 +17,7 @@ class PublishedPost():
     c_message_id: int
 
     @classmethod
-    def create(cls, channel_id: int, c_message_id: int):
+    def create(cls, channel_id: int, c_message_id: int) -> 'PublishedPost':
         """Inserts a new post in the table of published posts
 
         Args:
@@ -48,7 +48,7 @@ class PublishedPost():
 
         return cls(channel_id=channel_id, c_message_id=c_message_id)
 
-    def save_post(self):
+    def save_post(self) -> 'PublishedPost':
         """Saves the published_post in the database"""
         DbManager.insert_into(table_name="published_meme",
                               columns=("channel_id", "c_message_id"),
@@ -135,6 +135,6 @@ class PublishedPost():
                         self.set_user_vote(user_id=ids, vote=vote)
                         ids -= 1
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f"PublishedPost: [ channel_id: {self.channel_id}\n"\
                 f"c_message_id: {self.c_message_id} ]"

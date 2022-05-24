@@ -84,7 +84,7 @@ def spot_msg(update: Update, context: CallbackContext) -> int:
     return STATE['confirm']
 
 
-def spot_confirm_query(update: Update, context: CallbackContext):
+def spot_confirm_query(update: Update, context: CallbackContext) -> int:
     """Handles the [ submit | cancel ] callback.
     Creates the bid or cancels its creation.
 

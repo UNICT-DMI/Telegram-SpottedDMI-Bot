@@ -37,7 +37,8 @@ class Report():
         return delta_time.total_seconds() / 60
 
     @classmethod
-    def create_post_report(cls, user_id: int, channel_id: int, c_message_id: int, admin_message: Message):
+    def create_post_report(cls, user_id: int, channel_id: int, c_message_id: int,
+                           admin_message: Message) -> Optional['Report']:
         """Adds the report of the user on a specific post
 
         Args:
@@ -65,7 +66,7 @@ class Report():
                    g_message_id=g_message_id).save_report()
 
     @classmethod
-    def create_user_report(cls, user_id: int, target_username: str, admin_message: Message):
+    def create_user_report(cls, user_id: int, target_username: str, admin_message: Message) -> 'Report':
         """Adds the report of the user targetting another user
 
         Args:
@@ -85,7 +86,7 @@ class Report():
                 .save_report()
 
     @classmethod
-    def get_post_report(cls, user_id: int, channel_id: int, c_message_id: int):
+    def get_post_report(cls, user_id: int, channel_id: int, c_message_id: int) -> Optional['Report']:
         """Gets the report of a specific user on a published post
 
         Args:
@@ -112,7 +113,7 @@ class Report():
                    g_message_id=report['g_message_id'])
 
     @classmethod
-    def get_last_user_report(cls, user_id: int):
+    def get_last_user_report(cls, user_id: int) -> Optional['Report']:
         """Gets the last user report of a specific user
 
         Args:
@@ -174,7 +175,7 @@ class Report():
 
         return None
 
-    def save_report(self):
+    def save_report(self) -> 'Report':
         """Saves the report in the database"""
         if self.c_message_id is not None:
             DbManager.insert_into(table_name="spot_report",
@@ -186,7 +187,7 @@ class Report():
                                   values=(self.user_id, self.target_username, self.date, self.group_id, self.g_message_id))
         return self
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         if self.c_message_id is not None:
             return f"PostReport: [ user_id: {self.user_id}\n"\
                     f"channel_id: {self.channel_id}\n"\

@@ -1,6 +1,6 @@
 """Pending post management"""
 from dataclasses import dataclass
-from typing import Optional, Tuple
+from typing import List, Optional
 from datetime import datetime, timezone
 from telegram import Message, Bot
 from .db_manager import DbManager
@@ -25,7 +25,7 @@ class PendingPost():
     date: datetime
 
     @classmethod
-    def create(cls, user_message: Message, g_message_id: int, group_id: int):
+    def create(cls, user_message: Message, g_message_id: int, group_id: int) -> 'PendingPost':
         """Creates a new post and inserts it in the table of pending posts
 
         Args:
@@ -120,14 +120,14 @@ class PendingPost():
             pending_posts.append(PendingPost.from_group(group_id=group_id, g_message_id=g_message_id))
         return pending_posts
 
-    def save_post(self):
+    def save_post(self) -> 'PendingPost':
         """Saves the pending_post in the database"""
         DbManager.insert_into(table_name="pending_meme",
                               columns=("user_id", "u_message_id", "g_message_id", "group_id", "message_date"),
                               values=(self.user_id, self.u_message_id, self.g_message_id, self.group_id, self.date))
         return self
 
-    def get_votes(self, vote: bool):
+    def get_votes(self, vote: bool) -> int:
         """Gets all the votes of a specific kind (approve or reject)
 
         Args:
@@ -140,14 +140,14 @@ class PendingPost():
                                     where="g_message_id = %s and group_id = %s and is_upvote = %s",
                                     where_args=(self.g_message_id, self.group_id, vote))
 
-    def get_list_admin_votes(self, vote: bool) -> Tuple[str]:
+    def get_list_admin_votes(self, vote: bool) -> Optional[List[str]]:
         """Gets the list of admins that approved or rejected the post
 
         Args:
             vote: whether you look for the approve or reject votes
 
         Returns:
-            tuple of admins that approved or rejected a pending post
+            list of admins that approved or rejected a pending post
         """
         votes = DbManager.select_from(select="admin_id",
                                       table_name="admin_votes",
@@ -237,7 +237,7 @@ class PendingPost():
         self.g_message_id = None
         self.date = None
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f"PendingPost: [ user_id: {self.user_id}\n"\
                 f"u_message_id: {self.u_message_id}\n"\
                 f"group_id: {self.group_id}\n"\

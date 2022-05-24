@@ -116,7 +116,7 @@ def tot_callback(arg: str) -> str:
     return text
 
 
-def close_callback(arg: None) -> str:  # pylint: disable=unused-argument
+def close_callback(_: None) -> None:
     """Handles the close callback
     Closes the stats menu
 

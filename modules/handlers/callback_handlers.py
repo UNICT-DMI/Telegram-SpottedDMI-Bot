@@ -1,5 +1,5 @@
 """Handles the execution of callbacks by the bot"""
-from typing import Tuple
+from typing import Optional, Tuple
 from telegram import Update, InlineKeyboardMarkup, InlineKeyboardButton
 from telegram.ext import CallbackContext
 from telegram.error import BadRequest, RetryAfter, Unauthorized
@@ -64,7 +64,7 @@ def meme_callback(update: Update, context: CallbackContext) -> int:
 
 
 # region handle meme_callback
-def settings_callback(info: EventInfo, arg: str) -> Tuple[str, InlineKeyboardMarkup, int]:
+def settings_callback(info: EventInfo, arg: str) -> Tuple[Optional[str], None, None]:
     """Handles the settings,[ anonimo | credit ] callback.
 
     - anonimo: Removes the user_id from the table of credited users, if present.
@@ -104,7 +104,7 @@ def settings_callback(info: EventInfo, arg: str) -> Tuple[str, InlineKeyboardMar
     return text, None, None
 
 
-def approve_status_callback(info: EventInfo, arg: None) -> Tuple[str, InlineKeyboardMarkup, int]:  # pylint: disable=unused-argument
+def approve_status_callback(info: EventInfo, arg: None) -> Tuple[None, Optional[InlineKeyboardMarkup], None]:
     """Handles the approve_status callback.
     Pauses or resume voting on a specific pending post
 
@@ -127,7 +127,7 @@ def approve_status_callback(info: EventInfo, arg: None) -> Tuple[str, InlineKeyb
     return None, keyboard, None
 
 
-def approve_yes_callback(info: EventInfo, arg: None) -> Tuple[str, InlineKeyboardMarkup, int]:  # pylint: disable=unused-argument
+def approve_yes_callback(info: EventInfo, _: None) -> Tuple[None, Optional[InlineKeyboardMarkup], None]:
     """Handles the approve_yes callback.
     Approves the post, deleting it from the pending_post table, publishing it in the channel \
     and putting it in the published post table
@@ -169,7 +169,7 @@ def approve_yes_callback(info: EventInfo, arg: None) -> Tuple[str, InlineKeyboar
     return None, None, None
 
 
-def approve_no_callback(info: EventInfo, arg: None) -> Tuple[str, InlineKeyboardMarkup, int]:  # pylint: disable=unused-argument
+def approve_no_callback(info: EventInfo, _: None) -> Tuple[None, Optional[InlineKeyboardMarkup], None]:
     """Handles the approve_no callback.
     Rejects the post, deleting it from the pending_post table
 
@@ -209,7 +209,7 @@ def approve_no_callback(info: EventInfo, arg: None) -> Tuple[str, InlineKeyboard
     return None, None, None
 
 
-def vote_callback(info: EventInfo, arg: str) -> Tuple[str, InlineKeyboardMarkup, int]:
+def vote_callback(info: EventInfo, arg: str) -> Tuple[None, Optional[InlineKeyboardMarkup], None]:
     """Handles the vote,[ 0 | 1 | 2 | 3 | 4 ] callback.
 
     Args:

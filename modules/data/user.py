@@ -87,7 +87,7 @@ class User():
 
         return sign
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f"User: [ user_id: {self.user_id}\n"\
                 f"is_pending: {self.is_pending}\n"\
                 f"is_credited: {self.is_credited}\n"\
