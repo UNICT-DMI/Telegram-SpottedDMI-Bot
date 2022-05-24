@@ -26,8 +26,8 @@ def add_commands(up: Updater):
 
 
 def main():
-    """Main function
-    """
+    """Main function"""
+
     updater = Updater(Config.settings_get('token'),
                       request_kwargs={
                           'read_timeout': 20,

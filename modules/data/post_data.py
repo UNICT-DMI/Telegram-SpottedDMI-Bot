@@ -4,8 +4,7 @@ from modules.data import DbManager
 
 
 class PostData():
-    """Class that handles the management of persistent data fetch or manipulation in the meme bot
-    """
+    """Class that handles the management of persistent data fetch or manipulation in the meme bot"""
 
     @staticmethod
     def get_n_posts() -> int:

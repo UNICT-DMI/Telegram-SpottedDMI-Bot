@@ -8,8 +8,8 @@ from modules.utils.keyboard_util import get_approve_kb, get_vote_kb
 
 
 class EventInfo():
-    """Class that contains all the relevant information related to an event
-    """
+    """Class that contains all the relevant information related to an event"""
+
 
     def __init__(self,
                  bot: Bot,
@@ -69,8 +69,8 @@ class EventInfo():
 
     @property
     def is_private_chat(self) -> bool:
-        """:class:`bool`: Whether the chat is private or not
-        """
+        """:class:`bool`: Whether the chat is private or not"""
+
         if self.chat_type is None:
             return None
         return self.chat_type == Chat.PRIVATE
@@ -269,8 +269,8 @@ class EventInfo():
         return True
 
     def send_post_to_channel(self, user_id: int):
-        """Sends the post to  the channel, so it can be ejoyed by the users (and voted, if comments are disabled)
-        """
+        """Sends the post to  the channel, so it can be ejoyed by the users (and voted, if comments are disabled)"""
+
         message = self.__message
         channel_id = Config.meme_get('channel_id')
 
@@ -295,8 +295,8 @@ class EventInfo():
             self.bot_data[f"{channel_id},{c_message_id}"] = user_id
 
     def send_post_to_channel_group(self):
-        """Sends the post to the group associated to the channel, so that users can vote the post (if comments are enabled)
-        """
+        """Sends the post to the group associated to the channel, so that users can vote the post (if comments are enabled)"""
+
         message = self.__message
         channel_group_id = Config.meme_get('channel_group_id')
         user_id = self.bot_data.pop(f"{self.forward_from_chat_id},{self.forward_from_id}", -1)

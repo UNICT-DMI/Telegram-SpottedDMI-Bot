@@ -9,8 +9,8 @@ logger = logging.getLogger(__name__)
 
 
 class DbManager():
-    """Class that handles the management of databases
-    """
+    """Class that handles the management of databases"""
+
     db_path = ("data", "db", "db.sqlite3")
     row_factory = lambda cursor, row: {col[0]: row[idx] for idx, col in enumerate(cursor.description)}
 

@@ -202,8 +202,8 @@ class Config():
                 self.settings[key] = value
 
     def __validate_types_settings(self):
-        """Validates the settings values in the 'meme' section, casting them when necessary
-        """
+        """Validates the settings values in the 'meme' section, casting them when necessary"""
+
         if not os.path.exists(f"{self.settings_path}.types"):
             return
         with open(f"{self.settings_path}.types", 'r', encoding="utf-8") as conf_file:
