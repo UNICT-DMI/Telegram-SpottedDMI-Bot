@@ -1,0 +1,8 @@
+[MESSAGES CONTROL]
+disable=
+
+[CHECKER]
+max-args=7
+
+[FORMAT]
+max-line-length=128
