@@ -51,7 +51,7 @@ class PostData():
             vote: type of votes to consider. None means all
 
         Returns:
-            Tuple[int, int, int]: number of votes, id of the message, id of the channel
+            number of votes, id of the message, id of the channel
         """
         where = ""
         where_args = None

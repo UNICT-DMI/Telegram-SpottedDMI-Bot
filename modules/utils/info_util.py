@@ -24,7 +24,7 @@ class EventInfo():  # pylint: disable=too-many-public-methods
 
     @property
     def bot(self) -> Bot:
-        """Istance of the telegram bot"""
+        """Instance of the telegram bot"""
         return self.__bot
 
     @property
@@ -166,41 +166,41 @@ class EventInfo():  # pylint: disable=too-many-public-methods
         return self.__message.forward_from_chat.id
 
     @classmethod
-    def from_message(cls, update: Update, ctx: CallbackContext):
-        """Istance of EventInfo created by a message update
+    def from_message(cls, update: Update, ctx: CallbackContext) -> 'EventInfo':
+        """Instance of EventInfo created by a message update
 
         Args:
             update: update event
             context: context passed by the handler
 
         Returns:
-            istance of the class
+            instance of the class
         """
         message = update.message if update.message is not None else update.edited_message
         return cls(bot=ctx.bot, ctx=ctx, update=update, message=message)
 
     @classmethod
-    def from_callback(cls, update: Update, ctx: CallbackContext):
-        """Istance of EventInfo created by a callback update
+    def from_callback(cls, update: Update, ctx: CallbackContext) -> 'EventInfo':
+        """Instance of EventInfo created by a callback update
 
         Args:
             update: update event
             context: context passed by the handler
 
         Returns:
-            istance of the class
+            instance of the class
         """
         return cls(bot=ctx.bot, ctx=ctx, update=update, message=update.callback_query.message, query=update.callback_query)
 
     @classmethod
-    def from_job(cls, ctx: CallbackContext):
-        """Istance of EventInfo created by a job update
+    def from_job(cls, ctx: CallbackContext) -> 'EventInfo':
+        """Instance of EventInfo created by a job update
 
         Args:
             context: context passed by the handler
 
         Returns:
-            istance of the class
+            instance of the class
         """
         return cls(bot=ctx.bot, ctx=ctx)
 

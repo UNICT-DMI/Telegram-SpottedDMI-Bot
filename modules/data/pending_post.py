@@ -34,7 +34,7 @@ class PendingPost():
             group_id: id of the admin group
 
         Returns:
-            istance of the class
+            instance of the class
         """
         user_id = user_message.from_user.id
         u_message_id = user_message.message_id
@@ -44,7 +44,7 @@ class PendingPost():
                 .save_post()
 
     @classmethod
-    def from_group(cls, g_message_id: int, group_id: int):
+    def from_group(cls, g_message_id: int, group_id: int) -> Optional['PendingPost']:
         """Retrieves a pending post from the info related to the admin group
 
         Args:
@@ -52,7 +52,7 @@ class PendingPost():
             group_id: id of the admin group
 
         Returns:
-            istance of the class
+            instance of the class
         """
         pending_post_arr = DbManager.select_from(select="*",
                                                  table_name="pending_meme",
@@ -69,14 +69,14 @@ class PendingPost():
                    date=pending_post['message_date'])
 
     @classmethod
-    def from_user(cls, user_id: int):
+    def from_user(cls, user_id: int) -> Optional['PendingPost']:
         """Retrieves a pending post from the user_id
 
         Args:
             user_id: id of the author of the post
 
         Returns:
-            istance of the class
+            instance of the class
         """
         pending_post_arr = DbManager.select_from(select="*",
                                                  table_name="pending_meme",

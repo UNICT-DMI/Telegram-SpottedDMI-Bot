@@ -25,12 +25,12 @@ class PublishedPost():
             c_message_id: id of the post in the channel
 
         Returns:
-            istance of the class
+            instance of the class
         """
         return cls(channel_id=channel_id, c_message_id=c_message_id).save_post()
 
     @classmethod
-    def from_channel(cls, channel_id: int, c_message_id: int):
+    def from_channel(cls, channel_id: int, c_message_id: int) -> Optional['PublishedPost']:
         """Retrieves a published post from the info related to the channel
 
         Args:
@@ -38,7 +38,7 @@ class PublishedPost():
             c_message_id: id of the post in the channel
 
         Returns:
-            istance of the class
+            instance of the class
         """
         is_present = DbManager.count_from(table_name="published_meme",
                                           where="channel_id = %s and c_message_id = %s",

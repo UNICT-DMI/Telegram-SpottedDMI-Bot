@@ -1,5 +1,5 @@
-[MESSAGES CONTROL]
-disable=
+[MASTER]
+ignore=tests
 
 [CHECKER]
 max-args=7

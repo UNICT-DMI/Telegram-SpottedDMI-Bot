@@ -1,9 +1,9 @@
 # pylint: disable=unused-argument,protected-access,no-value-for-parameter
 """TelegramSimulator class"""
 from datetime import datetime
-from typing import List, Optional, Union, Callable
+from typing import List, Optional, Union
 import warnings
-from telegram import Bot, Message, ReplyMarkup, MessageEntity, User, Chat, Update, CallbackQuery
+from telegram import Message, ReplyMarkup, MessageEntity, User, Chat, Update, CallbackQuery
 from telegram.ext import Updater
 from telegram.inline.inlinekeyboardmarkup import InlineKeyboardMarkup
 from main import add_handlers

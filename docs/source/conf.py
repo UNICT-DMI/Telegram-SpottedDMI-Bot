@@ -63,4 +63,5 @@ html_logo = "_static/img/spotted-logo.jpg"
 # -- Extension configuration -------------------------------------------------
 
 # Configuration of "sphinx_autodoc_typehints"
+typehints_use_rtype = False
 typehints_defaults = "comma"

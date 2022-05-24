@@ -1,6 +1,7 @@
 """Reports management"""
 from dataclasses import dataclass
 from datetime import datetime
+from typing import Optional
 from telegram import Message
 from .db_manager import DbManager
 
@@ -46,7 +47,7 @@ class Report():
             admin_message: message received in the admin group that references the report
 
         Returns:
-            istance of the class or None if the report was not created
+            instance of the class or None if the report was not created
         """
 
         g_message_id = admin_message.message_id
@@ -73,7 +74,7 @@ class Report():
             admin_message: message received in the admin group that references the report
 
         Returns:
-            istance of the class
+            instance of the class
         """
 
         g_message_id = admin_message.message_id
@@ -93,7 +94,7 @@ class Report():
             c_message_id: id of the post in question in the channel
 
         Returns:
-            istance of the class or None if the report was not present
+            instance of the class or None if the report was not present
         """
 
         reports = DbManager.select_from(select="*",
@@ -118,7 +119,7 @@ class Report():
             user_id: id of the user that reported
 
         Returns:
-            istance of the class or None if the report was not present
+            instance of the class or None if the report was not present
         """
         reports = DbManager.select_from(select="*",
                                         table_name="user_report",
@@ -136,7 +137,7 @@ class Report():
                    g_message_id=report['g_message_id'])
 
     @classmethod
-    def from_group(cls, group_id: int, g_message_id: int):
+    def from_group(cls, group_id: int, g_message_id: int) -> Optional['Report']:
         """Gets a report of any type related to the specified message in the admin group
 
         Args:
@@ -144,7 +145,7 @@ class Report():
             g_message_id: id of the report in the group
 
         Returns:
-            istance of the class or None if the report was not present
+            instance of the class or None if the report was not present
         """
         reports = DbManager.select_from(select="*",
                                         table_name="user_report",

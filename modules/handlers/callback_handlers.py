@@ -75,7 +75,7 @@ def settings_callback(info: EventInfo, arg: str) -> Tuple[str, InlineKeyboardMar
         arg: [ anonimo | credit ]
 
     Returns:
-        Tuple[str, InlineKeyboardMarkup, int]: text and replyMarkup that make up the reply, new conversation state
+        text and replyMarkup that make up the reply, new conversation state
     """
     user = User(info.user_id)
     if arg == "anonimo":  # if the user wants to be anonym
@@ -113,7 +113,7 @@ def approve_status_callback(info: EventInfo, arg: None) -> Tuple[str, InlineKeyb
         arg: [ pause | play ]
 
     Returns:
-        Tuple[str, InlineKeyboardMarkup, int]: text and replyMarkup that make up the reply, new conversation state
+        text and replyMarkup that make up the reply, new conversation state
     """
     if arg == "pause":  # if the the admin wants to pause approval of the post
         keyboard = InlineKeyboardMarkup([[InlineKeyboardButton(text="▶️ Resume", callback_data="meme_approve_status,play")]])
@@ -136,7 +136,7 @@ def approve_yes_callback(info: EventInfo, arg: None) -> Tuple[str, InlineKeyboar
         info: information about the callback
 
     Returns:
-        Tuple[str, InlineKeyboardMarkup, int]: text and replyMarkup that make up the reply, new conversation state
+        text and replyMarkup that make up the reply, new conversation state
     """
     pending_post = PendingPost.from_group(group_id=info.chat_id, g_message_id=info.message_id)
     if pending_post is None:  # this pending post is not present in the database
@@ -177,7 +177,7 @@ def approve_no_callback(info: EventInfo, arg: None) -> Tuple[str, InlineKeyboard
         info: information about the callback
 
     Returns:
-        Tuple[str, InlineKeyboardMarkup, int]: text and replyMarkup that make up the reply, new conversation state
+        text and replyMarkup that make up the reply, new conversation state
     """
     pending_post = PendingPost.from_group(group_id=info.chat_id, g_message_id=info.message_id)
     if pending_post is None:  # this pending post is not present in the database
@@ -218,7 +218,7 @@ def vote_callback(info: EventInfo, arg: str) -> Tuple[str, InlineKeyboardMarkup,
 
 
     Returns:
-        Tuple[str, InlineKeyboardMarkup, int]: text and replyMarkup that make up the reply, new conversation state
+        text and replyMarkup that make up the reply, new conversation state
     """
     published_post = PublishedPost.from_channel(channel_id=info.chat_id, c_message_id=info.message_id)
     if published_post is None:

@@ -1,13 +1,15 @@
 # pylint: disable=anomalous-backslash-in-string
 """Common functions needed in conversation handlers"""
-from typing import Callable
+from typing import Callable, Optional
 from telegram import Update, ParseMode
 from telegram.ext import CallbackContext
 from modules.data import read_md
 from modules.utils.info_util import EventInfo
 
 
-def conv_fail(family: str) -> Callable:
+def conv_fail(
+    family: str
+) -> Callable[[Optional[Update], Optional[CallbackContext], Optional[EventInfo], Optional[str], Optional[int]], int]:
     """Creates a function used to handle any error in the conversation
 
     Args:
@@ -46,7 +48,7 @@ def conv_fail(family: str) -> Callable:
     return fail
 
 
-def conv_cancel(family: str) -> Callable:
+def conv_cancel(family: str) -> Callable[[Update, CallbackContext], int]:
     """Creates a function used to handle the /cancel command in the conversation
 
     Args:

@@ -40,7 +40,7 @@ class DbManager():
         """Creates the connection to the database. It can be sqlite or postgres
 
         Returns:
-            Tuple[sqlite3.Connection, sqlite3.Cursor]: sqlite database connection and cursor
+            sqlite database connection and cursor
         """
         db_path = get_abs_path(*cls.db_path)
         if not os.path.exists(db_path):

@@ -18,17 +18,17 @@ class User():
 
     @property
     def is_pending(self) -> bool:
-        """:class:`bool`: If the user has a post already pending or not"""
+        """If the user has a post already pending or not"""
         return bool(PendingPost.from_user(self.user_id))
 
     @property
     def is_banned(self) -> bool:
-        """:class:`bool`: If the user is banned or not"""
+        """If the user is banned or not"""
         return DbManager.count_from(table_name="banned_users", where="user_id = %s", where_args=(self.user_id,)) > 0
 
     @property
     def is_credited(self) -> bool:
-        """:class:`bool`: If the user is in the credited list"""
+        """If the user is in the credited list"""
         return DbManager.count_from(table_name="credited_users", where="user_id = %s", where_args=(self.user_id,)) == 1
 
     def ban(self):
