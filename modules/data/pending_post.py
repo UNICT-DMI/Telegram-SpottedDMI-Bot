@@ -1,27 +1,27 @@
 """Pending post management"""
+from dataclasses import dataclass
 from typing import Optional, Tuple
 from datetime import datetime, timezone
 from telegram import Message, Bot
 from modules.data import DbManager, Config
 
 
+@dataclass(slots=True)
 class PendingPost():
     """Class that represents a pending post
 
     Args:
         user_id (:class:`int`): id of the user that sent the post
         u_message_id (:class:`int`): id of the original message of the post
-        group_id (:class:`int`): id of the admin group
         g_message_id (:class:`int`): id of the post in the group
+        group_id (:class:`int`): id of the admin group
         date (:class:`datetime`): when the post was sent
     """
-
-    def __init__(self, user_id: int, u_message_id: int, g_message_id: int, group_id: int, date: datetime):
-        self.user_id = user_id
-        self.u_message_id = u_message_id
-        self.group_id = group_id
-        self.g_message_id = g_message_id
-        self.date = date
+    user_id: int
+    u_message_id: int
+    g_message_id: int
+    group_id: int
+    date: datetime
 
     @classmethod
     def create(cls, user_message: Message, g_message_id: int, group_id: int):
@@ -222,8 +222,8 @@ class PendingPost():
         return number_of_votes
 
     def delete_post(self):
-        """Removes all entries on a post that is no longer pending
-        """
+        """Removes all entries on a post that is no longer pending"""
+
         DbManager.delete_from(table_name="pending_meme",
                               where="g_message_id = %s and group_id = %s",
                               where_args=(self.g_message_id, self.group_id))

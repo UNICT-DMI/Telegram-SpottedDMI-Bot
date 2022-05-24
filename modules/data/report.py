@@ -1,9 +1,11 @@
 """Reports management"""
+from dataclasses import dataclass
 from datetime import datetime
 from telegram import Message
 from modules.data import DbManager
 
 
+@dataclass(slots=True)
 class Report():
     """Class that represents a report
 
@@ -16,22 +18,13 @@ class Report():
         target_username (:class:`str`): username of the reported user
         date (:class:`datetime`): when the report happened
     """
-
-    def __init__(self,
-                 user_id: int,
-                 group_id: int,
-                 g_message_id: int,
-                 channel_id: int = None,
-                 c_message_id: int = None,
-                 target_username: str = None,
-                 date: datetime = None):
-        self.user_id = user_id
-        self.group_id = group_id
-        self.g_message_id = g_message_id
-        self.channel_id = channel_id
-        self.c_message_id = c_message_id
-        self.target_username = target_username
-        self.date = date
+    user_id: int
+    group_id: int
+    g_message_id: int
+    channel_id: int = None
+    c_message_id: int = None
+    target_username: str = None
+    date: datetime = None
 
     @property
     def minutes_passed(self) -> float:

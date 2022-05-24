@@ -1,9 +1,11 @@
 """Published post management"""
+from dataclasses import dataclass
 from typing import Optional
 from telegram.inline.inlinekeyboardmarkup import InlineKeyboardMarkup
 from modules.data import DbManager
 
 
+@dataclass(slots=True)
 class PublishedPost():
     """Class that represents a published post
 
@@ -11,10 +13,8 @@ class PublishedPost():
         channel_id (:class:`int`): id of the channel
         c_message_id (:class:`int`): id of the post in the channel
     """
-
-    def __init__(self, channel_id: int, c_message_id: int):
-        self.channel_id = channel_id
-        self.c_message_id = c_message_id
+    channel_id: int
+    c_message_id: int
 
     @classmethod
     def create(cls, channel_id: int, c_message_id: int):

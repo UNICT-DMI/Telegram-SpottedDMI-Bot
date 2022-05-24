@@ -1,18 +1,18 @@
 """Users management"""
 from random import choice
+from attr import dataclass
 from telegram import Bot
 from modules.data import read_md, DbManager, PendingPost
 
 
+@dataclass(slots=True)
 class User():
     """Class that represents a user
 
     Args:
         user_id (:class:`int`): id of the user
     """
-
-    def __init__(self, user_id):
-        self.user_id = user_id
+    user_id: int
 
     @property
     def is_pending(self) -> bool:
@@ -30,8 +30,8 @@ class User():
         return DbManager.count_from(table_name="credited_users", where="user_id = %s", where_args=(self.user_id,)) == 1
 
     def ban(self):
-        """Adds the user to the banned list
-        """
+        """Adds the user to the banned list"""
+
         if not self.is_banned:
             DbManager.insert_into(table_name="banned_users", columns=("user_id",), values=(self.user_id,))
 
