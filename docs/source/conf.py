@@ -30,6 +30,7 @@ extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.napoleon',  # to use NumPy and Google style docstrings
     'sphinx.ext.githubpages',  # generates the .nojekyll file
+    'sphinx.ext.viewcode',  # add source code links to the documentation
     'sphinx_autodoc_typehints',  # improves the type hinting
 ]
 
