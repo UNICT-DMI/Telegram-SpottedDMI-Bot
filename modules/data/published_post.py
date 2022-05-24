@@ -5,7 +5,7 @@ from telegram.inline.inlinekeyboardmarkup import InlineKeyboardMarkup
 from .db_manager import DbManager
 
 
-@dataclass(slots=True)
+@dataclass()
 class PublishedPost():
     """Class that represents a published post
 
@@ -114,7 +114,7 @@ class PublishedPost():
                                     where="c_message_id = %s and channel_id = %s and vote = %s",
                                     where_args=(self.c_message_id, self.channel_id, vote))
 
-    def set_votes(self, keyboard: InlineKeyboardMarkup) -> None:
+    def set_votes(self, keyboard: InlineKeyboardMarkup):
         """Sets all the votes of the post based on the inline keyboard.
         This means that all previous votes associated with this post, if present, will be replaced
 

@@ -28,11 +28,11 @@ def conv_fail(family: str) -> Callable:
         Returns a warning message
 
         Args:
-            update: update event. Defaults to None
-            context: context passed by the handler. Defaults to None
-            event_info: if provided, overrides both update and context. Defaults to None
-            fail_file: name of the markdown file that contains the fail message. Defaults to "generic"
-            return_value: value of the next conversation state. Defaults to None (remains in the same state)
+            update: update event
+            context: context passed by the handler
+            event_info: if provided, overrides both update and context
+            fail_file: name of the markdown file that contains the fail message
+            return_value: value of the next conversation state. If default, remains in the same state.
             kwargs: values passed to :func:`read_md`
 
         Returns:

@@ -82,7 +82,7 @@ def get_vote_kb(published_post: PublishedPost = None) -> Optional[InlineKeyboard
     """Generates the InlineKeyboard for the published post and updates the correct number of reactions
 
     Args:
-        published_post: published post to which the keyboard is attached. Defaults to None
+        published_post: published post to which the keyboard is attached
 
     Returns:
         new inline keyboard
@@ -116,8 +116,8 @@ def update_approve_kb(keyboard: List[List[InlineKeyboardButton]],
     Args:
         keyboard (List[List[InlineKeyboardButton]]): previous keyboard
         pending_post: pending post to which the keyboard is attached
-        approve: number of approve votes, if known. Defaults to -1.
-        reject: number of reject votes, if known. Defaults to -1.
+        approve: number of approve votes, if known
+        reject: number of reject votes, if known
 
     Returns:
         updated inline keyboard

@@ -5,7 +5,7 @@ from telegram import Message
 from .db_manager import DbManager
 
 
-@dataclass(slots=True)
+@dataclass()
 class Report():
     """Class that represents a report
 

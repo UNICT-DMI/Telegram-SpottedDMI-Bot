@@ -35,7 +35,7 @@ class Config():
         Args:
             config: configuration dict to search
             key: key to search
-            default: default value to return if the key is not present. Defaults to None.
+            default: default value to return if the key is not present
 
         Returns:
             value of the key or default value
@@ -65,7 +65,7 @@ class Config():
 
         Args:
             key: key to get
-            default: default value to return if the key is not present. Defaults to None.
+            default: default value to return if the key is not present
 
         Returns:
             value of the key or default value
@@ -80,7 +80,7 @@ class Config():
 
         Args:
             key: key to get
-            default: default value to return if the key is not present. Defaults to None.
+            default: default value to return if the key is not present
 
         Returns:
             value of the key or default value
@@ -96,7 +96,7 @@ class Config():
 
         Args:
             key: key to get
-            default: default value to return if the key is not present. Defaults to None.
+            default: default value to return if the key is not present
 
         Returns:
             value of the key or default value
@@ -159,8 +159,8 @@ class Config():
 
         Args:
             path: path of the configuration .yaml file
-            load_default: whether to look for the .default file first for the default configuration. Defaults to True.
-            force_load: whether to force the presence of the specified file. Defaults to False.
+            load_default: whether to look for the .default file first for the default configuration
+            force_load: whether to force the presence of the specified file
 
         Returns:
             configuration dictionary

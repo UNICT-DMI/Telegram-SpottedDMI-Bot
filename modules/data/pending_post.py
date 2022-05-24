@@ -7,7 +7,7 @@ from .db_manager import DbManager
 from .config import Config
 
 
-@dataclass(slots=True)
+@dataclass()
 class PendingPost():
     """Class that represents a pending post
 
@@ -99,10 +99,10 @@ class PendingPost():
 
         Args:
             group_id: id of the admin group
-            before: timestamp before wich messages will be considered. Defaults to None.
+            before: timestamp before wich messages will be considered
 
         Returns:
-            List[type(PendingPost)]: list of ids of pending memes
+            list of ids of pending memes
         """
         if datetime:
             pending_posts_id = DbManager.select_from(select="g_message_id",

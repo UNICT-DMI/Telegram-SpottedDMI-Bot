@@ -7,7 +7,7 @@ from .db_manager import DbManager
 from .pending_post import PendingPost
 
 
-@dataclass(slots=True)
+@dataclass()
 class User():
     """Class that represents a user
 

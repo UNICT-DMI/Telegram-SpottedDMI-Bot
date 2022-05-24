@@ -1,9 +1,9 @@
 # pylint: disable=unused-argument,protected-access,no-value-for-parameter
 """TelegramSimulator class"""
 from datetime import datetime
-from typing import List, Optional, Union
+from typing import List, Optional, Union, Callable
 import warnings
-from telegram import Message, ReplyMarkup, MessageEntity, User, Chat, Update, CallbackQuery
+from telegram import Bot, Message, ReplyMarkup, MessageEntity, User, Chat, Update, CallbackQuery
 from telegram.ext import Updater
 from telegram.inline.inlinekeyboardmarkup import InlineKeyboardMarkup
 from main import add_handlers
@@ -109,13 +109,13 @@ class TelegramSimulator():
         """Sends a command to the bot on behalf of the user
 
         Args:
-            text: message text. Must be specified is message is None. Defaults to None
-            message: message to send. Must be specified is text is None. Defaults to None
-            user: user who sent the message. Defaults to None.
-            chat: chat where the message was sent. Defaults to None.
-            date: date when the message was sent. Defaults to None.
-            reply_markup: reply markup to use. Defaults to None.
-            **kwargs: additional parameters to be passed to the message. Defaults to None.
+            text: message text. Must be specified is message is None
+            message: message to send. Must be specified is text is None
+            user: user who sent the message
+            chat: chat where the message was sent
+            date: date when the message was sent
+            reply_markup: reply markup to use
+            **kwargs: additional parameters to be passed to the message
 
         Returns:
             message sent
@@ -138,14 +138,14 @@ class TelegramSimulator():
         """Sends a message to the bot on behalf of the user
 
         Args:
-            text: message text. Must be specified is message is None. Defaults to None
-            message: message to send. Must be specified is text is None. Defaults to None
-            user: user who sent the message. Defaults to None.
-            chat: chat where the message was sent. Defaults to None.
-            date: date when the message was sent. Defaults to None.
-            reply_markup: reply markup to use. Defaults to None.
-            reply_to_message: message (or message_id of said message) to reply to. Defaults to None.
-            **kwargs: additional parameters to be passed to the message. Defaults to None.
+            text: message text. Must be specified is message is None
+            message: message to send. Must be specified is text is None
+            user: user who sent the message
+            chat: chat where the message was sent
+            date: date when the message was sent
+            reply_markup: reply markup to use
+            reply_to_message: message (or message_id of said message) to reply to
+            **kwargs: additional parameters to be passed to the message
 
         Returns:
             message sent
@@ -174,12 +174,12 @@ class TelegramSimulator():
         """Sends a callback query on an inline keyboard button to the bot on behalf of the user
 
         Args:
-            data: data of the callback query. Must be specified is message is None. Defaults to None
-            query: query to send. Must be specified is text is None. Defaults to None
-            user: user who sent the message. Defaults to None.
-            chat: chat where the message was sent. Defaults to None.
-            message: message the callback query belongs to. Defaults to None.
-            **kwargs: additional parameters to be passed to the message. Defaults to None.
+            data: data of the callback query. Must be specified is message is None
+            query: query to send. Must be specified is text is None
+            user: user who sent the message
+            chat: chat where the message was sent
+            message: message the callback query belongs to
+            **kwargs: additional parameters to be passed to the message
 
         Returns:
             callback query answered
@@ -206,15 +206,15 @@ class TelegramSimulator():
         """Sends a message to the bot on behalf of the user
 
         Args:
-            forward_message: message to forward. Must be specified is message is None. Defaults to None
-            message: message to send. Must be specified is text is None. Defaults to None
-            user: user who sent the message. Defaults to None.
-            chat: chat where the message was sent. Defaults to None.
-            date: date when the message was sent. Defaults to None.
-            reply_markup: reply markup to use. Defaults to None.
-            reply_to_message: message (or message_id of said message) to reply to. Defaults to None.
-            is_automatic_forward: whether the message was forwarded automatically by telegram. Defaults to False.
-            **kwargs: additional parameters to be passed to the message. Defaults to None.
+            forward_message: message to forward. Must be specified is message is None
+            message: message to send. Must be specified is text is None
+            user: user who sent the message
+            chat: chat where the message was sent
+            date: date when the message was sent
+            reply_markup: reply markup to use
+            reply_to_message: message (or message_id of said message) to reply to
+            is_automatic_forward: whether the message was forwarded automatically by telegram
+            **kwargs: additional parameters to be passed to the message
 
         Returns:
             message sent
@@ -250,12 +250,12 @@ class TelegramSimulator():
 
         Args:
             text: message text
-            user: user who sent the message. Defaults to None.
-            chat: chat where the message was sent. Defaults to None.
-            date: date when the message was sent. Defaults to None.
-            reply_markup: reply markup to use. Defaults to None.
-            reply_to_message: message (or message_id of said message) to reply to. Defaults to None.
-            **kwargs: additional parameters to be passed to the message. Defaults to None.
+            user: user who sent the message
+            chat: chat where the message was sent
+            date: date when the message was sent
+            reply_markup: reply markup to use
+            reply_to_message: message (or message_id of said message) to reply to
+            **kwargs: additional parameters to be passed to the message
 
         Returns:
             message created from the given parameters
@@ -282,11 +282,11 @@ class TelegramSimulator():
 
         Args:
             text: message text
-            user: user who sent the message. Defaults to None.
-            chat: chat where the message was sent. Defaults to None.
-            data: data contained in the callback query. Defaults to None.
-            message: message the callback query belongs to. Defaults to None.
-            **kwargs: additional parameters to be passed to the message. Defaults to None.
+            user: user who sent the message
+            chat: chat where the message was sent
+            data: data contained in the callback query
+            message: message the callback query belongs to
+            **kwargs: additional parameters to be passed to the message
 
         Returns:
             message created from the given parameters
@@ -316,7 +316,11 @@ class TelegramSimulator():
         return Update(0, **update_kwargs)
 
     def weaved_message(self):
-        """Weaves the _message method in the bot object to intercept telegram's api requests"""
+        """Weaves the _message method in the bot object to intercept telegram's api requests
+
+        Returns:
+            weaved bot's _message method
+        """
 
         def _message(bot_self,
                      endpoint: str,
@@ -346,11 +350,19 @@ class TelegramSimulator():
         return _message
 
     def weaved_delete_webhook(self):
-        """Weaves the delete_webhook method in the bot object to intercept telegram's api requests"""
+        """Weaves the delete_webhook method in the bot object to intercept telegram's api requests
+        
+        Returns:
+            weaved bot's delete_webhook method
+        """
         return lambda *_, **__: True
 
     def weaved_post(self):
-        """Weaves the post method in the bot object to intercept telegram's api requests"""
+        """Weaves the _post method in the bot object to intercept telegram's api requests
+
+        Returns:
+            weaved bot's _post method
+        """
 
         def _post(bot_self,
                   endpoint: str,
@@ -365,7 +377,11 @@ class TelegramSimulator():
         return _post
 
     def weaved_copy_message(self):
-        """Weaves the post method in the bot object to intercept telegram's api requests"""
+        """Weaves the copy_message method in the bot object to intercept telegram's api requests
+
+        Returns:
+            weaved bot's copy_message method
+        """
 
         def copy_message(bot_self,
                          chat_id: Union[int, str],
@@ -390,7 +406,11 @@ class TelegramSimulator():
         return copy_message
 
     def weaved_get_chat(self):
-        """Weaves the get_chat method in the bot object to intercept telegram's api requests"""
+        """Weaves the get_chat method in the bot object to intercept telegram's api requests
+
+        Returns:
+            weaved bot's get_chat method
+        """
 
         def get_chat(
             self,

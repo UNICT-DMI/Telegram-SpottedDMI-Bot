@@ -20,7 +20,7 @@ class PostData():
         """Gets the total number of votes of the specified
 
         Args:
-            vote: type of votes to consider. None means all. Defaults to None.
+            vote: type of votes to consider. None means all
 
         Returns:
             number of votes of the specified type
@@ -34,7 +34,7 @@ class PostData():
         """Shows the average number of votes of the specified type per post
 
         Args:
-            vote: type of votes to consider. None means all. Defaults to None.
+            vote: type of votes to consider. None means all
 
         Returns:
             average number of votes
@@ -48,7 +48,7 @@ class PostData():
         """Gets the id of the post with the most votes of the specified type
 
         Args:
-            vote: type of votes to consider. None means all. Defaults to None.
+            vote: type of votes to consider. None means all
 
         Returns:
             Tuple[int, int, int]: number of votes, id of the message, id of the channel
