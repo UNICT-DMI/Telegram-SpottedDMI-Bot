@@ -31,7 +31,7 @@ def purge_cmd(update: Update, context: CallbackContext):
                                                    message_id=published_meme['c_message_id'],
                                                    disable_notification=True)
                 message.delete()
-            except Exception as e:
+            except Exception:
                 lost_posts += 1
                 sleep(10)
             finally:

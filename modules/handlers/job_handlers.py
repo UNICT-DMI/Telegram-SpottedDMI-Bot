@@ -31,10 +31,10 @@ def clean_pending_job(context: CallbackContext):
                 info.bot.send_message(
                     chat_id=pending_post.user_id,
                     text="Gli admin erano sicuramente molto impegnati e non sono riusciti a valutare lo spot in tempo")
-            except (BadRequest, Unauthorized) as e:
-                logger.warning("Notifying the user on /clean_pending: %s", e)
-        except BadRequest as e:
-            logger.error("Deleting old pending message: %s", e)
+            except (BadRequest, Unauthorized) as ex:
+                logger.warning("Notifying the user on /clean_pending: %s", ex)
+        except BadRequest as ex:
+            logger.error("Deleting old pending message: %s", ex)
         finally:  # delete the data associated with the pending meme
             pending_post.delete_post()
 
@@ -52,5 +52,5 @@ def db_backup_job(context: CallbackContext):
     admin_group_id = Config.meme_get('group_id')
     try:
         context.bot.send_document(chat_id=admin_group_id, document=open(path, 'rb'), timeout=600, caption="✅ Backup effettuato con successo")
-    except Exception as e:
-        context.bot.send_message(chat_id=admin_group_id, text=f"✖️ Impossibile effetturare il backup\n\n{e}")
+    except Exception as ex:
+        context.bot.send_message(chat_id=admin_group_id, text=f"✖️ Impossibile effetturare il backup\n\n{ex}")

@@ -35,8 +35,8 @@ def stats_callback(update: Update, context: CallbackContext):
     data = info.query_data.split(",")
     try:
         message_text = globals()[f'{data[0][6:]}_callback'](data[1])  # call the function based on its name
-    except KeyError as e:
-        logger.error("stats_callback: %s", e)
+    except KeyError as ex:
+        logger.error("stats_callback: %s", ex)
         return
 
     # if there is a valid text, edit the menu with the new text

@@ -44,10 +44,10 @@ def error_handler(update: Update, context: CallbackContext):  # pylint: disable=
                             f"message_date:  {update.message.date}\n"
             message += "_____________\n"
             log_file.write("\n" + message)
-    except AttributeError as e:
-        logger.warning(e)
-    except FileNotFoundError as e:
-        logger.error(e)
+    except AttributeError as ex:
+        logger.warning(ex)
+    except FileNotFoundError as ex:
+        logger.error(ex)
 
 
 def notify_error_admin(context: CallbackContext, traceback_str: str):
@@ -90,7 +90,7 @@ def log_message(update: Update, context: CallbackContext):  # pylint: disable=un
                         f"date:  {str(update.message.date)}"\
                         "\n_____________\n"
                 log_file.write("\n" + message)
-        except AttributeError as e:
-            logger.warning(e)
-        except FileNotFoundError as e:
-            logger.error(e)
+        except AttributeError as ex:
+            logger.warning(ex)
+        except FileNotFoundError as ex:
+            logger.error(ex)

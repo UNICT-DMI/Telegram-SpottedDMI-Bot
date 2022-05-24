@@ -32,8 +32,8 @@ class DbManager():
                 query_func(query, args)
             else:
                 query_func(query)
-        except sqlite3.Error as e:
-            logger.error("DbManager.%s(): %s", error_str, e)
+        except sqlite3.Error as ex:
+            logger.error("DbManager.%s(): %s", error_str, ex)
 
     @classmethod
     def get_db(cls) -> Tuple[sqlite3.Connection, sqlite3.Cursor]:

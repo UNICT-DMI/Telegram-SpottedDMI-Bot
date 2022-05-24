@@ -44,9 +44,9 @@ def meme_callback(update: Update, context: CallbackContext) -> int:
         # call the correct function
         message_text, reply_markup, output = globals()[f'{data[0][5:]}_callback'](info, data[1])
 
-    except KeyError as e:
+    except KeyError as ex:
         message_text = reply_markup = output = None
-        logger.error("meme_callback: %s", e)
+        logger.error("meme_callback: %s", ex)
 
     try:
         # if there is a valid text, edit the menu with the new text
@@ -57,8 +57,8 @@ def meme_callback(update: Update, context: CallbackContext) -> int:
                                        reply_markup=reply_markup)
         elif reply_markup:  # if there is a valid reply_markup, edit the menu with the new reply_markup
             info.edit_inline_keyboard(new_keyboard=reply_markup)
-    except RetryAfter as e:
-        logger.warning(e)
+    except RetryAfter as ex:
+        logger.warning(ex)
 
     return output
 
@@ -154,8 +154,8 @@ def approve_yes_callback(info: EventInfo, arg: None) -> Tuple[str, InlineKeyboar
             info.bot.send_message(
                 chat_id=user_id,
                 text=f"Il tuo ultimo post è stato pubblicato su {Config.meme_get('channel_tag')}")  # notify the user
-        except (BadRequest, Unauthorized) as e:
-            logger.warning("Notifying the user on approve_yes: %s", e)
+        except (BadRequest, Unauthorized) as ex:
+            logger.warning("Notifying the user on approve_yes: %s", ex)
 
         # Shows the list of admins who approved the pending post and removes it form the db
         pending_post.show_admins_votes(bot=info.bot, approve=True)
@@ -194,8 +194,8 @@ def approve_no_callback(info: EventInfo, arg: None) -> Tuple[str, InlineKeyboard
             info.bot.send_message(
                 chat_id=user_id,
                 text="Il tuo ultimo post è stato rifiutato\nPuoi controllare le regole con /rules")  # notify the user
-        except (BadRequest, Unauthorized) as e:
-            logger.warning("Notifying the user on approve_no: %s", e)
+        except (BadRequest, Unauthorized) as ex:
+            logger.warning("Notifying the user on approve_no: %s", ex)
 
         # Shows the list of admins who refused the pending post and removes it form the db
         pending_post.show_admins_votes(bot=info.bot, approve=False)

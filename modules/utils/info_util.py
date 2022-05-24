@@ -213,8 +213,8 @@ class EventInfo():
         """
         try:
             self.__bot.answer_callback_query(callback_query_id=self.query_id, text=text)
-        except BadRequest as e:
-            logger.warning("On answer_callback_query: %s", e)
+        except BadRequest as ex:
+            logger.warning("On answer_callback_query: %s", ex)
 
     def edit_inline_keyboard(self, chat_id: int = None, message_id: int = None, new_keyboard: InlineKeyboardMarkup = None):
         """Generic wrapper used to edit the inline keyboard of a message with the telegram bot, while also handling the exception
@@ -228,8 +228,8 @@ class EventInfo():
         message_id = message_id if message_id is not None else self.message_id
         try:
             self.__bot.edit_message_reply_markup(chat_id=chat_id, message_id=message_id, reply_markup=new_keyboard)
-        except (BadRequest) as e:
-            logger.error("EventInfo.edit_inline_keyboard: %s", e)
+        except BadRequest as ex:
+            logger.error("EventInfo.edit_inline_keyboard: %s", ex)
 
     def send_post_to_admins(self) -> bool:
         """Sends the post to the admin group, so it can be approved
@@ -260,8 +260,8 @@ class EventInfo():
                                                        from_chat_id=message.chat_id,
                                                        message_id=message.message_id,
                                                        reply_markup=get_approve_kb()).message_id
-        except (BadRequest) as e:
-            logger.error("Sending the post on send_post_to: %s", e)
+        except BadRequest as ex:
+            logger.error("Sending the post on send_post_to: %s", ex)
             return False
 
         PendingPost.create(user_message=message, group_id=group_id, g_message_id=g_message_id)
