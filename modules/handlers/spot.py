@@ -1,11 +1,11 @@
 """/spot command"""
+from random import choice
 from telegram import Update
 from telegram.ext import CallbackContext, ConversationHandler, CommandHandler, MessageHandler, Filters, CallbackQueryHandler
 from modules.data import User
 from modules.utils import EventInfo, conv_cancel, get_confirm_kb
 from modules.handlers.constants import CHAT_PRIVATE_ERROR, INVALID_MESSAGE_TYPE_ERROR
 from modules.data import Config
-from random import choice
 from modules.data.data_reader import read_md
 
 STATE = {'posting': 1, 'confirm': 2, 'end': -1}
@@ -21,14 +21,14 @@ def spot_conv_handler() -> CommandHandler:
     Returns:
         conversaton handler
     """
-    return ConversationHandler(entry_points=[CommandHandler("spot", spot_cmd)],
-                               states={
-                                   STATE['posting']: [MessageHandler(~Filters.command & ~Filters.update.edited_message,
-                                   spot_msg)],
-                                   STATE['confirm']: [CallbackQueryHandler(spot_confirm_query, pattern=r"^meme_confirm,.+")]
-                               },
-                               fallbacks=[CommandHandler("cancel", conv_cancel("spot"))],
-                               allow_reentry=False)
+    return ConversationHandler(
+        entry_points=[CommandHandler("spot", spot_cmd)],
+        states={
+            STATE['posting']: [MessageHandler(~Filters.command & ~Filters.update.edited_message, spot_msg)],
+            STATE['confirm']: [CallbackQueryHandler(spot_confirm_query, pattern=r"^meme_confirm,.+")]
+        },
+        fallbacks=[CommandHandler("cancel", conv_cancel("spot"))],
+        allow_reentry=False)
 
 
 def spot_cmd(update: Update, context: CallbackContext) -> int:

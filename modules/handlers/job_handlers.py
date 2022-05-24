@@ -3,7 +3,7 @@ from datetime import datetime, timezone, timedelta
 from telegram.ext import CallbackContext
 from telegram.error import BadRequest, Unauthorized
 from modules.debug import logger
-from modules.data import Config, PendingPost
+from modules.data import get_abs_path, Config, PendingPost, DbManager
 from modules.utils import EventInfo
 
 
@@ -48,9 +48,13 @@ def db_backup_job(context: CallbackContext):
     Args:
         context (CallbackContext): context passed by the jobqueue
     """
-    path = "./data/db/db.sqlite3"
+    path = get_abs_path(*DbManager.db_path)
     admin_group_id = Config.meme_get('group_id')
-    try:
-        context.bot.send_document(chat_id=admin_group_id, document=open(path, 'rb'), timeout=600, caption="✅ Backup effettuato con successo")
-    except Exception as ex:
-        context.bot.send_message(chat_id=admin_group_id, text=f"✖️ Impossibile effetturare il backup\n\n{ex}")
+    with open(path, 'rb', encoding='utf-8') as database_file:
+        try:
+            context.bot.send_document(chat_id=admin_group_id,
+                                      document=database_file,
+                                      timeout=600,
+                                      caption="✅ Backup effettuato con successo")
+        except Exception as ex:  #pylint: disable=broad-except
+            context.bot.send_message(chat_id=admin_group_id, text=f"✖️ Impossibile effetturare il backup\n\n{ex}")

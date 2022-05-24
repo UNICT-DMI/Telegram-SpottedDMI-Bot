@@ -5,7 +5,7 @@ from telegram.ext import CallbackContext
 from modules.data import Config, DbManager
 from modules.utils import EventInfo
 
-purge_in_progress = False
+purge_in_progress = False  # pylint: disable=invalid-name
 
 
 def purge_cmd(update: Update, context: CallbackContext):
@@ -16,7 +16,7 @@ def purge_cmd(update: Update, context: CallbackContext):
         update (Update): update event
         context (CallbackContext): context passed by the handler
     """
-    global purge_in_progress
+    global purge_in_progress  # pylint: disable=global-statement,invalid-name
     info = EventInfo.from_message(update, context)
     if info.chat_id == Config.meme_get('group_id') and not purge_in_progress:  # you have to be in the admin group
         purge_in_progress = True
@@ -31,7 +31,7 @@ def purge_cmd(update: Update, context: CallbackContext):
                                                    message_id=published_meme['c_message_id'],
                                                    disable_notification=True)
                 message.delete()
-            except Exception:
+            except Exception:  # pylint: disable=broad-except
                 lost_posts += 1
                 sleep(10)
             finally:

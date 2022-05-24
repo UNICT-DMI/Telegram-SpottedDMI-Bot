@@ -7,9 +7,8 @@ from modules.data import Config, PendingPost, PublishedPost, User
 from modules.utils.keyboard_util import get_approve_kb, get_vote_kb
 
 
-class EventInfo():
+class EventInfo():  # pylint: disable=too-many-public-methods
     """Class that contains all the relevant information related to an event"""
-
 
     def __init__(self,
                  bot: Bot,
@@ -218,7 +217,7 @@ class EventInfo():
 
     def edit_inline_keyboard(self, chat_id: int = None, message_id: int = None, new_keyboard: InlineKeyboardMarkup = None):
         """Generic wrapper used to edit the inline keyboard of a message with the telegram bot, while also handling the exception
-        
+
         Args:
             chat_id (int, optional): id of the chat the message to edit belongs to. It is the current chat if left None. Defaults to None.
             message_id (int, optional): id of the message to edit. It is the current message if left None. Defaults to None.

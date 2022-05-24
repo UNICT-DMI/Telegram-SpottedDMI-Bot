@@ -157,7 +157,7 @@ class PendingPost():
         if len(votes) == 0:  # the vote is not present
             return None
 
-        return tuple([vote['admin_id'] for vote in votes])
+        return [vote['admin_id'] for vote in votes]
 
     def show_admins_votes(self, bot: Bot, approve: bool):
         """After a post is been approved or rejected, shows the admins that aproved or rejected it \

@@ -220,19 +220,19 @@ def vote_callback(info: EventInfo, arg: str) -> Tuple[str, InlineKeyboardMarkup,
     Returns:
         Tuple[str, InlineKeyboardMarkup, int]: text and replyMarkup that make up the reply, new conversation state
     """
-    publishedPost = PublishedPost.from_channel(channel_id=info.chat_id, c_message_id=info.message_id)
-    if publishedPost is None:
-        publishedPost = PublishedPost.create(channel_id=info.chat_id, c_message_id=info.message_id)
-        publishedPost.set_votes(info.inline_keyboard)
+    published_post = PublishedPost.from_channel(channel_id=info.chat_id, c_message_id=info.message_id)
+    if published_post is None:
+        published_post = PublishedPost.create(channel_id=info.chat_id, c_message_id=info.message_id)
+        published_post.set_votes(info.inline_keyboard)
 
-    was_added = publishedPost.set_user_vote(user_id=info.user_id, vote=arg)
+    was_added = published_post.set_user_vote(user_id=info.user_id, vote=arg)
 
     if was_added:
         info.answer_callback_query(text=f"Hai messo un {REACTION[arg]}")
     else:
         info.answer_callback_query(text=f"Hai tolto il {REACTION[arg]}")
 
-    return None, get_vote_kb(published_post=publishedPost), None
+    return None, get_vote_kb(published_post=published_post), None
 
 
 # endregion

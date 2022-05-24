@@ -44,7 +44,8 @@ class DbManager():
         """
         db_path = get_abs_path(*cls.db_path)
         if not os.path.exists(db_path):
-            open(db_path, 'w').close()
+            with open(db_path, 'w', encoding='utf-8'):
+                pass
         conn = sqlite3.connect(db_path)
         conn.row_factory = cls.row_factory
         cur = conn.cursor()

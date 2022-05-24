@@ -133,22 +133,22 @@ class Config():
         self.__validate_types_settings()
 
     @classmethod
-    def __merge_settings(cls, d: dict, u: dict) -> dict:
+    def __merge_settings(cls, base: dict, update: dict) -> dict:
         """Merges two configuration dictionaries.
 
         Args:
-            d (dict): dict to merge. It will be modified
-            u (dict): dict to merge with
+            base (dict): dict to merge. It will be modified
+            update (dict): dict to merge with
 
         Returns:
             dict: merged dictionaries
         """
-        for k, v in u.items():
-            if isinstance(v, dict):
-                d[k] = cls.__merge_settings(d.get(k, {}), v)
+        for key, value in update.items():
+            if isinstance(value, dict):
+                base[key] = cls.__merge_settings(base.get(key, {}), value)
             else:
-                d[k] = v
-        return d
+                base[key] = value
+        return base
 
     @classmethod
     def __load_configuration(cls, path: str, load_default: bool = True, force_load: bool = False) -> dict:
