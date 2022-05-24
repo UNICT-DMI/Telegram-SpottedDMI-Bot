@@ -5,7 +5,7 @@ from .config import Config
 
 
 def get_abs_path(*root_file_path: str) -> str:
-    r"""Get the abs path from the root directory of the project to the requested path
+    """Get the abs path from the root directory of the project to the requested path
 
     Args:
         root_file_path: path from the root project directory
@@ -18,7 +18,7 @@ def get_abs_path(*root_file_path: str) -> str:
 
 
 def read_file(*root_file_path: str) -> str:
-    r"""Read the contens of the file
+    """Read the contens of the file
 
     Args:
         root_file_path: path of the file to read from the root project directory
