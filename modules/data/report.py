@@ -1,37 +1,31 @@
 """Reports management"""
+from dataclasses import dataclass
 from datetime import datetime
+from typing import Optional
 from telegram import Message
-from modules.data import DbManager
+from .db_manager import DbManager
 
 
+@dataclass()
 class Report():
     """Class that represents a report
 
     Args:
-        user_id (:class:`int`): id of the user that reported
-        group_id (:class:`int`): id of the admin group
-        g_message_id (:class:`int`): id of the post in the group
-        channel_id (:class:`int`): id of the channel
-        c_message_id (:class:`int`): id of the post in question in the channel
-        target_username (:class:`str`): username of the reported user
-        date (:class:`datetime`): when the report happened
+        user_id: id of the user that reported
+        group_id: id of the admin group
+        g_message_id: id of the post in the group
+        channel_id: id of the channel
+        c_message_id: id of the post in question in the channel
+        target_username: username of the reported user
+        date: when the report happened
     """
-
-    def __init__(self,
-                 user_id: int,
-                 group_id: int,
-                 g_message_id: int,
-                 channel_id: int = None,
-                 c_message_id: int = None,
-                 target_username: str = None,
-                 date: datetime = None):
-        self.user_id = user_id
-        self.group_id = group_id
-        self.g_message_id = g_message_id
-        self.channel_id = channel_id
-        self.c_message_id = c_message_id
-        self.target_username = target_username
-        self.date = date
+    user_id: int
+    group_id: int
+    g_message_id: int
+    channel_id: int = None
+    c_message_id: int = None
+    target_username: str = None
+    date: datetime = None
 
     @property
     def minutes_passed(self) -> float:
@@ -43,17 +37,18 @@ class Report():
         return delta_time.total_seconds() / 60
 
     @classmethod
-    def create_post_report(cls, user_id: int, channel_id: int, c_message_id: int, admin_message: Message):
+    def create_post_report(cls, user_id: int, channel_id: int, c_message_id: int,
+                           admin_message: Message) -> Optional['Report']:
         """Adds the report of the user on a specific post
 
         Args:
-            user_id (int): id of the user that reported
-            channel_id (int): id of the channel
-            c_message_id (int): id of the post in question in the channel
-            admin_message (Message): message received in the admin group that references the report
+            user_id: id of the user that reported
+            channel_id: id of the channel
+            c_message_id: id of the post in question in the channel
+            admin_message: message received in the admin group that references the report
 
         Returns:
-            Report: istance of the class or None if the report was not created
+            instance of the class or None if the report was not created
         """
 
         g_message_id = admin_message.message_id
@@ -71,16 +66,16 @@ class Report():
                    g_message_id=g_message_id).save_report()
 
     @classmethod
-    def create_user_report(cls, user_id: int, target_username: str, admin_message: Message):
+    def create_user_report(cls, user_id: int, target_username: str, admin_message: Message) -> 'Report':
         """Adds the report of the user targetting another user
 
         Args:
-            user_id (int): id of the user that reported
-            target_username (str): username of reported user
-            admin_message (Message): message received in the admin group that references the report
+            user_id: id of the user that reported
+            target_username: username of reported user
+            admin_message: message received in the admin group that references the report
 
         Returns:
-            Report: istance of the class
+            instance of the class
         """
 
         g_message_id = admin_message.message_id
@@ -91,16 +86,16 @@ class Report():
                 .save_report()
 
     @classmethod
-    def get_post_report(cls, user_id: int, channel_id: int, c_message_id: int):
+    def get_post_report(cls, user_id: int, channel_id: int, c_message_id: int) -> Optional['Report']:
         """Gets the report of a specific user on a published post
 
         Args:
-            user_id (int): id of the user that reported
-            channel_id (int): id of the channel
-            c_message_id (int): id of the post in question in the channel
+            user_id: id of the user that reported
+            channel_id: id of the channel
+            c_message_id: id of the post in question in the channel
 
         Returns:
-            Report: istance of the class or None if the report was not present
+            instance of the class or None if the report was not present
         """
 
         reports = DbManager.select_from(select="*",
@@ -118,14 +113,14 @@ class Report():
                    g_message_id=report['g_message_id'])
 
     @classmethod
-    def get_last_user_report(cls, user_id: int):
+    def get_last_user_report(cls, user_id: int) -> Optional['Report']:
         """Gets the last user report of a specific user
 
         Args:
-            user_id (int): id of the user that reported
+            user_id: id of the user that reported
 
         Returns:
-            Report: istance of the class or None if the report was not present
+            instance of the class or None if the report was not present
         """
         reports = DbManager.select_from(select="*",
                                         table_name="user_report",
@@ -143,15 +138,15 @@ class Report():
                    g_message_id=report['g_message_id'])
 
     @classmethod
-    def from_group(cls, group_id: int, g_message_id: int):
+    def from_group(cls, group_id: int, g_message_id: int) -> Optional['Report']:
         """Gets a report of any type related to the specified message in the admin group
 
         Args:
-            group_id (int): id of the admin group
-            g_message_id (int): id of the report in the group
+            group_id: id of the admin group
+            g_message_id: id of the report in the group
 
         Returns:
-            Report: istance of the class or None if the report was not present
+            instance of the class or None if the report was not present
         """
         reports = DbManager.select_from(select="*",
                                         table_name="user_report",
@@ -180,7 +175,7 @@ class Report():
 
         return None
 
-    def save_report(self):
+    def save_report(self) -> 'Report':
         """Saves the report in the database"""
         if self.c_message_id is not None:
             DbManager.insert_into(table_name="spot_report",
@@ -192,7 +187,7 @@ class Report():
                                   values=(self.user_id, self.target_username, self.date, self.group_id, self.g_message_id))
         return self
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         if self.c_message_id is not None:
             return f"PostReport: [ user_id: {self.user_id}\n"\
                     f"channel_id: {self.channel_id}\n"\

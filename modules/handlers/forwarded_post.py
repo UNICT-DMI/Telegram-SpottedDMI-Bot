@@ -10,8 +10,8 @@ def forwarded_post_msg(update: Update, context: CallbackContext):
     Sends a reply in the channel group and stores it in the database, so that the post can be voted
 
     Args:
-        update (Update): update event
-        context (CallbackContext): context passed by the handler
+        update: update event
+        context: context passed by the handler
     """
     info = EventInfo.from_message(update, context)
     if update.message is None or update.message.forward_from_chat is None:

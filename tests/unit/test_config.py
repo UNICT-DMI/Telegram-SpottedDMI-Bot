@@ -37,14 +37,14 @@ class TestConfig:
     """Test the Config class"""
 
     def test_load_flat_settings(self, config: Config):
-        """Tests the ability of the config object to load settings from a file
-        """
+        """Tests the ability of the config object to load settings from a file"""
+
         for key, value in TEST_SETTINGS.items():
             assert config.settings_get(key) == value
 
     def test_load_nested_settings(self, config: Config):
-        """Tests the ability of the config object to load settings from a file with nested properties
-        """
+        """Tests the ability of the config object to load settings from a file with nested properties"""
+
         for key, value in TEST_SETTINGS['meme'].items():
             assert config.settings_get("meme", key) == value
 
@@ -66,8 +66,8 @@ class TestConfig:
         assert Config.settings_get("string", "nested", default="value") == "value"
 
     def test_load_env_flat_settings(self, config: Config):
-        """Tests the ability of the config object to load settings from the env vars
-        """
+        """Tests the ability of the config object to load settings from the env vars"""
+
         os.environ["int"] = "2"
         os.environ["bool"] = "False"
         config.reset_settings()

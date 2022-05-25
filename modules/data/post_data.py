@@ -1,58 +1,57 @@
 """Data management for the bot"""
-from typing import Tuple
-from modules.data import DbManager
+from typing import Optional, Tuple
+from .db_manager import DbManager
 
 
 class PostData():
-    """Class that handles the management of persistent data fetch or manipulation in the meme bot
-    """
+    """Class that handles the management of persistent data fetch or manipulation in the meme bot"""
 
     @staticmethod
     def get_n_posts() -> int:
         """Gets the total number of posts
 
         Returns:
-            int: total number of posts
+            total number of posts
         """
         return DbManager.count_from(table_name="published_meme")
 
     @staticmethod
-    def get_n_votes(vote: str = None) -> int:
+    def get_n_votes(vote: Optional[str] = None) -> int:
         """Gets the total number of votes of the specified
 
         Args:
-            vote (str, optional): type of votes to consider. None means all. Defaults to None.
+            vote: type of votes to consider. None means all
 
         Returns:
-            int: number of votes of the specified type
+            number of votes of the specified type
         """
         if vote is not None:
             return DbManager.count_from(table_name="votes", where="vote = %s", where_args=(vote,))
         return DbManager.count_from(table_name="votes")
 
     @staticmethod
-    def get_avg(vote: str = None) -> int:
+    def get_avg(vote: Optional[str] = None) -> int:
         """Shows the average number of votes of the specified type per post
 
         Args:
-            vote (str, optional): type of votes to consider. None means all. Defaults to None.
+            vote: type of votes to consider. None means all
 
         Returns:
-            int: average number of votes
+            average number of votes
         """
         tot_posts = PostData.get_n_posts()
         avg = PostData.get_n_votes(vote) / (tot_posts if tot_posts != 0 else 1)
         return round(avg, 2)
 
     @staticmethod
-    def get_max_id(vote: str = None) -> Tuple[int, int, str]:
+    def get_max_id(vote: Optional[str] = None) -> Tuple[int, int, str]:
         """Gets the id of the post with the most votes of the specified type
 
         Args:
-            vote (str, optional): type of votes to consider. None means all. Defaults to None.
+            vote: type of votes to consider. None means all
 
         Returns:
-            Tuple[int, int, int]: number of votes, id of the message, id of the channel
+            number of votes, id of the message, id of the channel
         """
         where = ""
         where_args = None

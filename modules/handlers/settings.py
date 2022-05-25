@@ -10,8 +10,8 @@ def settings_cmd(update: Update, context: CallbackContext):
     Let's the user choose whether his posts will be credited or not
 
     Args:
-        update (Update): update event
-        context (CallbackContext): context passed by the handler
+        update: update event
+        context: context passed by the handler
     """
     info = EventInfo.from_message(update, context)
     if not info.is_private_chat:  # you can only post with a private message

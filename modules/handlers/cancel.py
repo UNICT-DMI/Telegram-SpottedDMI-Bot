@@ -11,11 +11,11 @@ def cancel_cmd(update: Update, context: CallbackContext) -> int:
     Exits from the post pipeline and removes the eventual pending post of the user
 
     Args:
-        update (Update): update event
-        context (CallbackContext): context passed by the handler
+        update: update event
+        context: context passed by the handler
 
     Returns:
-        int: next state of the conversation
+        next state of the conversation
     """
     info = EventInfo.from_message(update, context)
     if not info.is_private_chat:  # you can only cancel a post with a private message

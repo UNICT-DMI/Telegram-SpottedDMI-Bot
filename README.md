@@ -88,6 +88,19 @@ docker run -d --name botcontainer -e TOKEN=<token_arg> -e MEME_CHANNEL_ID=-4 -e 
 - **Run** `docker stop botcontainer` to stop the container
 - **Run** `docker rm -f botcontainer` to remove the container
 
+## 📦 DevContainer
+
+The VsCode [Remote - Containers](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers) extension lets you use a Docker container as a full-featured development environment. It allows you to open any folder inside (or mounted into) a container and take advantage of VsCode's full feature set.
+
+### System requirements
+
+- [VsCode](https://code.visualstudio.com/)
+- [Docker](https://www.docker.com/)
+
+### Steps
+
+- Start VsCode, run the **Remote-Containers: Reopen in container** command from the Command Palette (F1)
+
 ## ⚙️ Settings
 
 When the bot is initialized, the bot reads both the _"data/yaml/reactions.yaml"_ and the _"config/settings.yaml"_ files.  

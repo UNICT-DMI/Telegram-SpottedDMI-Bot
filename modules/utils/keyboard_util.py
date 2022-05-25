@@ -1,6 +1,6 @@
 """Creates the inlinekeyboard sent by the bot in its messages.
 Callback_data format: <callback_family>_<callback_name>,[arg]"""
-from typing import List, Optional
+from typing import Optional
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 from modules.data import PendingPost, PublishedPost, Config
 
@@ -12,7 +12,7 @@ def get_confirm_kb() -> InlineKeyboardMarkup:
     """Generates the InlineKeyboard to confirm the creation of the post
 
     Returns:
-        InlineKeyboardMarkup: new inline keyboard
+        new inline keyboard
     """
     return InlineKeyboardMarkup([[
         InlineKeyboardButton(text="Si", callback_data="meme_confirm,submit"),
@@ -24,7 +24,7 @@ def get_settings_kb() -> InlineKeyboardMarkup:
     """Generates the InlineKeyboard to edit the settings
 
     Returns:
-        InlineKeyboardMarkup: new inline keyboard
+        new inline keyboard
     """
     return InlineKeyboardMarkup([[
         InlineKeyboardButton(" Anonimo ", callback_data="meme_settings,anonimo"),
@@ -36,7 +36,7 @@ def get_stats_kb() -> InlineKeyboardMarkup:
     """Generates the InlineKeyboard for the stats menu
 
     Returns:
-        InlineKeyboardMarkup: new inline keyboard
+        new inline keyboard
     """
     keyboard = [
         [InlineKeyboardButton("~  Lo spot con più ___  ~", callback_data="none")],
@@ -70,7 +70,7 @@ def get_approve_kb() -> InlineKeyboardMarkup:
     """Generates the InlineKeyboard for the pending post
 
     Returns:
-        InlineKeyboardMarkup: new inline keyboard
+        new inline keyboard
     """
     return InlineKeyboardMarkup([[
         InlineKeyboardButton("🟢 0", callback_data="meme_approve_yes,"),
@@ -78,14 +78,14 @@ def get_approve_kb() -> InlineKeyboardMarkup:
     ], [InlineKeyboardButton("⏹ Stop", callback_data="meme_approve_status,pause")]])
 
 
-def get_vote_kb(published_post: PublishedPost = None) -> Optional[InlineKeyboardMarkup]:
+def get_vote_kb(published_post: Optional[PublishedPost] = None) -> Optional[InlineKeyboardMarkup]:
     """Generates the InlineKeyboard for the published post and updates the correct number of reactions
 
     Args:
-        published_post (PublishedPost, optional): published post to which the keyboard is attached. Defaults to None
+        published_post: published post to which the keyboard is attached
 
     Returns:
-        Optional[InlineKeyboardMarkup]: new inline keyboard
+        new inline keyboard
     """
     keyboard = []
     for row in ROWS:  # for each ROW or the keyboard...
@@ -107,20 +107,20 @@ def get_vote_kb(published_post: PublishedPost = None) -> Optional[InlineKeyboard
     return InlineKeyboardMarkup(keyboard) if keyboard else None
 
 
-def update_approve_kb(keyboard: List[List[InlineKeyboardButton]],
+def update_approve_kb(keyboard: list[list[InlineKeyboardButton]],
                       pending_post: PendingPost,
                       approve: int = -1,
                       reject: int = -1) -> InlineKeyboardMarkup:
     """Updates the InlineKeyboard when the valutation of a pending post changes
 
     Args:
-        keyboard (List[List[InlineKeyboardButton]]): previous keyboard
-        pending_post (PendingPost): pending post to which the keyboard is attached
-        approve (int, optional): number of approve votes, if known. Defaults to -1.
-        reject (int, optional): number of reject votes, if known. Defaults to -1.
+        keyboard: previous keyboard
+        pending_post: pending post to which the keyboard is attached
+        approve: number of approve votes, if known
+        reject: number of reject votes, if known
 
     Returns:
-        InlineKeyboardMarkup: updated inline keyboard
+        updated inline keyboard
     """
     if approve >= 0:
         keyboard[0][0].text = f"🟢 {approve}"

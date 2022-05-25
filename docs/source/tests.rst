@@ -2,7 +2,6 @@ Tests modules
 =============
 
 **Description**
----------------
 
 .. automodule:: tests
    :members:
@@ -13,7 +12,7 @@ Tests modules
 conftest
 ---------------------
 
-.. automodule:: tests.unit.unit.conftest
+.. automodule:: tests.unit.conftest
    :members:
    :undoc-members:
    :show-inheritance:

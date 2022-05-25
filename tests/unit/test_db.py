@@ -31,16 +31,16 @@ def db_results(init_local_test_db: DbManager) -> dict:
 class TestDB:
 
     def test_get_db(self, db_results):
-        """Tests the get_db function for the database
-        """
+        """Tests the get_db function for the database"""
+
         conn, cur = DbManager.get_db()
 
         assert conn is not None
         assert cur is not None
 
     def test_query_from_string(self, db_results):
-        """Tests the query_from_string function for the database
-        """
+        """Tests the query_from_string function for the database"""
+
         DbManager.query_from_string("DROP TABLE IF EXISTS temp;", "CREATE TABLE temp(id int NOT NULL, PRIMARY KEY (id));")
 
         assert DbManager.count_from(table_name="temp") == 0
@@ -48,8 +48,8 @@ class TestDB:
         DbManager.query_from_string("DROP TABLE temp;")
 
     def test_select_from(self, db_results):
-        """Tests the select_from function of the database
-        """
+        """Tests the select_from function of the database"""
+
         query_result = DbManager.select_from(table_name=TABLE_NAME, where="id = %s or id = %s", where_args=(2, 3))
         assert query_result == db_results['select_from1']
 
@@ -60,8 +60,8 @@ class TestDB:
         assert query_result == db_results['select_from3']
 
     def test_count_from(self, db_results):
-        """Tests the count_from function of the database
-        """
+        """Tests the count_from function of the database"""
+
         query_result = DbManager.count_from(table_name=TABLE_NAME, where="id = %s or id = %s", where_args=(2, 3))
         assert query_result == db_results['count_from1']
 
@@ -72,8 +72,8 @@ class TestDB:
         assert query_result == db_results['count_from3']
 
     def test_insert_into(self, db_results):
-        """Tests the insert_into function of the database
-        """
+        """Tests the insert_into function of the database"""
+
         DbManager.insert_into(table_name=TABLE_NAME, values=(10, "test_insert1", "none"))
         DbManager.insert_into(table_name=TABLE_NAME, values=(11, "test_insert2", "none"), columns=("id", "name", "surname"))
         DbManager.insert_into(table_name=TABLE_NAME,
@@ -94,8 +94,8 @@ class TestDB:
         assert query_result == db_results['update_from']
 
     def test_delete_from(self, db_results):
-        """Tests the delete_from function of the database
-        """
+        """Tests the delete_from function of the database"""
+
         DbManager.query_from_string(
             """DROP TABLE IF EXISTS temp;""", """CREATE TABLE temp(
                                     id int NOT NULL,

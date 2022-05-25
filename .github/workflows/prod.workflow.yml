@@ -24,12 +24,9 @@ jobs:
         run: |
           mv config/settings.yaml.default config/settings.yaml
           mv data/yaml/reactions.yaml.default data/yaml/reactions.yaml
-      - name: Lint with flake8
+      - name: Lint with pylint
         run: |
-          # stop the build if there are Python syntax errors or undefined names
-          flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
-          # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
-          flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+          pylint main.py modules
       - name: Test with pytest
         run: |
           pytest -p no:warnings --cov=./ --cov-report=xml
@@ -51,7 +48,7 @@ jobs:
       - name: Install dependencies for requirements and testing
         run: |
           python -m pip install --upgrade pip
-          pip install sphinx sphinx_rtd_theme sphinx_autodoc_typehints
+          pip3 install sphinx sphinx_rtd_theme sphinx_autodoc_typehints sphinx-rtd-dark-mode
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
           if [ -f requirements_dev.txt ]; then pip install -r requirements_dev.txt; fi
       - name: Setup enviroment

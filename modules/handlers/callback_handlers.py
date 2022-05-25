@@ -1,5 +1,5 @@
 """Handles the execution of callbacks by the bot"""
-from typing import Tuple
+from typing import Optional, Tuple
 from telegram import Update, InlineKeyboardMarkup, InlineKeyboardButton
 from telegram.ext import CallbackContext
 from telegram.error import BadRequest, RetryAfter, Unauthorized
@@ -14,10 +14,10 @@ def old_reactions(data: str) -> str:
     Can be removed later
 
     Args:
-        data (str): callback data
+        data: callback data
 
     Returns:
-        str: new reaction data corrisponding with the old reaction
+        new reaction data corrisponding with the old reaction
     """
     if data == "meme_vote_yes":
         return "meme_vote,1"
@@ -30,11 +30,11 @@ def meme_callback(update: Update, context: CallbackContext) -> int:
     """Passes the meme callback to the correct handler
 
     Args:
-        update (Update): update event
-        context (CallbackContext): context passed by the handler
+        update: update event
+        context: context passed by the handler
 
     Returns:
-        int: value to return to the handler, if requested
+        value to return to the handler, if requested
     """
     info = EventInfo.from_callback(update, context)
     data = old_reactions(info.query_data)
@@ -44,9 +44,9 @@ def meme_callback(update: Update, context: CallbackContext) -> int:
         # call the correct function
         message_text, reply_markup, output = globals()[f'{data[0][5:]}_callback'](info, data[1])
 
-    except KeyError as e:
+    except KeyError as ex:
         message_text = reply_markup = output = None
-        logger.error("meme_callback: %s", e)
+        logger.error("meme_callback: %s", ex)
 
     try:
         # if there is a valid text, edit the menu with the new text
@@ -57,25 +57,25 @@ def meme_callback(update: Update, context: CallbackContext) -> int:
                                        reply_markup=reply_markup)
         elif reply_markup:  # if there is a valid reply_markup, edit the menu with the new reply_markup
             info.edit_inline_keyboard(new_keyboard=reply_markup)
-    except RetryAfter as e:
-        logger.warning(e)
+    except RetryAfter as ex:
+        logger.warning(ex)
 
     return output
 
 
 # region handle meme_callback
-def settings_callback(info: EventInfo, arg: str) -> Tuple[str, InlineKeyboardMarkup, int]:
+def settings_callback(info: EventInfo, arg: str) -> Tuple[Optional[str], None, None]:
     """Handles the settings,[ anonimo | credit ] callback.
 
     - anonimo: Removes the user_id from the table of credited users, if present.
     - credit: Adds the user_id to the table of credited users, if it wasn't already there.
 
     Args:
-        info (dict): information about the callback
-        arg (str): [ anonimo | credit ]
+        info: information about the callback
+        arg: [ anonimo | credit ]
 
     Returns:
-        Tuple[str, InlineKeyboardMarkup, int]: text and replyMarkup that make up the reply, new conversation state
+        text and replyMarkup that make up the reply, new conversation state
     """
     user = User(info.user_id)
     if arg == "anonimo":  # if the user wants to be anonym
@@ -104,39 +104,40 @@ def settings_callback(info: EventInfo, arg: str) -> Tuple[str, InlineKeyboardMar
     return text, None, None
 
 
-def approve_status_callback(info: EventInfo, arg: None) -> Tuple[str, InlineKeyboardMarkup, int]:  # pylint: disable=unused-argument
+def approve_status_callback(info: EventInfo, arg: None) -> Tuple[None, Optional[InlineKeyboardMarkup], None]:
     """Handles the approve_status callback.
     Pauses or resume voting on a specific pending post
 
     Args:
-        info (dict): information about the callback
-        arg (str): [ pause | play ]
+        info: information about the callback
+        arg: [ pause | play ]
 
     Returns:
-        Tuple[str, InlineKeyboardMarkup, int]: text and replyMarkup that make up the reply, new conversation state
+        text and replyMarkup that make up the reply, new conversation state
     """
+    keyboard = None
     if arg == "pause":  # if the the admin wants to pause approval of the post
         keyboard = InlineKeyboardMarkup([[InlineKeyboardButton(text="▶️ Resume", callback_data="meme_approve_status,play")]])
     elif arg == "play":  # if the the admin wants to resume approval of the post
         pending_post = PendingPost.from_group(group_id=info.chat_id, g_message_id=info.message_id)
-        keyboard = update_approve_kb(get_approve_kb().inline_keyboard, pending_post)
+        if pending_post:
+            keyboard = update_approve_kb(get_approve_kb().inline_keyboard, pending_post)
     else:
-        keyboard = None
         logger.error("confirm_callback: invalid arg '%s'", arg)
 
     return None, keyboard, None
 
 
-def approve_yes_callback(info: EventInfo, arg: None) -> Tuple[str, InlineKeyboardMarkup, int]:  # pylint: disable=unused-argument
+def approve_yes_callback(info: EventInfo, _: None) -> Tuple[None, Optional[InlineKeyboardMarkup], None]:
     """Handles the approve_yes callback.
     Approves the post, deleting it from the pending_post table, publishing it in the channel \
     and putting it in the published post table
 
     Args:
-        info (dict): information about the callback
+        info: information about the callback
 
     Returns:
-        Tuple[str, InlineKeyboardMarkup, int]: text and replyMarkup that make up the reply, new conversation state
+        text and replyMarkup that make up the reply, new conversation state
     """
     pending_post = PendingPost.from_group(group_id=info.chat_id, g_message_id=info.message_id)
     if pending_post is None:  # this pending post is not present in the database
@@ -154,8 +155,8 @@ def approve_yes_callback(info: EventInfo, arg: None) -> Tuple[str, InlineKeyboar
             info.bot.send_message(
                 chat_id=user_id,
                 text=f"Il tuo ultimo post è stato pubblicato su {Config.meme_get('channel_tag')}")  # notify the user
-        except (BadRequest, Unauthorized) as e:
-            logger.warning("Notifying the user on approve_yes: %s", e)
+        except (BadRequest, Unauthorized) as ex:
+            logger.warning("Notifying the user on approve_yes: %s", ex)
 
         # Shows the list of admins who approved the pending post and removes it form the db
         pending_post.show_admins_votes(bot=info.bot, approve=True)
@@ -169,15 +170,15 @@ def approve_yes_callback(info: EventInfo, arg: None) -> Tuple[str, InlineKeyboar
     return None, None, None
 
 
-def approve_no_callback(info: EventInfo, arg: None) -> Tuple[str, InlineKeyboardMarkup, int]:  # pylint: disable=unused-argument
+def approve_no_callback(info: EventInfo, _: None) -> Tuple[None, Optional[InlineKeyboardMarkup], None]:
     """Handles the approve_no callback.
     Rejects the post, deleting it from the pending_post table
 
     Args:
-        info (dict): information about the callback
+        info: information about the callback
 
     Returns:
-        Tuple[str, InlineKeyboardMarkup, int]: text and replyMarkup that make up the reply, new conversation state
+        text and replyMarkup that make up the reply, new conversation state
     """
     pending_post = PendingPost.from_group(group_id=info.chat_id, g_message_id=info.message_id)
     if pending_post is None:  # this pending post is not present in the database
@@ -194,8 +195,8 @@ def approve_no_callback(info: EventInfo, arg: None) -> Tuple[str, InlineKeyboard
             info.bot.send_message(
                 chat_id=user_id,
                 text="Il tuo ultimo post è stato rifiutato\nPuoi controllare le regole con /rules")  # notify the user
-        except (BadRequest, Unauthorized) as e:
-            logger.warning("Notifying the user on approve_no: %s", e)
+        except (BadRequest, Unauthorized) as ex:
+            logger.warning("Notifying the user on approve_no: %s", ex)
 
         # Shows the list of admins who refused the pending post and removes it form the db
         pending_post.show_admins_votes(bot=info.bot, approve=False)
@@ -209,30 +210,30 @@ def approve_no_callback(info: EventInfo, arg: None) -> Tuple[str, InlineKeyboard
     return None, None, None
 
 
-def vote_callback(info: EventInfo, arg: str) -> Tuple[str, InlineKeyboardMarkup, int]:
+def vote_callback(info: EventInfo, arg: str) -> Tuple[None, Optional[InlineKeyboardMarkup], None]:
     """Handles the vote,[ 0 | 1 | 2 | 3 | 4 ] callback.
 
     Args:
-        info (dict): information about the callback
-        arg (str): [ 0 | 1 | 2 | 3 | 4 ]
+        info: information about the callback
+        arg: [ 0 | 1 | 2 | 3 | 4 ]
 
 
     Returns:
-        Tuple[str, InlineKeyboardMarkup, int]: text and replyMarkup that make up the reply, new conversation state
+        text and replyMarkup that make up the reply, new conversation state
     """
-    publishedPost = PublishedPost.from_channel(channel_id=info.chat_id, c_message_id=info.message_id)
-    if publishedPost is None:
-        publishedPost = PublishedPost.create(channel_id=info.chat_id, c_message_id=info.message_id)
-        publishedPost.set_votes(info.inline_keyboard)
+    published_post = PublishedPost.from_channel(channel_id=info.chat_id, c_message_id=info.message_id)
+    if published_post is None:
+        published_post = PublishedPost.create(channel_id=info.chat_id, c_message_id=info.message_id)
+        published_post.set_votes(info.inline_keyboard)
 
-    was_added = publishedPost.set_user_vote(user_id=info.user_id, vote=arg)
+    was_added = published_post.set_user_vote(user_id=info.user_id, vote=arg)
 
     if was_added:
         info.answer_callback_query(text=f"Hai messo un {REACTION[arg]}")
     else:
         info.answer_callback_query(text=f"Hai tolto il {REACTION[arg]}")
 
-    return None, get_vote_kb(published_post=publishedPost), None
+    return None, get_vote_kb(published_post=published_post), None
 
 
 # endregion

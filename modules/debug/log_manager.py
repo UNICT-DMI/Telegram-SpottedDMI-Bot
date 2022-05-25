@@ -12,12 +12,12 @@ logger = logging.getLogger(__name__)
 logger.info("Logger enabled")
 
 
-def error_handler(update: Update, context: CallbackContext):  # pylint: disable=unused-argument
+def error_handler(update: Update, context: CallbackContext):
     """Logs the error and notifies the admins.
 
     Args:
-        update (Update): update event
-        context (CallbackContext): context passed by the handler
+        update: update event
+        context: context passed by the handler
     """
     logger.error(msg="Exception while handling an update:", exc_info=context.error)
 
@@ -44,18 +44,18 @@ def error_handler(update: Update, context: CallbackContext):  # pylint: disable=
                             f"message_date:  {update.message.date}\n"
             message += "_____________\n"
             log_file.write("\n" + message)
-    except AttributeError as e:
-        logger.warning(e)
-    except FileNotFoundError as e:
-        logger.error(e)
+    except AttributeError as ex:
+        logger.warning(ex)
+    except FileNotFoundError as ex:
+        logger.error(ex)
 
 
 def notify_error_admin(context: CallbackContext, traceback_str: str):
     """Sends a telegram message to notify the admins.
 
     Args:
-        context (CallbackContext): context passed by the handler
-        traceback_str (str): the traceback text
+        context: context passed by the handler
+        traceback_str: the traceback text
     """
     traceback_str = traceback_str.replace(Config.settings_get("token"), "[bot_token]")
     text = (f'An exception was raised:\n'
@@ -63,12 +63,12 @@ def notify_error_admin(context: CallbackContext, traceback_str: str):
     context.bot.send_message(chat_id=Config.meme_get('group_id'), text=text, parse_mode=ParseMode.HTML)
 
 
-def log_message(update: Update, context: CallbackContext):  # pylint: disable=unused-argument
+def log_message(update: Update, _: CallbackContext):
     """Log the message that caused the update
 
     Args:
-        update (Update): update event
-        context (CallbackContext): context passed by the handler
+        update: update event
+        context: context passed by the handler
     """
     if update.message:
         try:
@@ -90,7 +90,7 @@ def log_message(update: Update, context: CallbackContext):  # pylint: disable=un
                         f"date:  {str(update.message.date)}"\
                         "\n_____________\n"
                 log_file.write("\n" + message)
-        except AttributeError as e:
-            logger.warning(e)
-        except FileNotFoundError as e:
-            logger.error(e)
+        except AttributeError as ex:
+            logger.warning(ex)
+        except FileNotFoundError as ex:
+            logger.error(ex)

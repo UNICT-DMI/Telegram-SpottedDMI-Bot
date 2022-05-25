@@ -10,34 +10,34 @@ from modules.data import Config
 STATE = {'reporting_spot': 1, 'end': -1}
 
 
-def report_spot_conv_handler() -> CommandHandler:
+def report_spot_conv_handler() -> ConversationHandler:
     """Creates the report (user) conversation handler.
     The states are:
 
     - reporting_spot: submit the reason of the report. Expects text
 
     Returns:
-        CommandHandler: conversaton handler
+        conversaton handler
     """
-    return ConversationHandler(entry_points=[CallbackQueryHandler(report_spot_callback, pattern=r"^meme_report\.*")],
-                               states={
-                                   STATE['reporting_spot']: [MessageHandler(~Filters.command & ~Filters.update.edited_message,
-                                   report_spot_msg)],
-                               },
-                               fallbacks=[CommandHandler("cancel", conv_cancel("report"))],
-                               allow_reentry=False,
-                               per_chat=False)
+    return ConversationHandler(
+        entry_points=[CallbackQueryHandler(report_spot_callback, pattern=r"^meme_report\.*")],
+        states={
+            STATE['reporting_spot']: [MessageHandler(~Filters.command & ~Filters.update.edited_message, report_spot_msg)],
+        },
+        fallbacks=[CommandHandler("cancel", conv_cancel("report"))],
+        allow_reentry=False,
+        per_chat=False)
 
 
 def report_spot_callback(update: Update, context: CallbackContext) -> int:
     """Handles the report callback.
 
     Args:
-        update (Update): update event
-        context (CallbackContext): context passed by the handler
+        update: update event
+        context: context passed by the handler
 
     Returns:
-        int: next state of the conversation
+        next state of the conversation
     """
     info = EventInfo.from_callback(update, context)
     abusive_message_id = info.message.reply_to_message.message_id if Config.meme_get('comments') else info.message_id
@@ -64,11 +64,11 @@ def report_spot_msg(update: Update, context: CallbackContext) -> int:
     Checks the message the user wants to report, and goes to the final step
 
     Args:
-        update (Update): update event
-        context (CallbackContext): context passed by the handler
+        update: update event
+        context: context passed by the handler
 
     Returns:
-        int: next state of the conversation
+        next state of the conversation
     """
     info = EventInfo.from_message(update, context)
 
@@ -79,8 +79,10 @@ def report_spot_msg(update: Update, context: CallbackContext) -> int:
         info.bot.send_message(chat_id=info.chat_id, text=INVALID_MESSAGE_TYPE_ERROR)
         return STATE['reporting_spot']
 
-    chat_id = Config.meme_get('group_id')  # should be admin group
+    if context.user_data is None or 'current_post_reported' not in context.user_data:
+        return STATE['end']
 
+    chat_id = Config.meme_get('group_id')  # should be admin group
     channel_id, target_message_id = context.user_data['current_post_reported'].split(",")
 
     info.bot.forward_message(chat_id=chat_id, from_chat_id=channel_id, message_id=target_message_id)

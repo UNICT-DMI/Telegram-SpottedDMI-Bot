@@ -1,7 +1,7 @@
 """Read the bot configuration from the settings.yaml and the reactions.yaml files"""
 import os
 import re
-from typing import Any, Iterable, Literal
+from typing import Any, Iterable, Literal, Optional
 import yaml
 
 SettingsKeys = Literal["debug", "meme", "test", "token", "bot_tag"]
@@ -19,7 +19,7 @@ class Config():
     """Configurations"""
     SETTINGS_PATH = ("config", "settings.yaml")
     REACTION_PATH = ("data", "yaml", "reactions.yaml")
-    __instance: 'Config' = None
+    __instance: Optional['Config'] = None
 
     @classmethod
     def reset_settings(cls):
@@ -33,12 +33,12 @@ class Config():
         If the key is not present, it will return the default value.
 
         Args:
-            config (dict): configuration dict to search
-            key (str): key to search
-            default (Any, optional): default value to return if the key is not present. Defaults to None.
+            config: configuration dict to search
+            key: key to search
+            default: default value to return if the key is not present
 
         Returns:
-            Any: value of the key or default value
+            value of the key or default value
         """
         for k in keys:
             if isinstance(config, Iterable) and k in config:
@@ -52,10 +52,10 @@ class Config():
         """Singleton getter
 
         Returns:
-            Config: instance of the Config class
+            instance of the Config class
         """
         if cls.__instance is None:
-            cls()
+            cls.__instance = cls()
         return cls.__instance
 
     @classmethod
@@ -64,11 +64,11 @@ class Config():
         If the key is not present, it will return the default value.
 
         Args:
-            key (SettingsMemeKeys): key to get
-            default (Any, optional): default value to return if the key is not present. Defaults to None.
+            key: key to get
+            default: default value to return if the key is not present
 
         Returns:
-            Any: value of the key or default value
+            value of the key or default value
         """
         return cls.settings_get("meme", key, default=default)
 
@@ -79,11 +79,11 @@ class Config():
         If the key is not present, it will return the default value.
 
         Args:
-            key (SettingsKeyType): key to get
-            default (Any, optional): default value to return if the key is not present. Defaults to None.
+            key: key to get
+            default: default value to return if the key is not present
 
         Returns:
-            Any: value of the key or default value
+            value of the key or default value
         """
         instance = cls.__get_instance()
         return cls.__get(instance.settings, *keys, default=default)
@@ -95,11 +95,11 @@ class Config():
         If the key is not present, it will return the default value.
 
         Args:
-            key (ReactionKeyType): key to get
-            default (Any, optional): default value to return if the key is not present. Defaults to None.
+            key: key to get
+            default: default value to return if the key is not present
 
         Returns:
-            Any: value of the key or default value
+            value of the key or default value
         """
         instance = cls.__get_instance()
         return cls.__get(instance.reactions, *keys, default=default)
@@ -115,10 +115,9 @@ class Config():
                 instance.settings['meme'][test_key] = cls.settings_get("test", test_key)
 
     def __init__(self):
-        if Config.__instance is not None:
+        if type(self).__instance is not None:
             raise Exception("This class is a singleton!")
 
-        Config.__instance = self
         root_path = os.path.join(os.path.dirname(__file__), "..", "..")
         self.settings_path = os.path.join(root_path, *self.SETTINGS_PATH)
         self.reaction_path = os.path.join(root_path, *self.REACTION_PATH)
@@ -133,22 +132,22 @@ class Config():
         self.__validate_types_settings()
 
     @classmethod
-    def __merge_settings(cls, d: dict, u: dict) -> dict:
+    def __merge_settings(cls, base: dict, update: dict) -> dict:
         """Merges two configuration dictionaries.
 
         Args:
-            d (dict): dict to merge. It will be modified
-            u (dict): dict to merge with
+            base: dict to merge. It will be modified
+            update: dict to merge with
 
         Returns:
-            dict: merged dictionaries
+            merged dictionaries
         """
-        for k, v in u.items():
-            if isinstance(v, dict):
-                d[k] = cls.__merge_settings(d.get(k, {}), v)
+        for key, value in update.items():
+            if isinstance(value, dict):
+                base[key] = cls.__merge_settings(base.get(key, {}), value)
             else:
-                d[k] = v
-        return d
+                base[key] = value
+        return base
 
     @classmethod
     def __load_configuration(cls, path: str, load_default: bool = True, force_load: bool = False) -> dict:
@@ -158,12 +157,12 @@ class Config():
         If force_load is True, the program will crash if the specified file is not present
 
         Args:
-            path (str): path of the configuration .yaml file
-            load_default (bool, optional): whether to look for the .default file first for the default configuration. Defaults to True.
-            force_load (bool, optional): whether to force the presence of the specified file. Defaults to False.
+            path: path of the configuration .yaml file
+            load_default: whether to look for the .default file first for the default configuration
+            force_load: whether to force the presence of the specified file
 
         Returns:
-            dict: configuration dictionary
+            configuration dictionary
         """
         conf = {}
         if load_default and os.path.exists(f"{path}.default"):
@@ -202,8 +201,8 @@ class Config():
                 self.settings[key] = value
 
     def __validate_types_settings(self):
-        """Validates the settings values in the 'meme' section, casting them when necessary
-        """
+        """Validates the settings values in the 'meme' section, casting them when necessary"""
+
         if not os.path.exists(f"{self.settings_path}.types"):
             return
         with open(f"{self.settings_path}.types", 'r', encoding="utf-8") as conf_file:

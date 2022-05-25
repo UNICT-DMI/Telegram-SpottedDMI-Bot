@@ -1,17 +1,17 @@
 """/spot command"""
+from random import choice
 from telegram import Update
 from telegram.ext import CallbackContext, ConversationHandler, CommandHandler, MessageHandler, Filters, CallbackQueryHandler
 from modules.data import User
 from modules.utils import EventInfo, conv_cancel, get_confirm_kb
 from modules.handlers.constants import CHAT_PRIVATE_ERROR, INVALID_MESSAGE_TYPE_ERROR
 from modules.data import Config
-from random import choice
 from modules.data.data_reader import read_md
 
 STATE = {'posting': 1, 'confirm': 2, 'end': -1}
 
 
-def spot_conv_handler() -> CommandHandler:
+def spot_conv_handler() -> ConversationHandler:
     """Creates the spot conversation handler.
     The states are:
 
@@ -21,14 +21,14 @@ def spot_conv_handler() -> CommandHandler:
     Returns:
         conversaton handler
     """
-    return ConversationHandler(entry_points=[CommandHandler("spot", spot_cmd)],
-                               states={
-                                   STATE['posting']: [MessageHandler(~Filters.command & ~Filters.update.edited_message,
-                                   spot_msg)],
-                                   STATE['confirm']: [CallbackQueryHandler(spot_confirm_query, pattern=r"^meme_confirm,.+")]
-                               },
-                               fallbacks=[CommandHandler("cancel", conv_cancel("spot"))],
-                               allow_reentry=False)
+    return ConversationHandler(
+        entry_points=[CommandHandler("spot", spot_cmd)],
+        states={
+            STATE['posting']: [MessageHandler(~Filters.command & ~Filters.update.edited_message, spot_msg)],
+            STATE['confirm']: [CallbackQueryHandler(spot_confirm_query, pattern=r"^meme_confirm,.+")]
+        },
+        fallbacks=[CommandHandler("cancel", conv_cancel("spot"))],
+        allow_reentry=False)
 
 
 def spot_cmd(update: Update, context: CallbackContext) -> int:
@@ -36,11 +36,11 @@ def spot_cmd(update: Update, context: CallbackContext) -> int:
     Checks that the user is in a private chat and it's not banned and start the post conversation
 
     Args:
-        update (Update): update event
-        context (CallbackContext): context passed by the handler
+        update: update event
+        context: context passed by the handler
 
     Returns:
-        int: next state of the conversation
+        next state of the conversation
     """
     info = EventInfo.from_message(update, context)
     user = User(info.user_id)
@@ -65,11 +65,11 @@ def spot_msg(update: Update, context: CallbackContext) -> int:
     Checks the message the user wants to post, and goes to the final step
 
     Args:
-        update (Update): update event
-        context (CallbackContext): context passed by the handler
+        update: update event
+        context: context passed by the handler
 
     Returns:
-        int: next state of the conversation
+        next state of the conversation
     """
     info = EventInfo.from_message(update, context)
 
@@ -84,7 +84,7 @@ def spot_msg(update: Update, context: CallbackContext) -> int:
     return STATE['confirm']
 
 
-def spot_confirm_query(update: Update, context: CallbackContext):
+def spot_confirm_query(update: Update, context: CallbackContext) -> int:
     """Handles the [ submit | cancel ] callback.
     Creates the bid or cancels its creation.
 
@@ -92,14 +92,15 @@ def spot_confirm_query(update: Update, context: CallbackContext):
     - cancel: cancels the current spot conversation
 
     Args:
-        update (Update): update event
-        context (CallbackContext): context passed by the handler
+        update: update event
+        context: context passed by the handler
 
     Returns:
-        int: next state of the conversation
+        next state of the conversation
     """
     info = EventInfo.from_callback(update, context)
     arg = info.query_data.split(",")[1]
+    text = "Qualcosa è andato storto!"
     if arg == "submit":  # if the the user wants to publish the post
         if User(info.user_id).is_pending:  # there is already a spot in pending by this user
             text = "Hai già un post in approvazione 🧐"

@@ -5,11 +5,11 @@ from modules.data import Config
 from modules.handlers import add_handlers, add_jobs
 
 
-def add_commands(up: Updater):
+def add_commands(updater: Updater):
     """Adds the list of commands with their description to the bot
 
     Args:
-        up (Updater): supplyed Updater
+        updater: supplyed Updater
     """
     commands = [
         BotCommand("start", "presentazione iniziale del bot"),
@@ -22,12 +22,12 @@ def add_commands(up: Updater):
         BotCommand("stats", "visualizza statistiche sugli spot"),
         BotCommand("settings", "cambia le impostazioni di privacy")
     ]
-    up.bot.set_my_commands(commands=commands)
+    updater.bot.set_my_commands(commands=commands)
 
 
 def main():
-    """Main function
-    """
+    """Main function"""
+
     updater = Updater(Config.settings_get('token'),
                       request_kwargs={
                           'read_timeout': 20,

@@ -9,7 +9,7 @@ from modules.data import Config
 STATE = {'reporting_user': 1, 'reporting_user_reason': 2, 'end': -1}
 
 
-def report_user_conv_handler() -> CommandHandler:
+def report_user_conv_handler() -> ConversationHandler:
     """Creates the /report (user) conversation handler.
     The states are:
 
@@ -17,17 +17,18 @@ def report_user_conv_handler() -> CommandHandler:
     - reporting_user_reason: submit the reason of the report. Expects text
 
     Returns:
-        CommandHandler: conversaton handler
+        conversaton handler
     """
-    return ConversationHandler(entry_points=[CommandHandler("report", report_cmd)],
-                               states={
-                                   STATE['reporting_user']: [MessageHandler(~Filters.command & ~Filters.update.edited_message,
-                                   report_user_msg)],
-                                   STATE['reporting_user_reason']: [MessageHandler(~Filters.command & ~Filters.update.edited_message,
-                                   report_user_sent_msg)],
-                               },
-                               fallbacks=[CommandHandler("cancel", conv_cancel("report"))],
-                               allow_reentry=False)
+    return ConversationHandler(
+        entry_points=[CommandHandler("report", report_cmd)],
+        states={
+            STATE['reporting_user']: [MessageHandler(~Filters.command & ~Filters.update.edited_message, report_user_msg)],
+            STATE['reporting_user_reason']: [
+                MessageHandler(~Filters.command & ~Filters.update.edited_message, report_user_sent_msg)
+            ],
+        },
+        fallbacks=[CommandHandler("cancel", conv_cancel("report"))],
+        allow_reentry=False)
 
 
 def report_cmd(update: Update, context: CallbackContext) -> int:
@@ -35,11 +36,11 @@ def report_cmd(update: Update, context: CallbackContext) -> int:
     Checks the message the user wants to report
 
     Args:
-        update (Update): update event
-        context (CallbackContext): context passed by the handler
+        update: update event
+        context: context passed by the handler
 
     Returns:
-        int: next state of the conversation
+        next state of the conversation
     """
     info = EventInfo.from_message(update, context)
     if not info.is_private_chat:  # you can only post with a private message
@@ -66,11 +67,11 @@ def report_user_msg(update: Update, context: CallbackContext) -> int:
     Checks the the user wants to report, and goes to ask the reason
 
     Args:
-        update (Update): update event
-        context (CallbackContext): context passed by the handler
+        update: update event
+        context: context passed by the handler
 
     Returns:
-        int: next state of the conversation
+        next state of the conversation
     """
     info = EventInfo.from_message(update, context)
     if not info.is_valid_message_type \
@@ -81,6 +82,9 @@ def report_user_msg(update: Update, context: CallbackContext) -> int:
             text="Questo tipo di messaggio non è supportato\n"\
                 "È consentito solo username telegram. Puoi annullare il processo con /cancel")
         return STATE['reporting_user']
+
+    if context.user_data is None:
+        return STATE['end']
 
     context.user_data['current_report_target'] = info.text.strip()
 
@@ -99,16 +103,19 @@ def report_user_sent_msg(update: Update, context: CallbackContext) -> int:
     Checks the the user wants to report, and goes to final step
 
     Args:
-        update (Update): update event
-        context (CallbackContext): context passed by the handler
+        update: update event
+        context: context passed by the handler
 
     Returns:
-        int: next state of the conversation
+        next state of the conversation
     """
     info = EventInfo.from_message(update, context)
     if not info.is_valid_message_type:  # the type is NOT supported
         info.bot.send_message(chat_id=info.chat_id, text=INVALID_MESSAGE_TYPE_ERROR)
         return STATE['reporting_user_reason']
+
+    if context.user_data is None or 'current_report_target' not in context.user_data:
+        return STATE['end']
 
     target_username = context.user_data['current_report_target']
 
