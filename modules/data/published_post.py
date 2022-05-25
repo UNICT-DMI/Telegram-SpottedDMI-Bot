@@ -127,7 +127,7 @@ class PublishedPost():
         ids = -1
         for row in keyboard.inline_keyboard:
             for column in row:
-                data = column.callback_data
+                data = str(column.callback_data)
                 if data.startswith("meme_vote,"):
                     n_votes = int(column.text.split(" ")[1])
                     vote = data.split(",")[1]

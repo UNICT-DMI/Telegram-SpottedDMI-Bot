@@ -115,13 +115,14 @@ def approve_status_callback(info: EventInfo, arg: None) -> Tuple[None, Optional[
     Returns:
         text and replyMarkup that make up the reply, new conversation state
     """
+    keyboard = None
     if arg == "pause":  # if the the admin wants to pause approval of the post
         keyboard = InlineKeyboardMarkup([[InlineKeyboardButton(text="▶️ Resume", callback_data="meme_approve_status,play")]])
     elif arg == "play":  # if the the admin wants to resume approval of the post
         pending_post = PendingPost.from_group(group_id=info.chat_id, g_message_id=info.message_id)
-        keyboard = update_approve_kb(get_approve_kb().inline_keyboard, pending_post)
+        if pending_post:
+            keyboard = update_approve_kb(get_approve_kb().inline_keyboard, pending_post)
     else:
-        keyboard = None
         logger.error("confirm_callback: invalid arg '%s'", arg)
 
     return None, keyboard, None

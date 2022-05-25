@@ -1,7 +1,7 @@
 """Read the bot configuration from the settings.yaml and the reactions.yaml files"""
 import os
 import re
-from typing import Any, Iterable, Literal
+from typing import Any, Iterable, Literal, Optional
 import yaml
 
 SettingsKeys = Literal["debug", "meme", "test", "token", "bot_tag"]
@@ -19,7 +19,7 @@ class Config():
     """Configurations"""
     SETTINGS_PATH = ("config", "settings.yaml")
     REACTION_PATH = ("data", "yaml", "reactions.yaml")
-    __instance: 'Config' = None
+    __instance: Optional['Config'] = None
 
     @classmethod
     def reset_settings(cls):
@@ -55,7 +55,7 @@ class Config():
             instance of the Config class
         """
         if cls.__instance is None:
-            cls()
+            cls.__instance = cls()
         return cls.__instance
 
     @classmethod
@@ -115,10 +115,9 @@ class Config():
                 instance.settings['meme'][test_key] = cls.settings_get("test", test_key)
 
     def __init__(self):
-        if Config.__instance is not None:
+        if type(self).__instance is not None:
             raise Exception("This class is a singleton!")
 
-        Config.__instance = self
         root_path = os.path.join(os.path.dirname(__file__), "..", "..")
         self.settings_path = os.path.join(root_path, *self.SETTINGS_PATH)
         self.reaction_path = os.path.join(root_path, *self.REACTION_PATH)

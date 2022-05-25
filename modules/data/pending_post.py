@@ -1,6 +1,6 @@
 """Pending post management"""
 from dataclasses import dataclass
-from typing import List, Optional
+from typing import Optional
 from datetime import datetime, timezone
 from telegram import Message, Bot
 from .db_manager import DbManager
@@ -93,7 +93,7 @@ class PendingPost():
                    date=pending_post['message_date'])
 
     @staticmethod
-    def get_all_pending_memes(group_id: int, before: datetime = None) -> list:
+    def get_all_pending_memes(group_id: int, before: Optional[datetime] = None) -> list:
         """Gets the list of pending memes in the specified admin group.
         If before is specified, returns only the one sent before that timestamp
 
@@ -140,7 +140,7 @@ class PendingPost():
                                     where="g_message_id = %s and group_id = %s and is_upvote = %s",
                                     where_args=(self.g_message_id, self.group_id, vote))
 
-    def get_list_admin_votes(self, vote: bool) -> Optional[List[str]]:
+    def get_list_admin_votes(self, vote: bool) -> Optional[list[str]]:
         """Gets the list of admins that approved or rejected the post
 
         Args:
@@ -170,7 +170,7 @@ class PendingPost():
         admins = self.get_list_admin_votes(vote=approve)
         text = "Approvato da:\n" if approve else "Rifiutato da:\n"
         tag = '@' if Config.meme_get('tag') else ''
-        for admin in admins:
+        for admin in admins or []:
             username = bot.get_chat(admin).username
             text += f"{tag}{username}\n" if username else f"{bot.get_chat(admin).first_name}\n"
 
@@ -231,11 +231,6 @@ class PendingPost():
         DbManager.delete_from(table_name="admin_votes",
                               where="g_message_id = %s and group_id = %s",
                               where_args=(self.g_message_id, self.group_id))
-        self.user_id = None
-        self.u_message_id = None
-        self.group_id = None
-        self.g_message_id = None
-        self.date = None
 
     def __repr__(self) -> str:
         return f"PendingPost: [ user_id: {self.user_id}\n"\

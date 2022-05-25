@@ -1,6 +1,6 @@
 """Creates the inlinekeyboard sent by the bot in its messages.
 Callback_data format: <callback_family>_<callback_name>,[arg]"""
-from typing import List, Optional
+from typing import Optional
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 from modules.data import PendingPost, PublishedPost, Config
 
@@ -78,7 +78,7 @@ def get_approve_kb() -> InlineKeyboardMarkup:
     ], [InlineKeyboardButton("⏹ Stop", callback_data="meme_approve_status,pause")]])
 
 
-def get_vote_kb(published_post: PublishedPost = None) -> Optional[InlineKeyboardMarkup]:
+def get_vote_kb(published_post: Optional[PublishedPost] = None) -> Optional[InlineKeyboardMarkup]:
     """Generates the InlineKeyboard for the published post and updates the correct number of reactions
 
     Args:
@@ -107,14 +107,14 @@ def get_vote_kb(published_post: PublishedPost = None) -> Optional[InlineKeyboard
     return InlineKeyboardMarkup(keyboard) if keyboard else None
 
 
-def update_approve_kb(keyboard: List[List[InlineKeyboardButton]],
+def update_approve_kb(keyboard: list[list[InlineKeyboardButton]],
                       pending_post: PendingPost,
                       approve: int = -1,
                       reject: int = -1) -> InlineKeyboardMarkup:
     """Updates the InlineKeyboard when the valutation of a pending post changes
 
     Args:
-        keyboard (List[List[InlineKeyboardButton]]): previous keyboard
+        keyboard: previous keyboard
         pending_post: pending post to which the keyboard is attached
         approve: number of approve votes, if known
         reject: number of reject votes, if known

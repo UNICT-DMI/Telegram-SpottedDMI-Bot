@@ -11,7 +11,7 @@ from modules.data.data_reader import read_md
 STATE = {'posting': 1, 'confirm': 2, 'end': -1}
 
 
-def spot_conv_handler() -> CommandHandler:
+def spot_conv_handler() -> ConversationHandler:
     """Creates the spot conversation handler.
     The states are:
 
@@ -100,6 +100,7 @@ def spot_confirm_query(update: Update, context: CallbackContext) -> int:
     """
     info = EventInfo.from_callback(update, context)
     arg = info.query_data.split(",")[1]
+    text = "Qualcosa è andato storto!"
     if arg == "submit":  # if the the user wants to publish the post
         if User(info.user_id).is_pending:  # there is already a spot in pending by this user
             text = "Hai già un post in approvazione 🧐"

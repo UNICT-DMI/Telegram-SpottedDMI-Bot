@@ -9,7 +9,7 @@ from modules.data import Config
 STATE = {'reporting_user': 1, 'reporting_user_reason': 2, 'end': -1}
 
 
-def report_user_conv_handler() -> CommandHandler:
+def report_user_conv_handler() -> ConversationHandler:
     """Creates the /report (user) conversation handler.
     The states are:
 
@@ -83,6 +83,9 @@ def report_user_msg(update: Update, context: CallbackContext) -> int:
                 "È consentito solo username telegram. Puoi annullare il processo con /cancel")
         return STATE['reporting_user']
 
+    if context.user_data is None:
+        return STATE['end']
+
     context.user_data['current_report_target'] = info.text.strip()
 
     info.bot.send_message(
@@ -110,6 +113,9 @@ def report_user_sent_msg(update: Update, context: CallbackContext) -> int:
     if not info.is_valid_message_type:  # the type is NOT supported
         info.bot.send_message(chat_id=info.chat_id, text=INVALID_MESSAGE_TYPE_ERROR)
         return STATE['reporting_user_reason']
+
+    if context.user_data is None or 'current_report_target' not in context.user_data:
+        return STATE['end']
 
     target_username = context.user_data['current_report_target']
 

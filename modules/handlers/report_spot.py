@@ -10,7 +10,7 @@ from modules.data import Config
 STATE = {'reporting_spot': 1, 'end': -1}
 
 
-def report_spot_conv_handler() -> CommandHandler:
+def report_spot_conv_handler() -> ConversationHandler:
     """Creates the report (user) conversation handler.
     The states are:
 
@@ -79,8 +79,10 @@ def report_spot_msg(update: Update, context: CallbackContext) -> int:
         info.bot.send_message(chat_id=info.chat_id, text=INVALID_MESSAGE_TYPE_ERROR)
         return STATE['reporting_spot']
 
-    chat_id = Config.meme_get('group_id')  # should be admin group
+    if context.user_data is None or 'current_post_reported' not in context.user_data:
+        return STATE['end']
 
+    chat_id = Config.meme_get('group_id')  # should be admin group
     channel_id, target_message_id = context.user_data['current_post_reported'].split(",")
 
     info.bot.forward_message(chat_id=chat_id, from_chat_id=channel_id, message_id=target_message_id)
