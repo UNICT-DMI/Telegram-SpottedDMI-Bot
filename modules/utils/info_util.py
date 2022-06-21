@@ -250,7 +250,7 @@ class EventInfo():  # pylint: disable=too-many-public-methods
                                                     allows_multiple_answers=poll.allows_multiple_answers,
                                                     correct_option_id=poll.correct_option_id,
                                                     reply_markup=get_approve_kb()).message_id
-            elif message.text and message.entities:  # mantains the previews, if present
+            elif message.text and message.entities:  # maintains the previews, if present
                 g_message_id = self.__bot.send_message(chat_id=group_id,
                                                        text=message.text,
                                                        entities=message.entities,
@@ -269,16 +269,24 @@ class EventInfo():  # pylint: disable=too-many-public-methods
         return True
 
     def send_post_to_channel(self, user_id: int):
-        """Sends the post to  the channel, so it can be ejoyed by the users (and voted, if comments are disabled)"""
+        """Sends the post to  the channel, so it can be enjoyed by the users (and voted, if comments are disabled)"""
 
         message = self.__message
         channel_id = Config.meme_get('channel_id')
+        poll = message.poll  # if the message is a poll, get its reference
 
         reply_markup = None
         if not Config.meme_get('comments'):  # ... append the voting Inline Keyboard, if comments are not to be supported
             reply_markup = get_vote_kb()
-
-        if message.text and message.entities:  # mantains the previews, if present
+        if poll:  # makes sure the poll is anonym
+            c_message_id = self.__bot.send_poll(chat_id=channel_id,
+                                                question=poll.question,
+                                                options=[option.text for option in poll.options],
+                                                type=poll.type,
+                                                allows_multiple_answers=poll.allows_multiple_answers,
+                                                correct_option_id=poll.correct_option_id,
+                                                reply_markup=reply_markup).message_id
+        elif message.text and message.entities:  # maintains the previews, if present
             c_message_id = self.__bot.send_message(chat_id=channel_id,
                                                    text=message.text,
                                                    entities=message.entities,
