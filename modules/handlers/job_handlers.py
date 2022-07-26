@@ -50,7 +50,7 @@ def db_backup_job(context: CallbackContext):
     """
     path = get_abs_path(*DbManager.db_path)
     admin_group_id = Config.meme_get('group_id')
-    with open(path, 'rb', encoding='utf-8') as database_file:
+    with open(path, 'rb') as database_file:
         try:
             context.bot.send_document(chat_id=admin_group_id,
                                       document=database_file,
