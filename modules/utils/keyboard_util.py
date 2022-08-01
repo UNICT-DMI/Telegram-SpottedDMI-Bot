@@ -19,6 +19,17 @@ def get_confirm_kb() -> InlineKeyboardMarkup:
         InlineKeyboardButton(text="No", callback_data="meme_confirm,cancel")
     ]])
 
+def get_preview_kb() -> InlineKeyboardMarkup:
+    """Generates the InlineKeyboard to choose if the post should be previewed or not
+
+    Returns:
+        new inline keyboard
+    """
+    return InlineKeyboardMarkup([[
+        InlineKeyboardButton(text="Si", callback_data="meme_preview,accept"),
+        InlineKeyboardButton(text="No", callback_data="meme_preview,reject")
+    ]])
+
 
 def get_settings_kb() -> InlineKeyboardMarkup:
     """Generates the InlineKeyboard to edit the settings

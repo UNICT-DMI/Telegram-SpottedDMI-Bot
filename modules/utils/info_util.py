@@ -1,4 +1,6 @@
 """Common info needed in both command and callback handlers"""
+from faulthandler import disable
+from html import entities
 from telegram import Bot, Update, Message, CallbackQuery, ReplyMarkup, Chat, InlineKeyboardMarkup
 from telegram.ext import CallbackContext
 from telegram.error import BadRequest
@@ -231,7 +233,7 @@ class EventInfo():  # pylint: disable=too-many-public-methods
         except BadRequest as ex:
             logger.error("EventInfo.edit_inline_keyboard: %s", ex)
 
-    def send_post_to_admins(self) -> bool:
+    def send_post_to_admins(self, show_preview: bool = True) -> bool:
         """Sends the post to the admin group, so it can be approved
 
         Returns:
@@ -253,8 +255,9 @@ class EventInfo():  # pylint: disable=too-many-public-methods
             elif message.text and message.entities:  # maintains the previews, if present
                 g_message_id = self.__bot.send_message(chat_id=group_id,
                                                        text=message.text,
+                                                       reply_markup=get_approve_kb(),
                                                        entities=message.entities,
-                                                       reply_markup=get_approve_kb()).message_id
+                                                       disable_web_page_preview=not show_preview).message_id
             else:
                 g_message_id = self.__bot.copy_message(chat_id=group_id,
                                                        from_chat_id=message.chat_id,
@@ -286,11 +289,6 @@ class EventInfo():  # pylint: disable=too-many-public-methods
                                                 allows_multiple_answers=poll.allows_multiple_answers,
                                                 correct_option_id=poll.correct_option_id,
                                                 reply_markup=reply_markup).message_id
-        elif message.text and message.entities:  # maintains the previews, if present
-            c_message_id = self.__bot.send_message(chat_id=channel_id,
-                                                   text=message.text,
-                                                   entities=message.entities,
-                                                   reply_markup=reply_markup).message_id
         else:
             c_message_id = self.__bot.copy_message(chat_id=channel_id,
                                                    from_chat_id=message.chat_id,
