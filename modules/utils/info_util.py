@@ -233,7 +233,7 @@ class EventInfo():  # pylint: disable=too-many-public-methods
         except BadRequest as ex:
             logger.error("EventInfo.edit_inline_keyboard: %s", ex)
 
-    def send_post_to_admins(self, show_preview: bool = True) -> bool:
+    def send_post_to_admins(self) -> bool:
         """Sends the post to the admin group, so it can be approved
 
         Returns:
@@ -242,7 +242,7 @@ class EventInfo():  # pylint: disable=too-many-public-methods
         message = self.__message.reply_to_message
         group_id = Config.meme_get('group_id')
         poll = message.poll  # if the message is a poll, get its reference
-
+        
         try:
             if poll:  # makes sure the poll is anonym
                 g_message_id = self.__bot.send_poll(chat_id=group_id,
@@ -253,6 +253,7 @@ class EventInfo():  # pylint: disable=too-many-public-methods
                                                     correct_option_id=poll.correct_option_id,
                                                     reply_markup=get_approve_kb()).message_id
             elif message.text and message.entities:  # maintains the previews, if present
+                show_preview = self.user_data['preview']
                 g_message_id = self.__bot.send_message(chat_id=group_id,
                                                        text=message.text,
                                                        reply_markup=get_approve_kb(),

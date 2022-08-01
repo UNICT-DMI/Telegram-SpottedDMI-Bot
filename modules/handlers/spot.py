@@ -140,7 +140,7 @@ def spot_confirm_query(update: Update, context: CallbackContext) -> int:
     if arg == "submit":  # if the the user wants to publish the post
         if User(info.user_id).is_pending:  # there is already a spot in pending by this user
             text = "Hai già un post in approvazione 🧐"
-        elif info.send_post_to_admins(info.user_data['preview']):
+        elif info.send_post_to_admins():
             text = "Il tuo post è in fase di valutazione\n"\
                 f"Una volta pubblicato, lo potrai trovare su {Config.meme_get('channel_tag')}"
         else:
