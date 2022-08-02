@@ -61,31 +61,6 @@ def spot_cmd(update: Update, context: CallbackContext) -> int:
     return STATE['posting']
 
 
-def spot_preview_query(update: Update, context: CallbackContext) -> int:
-    """Handles the [ accept | reject ] callback.
-    Let the user decide if wants to post the message with or without preview.
-
-    - accept: the post will be published with preview
-    - reject: the post will be published without preview
-
-    Args:
-        update: update event
-        context: context passed by the handler
-
-    Returns:
-        next state of the conversation
-    """
-    info = EventInfo.from_callback(update, context)
-    arg = info.query_data.split(",")[1]
-    info.user_data['preview'] = True if arg == "accept" else False
-
-    info.bot.edit_message_text(chat_id=info.chat_id,
-                                message_id=info.message_id,
-                                text="Sei sicuro di voler publicare questo post?",
-                                reply_markup=get_confirm_kb())
-    return STATE['confirm']
-
-
 def spot_msg(update: Update, context: CallbackContext) -> int:
     """Handles the reply to the /spot command.
     Checks the message the user wants to post, and goes to the final step
@@ -117,6 +92,31 @@ def spot_msg(update: Update, context: CallbackContext) -> int:
                           text="Sei sicuro di voler publicare questo post?",
                           reply_to_message_id=info.message_id,
                           reply_markup=get_confirm_kb())
+    return STATE['confirm']
+
+
+def spot_preview_query(update: Update, context: CallbackContext) -> int:
+    """Handles the [ accept | reject ] callback.
+    Let the user decide if wants to post the message with or without preview.
+
+    - accept: the post will be published with preview
+    - reject: the post will be published without preview
+
+    Args:
+        update: update event
+        context: context passed by the handler
+
+    Returns:
+        next state of the conversation
+    """
+    info = EventInfo.from_callback(update, context)
+    arg = info.query_data.split(",")[1]
+    info.user_data['preview'] = True if arg == "accept" else False
+
+    info.bot.edit_message_text(chat_id=info.chat_id,
+                                message_id=info.message_id,
+                                text="Sei sicuro di voler publicare questo post?",
+                                reply_markup=get_confirm_kb())
     return STATE['confirm']
 
 
