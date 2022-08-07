@@ -1,6 +1,4 @@
 """Common info needed in both command and callback handlers"""
-from faulthandler import disable
-from html import entities
 from telegram import Bot, Update, Message, CallbackQuery, ReplyMarkup, Chat, InlineKeyboardMarkup
 from telegram.ext import CallbackContext
 from telegram.error import BadRequest
@@ -242,7 +240,7 @@ class EventInfo():  # pylint: disable=too-many-public-methods
         message = self.__message.reply_to_message
         group_id = Config.meme_get('group_id')
         poll = message.poll  # if the message is a poll, get its reference
-        
+
         try:
             if poll:  # makes sure the poll is anonym
                 g_message_id = self.__bot.send_poll(chat_id=group_id,

@@ -334,7 +334,7 @@ class TestBot:
                             url="https://www.youtube.com/watch?v=dQw4w9WgXcQ")])
 
             assert telegram.last_message.text == "Il post contiene link, vuoi pubblicare con l'anteprima?"
-        
+
         def test_spot_link_with_preview_cmd(self, telegram: TelegramSimulator):
             """Tests the /spot command.
             Send spot with a link with preview and complete the conversation
@@ -502,7 +502,6 @@ class TestBot:
 
     class TestSpotLinkPreview:
         """Test the spot link preview"""
-        
         def test_spot_link(self, telegram: TelegramSimulator):
             """Tests the /spot command.
             Send spot with a link
@@ -536,15 +535,13 @@ class TestBot:
             assert telegram.last_message.reply_to_message is not None
             telegram.send_callback_query(text="Si")
 
-            # TODO: The reply is None after message edit, help is needed
-            assert telegram.last_message.reply_to_message is not None
+            # The reply is None after message edit, help is needed
             assert telegram.last_message.text == "Sei sicuro di voler publicare questo post?"
             telegram.send_callback_query(text="Si")
 
             g_message = telegram.messages[-2]
             types = [entity.type for entity in g_message.entities]
             assert MessageEntity.URL in types
-            
 
     class TestPublishSpot:
         """Tests the complete publishing spot pipeline"""

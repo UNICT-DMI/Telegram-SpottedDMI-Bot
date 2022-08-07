@@ -354,7 +354,7 @@ class TelegramSimulator():
 
     def weaved_delete_webhook(self):
         """Weaves the delete_webhook method in the bot object to intercept telegram's api requests
-        
+
         Returns:
             weaved bot's delete_webhook method
         """
