@@ -77,10 +77,10 @@ def spot_msg(update: Update, context: CallbackContext) -> int:
     if not info.is_valid_message_type:  # the type is NOT supported
         info.bot.send_message(chat_id=info.chat_id, text=INVALID_MESSAGE_TYPE_ERROR)
         return STATE['posting']
-    
+
     if info.message.entities:
         types = [entity.type for entity in info.message.entities]
-        
+
         if "url" in types or "text_link" in types:
             info.bot.send_message(chat_id=info.chat_id,
                                   text="Il post contiene link, vuoi pubblicare con l'anteprima?",
@@ -111,8 +111,7 @@ def spot_preview_query(update: Update, context: CallbackContext) -> int:
     """
     info = EventInfo.from_callback(update, context)
     arg = info.query_data.split(",")[1]
-    info.user_data['preview'] = True if arg == "accept" else False
-
+    info.user_data['preview'] = arg == "accept"
     info.bot.edit_message_text(chat_id=info.chat_id,
                                 message_id=info.message_id,
                                 text="Sei sicuro di voler publicare questo post?",
