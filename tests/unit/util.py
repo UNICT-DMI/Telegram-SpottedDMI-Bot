@@ -134,6 +134,7 @@ class TelegramSimulator():
                      date: datetime = None,
                      reply_markup: InlineKeyboardMarkup = None,
                      reply_to_message: Union[Message, int] = None,
+                     entities: List[MessageEntity] = None,
                      **kwargs) -> Message:
         """Sends a message to the bot on behalf of the user
 
@@ -145,6 +146,7 @@ class TelegramSimulator():
             date: date when the message was sent
             reply_markup: reply markup to use
             reply_to_message: message (or message_id of said message) to reply to
+            entities: list of entities to use in the message
             **kwargs: additional parameters to be passed to the message
 
         Returns:
@@ -157,6 +159,7 @@ class TelegramSimulator():
                                         date=date,
                                         reply_markup=reply_markup,
                                         reply_to_message=reply_to_message,
+                                        entities=entities,
                                         **kwargs)
         self.add_message(message)
         update = self.make_update(message)
