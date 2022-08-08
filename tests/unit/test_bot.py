@@ -522,17 +522,7 @@ class TestBot:
             """Tests the /spot command.
             Complete with yes the spot with link preview conversation
             """
-            telegram.send_command("/spot")
-            assert telegram.last_message.text == "Invia il post che vuoi pubblicare"
-
-            telegram.send_message("Hai vinto un iPad 🎉",
-                entities=[MessageEntity(type=MessageEntity.URL,
-                            offset=0,
-                            length=19,
-                            url="https://www.youtube.com/watch?v=dQw4w9WgXcQ")])
-
-            assert telegram.last_message.text == "Il post contiene link, vuoi pubblicare con l'anteprima?"
-            assert telegram.last_message.reply_to_message is not None
+            self.test_spot_link(telegram)
 
             telegram.send_callback_query(text="Si")
             assert telegram.last_message.text == "Sei sicuro di voler publicare questo post?"
@@ -544,6 +534,21 @@ class TestBot:
             g_message = telegram.messages[-2]
             types = [entity.type for entity in g_message.entities]
             assert MessageEntity.URL in types
+        
+        def test_spot_link_without_preview(self, telegram: TelegramSimulator):
+            """Tests the /spot command.
+            Complete with no the spot without link preview conversation
+            """
+            self.test_spot_link(telegram)
+
+            telegram.send_callback_query(text="No")
+            assert telegram.last_message.text == "Sei sicuro di voler publicare questo post?"
+
+            telegram.send_callback_query(data="meme_confirm,submit", message=telegram.messages[-2])
+            g_message = telegram.messages[-2]
+            types = [entity.type for entity in g_message.entities]
+            assert MessageEntity.URL in types
+            # NOTE: There is no way to check if message has preview
 
     class TestPublishSpot:
         """Tests the complete publishing spot pipeline"""
