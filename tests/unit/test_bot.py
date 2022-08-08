@@ -534,7 +534,7 @@ class TestBot:
             g_message = telegram.messages[-2]
             types = [entity.type for entity in g_message.entities]
             assert MessageEntity.URL in types
-        
+
         def test_spot_link_without_preview(self, telegram: TelegramSimulator):
             """Tests the /spot command.
             Complete with no the spot without link preview conversation
