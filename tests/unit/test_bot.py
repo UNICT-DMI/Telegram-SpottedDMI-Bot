@@ -449,7 +449,7 @@ class TestBot:
 
         def test_report_user_cooldown_cmd(self, telegram: TelegramSimulator):
             """Tests the /report user command's cooldown timer.
-            The user cannot report again for the amount of time enstablished in the settings
+            The user cannot report again for the amount of time established in the settings
             """
             telegram.send_command("/report")
             assert telegram.last_message.text == "Invia l'username di chi vuoi segnalare. Es. @massimobene"
@@ -533,12 +533,14 @@ class TestBot:
 
             assert telegram.last_message.text == "Il post contiene link, vuoi pubblicare con l'anteprima?"
             assert telegram.last_message.reply_to_message is not None
-            telegram.send_callback_query(text="Si")
 
-            # The reply is None after message edit, help is needed
+            telegram.send_callback_query(text="Si")
             assert telegram.last_message.text == "Sei sicuro di voler publicare questo post?"
-            telegram.send_callback_query(text="Si")
 
+            # The last edited message will not have the reply_to_message attribute (because of bot APIs)
+            # So instead we use the original message (the one that was sent before the callback query)
+            # and specify the data of the callback query manually
+            telegram.send_callback_query(data="meme_confirm,submit", message=telegram.messages[-2])
             g_message = telegram.messages[-2]
             types = [entity.type for entity in g_message.entities]
             assert MessageEntity.URL in types

@@ -37,7 +37,7 @@ class TelegramSimulator():
 
     @property
     def current_id(self) -> int:
-        """Returns the current message id and increses it by one"""
+        """Returns the current message id and increases it by one"""
         self.__current_id += 1
         return self.__current_id
 
@@ -83,7 +83,7 @@ class TelegramSimulator():
         return next(filter(lambda message: message.message_id == message_id, self.messages), None)
 
     def get_callback_query_data(self, text: str, message: Message) -> str:
-        """Returs the data of the callback query from the inline button with the given text from the given message
+        """Returns the data of the callback query from the inline button with the given text from the given message
 
         Args:
             text: text of the inline button
