@@ -289,7 +289,7 @@ class TestBot:
             assert telegram.last_message.text == "Invia il post che vuoi pubblicare"
 
             telegram.send_message("Test spot")
-            assert telegram.last_message.text == "Sei sicuro di voler publicare questo post?"
+            assert telegram.last_message.text == "Sei sicuro di voler pubblicare questo post?"
             assert telegram.last_message.reply_to_message is not None
 
             telegram.send_callback_query(text="No")
@@ -306,7 +306,7 @@ class TestBot:
             assert telegram.last_message.text == "Invia il post che vuoi pubblicare"
 
             telegram.send_message("Test spot")
-            assert telegram.last_message.text == "Sei sicuro di voler publicare questo post?"
+            assert telegram.last_message.text == "Sei sicuro di voler pubblicare questo post?"
             assert telegram.last_message.reply_to_message is not None
 
             telegram.send_callback_query(text="Si")
@@ -342,7 +342,7 @@ class TestBot:
             self.test_spot_link_cmd(telegram)
             telegram.send_callback_query(text="Si")
 
-            assert telegram.last_message.text == "Sei sicuro di voler publicare questo post?"
+            assert telegram.last_message.text == "Sei sicuro di voler pubblicare questo post?"
 
         def test_spot_link_without_preview_cmd(self, telegram: TelegramSimulator):
             """Tests the /spot command.
@@ -351,7 +351,7 @@ class TestBot:
             self.test_spot_link_cmd(telegram)
             telegram.send_callback_query(text="No")
 
-            assert telegram.last_message.text == "Sei sicuro di voler publicare questo post?"
+            assert telegram.last_message.text == "Sei sicuro di voler pubblicare questo post?"
 
     class TestBotSettings:
         """Tests the settings commands"""
@@ -525,7 +525,7 @@ class TestBot:
             self.test_spot_link(telegram)
 
             telegram.send_callback_query(text="Si")
-            assert telegram.last_message.text == "Sei sicuro di voler publicare questo post?"
+            assert telegram.last_message.text == "Sei sicuro di voler pubblicare questo post?"
 
             # The last edited message will not have the reply_to_message attribute (because of bot APIs)
             # So instead we use the original message (the one that was sent before the callback query)
@@ -542,7 +542,7 @@ class TestBot:
             self.test_spot_link(telegram)
 
             telegram.send_callback_query(text="No")
-            assert telegram.last_message.text == "Sei sicuro di voler publicare questo post?"
+            assert telegram.last_message.text == "Sei sicuro di voler pubblicare questo post?"
 
             telegram.send_callback_query(data="meme_confirm,submit", message=telegram.messages[-2])
             g_message = telegram.messages[-2]
@@ -561,7 +561,7 @@ class TestBot:
             assert telegram.last_message.text == "Invia il post che vuoi pubblicare"
 
             telegram.send_message("Test spot")
-            assert telegram.last_message.text == "Sei sicuro di voler publicare questo post?"
+            assert telegram.last_message.text == "Sei sicuro di voler pubblicare questo post?"
             assert telegram.last_message.reply_to_message is not None
 
             telegram.send_callback_query(text="Si")

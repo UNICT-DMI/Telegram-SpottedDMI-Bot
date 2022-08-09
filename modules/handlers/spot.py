@@ -89,7 +89,7 @@ def spot_msg(update: Update, context: CallbackContext) -> int:
             return STATE['posting']
 
     info.bot.send_message(chat_id=info.chat_id,
-                          text="Sei sicuro di voler publicare questo post?",
+                          text="Sei sicuro di voler pubblicare questo post?",
                           reply_to_message_id=info.message_id,
                           reply_markup=get_confirm_kb())
     return STATE['confirm']
@@ -114,7 +114,7 @@ def spot_preview_query(update: Update, context: CallbackContext) -> int:
     info.user_data['preview'] = arg == "accept"
     info.bot.edit_message_text(chat_id=info.chat_id,
                                 message_id=info.message_id,
-                                text="Sei sicuro di voler publicare questo post?",
+                                text="Sei sicuro di voler pubblicare questo post?",
                                 reply_markup=get_confirm_kb())
     return STATE['confirm']
 
