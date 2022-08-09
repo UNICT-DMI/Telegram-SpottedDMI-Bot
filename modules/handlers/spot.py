@@ -3,7 +3,7 @@ from random import choice
 from telegram import Update
 from telegram.ext import CallbackContext, ConversationHandler, CommandHandler, MessageHandler, Filters, CallbackQueryHandler
 from modules.data import User
-from modules.utils import EventInfo, conv_cancel, get_confirm_kb
+from modules.utils import EventInfo, conv_cancel, get_confirm_kb, get_preview_kb
 from modules.handlers.constants import CHAT_PRIVATE_ERROR, INVALID_MESSAGE_TYPE_ERROR
 from modules.data import Config
 from modules.data.data_reader import read_md
@@ -24,8 +24,9 @@ def spot_conv_handler() -> ConversationHandler:
     return ConversationHandler(
         entry_points=[CommandHandler("spot", spot_cmd)],
         states={
-            STATE['posting']: [MessageHandler(~Filters.command & ~Filters.update.edited_message, spot_msg)],
-            STATE['confirm']: [CallbackQueryHandler(spot_confirm_query, pattern=r"^meme_confirm,.+")]
+            STATE['posting']: [MessageHandler(~Filters.command & ~Filters.update.edited_message, spot_msg),
+                               CallbackQueryHandler(spot_preview_query, pattern=r"^meme_preview,.+")],
+            STATE['confirm']: [CallbackQueryHandler(spot_confirm_query, pattern=r"^meme_confirm,.+")],
         },
         fallbacks=[CommandHandler("cancel", conv_cancel("spot"))],
         allow_reentry=False)
@@ -77,10 +78,44 @@ def spot_msg(update: Update, context: CallbackContext) -> int:
         info.bot.send_message(chat_id=info.chat_id, text=INVALID_MESSAGE_TYPE_ERROR)
         return STATE['posting']
 
+    if info.message.entities:
+        types = [entity.type for entity in info.message.entities]
+
+        if "url" in types or "text_link" in types:
+            info.bot.send_message(chat_id=info.chat_id,
+                                  text="Il post contiene link, vuoi pubblicare con l'anteprima?",
+                                  reply_to_message_id=info.message_id,
+                                  reply_markup=get_preview_kb())
+            return STATE['posting']
+
     info.bot.send_message(chat_id=info.chat_id,
-                          text="Sei sicuro di voler publicare questo post?",
+                          text="Sei sicuro di voler pubblicare questo post?",
                           reply_to_message_id=info.message_id,
                           reply_markup=get_confirm_kb())
+    return STATE['confirm']
+
+
+def spot_preview_query(update: Update, context: CallbackContext) -> int:
+    """Handles the [ accept | reject ] callback.
+    Let the user decide if wants to post the message with or without preview.
+
+    - accept: the post will be published with preview
+    - reject: the post will be published without preview
+
+    Args:
+        update: update event
+        context: context passed by the handler
+
+    Returns:
+        next state of the conversation
+    """
+    info = EventInfo.from_callback(update, context)
+    arg = info.query_data.split(",")[1]
+    info.user_data['preview'] = arg == "accept"
+    info.bot.edit_message_text(chat_id=info.chat_id,
+                                message_id=info.message_id,
+                                text="Sei sicuro di voler pubblicare questo post?",
+                                reply_markup=get_confirm_kb())
     return STATE['confirm']
 
 

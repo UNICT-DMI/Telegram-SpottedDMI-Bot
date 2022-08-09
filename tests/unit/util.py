@@ -37,7 +37,7 @@ class TelegramSimulator():
 
     @property
     def current_id(self) -> int:
-        """Returns the current message id and increses it by one"""
+        """Returns the current message id and increases it by one"""
         self.__current_id += 1
         return self.__current_id
 
@@ -83,7 +83,7 @@ class TelegramSimulator():
         return next(filter(lambda message: message.message_id == message_id, self.messages), None)
 
     def get_callback_query_data(self, text: str, message: Message) -> str:
-        """Returs the data of the callback query from the inline button with the given text from the given message
+        """Returns the data of the callback query from the inline button with the given text from the given message
 
         Args:
             text: text of the inline button
@@ -134,6 +134,7 @@ class TelegramSimulator():
                      date: datetime = None,
                      reply_markup: InlineKeyboardMarkup = None,
                      reply_to_message: Union[Message, int] = None,
+                     entities: List[MessageEntity] = None,
                      **kwargs) -> Message:
         """Sends a message to the bot on behalf of the user
 
@@ -145,6 +146,7 @@ class TelegramSimulator():
             date: date when the message was sent
             reply_markup: reply markup to use
             reply_to_message: message (or message_id of said message) to reply to
+            entities: list of entities to use in the message
             **kwargs: additional parameters to be passed to the message
 
         Returns:
@@ -157,6 +159,7 @@ class TelegramSimulator():
                                         date=date,
                                         reply_markup=reply_markup,
                                         reply_to_message=reply_to_message,
+                                        entities=entities,
                                         **kwargs)
         self.add_message(message)
         update = self.make_update(message)
@@ -351,7 +354,7 @@ class TelegramSimulator():
 
     def weaved_delete_webhook(self):
         """Weaves the delete_webhook method in the bot object to intercept telegram's api requests
-        
+
         Returns:
             weaved bot's delete_webhook method
         """

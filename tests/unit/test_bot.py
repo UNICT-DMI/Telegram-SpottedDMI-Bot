@@ -3,7 +3,7 @@
 from datetime import datetime
 from typing import Tuple
 import pytest
-from telegram import Chat, Message, user
+from telegram import Chat, Message, MessageEntity, user
 from tests.unit.util import TelegramSimulator
 from modules.data import Config, read_md, DbManager, User, PendingPost, PublishedPost, Report
 from modules.handlers.constants import CHAT_PRIVATE_ERROR
@@ -289,7 +289,7 @@ class TestBot:
             assert telegram.last_message.text == "Invia il post che vuoi pubblicare"
 
             telegram.send_message("Test spot")
-            assert telegram.last_message.text == "Sei sicuro di voler publicare questo post?"
+            assert telegram.last_message.text == "Sei sicuro di voler pubblicare questo post?"
             assert telegram.last_message.reply_to_message is not None
 
             telegram.send_callback_query(text="No")
@@ -306,7 +306,7 @@ class TestBot:
             assert telegram.last_message.text == "Invia il post che vuoi pubblicare"
 
             telegram.send_message("Test spot")
-            assert telegram.last_message.text == "Sei sicuro di voler publicare questo post?"
+            assert telegram.last_message.text == "Sei sicuro di voler pubblicare questo post?"
             assert telegram.last_message.reply_to_message is not None
 
             telegram.send_callback_query(text="Si")
@@ -319,6 +319,39 @@ class TestBot:
             PendingPost.from_user(1).delete_post()
             telegram.send_command("/spot")
             assert telegram.last_message.text == "Invia il post che vuoi pubblicare"
+
+        def test_spot_link_cmd(self, telegram: TelegramSimulator):
+            """Tests the /spot command.
+            Send spot with a link
+            """
+            telegram.send_command("/spot")
+            assert telegram.last_message.text == "Invia il post che vuoi pubblicare"
+
+            telegram.send_message("Hai vinto un iPad 🎉",
+                entities=[MessageEntity(type=MessageEntity.URL,
+                            offset=0,
+                            length=19,
+                            url="https://www.youtube.com/watch?v=dQw4w9WgXcQ")])
+
+            assert telegram.last_message.text == "Il post contiene link, vuoi pubblicare con l'anteprima?"
+
+        def test_spot_link_with_preview_cmd(self, telegram: TelegramSimulator):
+            """Tests the /spot command.
+            Send spot with a link with preview and complete the conversation
+            """
+            self.test_spot_link_cmd(telegram)
+            telegram.send_callback_query(text="Si")
+
+            assert telegram.last_message.text == "Sei sicuro di voler pubblicare questo post?"
+
+        def test_spot_link_without_preview_cmd(self, telegram: TelegramSimulator):
+            """Tests the /spot command.
+            Send spot with a link with preview and complete the conversation
+            """
+            self.test_spot_link_cmd(telegram)
+            telegram.send_callback_query(text="No")
+
+            assert telegram.last_message.text == "Sei sicuro di voler pubblicare questo post?"
 
     class TestBotSettings:
         """Tests the settings commands"""
@@ -416,7 +449,7 @@ class TestBot:
 
         def test_report_user_cooldown_cmd(self, telegram: TelegramSimulator):
             """Tests the /report user command's cooldown timer.
-            The user cannot report again for the amount of time enstablished in the settings
+            The user cannot report again for the amount of time established in the settings
             """
             telegram.send_command("/report")
             assert telegram.last_message.text == "Invia l'username di chi vuoi segnalare. Es. @massimobene"
@@ -467,6 +500,56 @@ class TestBot:
             # the query will be answered with a warning but no new messages will be sent by the bot
             assert telegram.last_message.text == "Gli admins verificheranno quanto accaduto. Grazie per la collaborazione!"
 
+    class TestSpotLinkPreview:
+        """Test the spot link preview"""
+        def test_spot_link(self, telegram: TelegramSimulator):
+            """Tests the /spot command.
+            Send spot with a link
+            """
+            telegram.send_command("/spot")
+            assert telegram.last_message.text == "Invia il post che vuoi pubblicare"
+
+            telegram.send_message("Hai vinto un iPad 🎉",
+                entities=[MessageEntity(type=MessageEntity.URL,
+                            offset=0,
+                            length=19,
+                            url="https://www.youtube.com/watch?v=dQw4w9WgXcQ")])
+
+            assert telegram.last_message.text == "Il post contiene link, vuoi pubblicare con l'anteprima?"
+            assert telegram.last_message.reply_to_message is not None
+
+        def test_spot_link_with_preview(self, telegram: TelegramSimulator):
+            """Tests the /spot command.
+            Complete with yes the spot with link preview conversation
+            """
+            self.test_spot_link(telegram)
+
+            telegram.send_callback_query(text="Si")
+            assert telegram.last_message.text == "Sei sicuro di voler pubblicare questo post?"
+
+            # The last edited message will not have the reply_to_message attribute (because of bot APIs)
+            # So instead we use the original message (the one that was sent before the callback query)
+            # and specify the data of the callback query manually
+            telegram.send_callback_query(data="meme_confirm,submit", message=telegram.messages[-2])
+            g_message = telegram.messages[-2]
+            types = [entity.type for entity in g_message.entities]
+            assert MessageEntity.URL in types
+
+        def test_spot_link_without_preview(self, telegram: TelegramSimulator):
+            """Tests the /spot command.
+            Complete with no the spot without link preview conversation
+            """
+            self.test_spot_link(telegram)
+
+            telegram.send_callback_query(text="No")
+            assert telegram.last_message.text == "Sei sicuro di voler pubblicare questo post?"
+
+            telegram.send_callback_query(data="meme_confirm,submit", message=telegram.messages[-2])
+            g_message = telegram.messages[-2]
+            types = [entity.type for entity in g_message.entities]
+            assert MessageEntity.URL in types
+            # NOTE: There is no way to check if message has preview
+
     class TestPublishSpot:
         """Tests the complete publishing spot pipeline"""
 
@@ -478,7 +561,7 @@ class TestBot:
             assert telegram.last_message.text == "Invia il post che vuoi pubblicare"
 
             telegram.send_message("Test spot")
-            assert telegram.last_message.text == "Sei sicuro di voler publicare questo post?"
+            assert telegram.last_message.text == "Sei sicuro di voler pubblicare questo post?"
             assert telegram.last_message.reply_to_message is not None
 
             telegram.send_callback_query(text="Si")
