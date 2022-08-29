@@ -251,7 +251,7 @@ class EventInfo():  # pylint: disable=too-many-public-methods
                                                     correct_option_id=poll.correct_option_id,
                                                     reply_markup=get_approve_kb()).message_id
             elif message.text and message.entities:  # maintains the previews, if present
-                show_preview = self.user_data['preview']
+                show_preview = self.user_data['preview'] if 'preview' in self.user_data else True
                 g_message_id = self.__bot.send_message(chat_id=group_id,
                                                        text=message.text,
                                                        reply_markup=get_approve_kb(),
