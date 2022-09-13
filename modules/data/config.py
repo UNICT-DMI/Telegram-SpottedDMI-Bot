@@ -178,9 +178,9 @@ class Config():
         Any key already present will be overwritten
         """
         new_vars = {}
-        self.settings['test'] = self.settings['test'] if self.settings.get('test', False) else {}
-        self.settings['meme'] = self.settings['meme'] if self.settings.get('meme', False) else {}
-        self.settings['debug'] = self.settings['debug'] if self.settings.get('debug', False) else {}
+        self.settings['test'] = self.settings.get('test', {})
+        self.settings['meme'] = self.settings.get('meme', {})
+        self.settings['debug'] = self.settings.get('debug', {})
         env_path = os.path.join(os.path.dirname(__file__), "..", "..", ".env")
         if os.path.exists(env_path):
             envre = re.compile(r'''^([^\s=]+)=(?:[\s"']*)(.+?)(?:[\s"']*)$''')
