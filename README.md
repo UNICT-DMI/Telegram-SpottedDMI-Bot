@@ -151,7 +151,7 @@ bot_tag: "@bot" # tag of the telegram bot
 
 The settings may also be set through environment variables.  
 All the env vars with the same name (case insensitive) will override the ones in the settings file.
-To update the **meme** settings, prefix the env var name with **MEME\_**. The same is true for the **test** settings, that have to be prefixed with **TEST\_** and the **debug** settings, to be prefixed with **DEBUG\_**.
+To update the **meme** settings, prefix the env var name with **MEME\_**. The same is true for the **test** settings, which have to be prefixed with **TEST\_** and the **debug** settings, to be prefixed with **DEBUG\_**.
 
 ```env
 # Environment values
@@ -160,17 +160,17 @@ MEME_N_VOTES=4      # will override the *meme.n_votes* value found in settings.y
 DEBUG_LOCAL_LOG=4   # will override the *debug.local_log* value found in settings.yaml
 ```
 
-The complete order of precedence is for the application of configuration settings is
+The complete order of precedence for the application of configuration settings is
 
 ```
 env var > settings.yaml > settings.yaml.default
 ```
 
-Since every setting has a default value specified in _settings.yaml.default_ except for **token**, this is the only necessary settings to add when setting up the bot for the first time.
+Since every setting has a default value specified in _settings.yaml.default_ except for **token**, this is the only necessary setting to add when setting up the bot for the first time.
 
 ### Settings typing
 
-Typings is provided by default for eny value specified through the _.yaml_ files.
+Typings are provided by default for eny value specified through the _.yaml_ files.
 On the other hand, if you use the environment variables, everything will be treated as a string.  
 To prevent this, you can use the _settings.yaml.types_ specifying a type for each setting.
 This way it will be casted in the specified type.
