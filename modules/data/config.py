@@ -180,6 +180,7 @@ class Config():
         new_vars = {}
         self.settings['test'] = self.settings['test'] if self.settings.get('test', False) else {}
         self.settings['meme'] = self.settings['meme'] if self.settings.get('meme', False) else {}
+        self.settings['debug'] = self.settings['debug'] if self.settings.get('debug', False) else {}
         env_path = os.path.join(os.path.dirname(__file__), "..", "..", ".env")
         if os.path.exists(env_path):
             envre = re.compile(r'''^([^\s=]+)=(?:[\s"']*)(.+?)(?:[\s"']*)$''')
@@ -197,6 +198,8 @@ class Config():
                 self.settings['test'][key[5:]] = value
             elif key.startswith("meme_"):
                 self.settings['meme'][key[5:]] = value
+            elif key.startswith("debug_"):
+                self.settings['debug'][key[6:]] = value
             else:
                 self.settings[key] = value
 
@@ -222,7 +225,9 @@ class Config():
                             conf[key] = bool(conf[key])
                     elif types[key] == "int":
                         conf[key] = int(conf[key])
-                    elif types[key] == "array":
+                    elif types[key] == "float":
+                        conf[key] = float(conf[key])
+                    elif types[key] == "list":
                         if isinstance(conf[key], str):
                             conf[key] = conf[key].split(",")
                     else:

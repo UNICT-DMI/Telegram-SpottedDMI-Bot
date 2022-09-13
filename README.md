@@ -61,8 +61,8 @@ The main ones are:
 
 - Clone this repository
 - \[_OPTIONAL_\] Create _"data/yaml/reactions.yaml"_ and edit the desired parameters.
-- Create [_"config/settings.yaml"_](<(#⚙️-settings)>) and edit the desired parameters. **Make sure to add a valid _token_ setting**.
-- \[_OPTIONAL_\] You could also leave the settings files alone, and use the environment variables on the container instead.
+- Create [_"config/settings.yaml"_](#⚙️-settings) and edit the desired parameters. **Make sure to add a valid _token_ setting**.
+- \[_OPTIONAL_\] You could also leave the settings files alone, and use [_environment variables_](#settings-override) on the container instead.
 - Make sure the bot is in present both in the admin group and in the spot channel. It may need to have admin privileges. If comments are enabled, the bot has to be in the comment group too as an admin.
 - All the env vars with the same name (case insensitive) will override the ones in the settings file.
   To update the **meme** settings, prefix the env var name with **MEME\_**. The same is true for the **test** settings, that have to be prefixed with **TEST\_**.
@@ -103,12 +103,11 @@ The VsCode [Remote - Containers](https://marketplace.visualstudio.com/items?item
 
 ## ⚙️ Settings
 
-When the bot is initialized, the bot reads both the _"data/yaml/reactions.yaml"_ and the _"config/settings.yaml"_ files.  
+When it is initialized, the bot reads both the _"data/yaml/reactions.yaml"_ and the _"config/settings.yaml"_ files.  
 Feel free to customize the settings file. Make sure to add a valid **token** value to run the bot.
 
-_settings.yaml_
-
 ```yaml
+# config/settings.yaml
 debug:
   local_log: false # save each and every message in a log file. Make sure the path "logs/messages.log" is valid when enabled
   reset_on_load: false # whether or not the database should reset every time the bot launches. USE CAREFULLY
@@ -146,6 +145,72 @@ test:
 
 token: xxxxxxxxxxxx # token of the telegram bot
 bot_tag: "@bot" # tag of the telegram bot
+```
+
+### Settings override
+
+The settings may also be set through environment variables.  
+All the env vars with the same name (case insensitive) will override the ones in the settings file.
+To update the **meme** settings, prefix the env var name with **MEME\_**. The same is true for the **test** settings, that have to be prefixed with **TEST\_** and the **debug** settings, to be prefixed with **DEBUG\_**.
+
+```env
+# Environment values
+TOKEN=xxxxxx        # will override the *token* value found in settings.yaml
+MEME_N_VOTES=4      # will override the *meme.n_votes* value found in settings.yaml
+DEBUG_LOCAL_LOG=4   # will override the *debug.local_log* value found in settings.yaml
+```
+
+The complete order of precedence is for the application of configuration settings is
+
+```
+env var > settings.yaml > settings.yaml.default
+```
+
+Since every setting has a default value specified in _settings.yaml.default_ except for **token**, this is the only necessary settings to add when setting up the bot for the first time.
+
+### Settings typing
+
+Typings is provided by default for eny value specified through the _.yaml_ files.
+On the other hand, if you use the environment variables, everything will be treated as a string.  
+To prevent this, you can use the _settings.yaml.types_ specifying a type for each setting.
+This way it will be casted in the specified type.
+
+Supported types:
+
+- bool
+- int
+- float
+- list (of str)
+
+Any unknown type won't be casted.
+This means that env var will remain strings.
+
+```yaml
+# settings.yaml.types
+debug:
+  local_log: bool
+  reset_on_load: bool
+meme:
+  channel_group_id: int
+  channel_id: int
+  channel_tag: str
+  comments: bool
+  group_id: int
+  n_votes: int
+  remove_after_h: int
+  tag: bool
+  report: bool
+  report_wait_mins: int
+  replace_anonymous_comments: bool
+  delete_anonymous_comments: bool
+test:
+  api_hash: str
+  api_id: int
+  session: str
+  bot_tag: str
+  token: str
+token: str
+bot_tag: str
 ```
 
 ## 🧪 _[Optional]_ Setting up testing
