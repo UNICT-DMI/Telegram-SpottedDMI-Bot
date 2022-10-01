@@ -8,6 +8,22 @@ Handlers modules
    :undoc-members:
    :show-inheritance:
 
+anonym\_comment
+---------------------------
+
+.. automodule:: modules.handlers.anonym_comment
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+autoreply
+---------------------------
+
+.. automodule:: modules.handlers.autoreply
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 ban
 ---------------------------
 

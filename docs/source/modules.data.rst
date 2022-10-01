@@ -8,6 +8,14 @@ Data modules
    :undoc-members:
    :show-inheritance:
 
+config
+--------------------------------
+
+.. automodule:: modules.data.config
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 data\_reader
 --------------------------------
 
