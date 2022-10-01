@@ -3,8 +3,8 @@ from telegram import Update
 from telegram.ext import CallbackContext, ConversationHandler, CommandHandler, MessageHandler, Filters
 from modules.data import Report
 from modules.utils import EventInfo, conv_cancel
-from modules.handlers.constants import CHAT_PRIVATE_ERROR, INVALID_MESSAGE_TYPE_ERROR
 from modules.data import Config
+from .constants import CHAT_PRIVATE_ERROR, INVALID_MESSAGE_TYPE_ERROR
 
 STATE = {'reporting_user': 1, 'reporting_user_reason': 2, 'end': -1}
 

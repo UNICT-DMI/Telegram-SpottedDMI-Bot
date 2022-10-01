@@ -1,7 +1,7 @@
 """/db_backup command"""
 from telegram import Update
 from telegram.ext import CallbackContext
-from modules.handlers.job_handlers import db_backup_job
+from .job_handlers import db_backup_job
 
 
 def db_backup_cmd(_: Update, context: CallbackContext):

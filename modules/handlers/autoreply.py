@@ -3,13 +3,7 @@ from telegram import Update
 from telegram.ext import CallbackContext
 from modules.data import PendingPost, Report, read_md
 from modules.utils import EventInfo
-
-AUTOREPLIES = {
-    'gruppi materie': "autoreply_subject_groups",
-    'rappresentanti': "autoreply_representatives",
-    'repost': "autoreply_repost",
-    'lista': "autoreply_list"
-}
+from .constants import AUTOREPLIES
 
 
 def autoreply_cmd(update: Update, context: CallbackContext):

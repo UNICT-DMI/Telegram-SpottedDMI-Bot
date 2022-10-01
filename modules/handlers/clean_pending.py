@@ -1,7 +1,7 @@
 """/clean_pending command"""
 from telegram import Update
 from telegram.ext import CallbackContext
-from modules.handlers.job_handlers import clean_pending_job
+from .job_handlers import clean_pending_job
 
 
 def clean_pending_cmd(_: Update, context: CallbackContext):

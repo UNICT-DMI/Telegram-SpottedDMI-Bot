@@ -2,7 +2,7 @@
 from telegram import Update, ParseMode
 from telegram.ext import CallbackContext
 from modules.utils import EventInfo, get_settings_kb
-from modules.handlers.constants import CHAT_PRIVATE_ERROR
+from .constants import CHAT_PRIVATE_ERROR
 
 
 def settings_cmd(update: Update, context: CallbackContext):

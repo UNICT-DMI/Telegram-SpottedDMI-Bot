@@ -4,9 +4,9 @@ from telegram import Update
 from telegram.ext import CallbackContext, ConversationHandler, CommandHandler, MessageHandler, Filters, CallbackQueryHandler
 from modules.data import User
 from modules.utils import EventInfo, conv_cancel, get_confirm_kb, get_preview_kb
-from modules.handlers.constants import CHAT_PRIVATE_ERROR, INVALID_MESSAGE_TYPE_ERROR
 from modules.data import Config
 from modules.data.data_reader import read_md
+from .constants import CHAT_PRIVATE_ERROR, INVALID_MESSAGE_TYPE_ERROR
 
 STATE = {'posting': 1, 'confirm': 2, 'end': -1}
 
