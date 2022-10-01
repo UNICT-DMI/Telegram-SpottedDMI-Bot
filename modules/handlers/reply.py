@@ -28,11 +28,13 @@ def reply_cmd(update: Update, context: CallbackContext):
     user_id = None
     if (pending_post := PendingPost.from_group(group_id=info.chat_id, g_message_id=g_message_id)) is not None:
         user_id = pending_post.user_id
+        info.bot.send_message(chat_id=user_id, text="COMUNICAZIONE DEGLI ADMIN SUL TUO ULTIMO POST:\n" + info.text[7:].strip())
     elif (report := Report.from_group(group_id=info.chat_id, g_message_id=g_message_id)) is not None:
         user_id = report.user_id
+        info.bot.send_message(chat_id=user_id,
+                              text="COMUNICAZIONE DEGLI ADMIN SUL TUO ULTIMO REPORT:\n" + info.text[7:].strip())
 
     if user_id is not None:  # the message was a pending post or a report
-        info.bot.send_message(chat_id=user_id, text="COMUNICAZIONE DEGLI ADMIN SUL TUO ULTIMO POST:\n" + info.text[7:].strip())
         info.bot.send_message(chat_id=info.chat_id, text="L'utente ha ricevuto il messaggio", reply_to_message_id=g_message_id)
         return
 
