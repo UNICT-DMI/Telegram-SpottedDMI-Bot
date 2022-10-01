@@ -51,7 +51,7 @@ def add_handlers(disp: Dispatcher):
     """Adds all the needed handlers to the dispatcher
 
     Args:
-        disp: supplyed dispatcher
+        disp: supplied dispatcher
     """
     warnings.filterwarnings("ignore",
                             message="If 'per_message=False', 'CallbackQueryHandler' will not be tracked for every message.")
