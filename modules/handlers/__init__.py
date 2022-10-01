@@ -7,6 +7,7 @@ from telegram.ext import CallbackQueryHandler, CommandHandler, Dispatcher, Filte
 from modules.data.config import Config
 from modules.debug import error_handler, log_message
 from .anonym_comment import anonymous_comment_msg
+from .autoreply import autoreply_cmd
 from .ban import ban_cmd
 from .callback_handlers import meme_callback
 from .cancel import cancel_cmd
@@ -84,6 +85,7 @@ def add_handlers(disp: Dispatcher):
     # MessageHandler
     disp.add_handler(MessageHandler(Filters.reply & admin_filter & Filters.regex(r"^/ban$"), ban_cmd))
     disp.add_handler(MessageHandler(Filters.reply & admin_filter & Filters.regex(r"^/reply"), reply_cmd))
+    disp.add_handler(MessageHandler(Filters.reply & admin_filter & Filters.regex(r"^/autoreply"), autoreply_cmd))
 
     # Callback handlers
     disp.add_handler(CallbackQueryHandler(meme_callback, pattern=r"^meme_\.*"))
