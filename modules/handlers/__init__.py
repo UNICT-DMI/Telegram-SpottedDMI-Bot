@@ -55,33 +55,35 @@ def add_handlers(disp: Dispatcher):
     """
     warnings.filterwarnings("ignore",
                             message="If 'per_message=False', 'CallbackQueryHandler' will not be tracked for every message.")
+
     if Config.settings_get('debug', 'local_log'):  # add MessageHandler only if log_message is enabled
         disp.add_handler(MessageHandler(Filters.all, log_message), 1)
+
+    admin_filter = Filters.chat(chat_id=Config.meme_get('group_id'))
 
     # Error handler
     disp.add_error_handler(error_handler)
 
     # Conversation handler
     disp.add_handler(spot_conv_handler())
-
     disp.add_handler(report_user_conv_handler())
-
     disp.add_handler(report_spot_conv_handler())
+
     # Command handlers
     disp.add_handler(CommandHandler("start", start_cmd))
     disp.add_handler(CommandHandler("help", help_cmd))
     disp.add_handler(CommandHandler("rules", rules_cmd))
     disp.add_handler(CommandHandler("stats", stats_cmd))
     disp.add_handler(CommandHandler("settings", settings_cmd))
-    disp.add_handler(CommandHandler("sban", sban_cmd))
-    disp.add_handler(CommandHandler("clean_pending", clean_pending_cmd))
-    disp.add_handler(CommandHandler("db_backup", db_backup_cmd, run_async=True))
-    disp.add_handler(CommandHandler("purge", purge_cmd, run_async=True))
+    disp.add_handler(CommandHandler("sban", sban_cmd, filters=admin_filter))
+    disp.add_handler(CommandHandler("clean_pending", clean_pending_cmd, filters=admin_filter))
+    disp.add_handler(CommandHandler("db_backup", db_backup_cmd, run_async=True, filters=admin_filter))
+    disp.add_handler(CommandHandler("purge", purge_cmd, run_async=True, filters=admin_filter))
     disp.add_handler(CommandHandler("cancel", cancel_cmd))  # it must be after the conversation handler's 'cancel'
 
     # MessageHandler
-    disp.add_handler(MessageHandler(Filters.reply & Filters.regex(r"^/ban$"), ban_cmd))
-    disp.add_handler(MessageHandler(Filters.reply & Filters.regex(r"^/reply"), reply_cmd))
+    disp.add_handler(MessageHandler(Filters.reply & admin_filter & Filters.regex(r"^/ban$"), ban_cmd))
+    disp.add_handler(MessageHandler(Filters.reply & admin_filter & Filters.regex(r"^/reply"), reply_cmd))
 
     # Callback handlers
     disp.add_handler(CallbackQueryHandler(meme_callback, pattern=r"^meme_\.*"))

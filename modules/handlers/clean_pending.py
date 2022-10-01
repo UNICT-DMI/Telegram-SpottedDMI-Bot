@@ -2,18 +2,14 @@
 from telegram import Update
 from telegram.ext import CallbackContext
 from modules.handlers.job_handlers import clean_pending_job
-from modules.data import Config
-from modules.utils import EventInfo
 
 
-def clean_pending_cmd(update: Update, context: CallbackContext):
+def clean_pending_cmd(_: Update, context: CallbackContext):
     """Handles the /clean_pending command.
     Automatically rejects all pending posts that are older than the chosen amount of hours
 
     Args:
-        update: update event
+        _: update event
         context: context passed by the handler
     """
-    info = EventInfo.from_message(update, context)
-    if info.chat_id == Config.meme_get('group_id'):  # you have to be in the admin group
-        clean_pending_job(context=context)
+    clean_pending_job(context=context)
