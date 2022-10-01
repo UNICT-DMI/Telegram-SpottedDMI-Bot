@@ -17,7 +17,7 @@ def report_spot_conv_handler() -> ConversationHandler:
     - reporting_spot: submit the reason of the report. Expects text
 
     Returns:
-        conversaton handler
+        conversation handler
     """
     return ConversationHandler(
         entry_points=[CallbackQueryHandler(report_spot_callback, pattern=r"^meme_report\.*")],

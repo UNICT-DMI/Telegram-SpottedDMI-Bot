@@ -11,14 +11,14 @@ def get_abs_path(*root_file_path: str) -> str:
         root_file_path: path from the root project directory
 
     Returns:
-        corrisponding abs path
+        corresponding abs path
     """
     root_path = os.path.join(os.path.dirname(__file__), "..", "..")
     return os.path.join(root_path, *root_file_path)
 
 
 def read_file(*root_file_path: str) -> str:
-    """Read the contens of the file
+    """Read the contents of the file
 
     Args:
         root_file_path: path of the file to read from the root project directory
@@ -32,7 +32,7 @@ def read_file(*root_file_path: str) -> str:
 
 
 def read_md(file_name: str) -> str:
-    """Read the contens of a markdown file.
+    """Read the contents of a markdown file.
     The path is data/markdown.
     It also will replace the following parts of the text:
 

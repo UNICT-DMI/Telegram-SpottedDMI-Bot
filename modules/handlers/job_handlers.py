@@ -57,4 +57,4 @@ def db_backup_job(context: CallbackContext):
                                       timeout=600,
                                       caption="✅ Backup effettuato con successo")
         except Exception as ex:  #pylint: disable=broad-except
-            context.bot.send_message(chat_id=admin_group_id, text=f"✖️ Impossibile effetturare il backup\n\n{ex}")
+            context.bot.send_message(chat_id=admin_group_id, text=f"✖️ Impossibile effettuare il backup\n\n{ex}")

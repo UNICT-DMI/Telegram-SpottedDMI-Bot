@@ -19,7 +19,7 @@ def spot_conv_handler() -> ConversationHandler:
     - confirm: confirm or cancel the spot submission. Expects an inline query
 
     Returns:
-        conversaton handler
+        conversation handler
     """
     return ConversationHandler(
         entry_points=[CommandHandler("spot", spot_cmd)],

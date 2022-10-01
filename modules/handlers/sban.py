@@ -19,7 +19,7 @@ def sban_cmd(update: Update, context: CallbackContext):
             info.bot.send_message(chat_id=info.chat_id, text="[uso]: /sban <user_id1> [...user_id2]")
             return
         for user_id in context.args:
-            # the sban was unsuccesful (maybe the user id was not found)
+            # the sban was unsuccessful (maybe the user id was not found)
             if not User(int(user_id)).sban():
                 break
         else:

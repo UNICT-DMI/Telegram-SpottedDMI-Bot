@@ -17,7 +17,7 @@ def report_user_conv_handler() -> ConversationHandler:
     - reporting_user_reason: submit the reason of the report. Expects text
 
     Returns:
-        conversaton handler
+        conversation handler
     """
     return ConversationHandler(
         entry_points=[CommandHandler("report", report_cmd)],
@@ -50,8 +50,8 @@ def report_cmd(update: Update, context: CallbackContext) -> int:
     user_report = Report.get_last_user_report(user_id=info.user_id)
 
     if user_report is not None:
-        minutes_enlapsed = user_report.minutes_passed
-        remain_minutes = int(Config.meme_get('report_wait_mins') - minutes_enlapsed)
+        minutes_elapsed = user_report.minutes_passed
+        remain_minutes = int(Config.meme_get('report_wait_mins') - minutes_elapsed)
 
         if remain_minutes > 0:
             info.bot.send_message(chat_id=info.chat_id, text=f"Aspetta {remain_minutes} minuti")

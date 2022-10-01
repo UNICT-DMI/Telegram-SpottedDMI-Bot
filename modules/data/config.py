@@ -174,7 +174,7 @@ class Config():
         return conf
 
     def __read_env_settings(self):
-        """Reads the enviroment variables and stores the values in the config dict.
+        """Reads the environment variables and stores the values in the config dict.
         Any key already present will be overwritten
         """
         new_vars = {}
