@@ -291,7 +291,7 @@ class TestBot:
             telegram.send_command("/spot")
             assert telegram.last_message.text == "Sei stato bannato 😅"
 
-        def test_spot_pending_cmd(self, telegram: TelegramSimulator, local_table):
+        def test_spot_pending_cmd(self, telegram: TelegramSimulator):
             """Tests the /spot command.
             Spot is not allowed for users with a pending post
             """
