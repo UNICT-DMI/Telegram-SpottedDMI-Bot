@@ -2,7 +2,8 @@
 from datetime import time
 import warnings
 from pytz import utc
-from telegram.ext import CallbackQueryHandler, CommandHandler, Dispatcher, Filters, MessageHandler
+from telegram import BotCommand
+from telegram.ext import CallbackQueryHandler, CommandHandler, Dispatcher, Filters, MessageHandler, Updater
 from modules.data.config import Config
 from modules.debug import error_handler, log_message
 from .anonym_comment import anonymous_comment_msg
@@ -24,6 +25,26 @@ from .settings import settings_cmd
 from .spot import spot_conv_handler
 from .start import start_cmd
 from .stats import stats_callback, stats_cmd
+
+
+def add_commands(updater: Updater):
+    """Adds the list of commands with their description to the bot
+
+    Args:
+        updater: supplied Updater
+    """
+    commands = [
+        BotCommand("start", "presentazione iniziale del bot"),
+        BotCommand("spot", "inizia a spottare"),
+        BotCommand("cancel ",
+                   "annulla la procedura in corso e cancella l'ultimo spot inviato, se non è ancora stato pubblicato"),
+        BotCommand("help ", "funzionamento e scopo del bot"),
+        BotCommand("report", "segnala un utente"),
+        BotCommand("rules ", "regole da tenere a mente"),
+        BotCommand("stats", "visualizza statistiche sugli spot"),
+        BotCommand("settings", "cambia le impostazioni di privacy")
+    ]
+    updater.bot.set_my_commands(commands=commands)
 
 
 def add_handlers(disp: Dispatcher):
