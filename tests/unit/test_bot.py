@@ -6,7 +6,7 @@ import pytest
 from telegram import Chat, Message, MessageEntity, user
 from tests.unit.util import TelegramSimulator
 from modules.data import Config, read_md, DbManager, User, PendingPost, PublishedPost, Report
-from modules.handlers.constants import CHAT_PRIVATE_ERROR
+from modules.handlers.constants import CHAT_PRIVATE_ERROR, AUTOREPLIES
 
 
 @pytest.fixture(scope="function")
@@ -204,8 +204,7 @@ class TestBot:
             telegram.send_message("/reply TEST", chat=admin_group, reply_to_message=pending_post_message)
             assert telegram.messages[-2].text.startswith("COMUNICAZIONE DEGLI ADMIN SUL TUO ULTIMO POST:\n")
             assert telegram.messages[-2].text.endswith("TEST")
-            assert telegram.last_message.text.startswith("L'utente ha ricevuto il seguente messaggio:\n")
-            assert telegram.last_message.text.endswith("TEST")
+            assert telegram.last_message.text == "L'utente ha ricevuto il messaggio"
 
         def test_reply_report_user_cmd(self, telegram: TelegramSimulator, admin_group: Chat, report_user_message: Message):
             """Tests the /reply command.
@@ -214,8 +213,7 @@ class TestBot:
             telegram.send_message("/reply TEST", chat=admin_group, reply_to_message=report_user_message)
             assert telegram.messages[-2].text.startswith("COMUNICAZIONE DEGLI ADMIN SUL TUO ULTIMO REPORT:\n")
             assert telegram.messages[-2].text.endswith("TEST")
-            assert telegram.last_message.text.startswith("L'utente ha ricevuto il seguente messaggio:\n")
-            assert telegram.last_message.text.endswith("TEST")
+            assert telegram.last_message.text == "L'utente ha ricevuto il messaggio"
 
         def test_reply_report_spot_cmd(self, telegram: TelegramSimulator, admin_group: Chat, report_spot_message: Message):
             """Tests the /reply command.
@@ -225,8 +223,7 @@ class TestBot:
             telegram.send_message("/reply TEST", chat=admin_group, reply_to_message=group_message)
             assert telegram.messages[-2].text.startswith("COMUNICAZIONE DEGLI ADMIN SUL TUO ULTIMO REPORT:\n")
             assert telegram.messages[-2].text.endswith("TEST")
-            assert telegram.last_message.text.startswith("L'utente ha ricevuto il seguente messaggio:\n")
-            assert telegram.last_message.text.endswith("TEST")
+            assert telegram.last_message.text == "L'utente ha ricevuto il messaggio"
 
         def test_clean_pending(self, telegram: TelegramSimulator, admin_group: Chat):
             """Tests the /clean_pending command.
@@ -241,6 +238,40 @@ class TestBot:
             assert telegram.last_message.text == "Sono stati eliminati 1 messaggi rimasti in sospeso"
             assert PendingPost.from_user(1) is None
             assert PendingPost.from_user(2) is not None
+
+        def test_autoreply_invalid_cmd(self, telegram: TelegramSimulator, admin_group: Chat, pending_post_message: Message):
+            """Tests the /autoreply command.
+            The bot lists all available autoreplies
+            """
+            telegram.send_message("/autoreply", chat=admin_group, reply_to_message=pending_post_message)
+            assert telegram.last_message.text == read_md("autoreply_list")
+
+        def test_autoreply_unknown_cmd(self, telegram: TelegramSimulator, admin_group: Chat, pending_post_message: Message):
+            """Tests the /autoreply command.
+            The bot lists all available autoreplies
+            """
+            telegram.send_message("/autoreply unknown", chat=admin_group, reply_to_message=pending_post_message)
+            assert telegram.last_message.text == read_md("autoreply_list")
+
+        def test_autoreply_list_cmd(self, telegram: TelegramSimulator, admin_group: Chat, pending_post_message: Message):
+            """Tests the /reply command.
+            The bot sends an automatic reply to the user
+            """
+            # remove the "list" special autoreply
+            telegram.send_message(f"/autoreply list", chat=admin_group, reply_to_message=pending_post_message)
+            assert telegram.last_message.text == read_md("autoreply_list")
+
+        def test_autoreply_cmd(self, telegram: TelegramSimulator, admin_group: Chat, pending_post_message: Message):
+            """Tests the /reply command.
+            The bot sends an automatic reply to the user
+            """
+            # remove the "list" special autoreply
+            filtered_autoreplies = ((autoreply, file) for (autoreply, file) in AUTOREPLIES.items() if autoreply != "lista")
+            for (autoreply, file) in filtered_autoreplies:
+                telegram.send_message(f"/autoreply {autoreply}", chat=admin_group, reply_to_message=pending_post_message)
+                assert telegram.messages[-2].text.startswith("COMUNICAZIONE DEGLI ADMIN SUL TUO ULTIMO POST:\n")
+                assert telegram.messages[-2].text.endswith(read_md(file))
+                assert telegram.last_message.text == "L'utente ha ricevuto il messaggio"
 
     class TestBotSpotConversation:
         """Tests the spot conversation"""
@@ -260,7 +291,7 @@ class TestBot:
             telegram.send_command("/spot")
             assert telegram.last_message.text == "Sei stato bannato 😅"
 
-        def test_spot_pending_cmd(self, telegram: TelegramSimulator, local_table):
+        def test_spot_pending_cmd(self, telegram: TelegramSimulator):
             """Tests the /spot command.
             Spot is not allowed for users with a pending post
             """
@@ -328,10 +359,12 @@ class TestBot:
             assert telegram.last_message.text == "Invia il post che vuoi pubblicare"
 
             telegram.send_message("Hai vinto un iPad 🎉",
-                entities=[MessageEntity(type=MessageEntity.URL,
-                            offset=0,
-                            length=19,
-                            url="https://www.youtube.com/watch?v=dQw4w9WgXcQ")])
+                                  entities=[
+                                      MessageEntity(type=MessageEntity.URL,
+                                                    offset=0,
+                                                    length=19,
+                                                    url="https://www.youtube.com/watch?v=dQw4w9WgXcQ")
+                                  ])
 
             assert telegram.last_message.text == "Il post contiene link, vuoi pubblicare con l'anteprima?"
 
@@ -502,6 +535,7 @@ class TestBot:
 
     class TestSpotLinkPreview:
         """Test the spot link preview"""
+
         def test_spot_link(self, telegram: TelegramSimulator):
             """Tests the /spot command.
             Send spot with a link
@@ -510,10 +544,12 @@ class TestBot:
             assert telegram.last_message.text == "Invia il post che vuoi pubblicare"
 
             telegram.send_message("Hai vinto un iPad 🎉",
-                entities=[MessageEntity(type=MessageEntity.URL,
-                            offset=0,
-                            length=19,
-                            url="https://www.youtube.com/watch?v=dQw4w9WgXcQ")])
+                                  entities=[
+                                      MessageEntity(type=MessageEntity.URL,
+                                                    offset=0,
+                                                    length=19,
+                                                    url="https://www.youtube.com/watch?v=dQw4w9WgXcQ")
+                                  ])
 
             assert telegram.last_message.text == "Il post contiene link, vuoi pubblicare con l'anteprima?"
             assert telegram.last_message.reply_to_message is not None

@@ -93,18 +93,18 @@ class PendingPost():
                    date=pending_post['message_date'])
 
     @staticmethod
-    def get_all_pending_memes(group_id: int, before: Optional[datetime] = None) -> list:
+    def get_all(group_id: int, before: Optional[datetime] = None) -> list['PendingPost']:
         """Gets the list of pending memes in the specified admin group.
         If before is specified, returns only the one sent before that timestamp
 
         Args:
             group_id: id of the admin group
-            before: timestamp before wich messages will be considered
+            before: timestamp before which messages will be considered
 
         Returns:
             list of ids of pending memes
         """
-        if datetime:
+        if before:
             pending_posts_id = DbManager.select_from(select="g_message_id",
                                                      table_name="pending_meme",
                                                      where="group_id = %s and (message_date < %s or message_date IS NULL)",
@@ -160,7 +160,7 @@ class PendingPost():
         return [vote['admin_id'] for vote in votes]
 
     def show_admins_votes(self, bot: Bot, approve: bool):
-        """After a post is been approved or rejected, shows the admins that aproved or rejected it \
+        """After a post is been approved or rejected, shows the admins that approved or rejected it \
             and edit the message to delete the reply_markup
 
         Args:
@@ -173,6 +173,13 @@ class PendingPost():
         for admin in admins or []:
             username = bot.get_chat(admin).username
             text += f"{tag}{username}\n" if username else f"{bot.get_chat(admin).first_name}\n"
+
+        remaining_pending_posts = [
+            f"• https://t.me/c/{str(post.group_id)[4:]}/{post.g_message_id}\n"
+            for post in __class__.get_all(group_id=self.group_id)
+            if post.g_message_id != self.g_message_id
+        ]
+        text = f"Spot rimanenti:\n{''.join(remaining_pending_posts)}\n" if remaining_pending_posts else text
 
         bot.edit_message_reply_markup(chat_id=self.group_id, message_id=self.g_message_id, reply_markup=None)
         bot.send_message(chat_id=self.group_id, text=text, reply_to_message_id=self.g_message_id)

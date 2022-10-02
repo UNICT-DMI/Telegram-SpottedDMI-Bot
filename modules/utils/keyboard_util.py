@@ -19,6 +19,7 @@ def get_confirm_kb() -> InlineKeyboardMarkup:
         InlineKeyboardButton(text="No", callback_data="meme_confirm,cancel")
     ]])
 
+
 def get_preview_kb() -> InlineKeyboardMarkup:
     """Generates the InlineKeyboard to choose if the post should be previewed or not
 
@@ -122,7 +123,7 @@ def update_approve_kb(keyboard: list[list[InlineKeyboardButton]],
                       pending_post: PendingPost,
                       approve: int = -1,
                       reject: int = -1) -> InlineKeyboardMarkup:
-    """Updates the InlineKeyboard when the valutation of a pending post changes
+    """Updates the InlineKeyboard when the valuation of a pending post changes
 
     Args:
         keyboard: previous keyboard

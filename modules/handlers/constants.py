@@ -3,7 +3,7 @@ from modules.data import Config
 
 CHAT_PRIVATE_ERROR = f"Non puoi usare quest comando ora\nChatta con {Config.settings_get('bot_tag')} in privato"
 INVALID_MESSAGE_TYPE_ERROR = "Questo tipo di messaggio non è supportato\n"\
-                                "È consentito solo testo, stikers, immagini, audio, video o poll\n"\
+                                "È consentito solo testo, stickers, immagini, audio, video o poll\n"\
                                 "Invia il post che vuoi pubblicare\n"\
                                 "Puoi annullare il processo con /cancel"
 STATE = {
@@ -14,4 +14,11 @@ STATE = {
     'reporting_user_reason': 6,
     'sending_user_report': 7,
     'end': -1
+}
+
+AUTOREPLIES = {
+    'gruppi materie': "autoreply_subject_groups",
+    'rappresentanti': "autoreply_representatives",
+    'repost': "autoreply_repost",
+    'lista': "autoreply_list"
 }

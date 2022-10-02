@@ -18,7 +18,7 @@ def clean_pending_job(context: CallbackContext):
     admin_group_id = Config.meme_get('group_id')
 
     before_time = datetime.now(tz=timezone.utc) - timedelta(hours=Config.meme_get('remove_after_h'))
-    pending_posts = PendingPost.get_all_pending_memes(group_id=admin_group_id, before=before_time)
+    pending_posts = PendingPost.get_all(group_id=admin_group_id, before=before_time)
 
     # For each pending meme older than before_time
     removed = 0
@@ -57,4 +57,4 @@ def db_backup_job(context: CallbackContext):
                                       timeout=600,
                                       caption="✅ Backup effettuato con successo")
         except Exception as ex:  #pylint: disable=broad-except
-            context.bot.send_message(chat_id=admin_group_id, text=f"✖️ Impossibile effetturare il backup\n\n{ex}")
+            context.bot.send_message(chat_id=admin_group_id, text=f"✖️ Impossibile effettuare il backup\n\n{ex}")

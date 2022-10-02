@@ -10,14 +10,14 @@ from modules.utils.keyboard_util import REACTION, get_approve_kb, update_approve
 
 
 def old_reactions(data: str) -> str:
-    """Used to mantain compatibility with the old reactions.
+    """Used to maintain compatibility with the old reactions.
     Can be removed later
 
     Args:
         data: callback data
 
     Returns:
-        new reaction data corrisponding with the old reaction
+        new reaction data corresponding with the old reaction
     """
     if data == "meme_vote_yes":
         return "meme_vote,1"
@@ -63,7 +63,6 @@ def meme_callback(update: Update, context: CallbackContext) -> int:
     return output
 
 
-# region handle meme_callback
 def settings_callback(info: EventInfo, arg: str) -> Tuple[Optional[str], None, None]:
     """Handles the settings,[ anonimo | credit ] callback.
 
@@ -234,8 +233,3 @@ def vote_callback(info: EventInfo, arg: str) -> Tuple[None, Optional[InlineKeybo
         info.answer_callback_query(text=f"Hai tolto il {REACTION[arg]}")
 
     return None, get_vote_kb(published_post=published_post), None
-
-
-# endregion
-
-# endregion

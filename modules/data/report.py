@@ -29,7 +29,7 @@ class Report():
 
     @property
     def minutes_passed(self) -> float:
-        """:class:`float`:Ammount of minutes elapsed from when the report was submitted, if applicable"""
+        """:class:`float`:Amount of minutes elapsed from when the report was submitted, if applicable"""
         if self.date is None:
             return -1
 
@@ -67,7 +67,7 @@ class Report():
 
     @classmethod
     def create_user_report(cls, user_id: int, target_username: str, admin_message: Message) -> 'Report':
-        """Adds the report of the user targetting another user
+        """Adds the report of the user targeting another user
 
         Args:
             user_id: id of the user that reported

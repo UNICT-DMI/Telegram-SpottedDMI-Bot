@@ -25,7 +25,7 @@ class DbManager():
 
         Args:
             cur: database cursor
-            query: query to execute. It may contain ? placehorders
+            query: query to execute. It may contain ? placeholders
             args: tuple of values that will replace the placeholders
             error_str: name of the method that caused the exception
             is_many: whether to use the :func:`sqlite3.Cursor.executemany` function

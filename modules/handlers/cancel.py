@@ -3,7 +3,7 @@ from telegram import Update
 from telegram.ext import CallbackContext
 from modules.data import PendingPost
 from modules.utils import EventInfo
-from modules.handlers.constants import STATE
+from .constants import STATE
 
 
 def cancel_cmd(update: Update, context: CallbackContext) -> int:

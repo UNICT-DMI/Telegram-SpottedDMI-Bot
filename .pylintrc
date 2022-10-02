@@ -6,3 +6,6 @@ max-args=7
 
 [FORMAT]
 max-line-length=128
+
+[SIMILARITIES]
+min-similarity-lines=6

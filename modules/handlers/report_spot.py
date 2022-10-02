@@ -4,8 +4,8 @@ from telegram.ext import CallbackContext, ConversationHandler, CommandHandler, M
 from telegram.error import Unauthorized
 from modules.data import Report
 from modules.utils import EventInfo, conv_cancel
-from modules.handlers.constants import INVALID_MESSAGE_TYPE_ERROR
 from modules.data import Config
+from .constants import INVALID_MESSAGE_TYPE_ERROR
 
 STATE = {'reporting_spot': 1, 'end': -1}
 
@@ -17,7 +17,7 @@ def report_spot_conv_handler() -> ConversationHandler:
     - reporting_spot: submit the reason of the report. Expects text
 
     Returns:
-        conversaton handler
+        conversation handler
     """
     return ConversationHandler(
         entry_points=[CallbackQueryHandler(report_spot_callback, pattern=r"^meme_report\.*")],
