@@ -1,10 +1,9 @@
 """Pending post management"""
-# from modules.utils.keyboard_util import get_post_outcome_kb
 from dataclasses import dataclass
+from itertools import zip_longest
 from typing import Optional
 from datetime import datetime, timezone
-from xmlrpc.client import boolean
-from telegram import Message, Bot
+from telegram import Message, Bot, InlineKeyboardButton, InlineKeyboardMarkup
 from .db_manager import DbManager
 from .config import Config
 
@@ -141,11 +140,11 @@ class PendingPost():
                                     where="g_message_id = %s and group_id = %s and is_upvote = %s",
                                     where_args=(self.g_message_id, self.group_id, vote))
 
-    def get_list_admin_votes(self, vote: bool | None = None) -> Optional[list[str]] | Optional[list[(str, bool)]]:
+    def get_list_admin_votes(self, vote: bool | None = None) -> Optional[list[str]] | Optional[list[str, bool]]:
         """Gets the list of admins that approved or rejected the post
 
         Args:
-            vote: whether you look for the approve or reject votes
+            vote: whether you look for the approve or reject votes, or None if you want all the votes
 
         Returns:
             list of admins that approved or rejected a pending post
@@ -171,6 +170,39 @@ class PendingPost():
 
         return [vote['admin_id'] for vote in votes]
 
+
+    # TODO: it should be moved to keyboard_utils, but it will cause circular import
+    def get_post_outcome_kb(self, bot: Bot, votes: list[str, bool]) -> InlineKeyboardMarkup:
+        """Generates the InlineKeyboard for the outcome of a post
+
+        Args:
+            votes: list of votes
+
+        Returns:
+            new inline keyboard
+        """
+        keyboard = []
+
+        approved_by = [vote[0] for vote in votes if vote[1]]
+        rejected_by = [vote[0] for vote in votes if not vote[1]]
+
+        # keyboard with 2 columns: one for the approve votes and one for the reject votes
+        for approve, reject in zip_longest(approved_by, rejected_by, fillvalue=False):
+            keyboard.append([
+                InlineKeyboardButton(f"🟢 {bot.get_chat(approve).username}" if approve else '',
+                                    callback_data="none"),
+                InlineKeyboardButton(f"🔴 {bot.get_chat(reject).username}" if reject else '',
+                                    callback_data="none")
+            ])
+
+        is_approved = len(approved_by) > len(rejected_by)
+        outcome_text = "🟢 Approvato" if is_approved else "🔴 Rifiutato"
+
+        keyboard.append([
+                        InlineKeyboardButton(outcome_text,callback_data="none"),
+        ])
+        return InlineKeyboardMarkup(keyboard)
+
     def show_admins_votes(self, bot: Bot, approve: bool):
         """After a post is been approved or rejected, shows the admins that approved or rejected it \
             and edit the message to delete the reply_markup
@@ -185,9 +217,10 @@ class PendingPost():
         for admin in admins or []:
             username = bot.get_chat(admin).username
             text += f"{tag}{username}\n" if username else f"{bot.get_chat(admin).first_name}\n"
-        
-        # TODO: edit reply markup with post outcome
-        # bot.edit_message_reply_markup(chat_id=self.group_id, message_id=self.g_message_id, reply_markup=get_post_outcome_kb(self.get_list_admin_votes()))
+
+        bot.edit_message_reply_markup(chat_id=self.group_id,
+                                        message_id=self.g_message_id,
+                                        reply_markup=self.get_post_outcome_kb(bot, self.get_list_admin_votes()))
 
         remaining_pending_posts = __class__.get_all(group_id=self.group_id)
         remaining_pending_posts_count = len(remaining_pending_posts) - 1

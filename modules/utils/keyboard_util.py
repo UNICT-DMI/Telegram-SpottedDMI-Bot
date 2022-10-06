@@ -3,7 +3,7 @@ Callback_data format: <callback_family>_<callback_name>,[arg]"""
 from itertools import zip_longest
 from typing import Optional
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
-from modules.data import PendingPost, PublishedPost, Config
+from modules.data import Config, PublishedPost, PendingPost
 
 REACTION = Config.reactions_get('reactions')
 ROWS = Config.reactions_get('rows')
@@ -143,36 +143,4 @@ def update_approve_kb(keyboard: list[list[InlineKeyboardButton]],
         keyboard[0][1].text = f"🔴 {reject}"
     else:
         keyboard[0][1].text = f"🔴 {pending_post.get_votes(vote=False)}"
-    return InlineKeyboardMarkup(keyboard)
-
-
-def get_post_outcome_kb(votes: list[(str, bool)]) -> InlineKeyboardMarkup:
-    """Generates the InlineKeyboard for the outcome of a post
-
-    Args:
-        votes: list of votes
-
-    Returns:
-        new inline keyboard
-    """
-    keyboard = []
-
-    approved_by = [vote for vote in votes if vote['is_upvote']]
-    rejected_by = [vote for vote in votes if not vote['is_upvote']]
-
-    # keyboard with 2 columns: one for the approve votes and one for the reject votes
-    for approve, reject in zip_longest(approved_by, rejected_by, fillvalue=None):
-        keyboard.append([
-            InlineKeyboardButton(f"🟢 {approve['admin_id'] if approve else ''}",
-                                 callback_data="none"),
-            InlineKeyboardButton(f"🔴 {reject['admin_id'] if reject else ''}",
-                                 callback_data="none")
-        ])
-
-    is_approved = len(approved_by) > len(rejected_by)
-    outcome_text = "🟢 Approvato" if is_approved else "🔴 Rifiutato"
-
-    keyboard.append([
-                    InlineKeyboardButton(outcome_text,callback_data="none"),
-    ])
     return InlineKeyboardMarkup(keyboard)
