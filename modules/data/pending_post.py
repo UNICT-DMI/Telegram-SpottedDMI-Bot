@@ -1,11 +1,12 @@
 """Pending post management"""
+# from modules.utils.keyboard_util import get_post_outcome_kb
 from dataclasses import dataclass
 from typing import Optional
 from datetime import datetime, timezone
+from xmlrpc.client import boolean
 from telegram import Message, Bot
 from .db_manager import DbManager
 from .config import Config
-
 
 @dataclass()
 class PendingPost():
@@ -140,7 +141,7 @@ class PendingPost():
                                     where="g_message_id = %s and group_id = %s and is_upvote = %s",
                                     where_args=(self.g_message_id, self.group_id, vote))
 
-    def get_list_admin_votes(self, vote: bool) -> Optional[list[str]]:
+    def get_list_admin_votes(self, vote: bool | None = None) -> Optional[list[str]] | Optional[list[(str, bool)]]:
         """Gets the list of admins that approved or rejected the post
 
         Args:
@@ -149,13 +150,24 @@ class PendingPost():
         Returns:
             list of admins that approved or rejected a pending post
         """
-        votes = DbManager.select_from(select="admin_id",
-                                      table_name="admin_votes",
-                                      where="g_message_id = %s and group_id = %s and is_upvote = %s",
-                                      where_args=(self.g_message_id, self.group_id, vote))
+
+        where = "g_message_id = %s and group_id = %s"
+        where_args = (self.g_message_id, self.group_id)
+
+        if vote is not None:
+            where += " and is_upvote = %s"
+            where_args = (self.g_message_id, self.group_id, vote)
+
+        votes = DbManager.select_from(select="admin_id, is_upvote",
+                                        table_name="admin_votes",
+                                        where=where,
+                                        where_args=where_args)
 
         if len(votes) == 0:  # the vote is not present
             return None
+
+        if vote is None:
+            return [(vote['admin_id'], vote['is_upvote']) for vote in votes]
 
         return [vote['admin_id'] for vote in votes]
 
@@ -173,16 +185,21 @@ class PendingPost():
         for admin in admins or []:
             username = bot.get_chat(admin).username
             text += f"{tag}{username}\n" if username else f"{bot.get_chat(admin).first_name}\n"
+        
+        # TODO: edit reply markup with post outcome
+        # bot.edit_message_reply_markup(chat_id=self.group_id, message_id=self.g_message_id, reply_markup=get_post_outcome_kb(self.get_list_admin_votes()))
 
-        remaining_pending_posts = [
-            f"• https://t.me/c/{str(post.group_id)[4:]}/{post.g_message_id}\n"
-            for post in __class__.get_all(group_id=self.group_id)
-            if post.g_message_id != self.g_message_id
-        ]
-        text = f"Spot rimanenti:\n{''.join(remaining_pending_posts)}\n" if remaining_pending_posts else text
+        remaining_pending_posts = __class__.get_all(group_id=self.group_id)
+        remaining_pending_posts_count = len(remaining_pending_posts) - 1
 
-        bot.edit_message_reply_markup(chat_id=self.group_id, message_id=self.g_message_id, reply_markup=None)
-        bot.send_message(chat_id=self.group_id, text=text, reply_to_message_id=self.g_message_id)
+        # if there are pending post, reply to the oldest one with the number of remaining pending posts
+        if remaining_pending_posts_count > 0:
+            text = f"⬆️ Post in attesa\nRimangono {remaining_pending_posts_count} post in attesa"
+            oldest_pending_post = remaining_pending_posts[1]
+            bot.send_message(chat_id=self.group_id,
+                                text=text,
+                                reply_to_message_id=oldest_pending_post.g_message_id)
+
 
     def __get_admin_vote(self, admin_id: int) -> Optional[bool]:
         """Gets the vote of a specific admin on a pending post
