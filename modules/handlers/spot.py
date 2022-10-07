@@ -53,9 +53,9 @@ def spot_cmd(update: Update, context: CallbackContext) -> int:
         info.bot.send_message(chat_id=info.chat_id, text="Sei stato bannato 😅")
         return STATE['end']
 
-    # if user.is_pending:  # there is already a post in pending
-    #     info.bot.send_message(chat_id=info.chat_id, text="Hai già un post in approvazione 🧐")
-    #     return STATE['end']
+    if user.is_pending:  # there is already a post in pending
+        info.bot.send_message(chat_id=info.chat_id, text="Hai già un post in approvazione 🧐")
+        return STATE['end']
 
     info.bot.send_message(chat_id=info.chat_id, text="Invia il post che vuoi pubblicare")
     return STATE['posting']
@@ -137,9 +137,9 @@ def spot_confirm_query(update: Update, context: CallbackContext) -> int:
     arg = info.query_data.split(",")[1]
     text = "Qualcosa è andato storto!"
     if arg == "submit":  # if the the user wants to publish the post
-        # if User(info.user_id).is_pending:  # there is already a spot in pending by this user
-        #     text = "Hai già un post in approvazione 🧐"
-        if info.send_post_to_admins():
+        if User(info.user_id).is_pending:  # there is already a spot in pending by this user
+            text = "Hai già un post in approvazione 🧐"
+        elif info.send_post_to_admins():
             text = "Il tuo post è in fase di valutazione\n"\
                 f"Una volta pubblicato, lo potrai trovare su {Config.meme_get('channel_tag')}"
         else:
