@@ -4,6 +4,8 @@ from itertools import zip_longest
 from typing import Optional
 from datetime import datetime, timezone
 from telegram import Message, Bot, InlineKeyboardButton, InlineKeyboardMarkup
+
+import modules
 from .db_manager import DbManager
 from .config import Config
 
@@ -218,9 +220,12 @@ class PendingPost():
             username = bot.get_chat(admin).username
             text += f"{tag}{username}\n" if username else f"{bot.get_chat(admin).first_name}\n"
 
+        # fix circular import
+        get_post_outcome_kb = modules.utils.keyboard_util.get_post_outcome_kb
+
         bot.edit_message_reply_markup(chat_id=self.group_id,
                                         message_id=self.g_message_id,
-                                        reply_markup=self.get_post_outcome_kb(bot, self.get_list_admin_votes()))
+                                        reply_markup=get_post_outcome_kb(bot, self.get_list_admin_votes()))
 
         remaining_pending_posts = __class__.get_all(group_id=self.group_id)
         remaining_pending_posts_count = len(remaining_pending_posts) - 1
