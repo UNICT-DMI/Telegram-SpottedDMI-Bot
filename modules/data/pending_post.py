@@ -1,6 +1,7 @@
 """Pending post management"""
 from dataclasses import dataclass
 from itertools import zip_longest
+from this import d
 from typing import Optional
 from datetime import datetime, timezone
 from telegram import Message, Bot, InlineKeyboardButton, InlineKeyboardMarkup
@@ -173,38 +174,6 @@ class PendingPost():
         return [vote['admin_id'] for vote in votes]
 
 
-    # TODO: it should be moved to keyboard_utils, but it will cause circular import
-    def get_post_outcome_kb(self, bot: Bot, votes: list[str, bool]) -> InlineKeyboardMarkup:
-        """Generates the InlineKeyboard for the outcome of a post
-
-        Args:
-            votes: list of votes
-
-        Returns:
-            new inline keyboard
-        """
-        keyboard = []
-
-        approved_by = [vote[0] for vote in votes if vote[1]]
-        rejected_by = [vote[0] for vote in votes if not vote[1]]
-
-        # keyboard with 2 columns: one for the approve votes and one for the reject votes
-        for approve, reject in zip_longest(approved_by, rejected_by, fillvalue=False):
-            keyboard.append([
-                InlineKeyboardButton(f"🟢 {bot.get_chat(approve).username}" if approve else '',
-                                    callback_data="none"),
-                InlineKeyboardButton(f"🔴 {bot.get_chat(reject).username}" if reject else '',
-                                    callback_data="none")
-            ])
-
-        is_approved = len(approved_by) > len(rejected_by)
-        outcome_text = "🟢 Approvato" if is_approved else "🔴 Rifiutato"
-
-        keyboard.append([
-                        InlineKeyboardButton(outcome_text,callback_data="none"),
-        ])
-        return InlineKeyboardMarkup(keyboard)
-
     def show_admins_votes(self, bot: Bot, approve: bool):
         """After a post is been approved or rejected, shows the admins that approved or rejected it \
             and edit the message to delete the reply_markup
@@ -237,6 +206,11 @@ class PendingPost():
             bot.send_message(chat_id=self.group_id,
                                 text=text,
                                 reply_to_message_id=oldest_pending_post.g_message_id)
+        else:
+            text = "Non ci sono post in attesa 🏜️"
+            bot.send_message(chat_id=self.group_id,
+                                text=text,
+                                disable_notification=True)
 
 
     def __get_admin_vote(self, admin_id: int) -> Optional[bool]:

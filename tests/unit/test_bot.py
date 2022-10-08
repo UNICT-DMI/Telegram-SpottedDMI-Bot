@@ -612,7 +612,9 @@ class TestBot:
 
             assert telegram.messages[-4].text == "Test spot"
             assert telegram.messages[-3].text.startswith("Il tuo ultimo post è stato pubblicato")
-            assert telegram.last_message.text.startswith("Approvato da:")
+            assert telegram.messages[-2].reply_markup.inline_keyboard[1][0].text == "✅ Approvato"
+            assert telegram.last_message.text == "Non ci sono post in attesa 🏜️"
+            
             assert PendingPost.from_group(g_message_id=g_message.message_id, group_id=admin_group.id) is None
 
             telegram.send_forward_message(forward_message=telegram.messages[-4],

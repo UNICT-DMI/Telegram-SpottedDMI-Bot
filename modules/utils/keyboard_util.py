@@ -169,7 +169,7 @@ def get_post_outcome_kb(bot: Bot, votes: list[str, bool]) -> InlineKeyboardMarku
         ])
 
     is_approved = len(approved_by) > len(rejected_by)
-    outcome_text = "🟢 Approvato" if is_approved else "🔴 Rifiutato"
+    outcome_text = "✅ Approvato" if is_approved else "❌ Rifiutato"
 
     keyboard.append([
                     InlineKeyboardButton(outcome_text,callback_data="none"),
