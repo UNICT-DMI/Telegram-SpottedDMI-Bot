@@ -3,7 +3,7 @@ Callback_data format: <callback_family>_<callback_name>,[arg]"""
 from itertools import zip_longest
 from typing import Optional
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Bot
-from modules.data import Config, PublishedPost
+from modules.data import Config, PublishedPost, PendingPost
 
 REACTION = Config.reactions_get('reactions')
 ROWS = Config.reactions_get('rows')
@@ -121,7 +121,7 @@ def get_vote_kb(published_post: Optional[PublishedPost] = None) -> Optional[Inli
 
 
 def update_approve_kb(keyboard: list[list[InlineKeyboardButton]],
-                      pending_post: any,
+                      pending_post: PendingPost,
                       approve: int = -1,
                       reject: int = -1) -> InlineKeyboardMarkup:
     """Updates the InlineKeyboard when the valuation of a pending post changes
