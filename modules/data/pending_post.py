@@ -1,11 +1,8 @@
 """Pending post management"""
 from dataclasses import dataclass
-from itertools import zip_longest
-from this import d
 from typing import Optional
 from datetime import datetime, timezone
-from telegram import Message, Bot, InlineKeyboardButton, InlineKeyboardMarkup
-
+from telegram import Message, Bot
 import modules
 from .db_manager import DbManager
 from .config import Config
