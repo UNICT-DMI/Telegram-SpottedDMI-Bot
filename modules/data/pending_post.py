@@ -140,7 +140,7 @@ class PendingPost():
                                     where="g_message_id = %s and group_id = %s and is_upvote = %s",
                                     where_args=(self.g_message_id, self.group_id, vote))
 
-    def get_list_admin_votes(self, vote: bool | None = None) -> Optional[list[str]] | Optional[list[str, bool]]:
+    def get_list_admin_votes(self, vote: 'bool | None' = None) -> 'Optional[list[str]] | Optional[list[str, bool]]':
         """Gets the list of admins that approved or rejected the post
 
         Args:
