@@ -4,12 +4,10 @@ from datetime import datetime
 from typing import Tuple
 import pytest
 from telegram import Chat, Message, MessageEntity, user
-from modules.data.constants import NO_PENDING_MESSAGE
 from modules.utils.constants import APPROVED_KB
-from tests.unit.util import TelegramSimulator
-from modules.data import Config, read_md, DbManager, User, PendingPost, PublishedPost, Report
+from modules.data import Config, read_md, DbManager, User, PendingPost, PublishedPost, Report, NO_PENDING_MESSAGE
 from modules.handlers.constants import CHAT_PRIVATE_ERROR, AUTOREPLIES
-
+from tests.unit.util import TelegramSimulator
 
 @pytest.fixture(scope="function")
 def local_table(init_local_test_db: DbManager) -> DbManager:
