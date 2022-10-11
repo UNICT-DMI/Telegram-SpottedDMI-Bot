@@ -179,12 +179,6 @@ class PendingPost():
             bot: bot
             approve: whether the vote is approve or reject
         """
-        admins = self.get_list_admin_votes(vote=approve)
-        text = "Approvato da:\n" if approve else "Rifiutato da:\n"
-        tag = '@' if Config.meme_get('tag') else ''
-        for admin in admins or []:
-            username = bot.get_chat(admin).username
-            text += f"{tag}{username}\n" if username else f"{bot.get_chat(admin).first_name}\n"
 
         # fix circular import
         get_post_outcome_kb = modules.utils.keyboard_util.get_post_outcome_kb
