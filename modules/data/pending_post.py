@@ -171,7 +171,7 @@ class PendingPost():
         return [vote['admin_id'] for vote in votes]
 
 
-    def show_admins_votes(self, bot: Bot, approve: bool):
+    def show_admins_votes(self, bot: Bot):
         """After a post is been approved or rejected, shows the admins that approved or rejected it \
             and edit the message to delete the reply_markup
 
