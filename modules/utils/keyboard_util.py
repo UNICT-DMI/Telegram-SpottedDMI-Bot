@@ -4,6 +4,7 @@ from itertools import zip_longest
 from typing import Optional
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Bot
 from modules.data import Config, PublishedPost, PendingPost
+from modules.utils.constants import APPROVED_KB, REJECTED_KB
 
 REACTION = Config.reactions_get('reactions')
 ROWS = Config.reactions_get('rows')
@@ -169,7 +170,7 @@ def get_post_outcome_kb(bot: Bot, votes: list[str, bool]) -> InlineKeyboardMarku
         ])
 
     is_approved = len(approved_by) > len(rejected_by)
-    outcome_text = "✅ Approvato" if is_approved else "❌ Rifiutato"
+    outcome_text = APPROVED_KB if is_approved else REJECTED_KB
 
     keyboard.append([
                     InlineKeyboardButton(outcome_text,callback_data="none"),

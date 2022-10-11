@@ -5,7 +5,7 @@ from datetime import datetime, timezone
 from telegram import Message, Bot
 import modules
 from .db_manager import DbManager
-from .config import Config
+from .constants import NO_PENDING_MESSAGE
 
 @dataclass()
 class PendingPost():
@@ -198,9 +198,8 @@ class PendingPost():
                                 text=text,
                                 reply_to_message_id=oldest_pending_post.g_message_id)
         else:
-            text = "Non ci sono post in attesa 🏜️"
             bot.send_message(chat_id=self.group_id,
-                                text=text,
+                                text=NO_PENDING_MESSAGE,
                                 disable_notification=True)
 
 
