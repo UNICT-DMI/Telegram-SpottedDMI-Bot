@@ -188,12 +188,19 @@ class PendingPost():
                                         reply_markup=get_post_outcome_kb(bot, self.get_list_admin_votes()))
 
         remaining_pending_posts = __class__.get_all(group_id=self.group_id)
-        remaining_pending_posts_count = len(remaining_pending_posts) - 1
+
+        # remove the post from the pending posts
+        remaining_pending_posts = [post for post in remaining_pending_posts if post.g_message_id != self.g_message_id]
+
+        remaining_pending_posts.sort(key=lambda post: post.g_message_id)
+
+        remaining_pending_posts_count = len(remaining_pending_posts)
 
         # if there are pending post, reply to the oldest one with the number of remaining pending posts
         if remaining_pending_posts_count > 0:
             text = f"⬆️ Post in attesa\nRimangono {remaining_pending_posts_count} post in attesa"
-            oldest_pending_post = remaining_pending_posts[1]
+            oldest_pending_post = remaining_pending_posts[0]
+
             bot.send_message(chat_id=self.group_id,
                                 text=text,
                                 reply_to_message_id=oldest_pending_post.g_message_id)
