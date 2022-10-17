@@ -24,5 +24,6 @@ test:
   delete_anonymous_comments: true
   comments: true
   report: true
+  n_votes: 1
 token: ''
 bot_tag: ''
