@@ -4,10 +4,10 @@ from datetime import datetime
 from typing import Tuple
 import pytest
 from telegram import Chat, Message, MessageEntity, user
-from tests.unit.util import TelegramSimulator
-from modules.data import Config, read_md, DbManager, User, PendingPost, PublishedPost, Report
+from modules.utils.constants import APPROVED_KB
+from modules.data import Config, read_md, DbManager, User, PendingPost, PublishedPost, Report, NO_PENDING_MESSAGE
 from modules.handlers.constants import CHAT_PRIVATE_ERROR, AUTOREPLIES
-
+from tests.unit.util import TelegramSimulator
 
 @pytest.fixture(scope="function")
 def local_table(init_local_test_db: DbManager) -> DbManager:
@@ -612,7 +612,9 @@ class TestBot:
 
             assert telegram.messages[-4].text == "Test spot"
             assert telegram.messages[-3].text.startswith("Il tuo ultimo post è stato pubblicato")
-            assert telegram.last_message.text.startswith("Approvato da:")
+            assert telegram.messages[-2].reply_markup.inline_keyboard[1][0].text == APPROVED_KB
+            assert telegram.last_message.text == NO_PENDING_MESSAGE
+
             assert PendingPost.from_group(g_message_id=g_message.message_id, group_id=admin_group.id) is None
 
             telegram.send_forward_message(forward_message=telegram.messages[-4],

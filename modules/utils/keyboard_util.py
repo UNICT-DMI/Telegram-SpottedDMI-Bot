@@ -1,8 +1,10 @@
 """Creates the inlinekeyboard sent by the bot in its messages.
 Callback_data format: <callback_family>_<callback_name>,[arg]"""
+from itertools import zip_longest
 from typing import Optional
-from telegram import InlineKeyboardButton, InlineKeyboardMarkup
-from modules.data import PendingPost, PublishedPost, Config
+from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Bot
+from modules.data import Config, PublishedPost, PendingPost
+from modules.utils.constants import APPROVED_KB, REJECTED_KB
 
 REACTION = Config.reactions_get('reactions')
 ROWS = Config.reactions_get('rows')
@@ -142,4 +144,35 @@ def update_approve_kb(keyboard: list[list[InlineKeyboardButton]],
         keyboard[0][1].text = f"🔴 {reject}"
     else:
         keyboard[0][1].text = f"🔴 {pending_post.get_votes(vote=False)}"
+    return InlineKeyboardMarkup(keyboard)
+
+def get_post_outcome_kb(bot: Bot, votes: list[str, bool]) -> InlineKeyboardMarkup:
+    """Generates the InlineKeyboard for the outcome of a post
+
+    Args:
+        votes: list of votes
+
+    Returns:
+        new inline keyboard
+    """
+    keyboard = []
+
+    approved_by = [vote[0] for vote in votes if vote[1]]
+    rejected_by = [vote[0] for vote in votes if not vote[1]]
+
+    # keyboard with 2 columns: one for the approve votes and one for the reject votes
+    for approve, reject in zip_longest(approved_by, rejected_by, fillvalue=False):
+        keyboard.append([
+            InlineKeyboardButton(f"🟢 {bot.get_chat(approve).username}" if approve else '',
+                                callback_data="none"),
+            InlineKeyboardButton(f"🔴 {bot.get_chat(reject).username}" if reject else '',
+                                callback_data="none")
+        ])
+
+    is_approved = len(approved_by) > len(rejected_by)
+    outcome_text = APPROVED_KB if is_approved else REJECTED_KB
+
+    keyboard.append([
+                    InlineKeyboardButton(outcome_text,callback_data="none"),
+    ])
     return InlineKeyboardMarkup(keyboard)
