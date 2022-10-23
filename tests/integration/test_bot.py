@@ -7,7 +7,7 @@ from telegram import Chat, Message, MessageEntity, user
 from modules.utils.constants import APPROVED_KB
 from modules.data import Config, read_md, DbManager, User, PendingPost, PublishedPost, Report, NO_PENDING_MESSAGE
 from modules.handlers.constants import CHAT_PRIVATE_ERROR, AUTOREPLIES
-from tests.unit.util import TelegramSimulator
+from .telegram_simulator import TelegramSimulator
 
 @pytest.fixture(scope="function")
 def local_table(init_local_test_db: DbManager) -> DbManager:
@@ -98,7 +98,7 @@ def channel() -> Chat:
     Returns the channel chat
 
     Returns:
-        admin user
+        channel chat
     """
     group_id = Config.meme_get('channel_id')
     return Chat(id=group_id, type=Chat.CHANNEL)
@@ -110,7 +110,7 @@ def admin_group() -> Chat:
     Returns the admin group chat
 
     Returns:
-        admin user
+        admin group chat
     """
     group_id = Config.meme_get('group_id')
     return Chat(id=group_id, type=Chat.GROUP)
@@ -122,7 +122,7 @@ def channel_group() -> Chat:
     Returns the chat of the public group with the comments
 
     Returns:
-        admin user
+        public group for comments
     """
     channel_group_id = Config.meme_get('channel_group_id')
     return Chat(id=channel_group_id, type=Chat.GROUP)
@@ -258,7 +258,7 @@ class TestBot:
             The bot sends an automatic reply to the user
             """
             # remove the "list" special autoreply
-            telegram.send_message(f"/autoreply list", chat=admin_group, reply_to_message=pending_post_message)
+            telegram.send_message("/autoreply list", chat=admin_group, reply_to_message=pending_post_message)
             assert telegram.last_message.text == read_md("autoreply_list")
 
         def test_autoreply_cmd(self, telegram: TelegramSimulator, admin_group: Chat, pending_post_message: Message):

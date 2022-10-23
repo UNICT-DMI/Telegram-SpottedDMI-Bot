@@ -20,7 +20,7 @@ def db_results(init_local_test_db: DbManager) -> dict:
     }
     init_local_test_db.query_from_file("data/db/db_test.sql")
 
-    with open("tests/unit/db_results.yaml", 'r') as yaml_config:
+    with open("tests/unit/db_results.yaml", 'r', encoding='utf-8') as yaml_config:
         results = yaml.load(yaml_config, Loader=yaml.SafeLoader)
 
     yield results
@@ -29,6 +29,7 @@ def db_results(init_local_test_db: DbManager) -> dict:
 
 
 class TestDB:
+    """Test the DBManager class"""
 
     def test_get_db(self, db_results):
         """Tests the get_db function for the database"""
