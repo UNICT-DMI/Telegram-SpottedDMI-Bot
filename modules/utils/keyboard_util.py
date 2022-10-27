@@ -146,7 +146,8 @@ def update_approve_kb(keyboard: list[list[InlineKeyboardButton]],
         keyboard[0][1].text = f"🔴 {pending_post.get_votes(vote=False)}"
     return InlineKeyboardMarkup(keyboard)
 
-def get_post_outcome_kb(bot: Bot, votes: list[str, bool]) -> InlineKeyboardMarkup:
+
+def get_post_outcome_kb(bot: Bot, votes: list[tuple[int, bool]]) -> InlineKeyboardMarkup:
     """Generates the InlineKeyboard for the outcome of a post
 
     Args:
@@ -163,16 +164,14 @@ def get_post_outcome_kb(bot: Bot, votes: list[str, bool]) -> InlineKeyboardMarku
     # keyboard with 2 columns: one for the approve votes and one for the reject votes
     for approve, reject in zip_longest(approved_by, rejected_by, fillvalue=False):
         keyboard.append([
-            InlineKeyboardButton(f"🟢 {bot.get_chat(approve).username}" if approve else '',
-                                callback_data="none"),
-            InlineKeyboardButton(f"🔴 {bot.get_chat(reject).username}" if reject else '',
-                                callback_data="none")
+            InlineKeyboardButton(f"🟢 {bot.get_chat(approve).username}" if approve else '', callback_data="none"),
+            InlineKeyboardButton(f"🔴 {bot.get_chat(reject).username}" if reject else '', callback_data="none")
         ])
 
     is_approved = len(approved_by) > len(rejected_by)
     outcome_text = APPROVED_KB if is_approved else REJECTED_KB
 
     keyboard.append([
-                    InlineKeyboardButton(outcome_text,callback_data="none"),
+        InlineKeyboardButton(outcome_text, callback_data="none"),
     ])
     return InlineKeyboardMarkup(keyboard)
