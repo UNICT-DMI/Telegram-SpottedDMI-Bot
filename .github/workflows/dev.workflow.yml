@@ -45,4 +45,4 @@ jobs:
           pylint main.py modules
       - name: Test with pytest
         run: |
-          pytest tests/unit/
+          pytest
