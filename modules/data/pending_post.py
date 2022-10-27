@@ -2,10 +2,9 @@
 from dataclasses import dataclass
 from typing import Optional
 from datetime import datetime, timezone
-from telegram import Message, Bot
-import modules
+from telegram import Message
 from .db_manager import DbManager
-from .constants import NO_PENDING_MESSAGE
+
 
 @dataclass()
 class PendingPost():
@@ -140,7 +139,7 @@ class PendingPost():
                                     where="g_message_id = %s and group_id = %s and is_upvote = %s",
                                     where_args=(self.g_message_id, self.group_id, vote))
 
-    def get_list_admin_votes(self, vote: 'bool | None' = None) -> 'Optional[list[str | bool]]':
+    def get_list_admin_votes(self, vote: 'bool | None' = None) -> 'list[int] | list[tuple[int, bool]]':
         """Gets the list of admins that approved or rejected the post
 
         Args:
@@ -158,57 +157,14 @@ class PendingPost():
             where_args = (self.g_message_id, self.group_id, vote)
 
         votes = DbManager.select_from(select="admin_id, is_upvote",
-                                        table_name="admin_votes",
-                                        where=where,
-                                        where_args=where_args)
-
-        if len(votes) == 0:  # the vote is not present
-            return None
+                                      table_name="admin_votes",
+                                      where=where,
+                                      where_args=where_args)
 
         if vote is None:
             return [(vote['admin_id'], vote['is_upvote']) for vote in votes]
 
         return [vote['admin_id'] for vote in votes]
-
-
-    def show_admins_votes(self, bot: Bot):
-        """After a post is been approved or rejected, shows the admins that approved or rejected it \
-            and edit the message to delete the reply_markup
-
-        Args:
-            bot: bot
-            approve: whether the vote is approve or reject
-        """
-
-        # fix circular import
-        get_post_outcome_kb = modules.utils.keyboard_util.get_post_outcome_kb
-
-        bot.edit_message_reply_markup(chat_id=self.group_id,
-                                        message_id=self.g_message_id,
-                                        reply_markup=get_post_outcome_kb(bot, self.get_list_admin_votes()))
-
-        remaining_pending_posts = __class__.get_all(group_id=self.group_id)
-
-        # remove the post from the pending posts
-        remaining_pending_posts = [post for post in remaining_pending_posts if post.g_message_id != self.g_message_id]
-
-        remaining_pending_posts.sort(key=lambda post: post.g_message_id)
-
-        remaining_pending_posts_count = len(remaining_pending_posts)
-
-        # if there are pending post, reply to the oldest one with the number of remaining pending posts
-        if remaining_pending_posts_count > 0:
-            text = f"⬆️ Post in attesa\nRimangono {remaining_pending_posts_count} post in attesa"
-            oldest_pending_post = remaining_pending_posts[0]
-
-            bot.send_message(chat_id=self.group_id,
-                                text=text,
-                                reply_to_message_id=oldest_pending_post.g_message_id)
-        else:
-            bot.send_message(chat_id=self.group_id,
-                                text=NO_PENDING_MESSAGE,
-                                disable_notification=True)
-
 
     def __get_admin_vote(self, admin_id: int) -> Optional[bool]:
         """Gets the vote of a specific admin on a pending post

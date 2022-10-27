@@ -158,7 +158,7 @@ def approve_yes_callback(info: EventInfo, _: None) -> Tuple[None, Optional[Inlin
             logger.warning("Notifying the user on approve_yes: %s", ex)
 
         # Shows the list of admins who approved the pending post and removes it form the db
-        pending_post.show_admins_votes(bot=info.bot)
+        info.show_admins_votes(pending_post)
         pending_post.delete_post()
         return None, None, None
 
@@ -198,7 +198,7 @@ def approve_no_callback(info: EventInfo, _: None) -> Tuple[None, Optional[Inline
             logger.warning("Notifying the user on approve_no: %s", ex)
 
         # Shows the list of admins who refused the pending post and removes it form the db
-        pending_post.show_admins_votes(bot=info.bot)
+        info.show_admins_votes(pending_post)
         pending_post.delete_post()
         return None, None, None
 
