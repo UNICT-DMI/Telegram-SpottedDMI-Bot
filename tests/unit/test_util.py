@@ -196,7 +196,7 @@ class TestUtil:
 
             assert info.text is None
             assert info.message_id is None
-            assert info.is_valid_message_type is None
+            assert info.is_valid_message_type is False
             assert info.reply_markup is None
 
             assert info.user_id is None

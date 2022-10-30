@@ -5,7 +5,7 @@ from typing import Tuple
 import pytest
 from telegram import Chat, Message, MessageEntity, user
 from modules.utils.constants import APPROVED_KB
-from modules.data import Config, read_md, DbManager, User, PendingPost, PublishedPost, Report, NO_PENDING_MESSAGE
+from modules.data import Config, read_md, DbManager, User, PendingPost, PublishedPost, Report
 from modules.handlers.constants import CHAT_PRIVATE_ERROR, AUTOREPLIES
 from .telegram_simulator import TelegramSimulator
 
@@ -610,14 +610,13 @@ class TestBot:
             telegram.send_callback_query(text="🟢 0", message=g_message)
             telegram.send_callback_query(text="🟢 1", message=g_message, user=user.User(2, first_name="Test2", is_bot=False))
 
-            assert telegram.messages[-4].text == "Test spot"
-            assert telegram.messages[-3].text.startswith("Il tuo ultimo post è stato pubblicato")
-            assert telegram.messages[-2].reply_markup.inline_keyboard[1][0].text == APPROVED_KB
-            assert telegram.last_message.text == NO_PENDING_MESSAGE
+            assert telegram.messages[-3].text == "Test spot"
+            assert telegram.messages[-2].text.startswith("Il tuo ultimo post è stato pubblicato")
+            assert telegram.last_message.reply_markup.inline_keyboard[1][0].text == APPROVED_KB
 
             assert PendingPost.from_group(g_message_id=g_message.message_id, group_id=admin_group.id) is None
 
-            telegram.send_forward_message(forward_message=telegram.messages[-4],
+            telegram.send_forward_message(forward_message=telegram.messages[-3],
                                           chat=channel_group,
                                           is_automatic_forward=True,
                                           user=user.User(1, first_name="Telegram", is_bot=False))

@@ -4,7 +4,7 @@ from telegram.ext import CallbackContext
 from telegram.error import BadRequest
 from modules.debug.log_manager import logger
 from modules.data import Config, PendingPost, PublishedPost, User
-from modules.utils.keyboard_util import get_approve_kb, get_vote_kb
+from modules.utils.keyboard_util import get_approve_kb, get_vote_kb, get_post_outcome_kb
 
 
 class EventInfo():  # pylint: disable=too-many-public-methods
@@ -92,9 +92,9 @@ class EventInfo():  # pylint: disable=too-many-public-methods
     def is_valid_message_type(self) -> bool:
         """Whether or not the type of the message is supported"""
         if self.__message is None:
-            return None
-        return self.__message.text or self.__message.photo or self.__message.voice or self.__message.audio\
-        or self.__message.video or self.__message.animation or self.__message.sticker or self.__message.poll
+            return False
+        return bool(self.__message.text or self.__message.photo or self.__message.voice or self.__message.audio\
+        or self.__message.video or self.__message.animation or self.__message.sticker or self.__message.poll)
 
     @property
     def reply_markup(self) -> ReplyMarkup:
@@ -113,7 +113,7 @@ class EventInfo():  # pylint: disable=too-many-public-methods
         return None
 
     @property
-    def user_username(self) -> int:
+    def user_username(self) -> str:
         """Username of the user that caused the update"""
         if self.__query is not None:
             return self.__query.from_user.username
@@ -138,7 +138,7 @@ class EventInfo():  # pylint: disable=too-many-public-methods
         return self.__message.reply_markup
 
     @property
-    def query_id(self) -> int:
+    def query_id(self) -> str:
         """Id of the query that caused the update"""
         if self.__query is None:
             return None
@@ -313,3 +313,33 @@ class EventInfo():  # pylint: disable=too-many-public-methods
                                                   reply_to_message_id=message.message_id).message_id
 
         PublishedPost.create(channel_id=channel_group_id, c_message_id=post_message_id)
+
+    def show_admins_votes(self, pending_post: PendingPost):
+        """After a post is been approved or rejected, shows the admins that approved or rejected it \
+            and edit the message to show the admin's votes
+
+        Args:
+            pending_post: post to show the admin's votes for
+        """
+        inline_keyboard = get_post_outcome_kb(self.__bot, pending_post.get_list_admin_votes())
+        self.__bot.edit_message_reply_markup(chat_id=pending_post.group_id,
+                                             message_id=pending_post.g_message_id,
+                                             reply_markup=inline_keyboard)
+
+        remaining_pending_posts = PendingPost.get_all(group_id=pending_post.group_id)
+
+        # remove the post from the pending posts
+        remaining_pending_posts = [post for post in remaining_pending_posts if post.g_message_id != pending_post.g_message_id]
+
+        remaining_pending_posts.sort(key=lambda post: post.g_message_id)
+
+        remaining_pending_posts_count = len(remaining_pending_posts)
+
+        # if there are pending post, reply to the oldest one with the number of remaining pending posts
+        if remaining_pending_posts_count > 0:
+            text = f"⬆️ Post in attesa\nRimangono {remaining_pending_posts_count} post in attesa"
+            oldest_pending_post = remaining_pending_posts[0]
+
+            self.__bot.send_message(chat_id=pending_post.group_id,
+                                    text=text,
+                                    reply_to_message_id=oldest_pending_post.g_message_id)
