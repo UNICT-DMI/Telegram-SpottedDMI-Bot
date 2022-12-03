@@ -14,11 +14,14 @@ SettingsKeysType = Literal[SettingsKeys, SettingsMemeKeys, SettingsDebugKeys, Se
 
 ReactionKeysType = Literal["reactions", "rows"]
 
+AutorepliesKeysType = Literal["autoreplies"]
+
 
 class Config():
     """Configurations"""
     SETTINGS_PATH = ("config", "settings.yaml")
     REACTION_PATH = ("data", "yaml", "reactions.yaml")
+    AUTOREPLIES_PATH = ("data", "yaml", "autoreplies.yaml")
     __instance: Optional['Config'] = None
 
     @classmethod
@@ -105,6 +108,22 @@ class Config():
         return cls.__get(instance.reactions, *keys, default=default)
 
     @classmethod
+    def autoreplies_get(cls, *keys: AutorepliesKeysType, default: Any = None) -> Any:
+        """Get the value of the specified key in the autoreplies configuration dictionary.
+        If the key is a tuple, it will return the value of the nested key.
+        If the key is not present, it will return the default value.
+
+        Args:
+            key: key to get
+            default: default value to return if the key is not present
+
+        Returns:
+            value of the key or default value
+        """
+        instance = cls.__get_instance()
+        return cls.__get(instance.autoreplies, *keys, default=default)
+
+    @classmethod
     def override_test_settings(cls):
         """Overrides the settings with the test settings"""
         instance = cls.__get_instance()
@@ -121,11 +140,13 @@ class Config():
         root_path = os.path.join(os.path.dirname(__file__), "..", "..")
         self.settings_path = os.path.join(root_path, *self.SETTINGS_PATH)
         self.reaction_path = os.path.join(root_path, *self.REACTION_PATH)
+        self.autoreplies_path = os.path.join(root_path, *self.AUTOREPLIES_PATH)
 
         # Read the local configuration.
         # First, load the .default file, than override it with any non .default file
         self.settings = self.__load_configuration(self.settings_path, force_load=True)
         self.reactions = self.__load_configuration(self.reaction_path)
+        self.autoreplies = self.__load_configuration(self.autoreplies_path)
 
         # Read the environment configuration, if present, and override the settings
         self.__read_env_settings()

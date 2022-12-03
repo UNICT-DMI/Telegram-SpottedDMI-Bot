@@ -1,12 +1,12 @@
 """Handles the execution of callbacks by the bot"""
 from typing import Optional, Tuple
-from telegram import Update, InlineKeyboardMarkup, InlineKeyboardButton
+from telegram import Update, InlineKeyboardMarkup
 from telegram.ext import CallbackContext
 from telegram.error import BadRequest, RetryAfter, Unauthorized
 from modules.debug import logger
 from modules.data import Config, PendingPost, PublishedPost, User
 from modules.utils import EventInfo
-from modules.utils.keyboard_util import REACTION, get_approve_kb, update_approve_kb, get_vote_kb
+from modules.utils.keyboard_util import REACTION, get_approve_kb, update_approve_kb, get_vote_kb, get_paused_kb
 
 
 def old_reactions(data: str) -> str:
@@ -116,15 +116,37 @@ def approve_status_callback(info: EventInfo, arg: None) -> Tuple[None, Optional[
     """
     keyboard = None
     if arg == "pause":  # if the the admin wants to pause approval of the post
-        keyboard = InlineKeyboardMarkup([[InlineKeyboardButton(text="▶️ Resume", callback_data="meme_approve_status,play")]])
+        keyboard = get_paused_kb()
     elif arg == "play":  # if the the admin wants to resume approval of the post
-        pending_post = PendingPost.from_group(group_id=info.chat_id, g_message_id=info.message_id)
+        pending_post = PendingPost.from_group(
+            group_id=info.chat_id, g_message_id=info.message_id)
         if pending_post:
-            keyboard = update_approve_kb(get_approve_kb().inline_keyboard, pending_post)
+            keyboard = update_approve_kb(
+                get_approve_kb().inline_keyboard, pending_post)
     else:
         logger.error("confirm_callback: invalid arg '%s'", arg)
 
     return None, keyboard, None
+
+
+def autoreply_callback(info: EventInfo, arg: str) -> Tuple[None, None, None]:
+    """Handles the autoreply callback.
+    Reply to the user that requested the post
+
+    Args:
+        info: information about the callback
+        arg: [ autoreply ]
+
+    Returns:
+        text and replyMarkup that make up the reply, new conversation state
+    """
+
+    all_autoreplies = Config.autoreplies_get('autoreplies')
+    current_reply = all_autoreplies.get(arg)
+
+    info.bot.send_message(chat_id=info.user_id, text=current_reply)
+
+    return None, None, None
 
 
 def approve_yes_callback(info: EventInfo, _: None) -> Tuple[None, Optional[InlineKeyboardMarkup], None]:

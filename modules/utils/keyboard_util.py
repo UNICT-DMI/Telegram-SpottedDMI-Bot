@@ -1,14 +1,14 @@
 """Creates the inlinekeyboard sent by the bot in its messages.
 Callback_data format: <callback_family>_<callback_name>,[arg]"""
 from itertools import zip_longest
-from typing import Optional
+from typing import List, Optional
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Bot
 from modules.data import Config, PublishedPost, PendingPost
 from modules.utils.constants import APPROVED_KB, REJECTED_KB
 
 REACTION = Config.reactions_get('reactions')
 ROWS = Config.reactions_get('rows')
-
+AUTOREPLIES = Config.autoreplies_get('autoreplies')
 
 def get_confirm_kb() -> InlineKeyboardMarkup:
     """Generates the InlineKeyboard to confirm the creation of the post
@@ -91,6 +91,31 @@ def get_approve_kb() -> InlineKeyboardMarkup:
         InlineKeyboardButton("🔴 0", callback_data="meme_approve_no,")
     ], [InlineKeyboardButton("⏹ Stop", callback_data="meme_approve_status,pause")]])
 
+
+def get_autoreply_kb() -> List[List[InlineKeyboardButton]]:
+    """Generates the keyboard for the autoreplies
+
+    Returns:
+        new part of keyboard
+    """
+    keyboard = []
+    for row in zip_longest(*[iter(AUTOREPLIES)] * 2, fillvalue=None):
+        new_row = []
+        for autoreply in row:
+            if autoreply is not None:
+                new_row.append(InlineKeyboardButton(autoreply, callback_data=f"meme_autoreply,{autoreply}"))
+        keyboard.append(new_row)
+    return keyboard
+
+def get_paused_kb() -> InlineKeyboardMarkup:
+    """Generates the InlineKeyboard for the paused post
+
+    Returns:
+        autoreplies keyboard append with resume button
+    """
+    keyboard = get_autoreply_kb()
+    keyboard.append([InlineKeyboardButton("▶️ Resume", callback_data="meme_approve_status,play")])
+    return InlineKeyboardMarkup(keyboard)
 
 def get_vote_kb(published_post: Optional[PublishedPost] = None) -> Optional[InlineKeyboardMarkup]:
     """Generates the InlineKeyboard for the published post and updates the correct number of reactions
