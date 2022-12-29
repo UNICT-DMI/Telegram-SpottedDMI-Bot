@@ -40,9 +40,11 @@ def meme_callback(update: Update, context: CallbackContext) -> int:
     data = old_reactions(info.query_data)
     # the callback data indicates the correct callback and the arg to pass to it separated by ,
     data = data.split(",")
+    callback_args = data[1:]
+
     try:
         # call the correct function
-        message_text, reply_markup, output = globals()[f'{data[0][5:]}_callback'](info, data[1])
+        message_text, reply_markup, output = globals()[f'{data[0][5:]}_callback'](info, *callback_args)
 
     except KeyError as ex:
         message_text = reply_markup = output = None
@@ -103,7 +105,7 @@ def settings_callback(info: EventInfo, arg: str) -> Tuple[Optional[str], None, N
     return text, None, None
 
 
-def approve_status_callback(info: EventInfo, arg: None) -> Tuple[None, Optional[InlineKeyboardMarkup], None]:
+def approve_status_callback(info: EventInfo, arg: str, pause_page: str = 0) -> Tuple[None, Optional[InlineKeyboardMarkup], None]:
     """Handles the approve_status callback.
     Pauses or resume voting on a specific pending post
 
@@ -115,8 +117,10 @@ def approve_status_callback(info: EventInfo, arg: None) -> Tuple[None, Optional[
         text and replyMarkup that make up the reply, new conversation state
     """
     keyboard = None
+    pause_page = int(pause_page)
+    items_per_page = Config.settings_get("meme", "autoreplies_per_page")
     if arg == "pause":  # if the the admin wants to pause approval of the post
-        keyboard = get_paused_kb()
+        keyboard = get_paused_kb(pause_page, items_per_page)
     elif arg == "play":  # if the the admin wants to resume approval of the post
         pending_post = PendingPost.from_group(
             group_id=info.chat_id, g_message_id=info.message_id)

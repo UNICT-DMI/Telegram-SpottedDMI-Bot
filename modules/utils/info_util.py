@@ -326,7 +326,7 @@ class EventInfo():  # pylint: disable=too-many-public-methods
         inline_keyboard = get_post_outcome_kb(bot=self.__bot,
                                               votes=pending_post.get_list_admin_votes(),
                                               reason=reason)
-        
+
         self.__bot.edit_message_reply_markup(chat_id=pending_post.group_id,
                                              message_id=pending_post.g_message_id,
                                              reply_markup=inline_keyboard)

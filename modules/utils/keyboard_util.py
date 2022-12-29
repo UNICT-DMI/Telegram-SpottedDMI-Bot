@@ -1,6 +1,6 @@
 """Creates the inlinekeyboard sent by the bot in its messages.
 Callback_data format: <callback_family>_<callback_name>,[arg]"""
-from itertools import zip_longest
+from itertools import islice, zip_longest
 from typing import List, Optional
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Bot
 from modules.data import Config, PublishedPost, PendingPost
@@ -89,31 +89,52 @@ def get_approve_kb() -> InlineKeyboardMarkup:
     return InlineKeyboardMarkup([[
         InlineKeyboardButton("🟢 0", callback_data="meme_approve_yes,"),
         InlineKeyboardButton("🔴 0", callback_data="meme_approve_no,")
-    ], [InlineKeyboardButton("⏹ Stop", callback_data="meme_approve_status,pause")]])
+    ], [InlineKeyboardButton("⏹ Stop", callback_data="meme_approve_status,pause,0")]])
 
-
-def get_autoreply_kb() -> List[List[InlineKeyboardButton]]:
+def get_autoreply_kb(page: int, items_per_page: int) -> List[List[InlineKeyboardButton]]:
     """Generates the keyboard for the autoreplies
+
+    Args:
+        page: page of the autoreplies
+        items_per_page: number of items per page
 
     Returns:
         new part of keyboard
     """
     keyboard = []
-    for row in zip_longest(*[iter(AUTOREPLIES)] * 2, fillvalue=None):
+
+    autoreplies = islice(AUTOREPLIES, page * items_per_page, (page + 1) * items_per_page)
+
+    for row in zip_longest(*[iter(autoreplies)] * 2, fillvalue=None):
         new_row = []
         for autoreply in row:
             if autoreply is not None:
                 new_row.append(InlineKeyboardButton(autoreply, callback_data=f"meme_autoreply,{autoreply}"))
         keyboard.append(new_row)
+
+    # navigation buttons
+    navigation_row = []
+
+    if page > 0:
+        navigation_row.append(InlineKeyboardButton("⏮ Previous", callback_data=f"meme_approve_status,pause,{page - 1}"))
+
+    if len(AUTOREPLIES) > (page + 1) * items_per_page:
+        navigation_row.append(InlineKeyboardButton("⏭ Next", callback_data=f"meme_approve_status,pause,{page + 1}"))
+
+    keyboard.append(navigation_row)
+
     return keyboard
 
-def get_paused_kb() -> InlineKeyboardMarkup:
+def get_paused_kb(page: int, items_per_page: int) -> InlineKeyboardMarkup:
     """Generates the InlineKeyboard for the paused post
+
+    Args:
+        page: page of the autoreplies
 
     Returns:
         autoreplies keyboard append with resume button
     """
-    keyboard = get_autoreply_kb()
+    keyboard = get_autoreply_kb(page, items_per_page)
     keyboard.append([InlineKeyboardButton("▶️ Resume", callback_data="meme_approve_status,play")])
     return InlineKeyboardMarkup(keyboard)
 
