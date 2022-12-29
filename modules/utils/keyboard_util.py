@@ -172,11 +172,13 @@ def update_approve_kb(keyboard: list[list[InlineKeyboardButton]],
     return InlineKeyboardMarkup(keyboard)
 
 
-def get_post_outcome_kb(bot: Bot, votes: list[tuple[int, bool]]) -> InlineKeyboardMarkup:
+def get_post_outcome_kb(bot: Bot, votes: list[tuple[int, bool]], reason: Optional[str] = None) -> InlineKeyboardMarkup:
     """Generates the InlineKeyboard for the outcome of a post
 
     Args:
+        bot: bot instance
         votes: list of votes
+        reason: reason for the rejection, currently used on autoreplies
 
     Returns:
         new inline keyboard
@@ -195,6 +197,9 @@ def get_post_outcome_kb(bot: Bot, votes: list[tuple[int, bool]]) -> InlineKeyboa
 
     is_approved = len(approved_by) > len(rejected_by)
     outcome_text = APPROVED_KB if is_approved else REJECTED_KB
+
+    if reason is not None and not is_approved:
+        outcome_text += f" [{reason}]"
 
     keyboard.append([
         InlineKeyboardButton(outcome_text, callback_data="none"),

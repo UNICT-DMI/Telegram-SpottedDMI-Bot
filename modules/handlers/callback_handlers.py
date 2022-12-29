@@ -129,6 +129,31 @@ def approve_status_callback(info: EventInfo, arg: None) -> Tuple[None, Optional[
     return None, keyboard, None
 
 
+def reject_post(info: EventInfo, pending_post: PendingPost, reason: Optional[str] = None) -> None:
+    """Rejects a pending post
+
+    Args:
+        info: information about the callback
+        pending_post: pending post to reject
+        reason: reason for the rejection, currently used on autoreply
+
+    Returns:
+        None
+    """
+    user_id = pending_post.user_id
+    pending_post.set_admin_vote(info.user_id, False)
+
+    try:
+        info.bot.send_message(
+            chat_id=user_id,
+            text="Il tuo ultimo post è stato rifiutato\nPuoi controllare le regole con /rules")  # notify the user
+    except (BadRequest, Unauthorized) as ex:
+        logger.warning("Notifying the user on approve_no: %s", ex)
+
+    # Shows the list of admins who refused the pending post and removes it form the db
+    info.show_admins_votes(pending_post, reason)
+    pending_post.delete_post()
+
 def autoreply_callback(info: EventInfo, arg: str) -> Tuple[None, None, None]:
     """Handles the autoreply callback.
     Reply to the user that requested the post
@@ -145,6 +170,13 @@ def autoreply_callback(info: EventInfo, arg: str) -> Tuple[None, None, None]:
     current_reply = all_autoreplies.get(arg)
 
     info.bot.send_message(chat_id=info.user_id, text=current_reply)
+
+    if Config.settings_get('meme', 'reject_after_autoreply'):
+        pending_post = PendingPost.from_group(
+            group_id=info.chat_id, g_message_id=info.message_id)
+
+        if pending_post:
+            reject_post(info=info, pending_post=pending_post, reason=arg)
 
     return None, None, None
 
@@ -190,7 +222,6 @@ def approve_yes_callback(info: EventInfo, _: None) -> Tuple[None, Optional[Inlin
 
     return None, None, None
 
-
 def approve_no_callback(info: EventInfo, _: None) -> Tuple[None, Optional[InlineKeyboardMarkup], None]:
     """Handles the approve_no callback.
     Rejects the post, deleting it from the pending_post table
@@ -210,18 +241,7 @@ def approve_no_callback(info: EventInfo, _: None) -> Tuple[None, Optional[Inline
 
     # The post has been refused
     if n_reject >= Config.meme_get('n_votes'):
-        user_id = pending_post.user_id
-
-        try:
-            info.bot.send_message(
-                chat_id=user_id,
-                text="Il tuo ultimo post è stato rifiutato\nPuoi controllare le regole con /rules")  # notify the user
-        except (BadRequest, Unauthorized) as ex:
-            logger.warning("Notifying the user on approve_no: %s", ex)
-
-        # Shows the list of admins who refused the pending post and removes it form the db
-        info.show_admins_votes(pending_post)
-        pending_post.delete_post()
+        reject_post(info=info, pending_post=pending_post)
         return None, None, None
 
     if n_reject != -1:  # the vote changed

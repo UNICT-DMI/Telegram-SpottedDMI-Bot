@@ -117,7 +117,7 @@ dmypy.json
 
 # Config and data
 config/*.yaml
-data/yaml/reactions.yaml
+data/yaml/*.yaml
 logs/*.log
 *.db
 
