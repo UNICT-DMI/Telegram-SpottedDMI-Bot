@@ -105,7 +105,9 @@ def settings_callback(info: EventInfo, arg: str) -> Tuple[Optional[str], None, N
     return text, None, None
 
 
-def approve_status_callback(info: EventInfo, arg: str, pause_page: str = 0) -> Tuple[None, Optional[InlineKeyboardMarkup], None]:
+def approve_status_callback(info: EventInfo,
+                            arg: str,
+                            pause_page: str = 0) -> Tuple[None, Optional[InlineKeyboardMarkup], None]:
     """Handles the approve_status callback.
     Pauses or resume voting on a specific pending post
 

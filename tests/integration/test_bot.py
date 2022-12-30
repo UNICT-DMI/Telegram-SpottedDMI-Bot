@@ -4,7 +4,7 @@ from datetime import datetime
 from typing import Tuple
 import pytest
 from telegram import Chat, Message, MessageEntity, user
-from modules.utils.constants import APPROVED_KB
+from modules.utils.constants import APPROVED_KB, REJECTED_KB
 from modules.data import Config, read_md, DbManager, User, PendingPost, PublishedPost, Report
 from modules.handlers.constants import CHAT_PRIVATE_ERROR, AUTOREPLIES
 from .telegram_simulator import TelegramSimulator
@@ -622,6 +622,45 @@ class TestBot:
                                           user=user.User(1, first_name="Telegram", is_bot=False))
             assert telegram.last_message.text.startswith("by: ")
             assert PublishedPost(channel_id=channel.id, c_message_id=telegram.last_message.message_id)
+
+    class TestRejectSpot:
+        """Tests the complete publishing spot pipeline"""
+
+        @pytest.fixture(autouse=True)
+        def test_spot_send(self, telegram: TelegramSimulator, admin_group: Chat):
+            """Tests the /spot command.
+            Complete with yes the spot conversation
+            """
+            telegram.send_command("/spot")
+            telegram.send_message("Test spot")
+            telegram.send_callback_query(text="Si")
+
+        def test_reject_spot(self, telegram: TelegramSimulator, admin_group: Chat):
+            """
+            Complete with no the spot conversation
+            """
+            g_message = telegram.messages[-2]
+            telegram.send_callback_query(text="🔴 0", message=g_message)
+            telegram.send_callback_query(text="🔴 1", message=g_message, user=user.User(2, first_name="Test2", is_bot=False))
+            assert telegram.messages[-4].text == "Test spot"
+            assert telegram.messages[-2].text.startswith("Il tuo ultimo post è stato rifiutato")
+            assert telegram.last_message.reply_markup.inline_keyboard[1][0].text == REJECTED_KB
+            assert PendingPost.from_group(g_message_id=g_message.message_id, group_id=admin_group.id) is None
+
+        def test_reject_after_autoreply_spot(self, telegram: TelegramSimulator, admin_group: Chat):
+            """
+            Test the reject spot after the autoreply
+            """
+            g_message = telegram.messages[-2]
+            telegram.send_callback_query(text="⏹ Stop", message=g_message)
+            autoreplies = Config.autoreplies_get('autoreplies')
+            first_autoreply_key = list(autoreplies.keys())[0]
+            telegram.send_callback_query(text=first_autoreply_key,
+                                            message=g_message,
+                                            data=f"meme_autoreply,{first_autoreply_key}")
+            assert telegram.messages[-3].text == autoreplies[first_autoreply_key]
+            assert telegram.messages[-2].text.startswith("Il tuo ultimo post è stato rifiutato")
+            assert telegram.last_message.reply_markup.inline_keyboard[-1][0].text == f"{REJECTED_KB} [{first_autoreply_key}]"
 
     class TestComments:
         """Tests the comments feature in the channel group"""

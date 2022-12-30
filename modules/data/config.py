@@ -108,7 +108,7 @@ class Config():
         return cls.__get(instance.reactions, *keys, default=default)
 
     @classmethod
-    def autoreplies_get(cls, *keys: AutorepliesKeysType, default: Any = None) -> Any:
+    def autoreplies_get(cls, *keys: AutorepliesKeysType, default: Any = None) -> dict:
         """Get the value of the specified key in the autoreplies configuration dictionary.
         If the key is a tuple, it will return the value of the nested key.
         If the key is not present, it will return the default value.
