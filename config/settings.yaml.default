@@ -15,7 +15,7 @@ meme:
   replace_anonymous_comments: false
   delete_anonymous_comments: true
   reject_after_autoreply: true
-  autoreplies_per_page: 4 
+  autoreplies_per_page: 6
 test:
   api_hash: ''
   api_id: -1

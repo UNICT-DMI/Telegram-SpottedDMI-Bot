@@ -112,17 +112,6 @@ def get_autoreply_kb(page: int, items_per_page: int) -> List[List[InlineKeyboard
                 new_row.append(InlineKeyboardButton(autoreply, callback_data=f"meme_autoreply,{autoreply}"))
         keyboard.append(new_row)
 
-    # navigation buttons
-    navigation_row = []
-
-    if page > 0:
-        navigation_row.append(InlineKeyboardButton("⏮ Previous", callback_data=f"meme_approve_status,pause,{page - 1}"))
-
-    if len(AUTOREPLIES) > (page + 1) * items_per_page:
-        navigation_row.append(InlineKeyboardButton("⏭ Next", callback_data=f"meme_approve_status,pause,{page + 1}"))
-
-    keyboard.append(navigation_row)
-
     return keyboard
 
 def get_paused_kb(page: int, items_per_page: int) -> InlineKeyboardMarkup:
@@ -135,7 +124,26 @@ def get_paused_kb(page: int, items_per_page: int) -> InlineKeyboardMarkup:
         autoreplies keyboard append with resume button
     """
     keyboard = get_autoreply_kb(page, items_per_page)
-    keyboard.append([InlineKeyboardButton("▶️ Resume", callback_data="meme_approve_status,play")])
+
+    # navigation buttons
+    navigation_row = []
+    # to keep the same number of buttons in the row
+    none_button = InlineKeyboardButton(" ", callback_data="none")
+
+    if page > 0:
+        navigation_row.append(InlineKeyboardButton("⏮ Previous", callback_data=f"meme_approve_status,pause,{page - 1}"))
+    else:
+        navigation_row.append(none_button)
+
+    navigation_row.append(InlineKeyboardButton("▶️ Resume", callback_data="meme_approve_status,play"))
+
+    if len(AUTOREPLIES) > (page + 1) * items_per_page:
+        navigation_row.append(InlineKeyboardButton("⏭ Next", callback_data=f"meme_approve_status,pause,{page + 1}"))
+    else:
+        navigation_row.append(none_button)
+
+    keyboard.append(navigation_row)
+
     return InlineKeyboardMarkup(keyboard)
 
 def get_vote_kb(published_post: Optional[PublishedPost] = None) -> Optional[InlineKeyboardMarkup]:
