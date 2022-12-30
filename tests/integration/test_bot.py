@@ -651,6 +651,9 @@ class TestBot:
             """
             Test the reject spot after the autoreply
             """
+            if not Config.settings_get("meme", "reject_after_autoreply"):
+                pytest.skip("Reject after autoreply is disabled")
+
             g_message = telegram.messages[-2]
             telegram.send_callback_query(text="⏹ Stop", message=g_message)
             autoreplies = Config.autoreplies_get('autoreplies')
@@ -661,6 +664,55 @@ class TestBot:
             assert telegram.messages[-3].text == autoreplies[first_autoreply_key]
             assert telegram.messages[-2].text.startswith("Il tuo ultimo post è stato rifiutato")
             assert telegram.last_message.reply_markup.inline_keyboard[-1][0].text == f"{REJECTED_KB} [{first_autoreply_key}]"
+
+
+    class TestStoppedSpot:
+        """Tests the stopped spot and its navigation for autoreplies"""
+
+        @pytest.fixture(autouse=True)
+        def test_spot_send(self, telegram: TelegramSimulator, admin_group: Chat):
+            """Tests the /spot command.
+            Complete with yes the spot conversation
+            """
+            telegram.send_command("/spot")
+            telegram.send_message("Test spot")
+            telegram.send_callback_query(text="Si")
+            g_message = telegram.messages[-2]
+            telegram.send_callback_query(text="⏹ Stop", message=g_message)
+
+        @pytest.mark.parametrize("autoreply_key", list(Config.autoreplies_get('autoreplies').keys()))
+        def test_stop_spot(self, telegram: TelegramSimulator, admin_group: Chat, autoreply_key: str):
+            """
+            Complete with no the spot conversation
+            """
+            g_message = telegram.messages[-3]
+            autoreply_message = Config.autoreplies_get('autoreplies')[autoreply_key]
+
+            # find if the autoreply is in the keyboard
+            autoreply_found = False
+            next_button = telegram.find_button_on_keyboard("⏭ Next", telegram.last_message)
+
+            while next_button:
+                if telegram.find_button_on_keyboard(autoreply_key, telegram.last_message):
+                    autoreply_found = True
+                    break
+                next_button = telegram.find_button_on_keyboard("⏭ Next", telegram.last_message)
+
+                if next_button:
+                    telegram.send_callback_query(text="⏭ Next", message=g_message, data=next_button.callback_data)
+
+            assert autoreply_found is True
+
+            telegram.send_callback_query(text=autoreply_key,
+                                         data=f"meme_autoreply,{autoreply_key}",
+                                         message=g_message)
+
+            if Config.settings_get("meme", "reject_after_autoreply"):
+                assert telegram.messages[-3].text == autoreply_message
+                assert telegram.messages[-2].text.startswith("Il tuo ultimo post è stato rifiutato")
+            else:
+                assert telegram.last_message.text == autoreply_message
+
 
     class TestComments:
         """Tests the comments feature in the channel group"""

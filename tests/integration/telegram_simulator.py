@@ -3,7 +3,7 @@
 from datetime import datetime
 from typing import List, Optional, Union
 import warnings
-from telegram import Message, ReplyMarkup, MessageEntity, User, Chat, Update, CallbackQuery
+from telegram import Message, ReplyMarkup, MessageEntity, User, Chat, Update, CallbackQuery, InlineKeyboardButton
 from telegram.ext import Updater
 from telegram.inline.inlinekeyboardmarkup import InlineKeyboardMarkup
 from main import add_handlers
@@ -434,3 +434,19 @@ class TelegramSimulator():
             message: message to add
         """
         self.messages.append(message)
+
+    def find_button_on_keyboard(self, text: str, message: Message) -> Optional[InlineKeyboardButton]:
+        """Find a button on the keyboard with the given text
+
+        Args:
+            text: text of the button to find
+            message: message containing the keyboard
+
+        Returns:
+            the button found or None
+        """
+        for row in message.reply_markup.inline_keyboard:
+            for button in row:
+                if button.text == text:
+                    return button
+        return None
