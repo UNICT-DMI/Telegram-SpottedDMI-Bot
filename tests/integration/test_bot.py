@@ -683,7 +683,7 @@ class TestBot:
         @pytest.mark.parametrize("autoreply_key", list(Config.autoreplies_get('autoreplies').keys()))
         def test_stop_spot(self, telegram: TelegramSimulator, admin_group: Chat, autoreply_key: str):
             """
-            Complete with no the spot conversation
+            Test autoreplies and navigation on the stopped spot
             """
             g_message = telegram.messages[-3]
             autoreply_message = Config.autoreplies_get('autoreplies')[autoreply_key]
