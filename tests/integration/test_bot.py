@@ -710,8 +710,9 @@ class TestBot:
             if Config.settings_get("meme", "reject_after_autoreply"):
                 assert telegram.messages[-3].text == autoreply_message
                 assert telegram.messages[-2].text.startswith("Il tuo ultimo post è stato rifiutato")
-            else:
-                assert telegram.last_message.text == autoreply_message
+                return
+
+            assert telegram.last_message.text == autoreply_message
 
 
     class TestComments:
