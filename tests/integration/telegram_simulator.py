@@ -9,7 +9,7 @@ from telegram.inline.inlinekeyboardmarkup import InlineKeyboardMarkup
 from main import add_handlers
 
 
-class TelegramSimulator():
+class TelegramSimulator(): # pylint: disable=too-many-public-methods
     """Weaves the standard bot class to intercept any contact with the telegram api and store the message"""
     __name = "BOT"
     __bot_id = 1234567890
