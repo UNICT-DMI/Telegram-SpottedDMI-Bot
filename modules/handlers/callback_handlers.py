@@ -1,12 +1,12 @@
 """Handles the execution of callbacks by the bot"""
 from typing import Optional, Tuple
-from telegram import Update, InlineKeyboardMarkup, InlineKeyboardButton
+from telegram import Update, InlineKeyboardMarkup
 from telegram.ext import CallbackContext
 from telegram.error import BadRequest, RetryAfter, Unauthorized
 from modules.debug import logger
 from modules.data import Config, PendingPost, PublishedPost, User
 from modules.utils import EventInfo
-from modules.utils.keyboard_util import REACTION, get_approve_kb, update_approve_kb, get_vote_kb
+from modules.utils.keyboard_util import REACTION, get_approve_kb, update_approve_kb, get_vote_kb, get_paused_kb
 
 
 def old_reactions(data: str) -> str:
@@ -40,9 +40,11 @@ def meme_callback(update: Update, context: CallbackContext) -> int:
     data = old_reactions(info.query_data)
     # the callback data indicates the correct callback and the arg to pass to it separated by ,
     data = data.split(",")
+    callback_args = data[1:]
+
     try:
         # call the correct function
-        message_text, reply_markup, output = globals()[f'{data[0][5:]}_callback'](info, data[1])
+        message_text, reply_markup, output = globals()[f'{data[0][5:]}_callback'](info, *callback_args)
 
     except KeyError as ex:
         message_text = reply_markup = output = None
@@ -103,7 +105,9 @@ def settings_callback(info: EventInfo, arg: str) -> Tuple[Optional[str], None, N
     return text, None, None
 
 
-def approve_status_callback(info: EventInfo, arg: None) -> Tuple[None, Optional[InlineKeyboardMarkup], None]:
+def approve_status_callback(info: EventInfo,
+                            arg: str,
+                            pause_page: str = 0) -> Tuple[None, Optional[InlineKeyboardMarkup], None]:
     """Handles the approve_status callback.
     Pauses or resume voting on a specific pending post
 
@@ -115,16 +119,72 @@ def approve_status_callback(info: EventInfo, arg: None) -> Tuple[None, Optional[
         text and replyMarkup that make up the reply, new conversation state
     """
     keyboard = None
+    pause_page = int(pause_page)
+    items_per_page = Config.settings_get("meme", "autoreplies_per_page")
     if arg == "pause":  # if the the admin wants to pause approval of the post
-        keyboard = InlineKeyboardMarkup([[InlineKeyboardButton(text="▶️ Resume", callback_data="meme_approve_status,play")]])
+        keyboard = get_paused_kb(pause_page, items_per_page)
     elif arg == "play":  # if the the admin wants to resume approval of the post
-        pending_post = PendingPost.from_group(group_id=info.chat_id, g_message_id=info.message_id)
+        pending_post = PendingPost.from_group(
+            group_id=info.chat_id, g_message_id=info.message_id)
         if pending_post:
-            keyboard = update_approve_kb(get_approve_kb().inline_keyboard, pending_post)
+            keyboard = update_approve_kb(
+                get_approve_kb().inline_keyboard, pending_post)
     else:
         logger.error("confirm_callback: invalid arg '%s'", arg)
 
     return None, keyboard, None
+
+
+def reject_post(info: EventInfo, pending_post: PendingPost, reason: Optional[str] = None) -> None:
+    """Rejects a pending post
+
+    Args:
+        info: information about the callback
+        pending_post: pending post to reject
+        reason: reason for the rejection, currently used on autoreply
+
+    Returns:
+        None
+    """
+    user_id = pending_post.user_id
+    pending_post.set_admin_vote(info.user_id, False)
+
+    try:
+        info.bot.send_message(
+            chat_id=user_id,
+            text="Il tuo ultimo post è stato rifiutato\nPuoi controllare le regole con /rules")  # notify the user
+    except (BadRequest, Unauthorized) as ex:
+        logger.warning("Notifying the user on approve_no: %s", ex)
+
+    # Shows the list of admins who refused the pending post and removes it form the db
+    info.show_admins_votes(pending_post, reason)
+    pending_post.delete_post()
+
+def autoreply_callback(info: EventInfo, arg: str) -> Tuple[None, None, None]:
+    """Handles the autoreply callback.
+    Reply to the user that requested the post
+
+    Args:
+        info: information about the callback
+        arg: [ autoreply ]
+
+    Returns:
+        text and replyMarkup that make up the reply, new conversation state
+    """
+
+    all_autoreplies = Config.autoreplies_get('autoreplies')
+    current_reply = all_autoreplies.get(arg)
+
+    info.bot.send_message(chat_id=info.user_id, text=current_reply)
+
+    if Config.settings_get('meme', 'reject_after_autoreply'):
+        pending_post = PendingPost.from_group(
+            group_id=info.chat_id, g_message_id=info.message_id)
+
+        if pending_post:
+            reject_post(info=info, pending_post=pending_post, reason=arg)
+
+    return None, None, None
 
 
 def approve_yes_callback(info: EventInfo, _: None) -> Tuple[None, Optional[InlineKeyboardMarkup], None]:
@@ -168,7 +228,6 @@ def approve_yes_callback(info: EventInfo, _: None) -> Tuple[None, Optional[Inlin
 
     return None, None, None
 
-
 def approve_no_callback(info: EventInfo, _: None) -> Tuple[None, Optional[InlineKeyboardMarkup], None]:
     """Handles the approve_no callback.
     Rejects the post, deleting it from the pending_post table
@@ -188,18 +247,7 @@ def approve_no_callback(info: EventInfo, _: None) -> Tuple[None, Optional[Inline
 
     # The post has been refused
     if n_reject >= Config.meme_get('n_votes'):
-        user_id = pending_post.user_id
-
-        try:
-            info.bot.send_message(
-                chat_id=user_id,
-                text="Il tuo ultimo post è stato rifiutato\nPuoi controllare le regole con /rules")  # notify the user
-        except (BadRequest, Unauthorized) as ex:
-            logger.warning("Notifying the user on approve_no: %s", ex)
-
-        # Shows the list of admins who refused the pending post and removes it form the db
-        info.show_admins_votes(pending_post)
-        pending_post.delete_post()
+        reject_post(info=info, pending_post=pending_post)
         return None, None, None
 
     if n_reject != -1:  # the vote changed

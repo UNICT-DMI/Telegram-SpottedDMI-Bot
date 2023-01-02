@@ -1,4 +1,5 @@
 """Common info needed in both command and callback handlers"""
+from typing import Optional
 from telegram import Bot, Update, Message, CallbackQuery, ReplyMarkup, Chat, InlineKeyboardMarkup
 from telegram.ext import CallbackContext
 from telegram.error import BadRequest
@@ -314,14 +315,18 @@ class EventInfo():  # pylint: disable=too-many-public-methods
 
         PublishedPost.create(channel_id=channel_group_id, c_message_id=post_message_id)
 
-    def show_admins_votes(self, pending_post: PendingPost):
+    def show_admins_votes(self, pending_post: PendingPost, reason: Optional[str] = None):
         """After a post is been approved or rejected, shows the admins that approved or rejected it \
             and edit the message to show the admin's votes
 
         Args:
             pending_post: post to show the admin's votes for
+            reason: reason for the rejection, currently used on autoreply
         """
-        inline_keyboard = get_post_outcome_kb(self.__bot, pending_post.get_list_admin_votes())
+        inline_keyboard = get_post_outcome_kb(bot=self.__bot,
+                                              votes=pending_post.get_list_admin_votes(),
+                                              reason=reason)
+
         self.__bot.edit_message_reply_markup(chat_id=pending_post.group_id,
                                              message_id=pending_post.g_message_id,
                                              reply_markup=inline_keyboard)

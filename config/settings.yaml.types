@@ -14,6 +14,8 @@ meme:
   report_wait_mins: int
   replace_anonymous_comments: bool
   delete_anonymous_comments: bool
+  reject_after_autoreply: bool
+  autoreplies_per_page: int
 test:
   api_hash: str
   api_id: int

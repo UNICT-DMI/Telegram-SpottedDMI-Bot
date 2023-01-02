@@ -1,14 +1,14 @@
 """Creates the inlinekeyboard sent by the bot in its messages.
 Callback_data format: <callback_family>_<callback_name>,[arg]"""
-from itertools import zip_longest
-from typing import Optional
+from itertools import islice, zip_longest
+from typing import List, Optional
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Bot
 from modules.data import Config, PublishedPost, PendingPost
 from modules.utils.constants import APPROVED_KB, REJECTED_KB
 
 REACTION = Config.reactions_get('reactions')
 ROWS = Config.reactions_get('rows')
-
+AUTOREPLIES = Config.autoreplies_get('autoreplies')
 
 def get_confirm_kb() -> InlineKeyboardMarkup:
     """Generates the InlineKeyboard to confirm the creation of the post
@@ -89,8 +89,62 @@ def get_approve_kb() -> InlineKeyboardMarkup:
     return InlineKeyboardMarkup([[
         InlineKeyboardButton("🟢 0", callback_data="meme_approve_yes,"),
         InlineKeyboardButton("🔴 0", callback_data="meme_approve_no,")
-    ], [InlineKeyboardButton("⏹ Stop", callback_data="meme_approve_status,pause")]])
+    ], [InlineKeyboardButton("⏹ Stop", callback_data="meme_approve_status,pause,0")]])
 
+def get_autoreply_kb(page: int, items_per_page: int) -> List[List[InlineKeyboardButton]]:
+    """Generates the keyboard for the autoreplies
+
+    Args:
+        page: page of the autoreplies
+        items_per_page: number of items per page
+
+    Returns:
+        new part of keyboard
+    """
+    keyboard = []
+
+    autoreplies = islice(AUTOREPLIES, page * items_per_page, (page + 1) * items_per_page)
+
+    for row in zip_longest(*[iter(autoreplies)] * 2, fillvalue=None):
+        new_row = []
+        for autoreply in row:
+            if autoreply is not None:
+                new_row.append(InlineKeyboardButton(autoreply, callback_data=f"meme_autoreply,{autoreply}"))
+        keyboard.append(new_row)
+
+    return keyboard
+
+def get_paused_kb(page: int, items_per_page: int) -> InlineKeyboardMarkup:
+    """Generates the InlineKeyboard for the paused post
+
+    Args:
+        page: page of the autoreplies
+
+    Returns:
+        autoreplies keyboard append with resume button
+    """
+    keyboard = get_autoreply_kb(page, items_per_page)
+
+    # navigation buttons
+    navigation_row = []
+    # to keep the same number of buttons in the row
+    none_button = InlineKeyboardButton(" ", callback_data="none")
+
+    if page > 0:
+        navigation_row.append(InlineKeyboardButton("⏮ Previous", callback_data=f"meme_approve_status,pause,{page - 1}"))
+    else:
+        navigation_row.append(none_button)
+
+    navigation_row.append(InlineKeyboardButton("▶️ Resume", callback_data="meme_approve_status,play"))
+
+    if len(AUTOREPLIES) > (page + 1) * items_per_page:
+        navigation_row.append(InlineKeyboardButton("⏭ Next", callback_data=f"meme_approve_status,pause,{page + 1}"))
+    else:
+        navigation_row.append(none_button)
+
+    keyboard.append(navigation_row)
+
+    return InlineKeyboardMarkup(keyboard)
 
 def get_vote_kb(published_post: Optional[PublishedPost] = None) -> Optional[InlineKeyboardMarkup]:
     """Generates the InlineKeyboard for the published post and updates the correct number of reactions
@@ -147,11 +201,13 @@ def update_approve_kb(keyboard: list[list[InlineKeyboardButton]],
     return InlineKeyboardMarkup(keyboard)
 
 
-def get_post_outcome_kb(bot: Bot, votes: list[tuple[int, bool]]) -> InlineKeyboardMarkup:
+def get_post_outcome_kb(bot: Bot, votes: list[tuple[int, bool]], reason: Optional[str] = None) -> InlineKeyboardMarkup:
     """Generates the InlineKeyboard for the outcome of a post
 
     Args:
+        bot: bot instance
         votes: list of votes
+        reason: reason for the rejection, currently used on autoreplies
 
     Returns:
         new inline keyboard
@@ -170,6 +226,9 @@ def get_post_outcome_kb(bot: Bot, votes: list[tuple[int, bool]]) -> InlineKeyboa
 
     is_approved = len(approved_by) > len(rejected_by)
     outcome_text = APPROVED_KB if is_approved else REJECTED_KB
+
+    if reason is not None and not is_approved:
+        outcome_text += f" [{reason}]"
 
     keyboard.append([
         InlineKeyboardButton(outcome_text, callback_data="none"),
