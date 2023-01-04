@@ -175,13 +175,13 @@ def autoreply_callback(info: EventInfo, arg: str) -> Tuple[None, None, None]:
     all_autoreplies = Config.autoreplies_get('autoreplies')
     current_reply = all_autoreplies.get(arg)
 
-    info.bot.send_message(chat_id=info.user_id, text=current_reply)
+    pending_post = PendingPost.from_group(
+        group_id=info.chat_id, g_message_id=info.message_id)
 
-    if Config.settings_get('meme', 'reject_after_autoreply'):
-        pending_post = PendingPost.from_group(
-            group_id=info.chat_id, g_message_id=info.message_id)
+    if pending_post:
+        info.bot.send_message(chat_id=pending_post.user_id, text=current_reply)
 
-        if pending_post:
+        if Config.settings_get('meme', 'reject_after_autoreply'):
             reject_post(info=info, pending_post=pending_post, reason=arg)
 
     return None, None, None
