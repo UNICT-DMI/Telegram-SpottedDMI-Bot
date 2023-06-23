@@ -119,6 +119,7 @@ def get_paused_kb(page: int, items_per_page: int) -> InlineKeyboardMarkup:
 
     Args:
         page: page of the autoreplies
+        items_per_page: number of items per page
 
     Returns:
         autoreplies keyboard append with resume button
