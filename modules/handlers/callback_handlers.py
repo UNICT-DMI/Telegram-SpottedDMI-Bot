@@ -127,8 +127,12 @@ def approve_status_callback(info: EventInfo,
         pending_post = PendingPost.from_group(
             group_id=info.chat_id, g_message_id=info.message_id)
         if pending_post:
+            user = User(pending_post.user_id)
+            username = None
+            if user.is_credited:
+                username = user.username
             keyboard = update_approve_kb(
-                get_approve_kb().inline_keyboard, pending_post)
+                    get_approve_kb(username).inline_keyboard, pending_post)
     else:
         logger.error("confirm_callback: invalid arg '%s'", arg)
 

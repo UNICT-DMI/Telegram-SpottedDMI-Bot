@@ -80,16 +80,28 @@ def get_stats_kb() -> InlineKeyboardMarkup:
     return InlineKeyboardMarkup(keyboard)
 
 
-def get_approve_kb() -> InlineKeyboardMarkup:
+def get_approve_kb(username: Optional[str] = None) -> InlineKeyboardMarkup:
     """Generates the InlineKeyboard for the pending post
+
+    Args:
+        username: username of the user only if is credited
 
     Returns:
         new inline keyboard
     """
-    return InlineKeyboardMarkup([[
-        InlineKeyboardButton("🟢 0", callback_data="meme_approve_yes,"),
-        InlineKeyboardButton("🔴 0", callback_data="meme_approve_no,")
-    ], [InlineKeyboardButton("⏹ Stop", callback_data="meme_approve_status,pause,0")]])
+    kb = []
+
+    if username:
+        kb.append([InlineKeyboardButton(f"Credits: {username}", callback_data=f"meme_credit,{username}")])
+
+    kb.extend([
+        [
+            InlineKeyboardButton("🟢 0", callback_data="meme_approve_yes,"),
+            InlineKeyboardButton("🔴 0", callback_data="meme_approve_no,")
+        ], 
+        [InlineKeyboardButton("⏹ Stop", callback_data="meme_approve_status,pause,0")]
+    ])
+    return InlineKeyboardMarkup(kb)
 
 def get_autoreply_kb(page: int, items_per_page: int) -> List[List[InlineKeyboardButton]]:
     """Generates the keyboard for the autoreplies
