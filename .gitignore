@@ -126,3 +126,6 @@ logs/*.log
 
 # Dev
 test.py
+
+# Mac
+.DS_Store
