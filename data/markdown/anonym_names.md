@@ -65,7 +65,6 @@ Barbero
 i soliti 4
 furry
 programming socks
-appartengo alla comunità XYZ, quindi
 di sinistra
 Scheda Bianca-Chan
 il chiesitore
