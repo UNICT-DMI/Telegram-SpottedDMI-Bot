@@ -59,3 +59,17 @@ me and the boys
 Lorenzo Paoria 😕♍️
 ciccio chi?!?!
 Cacatore seriale
+Fabio Rovazzi
+Barbero
+81
+i soliti 4
+furry
+programming socks
+appartengo alla comunità XYZ, quindi
+di sinistra
+Scheda Bianca-Chan
+il chiesitore
+Boomer io o disagiati loro?
+Xenia, the Linux mascot
+tutta colpa dei rappresentanti
+persiste un problema
