@@ -124,3 +124,4 @@ def close_callback(_: None) -> None:
         text and replyMarkup that make up the reply
     """
     return None
+# endregion

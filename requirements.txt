@@ -21,10 +21,10 @@ pyasn1==0.4.8
 pycodestyle==2.8.0
 pycparser==2.21
 pyparsing==3.0.7
-python-telegram-bot==13.14
+python-telegram-bot==13.15
 pytz==2022.1
 pytz-deprecation-shim==0.1.0.post0
-PyYAML==6.0.1
+PyYAML==6.0
 requests==2.27.1
 rsa==4.8
 six==1.16.0
