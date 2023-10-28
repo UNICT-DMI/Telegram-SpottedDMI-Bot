@@ -172,7 +172,7 @@ def get_vote_kb(published_post: Optional[PublishedPost] = None) -> Optional[Inli
             keyboard[-1].append(report_button)
         else:
             keyboard.append([report_button])
-    
+
     keyboard.append([follow_button])
     return InlineKeyboardMarkup(keyboard) if keyboard else None
 

@@ -49,7 +49,7 @@ def follow_spot_callback(update: Update, context: CallbackContext) -> int:
         )
     else:
         post_url = f"https://t.me/c/{str(info.chat_id).replace('-100', '')}/{info.message_id}"
-        answer_text = f"Stai seguendo questo spot."
+        answer_text = "Stai seguendo questo spot."
         try:
             # Forward the spot in user's conversation with the bot, so that
             # future comments will be sent in response to this forwarded message.
