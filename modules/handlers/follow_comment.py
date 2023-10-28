@@ -29,4 +29,6 @@ def follow_spot_comment(update: Update, context: CallbackContext):
 
         # Send them an update about the new comment
         for user in result:
-            info.message.copy(chat_id=user['user_id'], reply_to_message_id=user['private_message_id'])
+            # Avoid sending if it's made by the same user
+            if not user['user_id'] == info.message.from_user.id:
+                info.message.copy(chat_id=user['user_id'], reply_to_message_id=user['private_message_id'])

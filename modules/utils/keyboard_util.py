@@ -147,7 +147,7 @@ def get_paused_kb(page: int, items_per_page: int) -> InlineKeyboardMarkup:
     return InlineKeyboardMarkup(keyboard)
 
 def get_vote_kb(published_post: Optional[PublishedPost] = None) -> Optional[InlineKeyboardMarkup]:
-    """Generates the InlineKeyboard for the published post
+    """Generates the InlineKeyboard for the published post and updates the correct number of reactions
 
     Args:
         published_post: published post to which the keyboard is attached
@@ -155,16 +155,26 @@ def get_vote_kb(published_post: Optional[PublishedPost] = None) -> Optional[Inli
     Returns:
         new inline keyboard
     """
-    return InlineKeyboardMarkup([
-        *([[InlineKeyboardButton(
-            "🚩 Report",
-            callback_data="meme_report_spot"
-        )]] if Config.meme_get('report') else []),
-        [InlineKeyboardButton(
-            "👁 Follow",
-            callback_data="follow_spot"
-        )]
-    ])
+    keyboard = []
+    for row in ROWS:  # for each ROW or the keyboard...
+        new_row = []
+        for reaction_id in row:  # ... add all the reactions for that row
+            n_votes = "0" if published_post is None else published_post.get_votes(vote=reaction_id)
+            new_row.append(InlineKeyboardButton(f"{REACTION[reaction_id]} {n_votes}",
+                                                callback_data=f"meme_vote,{reaction_id}"))
+        keyboard.append(new_row)
+
+    # the last buttons in the last rows will be the report button and the follow button
+    report_button = InlineKeyboardButton("🚩 Report", callback_data="meme_report_spot")
+    follow_button = InlineKeyboardButton("👁 Follow", callback_data="follow_spot")
+    if Config.meme_get('report'):
+        if len(keyboard) > 0:
+            keyboard[-1].append(report_button)
+        else:
+            keyboard.append([report_button])
+    
+    keyboard.append([follow_button])
+    return InlineKeyboardMarkup(keyboard) if keyboard else None
 
 
 def update_approve_kb(keyboard: list[list[InlineKeyboardButton]],
