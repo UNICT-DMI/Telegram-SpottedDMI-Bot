@@ -31,7 +31,7 @@ def follow_spot_callback(update: Update, context: CallbackContext) -> int:
         where = "user_id = %s and message_id = %s",
         where_args = (info.user_id, message_id)
     )
-    
+
     if len(result) > 0:
         answer_text = "Non stai più seguendo questo spot."
         # Forget the stored data
