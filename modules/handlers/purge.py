@@ -8,7 +8,7 @@ from modules.utils import EventInfo
 purge_in_progress = False  # pylint: disable=invalid-name
 
 
-def purge_cmd(update: Update, context: CallbackContext):
+async def purge_cmd(update: Update, context: CallbackContext):
     """Handles the /purge command.
     Deletes all posts and the related votes in the database whose actual telegram message could not be found
 
@@ -20,16 +20,18 @@ def purge_cmd(update: Update, context: CallbackContext):
     info = EventInfo.from_message(update, context)
     if not purge_in_progress:  # there is no purge already in progress
         purge_in_progress = True
-        info.bot.send_message(info.chat_id, text="Avvio del comando /purge")
+        await info.bot.send_message(info.chat_id, text="Avvio del comando /purge")
         published_memes = DbManager.select_from("published_meme")
         total_posts = len(published_memes)
         lost_posts = 0
         for published_meme in published_memes:
             try:
-                message = info.bot.forward_message(info.chat_id,
-                                                    from_chat_id=published_meme['channel_id'],
-                                                    message_id=published_meme['c_message_id'],
-                                                    disable_notification=True)
+                message = await info.bot.forward_message(
+                    info.chat_id,
+                    from_chat_id=published_meme["channel_id"],
+                    message_id=published_meme["c_message_id"],
+                    disable_notification=True,
+                )
                 message.delete()
             except Exception:  # pylint: disable=broad-except
                 lost_posts += 1
@@ -38,6 +40,7 @@ def purge_cmd(update: Update, context: CallbackContext):
                 sleep(0.2)
 
         avg = round(lost_posts / (total_posts if total_posts != 0 else 1), 3)
-        info.bot.send_message(info.chat_id,
-                                text=f"Dei {total_posts} totali, {lost_posts} sono andati persi. Il rapporto è {avg}")
+        await info.bot.send_message(
+            info.chat_id, text=f"Dei {total_posts} totali, {lost_posts} sono andati persi. Il rapporto è {avg}"
+        )
         purge_in_progress = False

@@ -1,23 +1,24 @@
 """Published post management"""
 from dataclasses import dataclass
 from typing import Optional
-from telegram.inline.inlinekeyboardmarkup import InlineKeyboardMarkup
+from telegram import InlineKeyboardMarkup
 from .db_manager import DbManager
 
 
 @dataclass()
-class PublishedPost():
+class PublishedPost:
     """Class that represents a published post
 
     Args:
         channel_id: id of the channel
         c_message_id: id of the post in the channel
     """
+
     channel_id: int
     c_message_id: int
 
     @classmethod
-    def create(cls, channel_id: int, c_message_id: int) -> 'PublishedPost':
+    def create(cls, channel_id: int, c_message_id: int) -> "PublishedPost":
         """Inserts a new post in the table of published posts
 
         Args:
@@ -30,7 +31,7 @@ class PublishedPost():
         return cls(channel_id=channel_id, c_message_id=c_message_id).save_post()
 
     @classmethod
-    def from_channel(cls, channel_id: int, c_message_id: int) -> Optional['PublishedPost']:
+    def from_channel(cls, channel_id: int, c_message_id: int) -> Optional["PublishedPost"]:
         """Retrieves a published post from the info related to the channel
 
         Args:
@@ -40,19 +41,23 @@ class PublishedPost():
         Returns:
             instance of the class
         """
-        is_present = DbManager.count_from(table_name="published_meme",
-                                          where="channel_id = %s and c_message_id = %s",
-                                          where_args=(channel_id, c_message_id))
+        is_present = DbManager.count_from(
+            table_name="published_meme",
+            where="channel_id = %s and c_message_id = %s",
+            where_args=(channel_id, c_message_id),
+        )
         if not is_present:
             return None
 
         return cls(channel_id=channel_id, c_message_id=c_message_id)
 
-    def save_post(self) -> 'PublishedPost':
+    def save_post(self) -> "PublishedPost":
         """Saves the published_post in the database"""
-        DbManager.insert_into(table_name="published_meme",
-                              columns=("channel_id", "c_message_id"),
-                              values=(self.channel_id, self.c_message_id))
+        DbManager.insert_into(
+            table_name="published_meme",
+            columns=("channel_id", "c_message_id"),
+            values=(self.channel_id, self.c_message_id),
+        )
         return self
 
     def __get_user_vote(self, user_id: int) -> Optional[str]:
@@ -64,14 +69,16 @@ class PublishedPost():
         Returns:
             value of the vote or None if a vote was not yet made
         """
-        vote = DbManager.select_from(select="vote",
-                                     table_name="votes",
-                                     where="user_id = %s and c_message_id = %s and channel_id = %s",
-                                     where_args=(user_id, self.c_message_id, self.channel_id))
+        vote = DbManager.select_from(
+            select="vote",
+            table_name="votes",
+            where="user_id = %s and c_message_id = %s and channel_id = %s",
+            where_args=(user_id, self.c_message_id, self.channel_id),
+        )
 
         if len(vote) == 0:  # the vote is not present
             return None
-        return vote[0]['vote']
+        return vote[0]["vote"]
 
     def set_user_vote(self, user_id: int, vote: str) -> bool:
         """Adds the vote of the user on the post, updates the existing vote or deletes it
@@ -85,18 +92,24 @@ class PublishedPost():
         """
         current_vote = self.__get_user_vote(user_id=user_id)
         if current_vote is None:  # there isn't a vote yet
-            DbManager.insert_into(table_name="votes",
-                                  columns=("user_id", "c_message_id", "channel_id", "vote"),
-                                  values=(user_id, self.c_message_id, self.channel_id, vote))
+            DbManager.insert_into(
+                table_name="votes",
+                columns=("user_id", "c_message_id", "channel_id", "vote"),
+                values=(user_id, self.c_message_id, self.channel_id, vote),
+            )
         elif current_vote != vote:  # the old vote was different from the new vote
-            DbManager.update_from(table_name="votes",
-                                  set_clause="vote = %s",
-                                  where="user_id = %s and c_message_id = %s and channel_id = %s",
-                                  args=(vote, user_id, self.c_message_id, self.channel_id))
+            DbManager.update_from(
+                table_name="votes",
+                set_clause="vote = %s",
+                where="user_id = %s and c_message_id = %s and channel_id = %s",
+                args=(vote, user_id, self.c_message_id, self.channel_id),
+            )
         else:  # the user wants to remove his vote
-            DbManager.delete_from(table_name="votes",
-                                  where="user_id = %s and c_message_id = %s and channel_id = %s",
-                                  where_args=(user_id, self.c_message_id, self.channel_id))
+            DbManager.delete_from(
+                table_name="votes",
+                where="user_id = %s and c_message_id = %s and channel_id = %s",
+                where_args=(user_id, self.c_message_id, self.channel_id),
+            )
             return False
 
         return True
@@ -110,9 +123,11 @@ class PublishedPost():
         Returns:
             number of votes
         """
-        return DbManager.count_from(table_name="votes",
-                                    where="c_message_id = %s and channel_id = %s and vote = %s",
-                                    where_args=(self.c_message_id, self.channel_id, vote))
+        return DbManager.count_from(
+            table_name="votes",
+            where="c_message_id = %s and channel_id = %s and vote = %s",
+            where_args=(self.c_message_id, self.channel_id, vote),
+        )
 
     def set_votes(self, keyboard: InlineKeyboardMarkup):
         """Sets all the votes of the post based on the inline keyboard.
@@ -121,9 +136,11 @@ class PublishedPost():
         Args:
             keyboard: posts inline keyboard
         """
-        DbManager.delete_from(table_name="votes",
-                              where="c_message_id = %s and channel_id = %s",
-                              where_args=(self.c_message_id, self.channel_id))
+        DbManager.delete_from(
+            table_name="votes",
+            where="c_message_id = %s and channel_id = %s",
+            where_args=(self.c_message_id, self.channel_id),
+        )
         ids = -1
         for row in keyboard.inline_keyboard:
             for column in row:
@@ -136,5 +153,4 @@ class PublishedPost():
                         ids -= 1
 
     def __repr__(self) -> str:
-        return f"PublishedPost: [ channel_id: {self.channel_id}\n"\
-                f"c_message_id: {self.c_message_id} ]"
+        return f"PublishedPost: [ channel_id: {self.channel_id}\n" f"c_message_id: {self.c_message_id} ]"

@@ -1,12 +1,15 @@
 """Common functions needed in conversation handlers"""
 from typing import Callable, Optional, Union
-from telegram import Update, ParseMode
+from telegram import Update
+from telegram.constants import ParseMode
 from telegram.ext import CallbackContext
 from modules.data import read_md
 from modules.utils.info_util import EventInfo
 
 
-def conv_fail(family: str) -> Callable[[Union[tuple[Update, CallbackContext], EventInfo], str, Optional[int]], Optional[int]]:
+def conv_fail(
+    family: str,
+) -> Callable[[Union[tuple[Update, CallbackContext], EventInfo], str, Optional[int]], Optional[int]]:
     """Creates a function used to handle any error in the conversation
 
     Args:
@@ -16,10 +19,12 @@ def conv_fail(family: str) -> Callable[[Union[tuple[Update, CallbackContext], Ev
         function used to handle the error
     """
 
-    def fail(event: Union[tuple[Update, CallbackContext], EventInfo],
-             fail_file: str = "generic",
-             return_value: Optional[int] = None,
-             **kwargs) -> Optional[int]:
+    async def fail(
+        event: Union[tuple[Update, CallbackContext], EventInfo],
+        fail_file: str = "generic",
+        return_value: Optional[int] = None,
+        **kwargs,
+    ) -> Optional[int]:
         """Handles an invalid message in the conversation.
         Optional[int]he filename is expected to be in the format of <family>_error_<fail_file>.md.
         Returns a warning message
@@ -37,14 +42,15 @@ def conv_fail(family: str) -> Callable[[Union[tuple[Update, CallbackContext], Ev
         """
         info = event if isinstance(event, EventInfo) else EventInfo.from_message(*event)
         text = read_md(f"{family}_error_{fail_file}", **kwargs)
-        info.bot.send_message(chat_id=info.chat_id, text=text, parse_mode=ParseMode.MARKDOWN_V2)
+        await info.bot.send_message(chat_id=info.chat_id, text=text, parse_mode=ParseMode.MARKDOWN_V2)
         return return_value
 
     return fail
 
 
 def conv_cancel(family: str) -> Callable[[Update, CallbackContext], int]:
-    """Creates a function used to handle the /cancel command in the conversation
+    """Creates a function used to handle the /cancel command in the conversation.
+    Invoking /cancel will exit the conversation immediately
 
     Args:
         family: family of the command
@@ -53,7 +59,7 @@ def conv_cancel(family: str) -> Callable[[Update, CallbackContext], int]:
         function used to handle the /cancel command
     """
 
-    def cancel(update: Update, context: CallbackContext) -> int:
+    async def cancel(update: Update, context: CallbackContext) -> int:
         """Handles the /cancel command.
         Exits the conversation
 
@@ -66,7 +72,7 @@ def conv_cancel(family: str) -> Callable[[Update, CallbackContext], int]:
         """
         info = EventInfo.from_message(update, context)
         text = read_md(f"{family}_cancel")
-        info.bot.send_message(chat_id=info.chat_id, text=text, parse_mode=ParseMode.MARKDOWN_V2)
+        await info.bot.send_message(chat_id=info.chat_id, text=text, parse_mode=ParseMode.MARKDOWN_V2)
         return -1
 
     return cancel

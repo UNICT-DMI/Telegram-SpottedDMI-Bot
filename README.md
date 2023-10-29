@@ -44,7 +44,6 @@ The main ones are:
 ### Steps:
 
 - Clone this repository
-- \[_OPTIONAL_\] Create _"data/yaml/reactions.yaml"_ and edit the desired parameters.
 - Create [_"config/settings.yaml"_](#⚙️-settings) and edit the desired parameters. **Make sure to add a valid _token_ setting**.
 - Make sure the bot is in present both in the admin group and in the spot channel. It may need to have admin privileges. If comments are enabled, the bot has to be in the comment group too as an admin.
 - What follows are some example settings with explaination for each:
@@ -60,7 +59,6 @@ The main ones are:
 ### Steps:
 
 - Clone this repository
-- \[_OPTIONAL_\] Create _"data/yaml/reactions.yaml"_ and edit the desired parameters.
 - Create [_"config/settings.yaml"_](#⚙️-settings) and edit the desired parameters. **Make sure to add a valid _token_ setting**.
 - \[_OPTIONAL_\] You could also leave the settings files alone, and use [_environment variables_](#settings-override) on the container instead.
 - Make sure the bot is in present both in the admin group and in the spot channel. It may need to have admin privileges. If comments are enabled, the bot has to be in the comment group too as an admin.
@@ -103,7 +101,7 @@ The VsCode [Remote - Containers](https://marketplace.visualstudio.com/items?item
 
 ## ⚙️ Settings
 
-When it is initialized, the bot reads both the _"data/yaml/reactions.yaml"_ and the _"config/settings.yaml"_ files.  
+When it is initialized, the bot reads both the _"data/yaml/autoreplies.yaml"_ and the _"config/settings.yaml"_ files.  
 Feel free to customize the settings file. Make sure to add a valid **token** value to run the bot.
 
 ```yaml

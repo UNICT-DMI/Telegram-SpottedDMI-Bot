@@ -4,7 +4,7 @@ from telegram.ext import CallbackContext
 from .job_handlers import clean_pending_job
 
 
-def clean_pending_cmd(_: Update, context: CallbackContext):
+async def clean_pending_cmd(_: Update, context: CallbackContext):
     """Handles the /clean_pending command.
     Automatically rejects all pending posts that are older than the chosen amount of hours
 
@@ -12,4 +12,4 @@ def clean_pending_cmd(_: Update, context: CallbackContext):
         _: update event
         context: context passed by the handler
     """
-    clean_pending_job(context=context)
+    await clean_pending_job(context=context)

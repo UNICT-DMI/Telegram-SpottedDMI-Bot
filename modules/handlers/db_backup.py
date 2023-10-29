@@ -4,7 +4,7 @@ from telegram.ext import CallbackContext
 from .job_handlers import db_backup_job
 
 
-def db_backup_cmd(_: Update, context: CallbackContext):
+async def db_backup_cmd(_: Update, context: CallbackContext):
     """Handles the /db_backup command.
     Automatically upload and send current version of db for backup
 
@@ -12,4 +12,4 @@ def db_backup_cmd(_: Update, context: CallbackContext):
         _: update event
         context: context passed by the handler
     """
-    db_backup_job(context=context)
+    await db_backup_job(context=context)

@@ -2,14 +2,14 @@
 from datetime import time
 import warnings
 from pytz import utc
-from telegram import BotCommand
-from telegram.ext import CallbackQueryHandler, CommandHandler, Dispatcher, Filters, MessageHandler, Updater
+from telegram import BotCommand, BotCommandScopeChat, BotCommandScopeAllPrivateChats
+from telegram.ext import Application, CallbackQueryHandler, CommandHandler, MessageHandler, filters
 from modules.data.config import Config
 from modules.debug import error_handler, log_message
 from .anonym_comment import anonymous_comment_msg
-from .autoreply import autoreply_cmd
+from .autoreply import autoreply_callback
 from .ban import ban_cmd
-from .callback_handlers import meme_callback
+from .approve import approve_yes_callback, approve_no_callback, approve_status_callback
 from .cancel import cancel_cmd
 from .clean_pending import clean_pending_cmd
 from .db_backup import db_backup_cmd
@@ -22,55 +22,64 @@ from .report_spot import report_spot_conv_handler
 from .report_user import report_user_conv_handler
 from .rules import rules_cmd
 from .sban import sban_cmd
-from .settings import settings_cmd
+from .settings import settings_cmd, settings_callback
 from .spot import spot_conv_handler
 from .start import start_cmd
-from .stats import stats_callback, stats_cmd
 from .follow_spot import follow_spot_callback
 from .follow_comment import follow_spot_comment
 
 
-def add_commands(updater: Updater):
+async def add_commands(app: Application):
     """Adds the list of commands with their description to the bot
 
     Args:
-        updater: supplied Updater
+        app: supplied application
     """
-    commands = [
+    private_chat_commands = [
         BotCommand("start", "presentazione iniziale del bot"),
         BotCommand("spot", "inizia a spottare"),
-        BotCommand("cancel ",
-                   "annulla la procedura in corso e cancella l'ultimo spot inviato, se non è ancora stato pubblicato"),
+        BotCommand(
+            "cancel ",
+            "annulla la procedura in corso e cancella l'ultimo spot inviato, se non è ancora stato pubblicato",
+        ),
         BotCommand("help ", "funzionamento e scopo del bot"),
         BotCommand("report", "segnala un utente"),
         BotCommand("rules ", "regole da tenere a mente"),
-        BotCommand("stats", "visualizza statistiche sugli spot"),
-        BotCommand("settings", "cambia le impostazioni di privacy")
+        BotCommand("settings", "cambia le impostazioni di privacy"),
     ]
-    updater.bot.set_my_commands(commands=commands)
+    admin_commands = [
+        BotCommand("sban", "banna un utente"),
+        BotCommand("clean_pending", "elimina tutti gli spot in sospeso"),
+        BotCommand("db_backup", "esegui il backup del database"),
+        BotCommand("reply", "rispondi ad uno spot o un report"),
+        BotCommand("ban", "banna un utente"),
+    ]
+    await app.bot.set_my_commands(private_chat_commands, scope=BotCommandScopeAllPrivateChats())
+    await app.bot.set_my_commands(admin_commands, scope=BotCommandScopeChat(Config.meme_get("group_id")))
 
 
-def add_handlers(disp: Dispatcher):
-    """Adds all the needed handlers to the dispatcher
+def add_handlers(app: Application):
+    """Adds all the needed handlers to the application
 
     Args:
-        disp: supplied dispatcher
+        app: supplied application
     """
-    warnings.filterwarnings("ignore",
-                            message="If 'per_message=False', 'CallbackQueryHandler' will not be tracked for every message.")
+    warnings.filterwarnings(
+        "ignore", message="If 'per_message=False', 'CallbackQueryHandler' will not be tracked for every message."
+    )
 
-    if Config.settings_get('debug', 'local_log'):  # add MessageHandler only if log_message is enabled
-        disp.add_handler(MessageHandler(Filters.all, log_message), 1)
+    if Config.settings_get("debug", "local_log"):  # add MessageHandler only if log_message is enabled
+        app.add_handler(MessageHandler(filters.ALL, log_message), 1)
 
-    admin_filter = Filters.chat(chat_id=Config.meme_get('group_id'))
+    admin_filter = filters.Chat(chat_id=Config.meme_get("group_id"))
 
     # Error handler
-    disp.add_error_handler(error_handler)
+    app.add_error_handler(error_handler)
 
     # Conversation handler
-    disp.add_handler(spot_conv_handler())
-    disp.add_handler(report_user_conv_handler())
-    disp.add_handler(report_spot_conv_handler())
+    app.add_handler(spot_conv_handler())
+    app.add_handler(report_user_conv_handler())
+    app.add_handler(report_spot_conv_handler())
 
     # remove anonymous comments
     if Config.meme_get('delete_anonymous_comments'):
@@ -80,39 +89,51 @@ def add_handlers(disp: Dispatcher):
                            run_async=True))
 
     # Command handlers
-    disp.add_handler(CommandHandler("start", start_cmd, filters=Filters.chat_type.private))
-    disp.add_handler(CommandHandler("help", help_cmd, filters=Filters.chat_type.private | admin_filter))
-    disp.add_handler(CommandHandler("rules", rules_cmd, filters=Filters.chat_type.private))
-    disp.add_handler(CommandHandler("stats", stats_cmd, filters=Filters.chat_type.private))
-    disp.add_handler(CommandHandler("settings", settings_cmd, filters=Filters.chat_type.private))
-    disp.add_handler(CommandHandler("sban", sban_cmd, filters=admin_filter))
-    disp.add_handler(CommandHandler("clean_pending", clean_pending_cmd, filters=admin_filter))
-    disp.add_handler(CommandHandler("db_backup", db_backup_cmd, run_async=True, filters=admin_filter))
-    disp.add_handler(CommandHandler("purge", purge_cmd, run_async=True, filters=admin_filter))
-    # it must be after the conversation handler's 'cancel'
-    disp.add_handler(CommandHandler("cancel", cancel_cmd, filters=Filters.chat_type.private))
+    app.add_handler(CommandHandler("start", start_cmd))
+    app.add_handler(CommandHandler("help", help_cmd))
+    app.add_handler(CommandHandler("rules", rules_cmd))
+    app.add_handler(CommandHandler("settings", settings_cmd))
+    app.add_handler(CommandHandler("cancel", cancel_cmd))  # it must be after the conversation handler's 'cancel'
+
+    # Command handlers: Admin commands
+    app.add_handler(CommandHandler("sban", sban_cmd, filters=admin_filter))
+    app.add_handler(CommandHandler("clean_pending", clean_pending_cmd, filters=admin_filter))
+    app.add_handler(CommandHandler("db_backup", db_backup_cmd, filters=admin_filter))
+    app.add_handler(CommandHandler("purge", purge_cmd, filters=admin_filter))
 
     # MessageHandler
-    disp.add_handler(MessageHandler(Filters.reply & admin_filter & Filters.regex(r"^/ban$"), ban_cmd))
-    disp.add_handler(MessageHandler(Filters.reply & admin_filter & Filters.regex(r"^/reply"), reply_cmd))
-    disp.add_handler(MessageHandler(Filters.reply & admin_filter & Filters.regex(r"^/autoreply"), autoreply_cmd))
+    app.add_handler(MessageHandler(filters.REPLY & admin_filter & filters.Regex(r"^/ban$"), ban_cmd))
+    app.add_handler(MessageHandler(filters.REPLY & admin_filter & filters.Regex(r"^/reply"), reply_cmd))
 
     # Callback handlers
-    disp.add_handler(CallbackQueryHandler(meme_callback, pattern=r"^meme_\.*"))
-    disp.add_handler(CallbackQueryHandler(stats_callback, pattern=r"^stats_\.*"))
-    disp.add_handler(CallbackQueryHandler(follow_spot_callback, pattern=r"^follow_\.*"))
+    app.add_handler(CallbackQueryHandler(settings_callback, pattern=r"^settings\.*"))
+    app.add_handler(CallbackQueryHandler(approve_yes_callback, pattern=r"^approve_yes$"))
+    app.add_handler(CallbackQueryHandler(approve_no_callback, pattern=r"^approve_no$"))
+    app.add_handler(CallbackQueryHandler(approve_status_callback, pattern=r"^approve_status\.*"))
+    app.add_handler(CallbackQueryHandler(autoreply_callback, pattern=r"^autoreply\.*"))
+    app.add_handler(CallbackQueryHandler(follow_spot_callback, pattern=r"^follow_\.*"))
 
-    if Config.meme_get('comments'):
-        disp.add_handler(
-            MessageHandler(Filters.forwarded & Filters.chat_type.groups & Filters.is_automatic_forward, forwarded_post_msg))
+    if Config.meme_get("comments"):
+        app.add_handler(
+            MessageHandler(
+                filters.FORWARDED & filters.ChatType.GROUPS & filters.IS_AUTOMATIC_FORWARD, forwarded_post_msg
+            )
+        )
+    if Config.meme_get("delete_anonymous_comments"):
+        app.add_handler(
+            MessageHandler(
+                filters.SenderChat.CHANNEL & filters.ChatType.GROUPS & ~filters.IS_AUTOMATIC_FORWARD,
+                anonymous_comment_msg,
+            )
+        )
 
-    disp.add_handler(MessageHandler(Filters.reply & Filters.chat_type.groups, follow_spot_comment, run_async=True))
+    app.add_handler(MessageHandler(filters.REPLY & filters.ChatType.GROUPS, follow_spot_comment))
 
-def add_jobs(disp: Dispatcher):
-    """Adds all the jobs to be scheduled to the dispatcher
+def add_jobs(app: Application):
+    """Adds all the jobs to be scheduled to the application
 
     Args:
-        disp: supplyed dispatcher
+        app: supplyed application
     """
-    disp.job_queue.run_daily(clean_pending_job, time=time(hour=5, tzinfo=utc))  # run each day at 05:00 utc
-    disp.job_queue.run_daily(db_backup_job, time=time(hour=5, tzinfo=utc))  # run each day at 05:00 utc
+    app.job_queue.run_daily(clean_pending_job, time=time(hour=5, tzinfo=utc))  # run each day at 05:00 utc
+    app.job_queue.run_daily(db_backup_job, time=time(hour=5, tzinfo=utc))  # run each day at 05:00 utc

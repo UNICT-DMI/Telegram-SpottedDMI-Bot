@@ -5,7 +5,7 @@ from modules.data import PendingPost, User
 from modules.utils import EventInfo
 
 
-def ban_cmd(update: Update, context: CallbackContext):
+async def ban_cmd(update: Update, context: CallbackContext):
     """Handles the /ban command.
     Ban a user by replying to one of his pending posts with /ban
 
@@ -18,11 +18,11 @@ def ban_cmd(update: Update, context: CallbackContext):
     pending_post = PendingPost.from_group(group_id=info.chat_id, g_message_id=g_message_id)
 
     if pending_post is None:
-        info.bot.send_message(chat_id=info.chat_id, text="Per bannare qualcuno, rispondi al suo post con /ban")
+        await info.bot.send_message(chat_id=info.chat_id, text="Per bannare qualcuno, rispondi al suo post con /ban")
         return
 
     user = User(pending_post.user_id)
     user.ban()
     pending_post.delete_post()
-    info.edit_inline_keyboard(message_id=g_message_id)
-    info.bot.send_message(chat_id=info.chat_id, text="L'utente è stato bannato")
+    await info.edit_inline_keyboard(message_id=g_message_id)
+    await info.bot.send_message(chat_id=info.chat_id, text="L'utente è stato bannato")

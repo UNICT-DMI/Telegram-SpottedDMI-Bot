@@ -1,6 +1,6 @@
 """Read data from files"""
 import os
-from telegram.utils.helpers import escape_markdown
+from telegram.helpers import escape_markdown
 from .config import Config
 
 
@@ -46,6 +46,6 @@ def read_md(file_name: str) -> str:
         contents of the file
     """
     text = read_file("data", "markdown", file_name + ".md")
-    text = text.replace("{channel_tag}", escape_markdown(Config.meme_get('channel_tag'), version=2))
-    text = text.replace("{bot_tag}", escape_markdown(Config.settings_get('bot_tag'), version=2))
+    text = text.replace("{channel_tag}", escape_markdown(Config.meme_get("channel_tag"), version=2))
+    text = text.replace("{bot_tag}", escape_markdown(Config.settings_get("bot_tag"), version=2))
     return text

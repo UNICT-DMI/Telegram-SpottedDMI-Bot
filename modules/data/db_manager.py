@@ -8,7 +8,7 @@ from .data_reader import get_abs_path, read_file
 logger = logging.getLogger(__name__)
 
 
-class DbManager():
+class DbManager:
     """Class that handles the management of databases"""
 
     db_path = ("data", "db", "db.sqlite3")
@@ -27,12 +27,9 @@ class DbManager():
         return {col[0]: row[idx] for idx, col in enumerate(cursor.description)}
 
     @classmethod
-    def __query_execute(cls,
-                        cur: sqlite3.Cursor,
-                        query: str,
-                        args: Optional[tuple] = None,
-                        error_str: str = "",
-                        is_many: bool = False):
+    def __query_execute(
+        cls, cur: sqlite3.Cursor, query: str, args: Optional[tuple] = None, error_str: str = "", is_many: bool = False
+    ):
         """Materially executes the requested query, while also catching and logging any exception that may be thrown
 
         Args:
@@ -61,7 +58,7 @@ class DbManager():
         """
         db_path = get_abs_path(*cls.db_path)
         if not os.path.exists(db_path):
-            with open(db_path, 'w', encoding='utf-8'):
+            with open(db_path, "w", encoding="utf-8"):
                 pass
         conn = sqlite3.connect(db_path)
         conn.row_factory = cls.row_factory
@@ -101,13 +98,15 @@ class DbManager():
         conn.close()
 
     @classmethod
-    def select_from(cls,
-                    table_name: str,
-                    select: str = "*",
-                    where: str = "",
-                    where_args: Optional[tuple] = None,
-                    group_by: str = "",
-                    order_by: str = "") -> list:
+    def select_from(
+        cls,
+        table_name: str,
+        select: str = "*",
+        where: str = "",
+        where_args: Optional[tuple] = None,
+        group_by: str = "",
+        order_by: str = "",
+    ) -> list:
         """Returns the results of a query.
         Executes "SELECT select FROM table_name [WHERE where (with where_args)] [GROUP_BY group_by] [ORDER BY order_by]"
 
@@ -129,10 +128,12 @@ class DbManager():
         group_by = f"GROUP BY {group_by}" if group_by else ""
         order_by = f"ORDER BY {order_by}" if order_by else ""
 
-        cls.__query_execute(cur=cur,
-                            query=f"SELECT {select} FROM {table_name} {where} {group_by} {order_by}",
-                            args=where_args,
-                            error_str="select_from")
+        cls.__query_execute(
+            cur=cur,
+            query=f"SELECT {select} FROM {table_name} {where} {group_by} {order_by}",
+            args=where_args,
+            error_str="select_from",
+        )
 
         query_result = cur.fetchall()
         conn.commit()
@@ -159,16 +160,18 @@ class DbManager():
         where = where.replace("%s", "?")
         where = f"WHERE {where}" if where else ""
 
-        cls.__query_execute(cur=cur,
-                            query=f"SELECT COUNT({select}) as number FROM {table_name} {where}",
-                            args=where_args,
-                            error_str="count_from")
+        cls.__query_execute(
+            cur=cur,
+            query=f"SELECT COUNT({select}) as number FROM {table_name} {where}",
+            args=where_args,
+            error_str="count_from",
+        )
 
         query_result = cur.fetchall()
         conn.commit()
         cur.close()
         conn.close()
-        return query_result[0]['number'] if len(query_result) > 0 else None
+        return query_result[0]["number"] if len(query_result) > 0 else None
 
     @classmethod
     def insert_into(cls, table_name: str, values: tuple, columns: Union[tuple, str] = "", multiple_rows: bool = False):
@@ -191,11 +194,13 @@ class DbManager():
         if columns:
             columns = "(" + ", ".join(columns) + ")"
 
-        cls.__query_execute(cur=cur,
-                            query=f"INSERT INTO {table_name} {columns} VALUES ({placeholders})",
-                            args=values,
-                            error_str="insert_into",
-                            is_many=multiple_rows)
+        cls.__query_execute(
+            cur=cur,
+            query=f"INSERT INTO {table_name} {columns} VALUES ({placeholders})",
+            args=values,
+            error_str="insert_into",
+            is_many=multiple_rows,
+        )
 
         conn.commit()
         cur.close()
@@ -218,7 +223,9 @@ class DbManager():
         where = where.replace("%s", "?")
         where = f"WHERE {where}" if where else ""
 
-        cls.__query_execute(cur=cur, query=f"UPDATE {table_name} SET {set_clause} {where}", args=args, error_str="update_from")
+        cls.__query_execute(
+            cur=cur, query=f"UPDATE {table_name} SET {set_clause} {where}", args=args, error_str="update_from"
+        )
 
         conn.commit()
         cur.close()
@@ -239,7 +246,9 @@ class DbManager():
         where = where.replace("%s", "?")
         where = f"WHERE {where}" if where else ""
 
-        cls.__query_execute(cur=cur, query=f"DELETE FROM {table_name} {where}", args=where_args, error_str="delete_from")
+        cls.__query_execute(
+            cur=cur, query=f"DELETE FROM {table_name} {where}", args=where_args, error_str="delete_from"
+        )
 
         conn.commit()
         cur.close()

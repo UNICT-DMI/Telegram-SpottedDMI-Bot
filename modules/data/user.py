@@ -1,6 +1,6 @@
 """Users management"""
 from random import choice
-from attr import dataclass
+from dataclasses import dataclass
 from telegram import Bot
 from .data_reader import read_md
 from .db_manager import DbManager
@@ -8,12 +8,13 @@ from .pending_post import PendingPost
 
 
 @dataclass()
-class User():
+class User:
     """Class that represents a user
 
     Args:
         user_id: id of the user
     """
+
     user_id: int
 
     @property
@@ -30,6 +31,13 @@ class User():
     def is_credited(self) -> bool:
         """If the user is in the credited list"""
         return DbManager.count_from(table_name="credited_users", where="user_id = %s", where_args=(self.user_id,)) == 1
+
+    @classmethod
+    def banned_users(cls) -> "list[User]":
+        """Returns a list of all the banned users"""
+        return [
+            cls(user_id=row["user_id"]) for row in DbManager.select_from(table_name="banned_users", select="user_id")
+        ]
 
     def ban(self):
         """Adds the user to the banned list"""
@@ -88,7 +96,9 @@ class User():
         return sign
 
     def __repr__(self) -> str:
-        return f"User: [ user_id: {self.user_id}\n"\
-                f"is_pending: {self.is_pending}\n"\
-                f"is_credited: {self.is_credited}\n"\
-                f"is_banned: {self.is_banned} ]"
+        return (
+            f"User: [ user_id: {self.user_id}\n"
+            f"is_pending: {self.is_pending}\n"
+            f"is_credited: {self.is_credited}\n"
+            f"is_banned: {self.is_banned} ]"
+        )

@@ -3,7 +3,7 @@ from typing import Optional, Tuple
 from .db_manager import DbManager
 
 
-class PostData():
+class PostData:
     """Class that handles the management of persistent data fetch or manipulation in the meme bot"""
 
     @staticmethod
@@ -66,10 +66,10 @@ class PostData():
                             GROUP BY v.c_message_id, v.channel_id
                             ORDER BY v.c_message_id DESC
                         )"""
-        max_message = DbManager.select_from(select="MAX(n_votes) as max, message_id, channel_id",
-                                            table_name=sub_select,
-                                            where_args=where_args)
+        max_message = DbManager.select_from(
+            select="MAX(n_votes) as max, message_id, channel_id", table_name=sub_select, where_args=where_args
+        )
 
-        if len(max_message) == 0 or max_message[0]['max'] is None:  # there is no post with the requested vote
+        if len(max_message) == 0 or max_message[0]["max"] is None:  # there is no post with the requested vote
             return 0, 0, "0"
-        return int(max_message[0]['max']), int(max_message[0]['message_id']), str(max_message[0]['channel_id'])
+        return int(max_message[0]["max"]), int(max_message[0]["message_id"]), str(max_message[0]["channel_id"])

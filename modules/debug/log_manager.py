@@ -3,7 +3,8 @@ import logging
 import traceback
 import html
 from datetime import datetime
-from telegram import Update, ParseMode
+from telegram import Update
+from telegram.constants import ParseMode
 from telegram.ext import CallbackContext
 from modules.data import Config, get_abs_path
 
@@ -12,7 +13,7 @@ logger = logging.getLogger(__name__)
 logger.info("Logger enabled")
 
 
-def error_handler(update: Update, context: CallbackContext):
+async def error_handler(update: Update, context: CallbackContext):
     """Logs the error and notifies the admins.
 
     Args:
@@ -27,7 +28,7 @@ def error_handler(update: Update, context: CallbackContext):
     min_traceback_list = [line for line in traceback_list if "modules" in line]
     min_traceback_list.append(traceback_list[-1])
     min_traceback_str = ''.join(min_traceback_list)
-    notify_error_admin(context=context, traceback_str=min_traceback_str)
+    await notify_error_admin(context=context, traceback_str=min_traceback_str)
 
     try:  # log the error
         with open(get_abs_path("logs", "errors.log"), "a", encoding="utf8") as log_file:
@@ -50,7 +51,7 @@ def error_handler(update: Update, context: CallbackContext):
         logger.error(ex)
 
 
-def notify_error_admin(context: CallbackContext, traceback_str: str):
+async def notify_error_admin(context: CallbackContext, traceback_str: str):
     """Sends a telegram message to notify the admins.
 
     Args:
@@ -60,10 +61,10 @@ def notify_error_admin(context: CallbackContext, traceback_str: str):
     traceback_str = traceback_str.replace(Config.settings_get("token"), "[bot_token]")
     text = (f'An exception was raised:\n'
             f'<pre>{html.escape(traceback_str)}</pre>')
-    context.bot.send_message(chat_id=Config.meme_get('group_id'), text=text, parse_mode=ParseMode.HTML)
+    await context.bot.send_message(chat_id=Config.meme_get('group_id'), text=text, parse_mode=ParseMode.HTML)
 
 
-def log_message(update: Update, _: CallbackContext):
+async def log_message(update: Update, _: CallbackContext):
     """Log the message that caused the update
 
     Args:

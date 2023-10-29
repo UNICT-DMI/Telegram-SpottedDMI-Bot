@@ -1,4 +1,5 @@
 """Modules that work with the data section"""
+from telegram.ext import Application
 from .config import Config
 from .data_reader import get_abs_path, read_md
 from .db_manager import DbManager
@@ -8,6 +9,14 @@ from .published_post import PublishedPost
 from .report import Report
 from .user import User
 
-if Config.settings_get('debug', 'reset_on_load'):
-    DbManager.query_from_file("data", "db", "meme_db_del.sql")
-DbManager.query_from_file("data", "db", "meme_db_init.sql")
+
+async def init_db(_: Application):
+    """Initialize the database.
+    If the debug.reset_on_load setting is True, it will delete the database and create a new one.
+
+    Args:
+        _: telegram application passed by the handler
+    """
+    if Config.settings_get("debug", "reset_on_load"):
+        DbManager.query_from_file("data", "db", "meme_db_del.sql")
+    DbManager.query_from_file("data", "db", "meme_db_init.sql")
