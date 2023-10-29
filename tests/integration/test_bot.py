@@ -3,11 +3,12 @@
 from datetime import datetime
 from typing import Tuple
 import pytest
-from telegram import Chat, Message, MessageEntity, user
+from telegram import Chat, Message, MessageEntity, User as TGUser
 from modules.utils.constants import APPROVED_KB, REJECTED_KB
 from modules.data import Config, read_md, DbManager, User, PendingPost, PublishedPost, Report
-from modules.handlers.constants import CHAT_PRIVATE_ERROR, AUTOREPLIES
+from modules.handlers.constants import CHAT_PRIVATE_ERROR
 from .telegram_simulator import TelegramSimulator
+
 
 @pytest.fixture(scope="function")
 def local_table(init_local_test_db: DbManager) -> DbManager:
@@ -38,7 +39,7 @@ def pending_post_message(local_table: DbManager, admin_group: Chat) -> Message:
     Returns:
         pending post message
     """
-    PendingPost(1, 0, 0, Config.meme_get('group_id'), datetime.now()).save_post()
+    PendingPost(1, 0, 0, Config.meme_get("group_id"), datetime.now()).save_post()
     return Message(message_id=0, date=datetime.now(), chat=admin_group)
 
 
@@ -53,11 +54,13 @@ def published_post_message(telegram: TelegramSimulator, channel: Chat, channel_g
     c_message = Message(message_id=0, date=datetime.now(), chat=channel)
     telegram.add_message(c_message)
 
-    if Config.meme_get('comments'):
-        telegram.send_forward_message(forward_message=c_message,
-                                      chat=channel_group,
-                                      is_automatic_forward=True,
-                                      user=user.User(1, first_name="Telegram", is_bot=False))
+    if Config.meme_get("comments"):
+        telegram.send_forward_message(
+            forward_message=c_message,
+            chat=channel_group,
+            is_automatic_forward=True,
+            user=TGUser(1, first_name="Telegram", is_bot=False),
+        )
         assert PublishedPost(channel_id=channel_group, c_message_id=telegram.last_message.message_id)
         return telegram.last_message
 
@@ -73,7 +76,7 @@ def report_user_message(local_table: DbManager, admin_group: Chat) -> Message:
     Returns:
         user report message
     """
-    Report(1, Config.meme_get('group_id'), 0, target_username='BadUser', date=datetime.now()).save_report()
+    Report(1, Config.meme_get("group_id"), 0, target_username="BadUser", date=datetime.now()).save_report()
     return Message(message_id=0, date=datetime.now(), chat=admin_group)
 
 
@@ -85,8 +88,9 @@ def report_spot_message(local_table: DbManager, admin_group: Chat, channel: Chat
     Returns:
         spot report in the admin group and post in the channel
     """
-    Report(1, Config.meme_get('group_id'), 0, channel_id=Config.meme_get('channel_id'), c_message_id=1,
-           date=datetime.now()).save_report()
+    Report(
+        1, Config.meme_get("group_id"), 0, channel_id=Config.meme_get("channel_id"), c_message_id=1, date=datetime.now()
+    ).save_report()
     group_message = Message(message_id=0, date=datetime.now(), chat=admin_group)
     channel_message = Message(message_id=1, date=datetime.now(), chat=channel)
     return group_message, channel_message
@@ -100,7 +104,7 @@ def channel() -> Chat:
     Returns:
         channel chat
     """
-    group_id = Config.meme_get('channel_id')
+    group_id = Config.meme_get("channel_id")
     return Chat(id=group_id, type=Chat.CHANNEL)
 
 
@@ -112,7 +116,7 @@ def admin_group() -> Chat:
     Returns:
         admin group chat
     """
-    group_id = Config.meme_get('group_id')
+    group_id = Config.meme_get("group_id")
     return Chat(id=group_id, type=Chat.GROUP)
 
 
@@ -124,7 +128,7 @@ def channel_group() -> Chat:
     Returns:
         public group for comments
     """
-    channel_group_id = Config.meme_get('channel_group_id')
+    channel_group_id = Config.meme_get("channel_group_id")
     return Chat(id=channel_group_id, type=Chat.GROUP)
 
 
@@ -206,7 +210,9 @@ class TestBot:
             assert telegram.messages[-2].text.endswith("TEST")
             assert telegram.last_message.text == "L'utente ha ricevuto il messaggio"
 
-        def test_reply_report_user_cmd(self, telegram: TelegramSimulator, admin_group: Chat, report_user_message: Message):
+        def test_reply_report_user_cmd(
+            self, telegram: TelegramSimulator, admin_group: Chat, report_user_message: Message
+        ):
             """Tests the /reply command.
             The bot sends a message to the user on behalf of the admin
             """
@@ -215,7 +221,9 @@ class TestBot:
             assert telegram.messages[-2].text.endswith("TEST")
             assert telegram.last_message.text == "L'utente ha ricevuto il messaggio"
 
-        def test_reply_report_spot_cmd(self, telegram: TelegramSimulator, admin_group: Chat, report_spot_message: Message):
+        def test_reply_report_spot_cmd(
+            self, telegram: TelegramSimulator, admin_group: Chat, report_spot_message: Message
+        ):
             """Tests the /reply command.
             The bot sends a message to the user on behalf of the admin
             """
@@ -230,30 +238,38 @@ class TestBot:
             The bot cleans the old pending posts, while ignoring the more recent ones
             """
             # An old an a recent pending posts are present
-            PendingPost(1, 1, 1, Config.meme_get('group_id'), datetime.fromtimestamp(1)).save_post()
-            PendingPost(2, 2, 2, Config.meme_get('group_id'), datetime.now()).save_post()
+            PendingPost(1, 1, 1, Config.meme_get("group_id"), datetime.fromtimestamp(1)).save_post()
+            PendingPost(2, 2, 2, Config.meme_get("group_id"), datetime.now()).save_post()
             telegram.send_command("/clean_pending", chat=admin_group)
-            assert telegram.messages[
-                -2].text == "Gli admin erano sicuramente molto impegnati e non sono riusciti a valutare lo spot in tempo"
+            assert (
+                telegram.messages[-2].text
+                == "Gli admin erano sicuramente molto impegnati e non sono riusciti a valutare lo spot in tempo"
+            )
             assert telegram.last_message.text == "Sono stati eliminati 1 messaggi rimasti in sospeso"
             assert PendingPost.from_user(1) is None
             assert PendingPost.from_user(2) is not None
 
-        def test_autoreply_invalid_cmd(self, telegram: TelegramSimulator, admin_group: Chat, pending_post_message: Message):
+        def test_autoreply_invalid_cmd(
+            self, telegram: TelegramSimulator, admin_group: Chat, pending_post_message: Message
+        ):
             """Tests the /autoreply command.
             The bot lists all available autoreplies
             """
             telegram.send_message("/autoreply", chat=admin_group, reply_to_message=pending_post_message)
             assert telegram.last_message.text == read_md("autoreply_list")
 
-        def test_autoreply_unknown_cmd(self, telegram: TelegramSimulator, admin_group: Chat, pending_post_message: Message):
+        def test_autoreply_unknown_cmd(
+            self, telegram: TelegramSimulator, admin_group: Chat, pending_post_message: Message
+        ):
             """Tests the /autoreply command.
             The bot lists all available autoreplies
             """
             telegram.send_message("/autoreply unknown", chat=admin_group, reply_to_message=pending_post_message)
             assert telegram.last_message.text == read_md("autoreply_list")
 
-        def test_autoreply_list_cmd(self, telegram: TelegramSimulator, admin_group: Chat, pending_post_message: Message):
+        def test_autoreply_list_cmd(
+            self, telegram: TelegramSimulator, admin_group: Chat, pending_post_message: Message
+        ):
             """Tests the /reply command.
             The bot sends an automatic reply to the user
             """
@@ -266,11 +282,15 @@ class TestBot:
             The bot sends an automatic reply to the user
             """
             # remove the "list" special autoreply
-            filtered_autoreplies = ((autoreply, file) for (autoreply, file) in AUTOREPLIES.items() if autoreply != "lista")
-            for (autoreply, file) in filtered_autoreplies:
-                telegram.send_message(f"/autoreply {autoreply}", chat=admin_group, reply_to_message=pending_post_message)
+            filtered_autoreplies = (
+                autoreply for autoreply in Config.autoreplies_get("autoreplies").keys() if autoreply != "lista"
+            )
+            for autoreply in filtered_autoreplies:
+                telegram.send_message(
+                    f"/autoreply {autoreply}", chat=admin_group, reply_to_message=pending_post_message
+                )
                 assert telegram.messages[-2].text.startswith("COMUNICAZIONE DEGLI ADMIN SUL TUO ULTIMO POST:\n")
-                assert telegram.messages[-2].text.endswith(read_md(file))
+                assert telegram.messages[-2].text.endswith(Config.autoreplies_get("autoreplies")[autoreply])
                 assert telegram.last_message.text == "L'utente ha ricevuto il messaggio"
 
     class TestBotSpotConversation:
@@ -341,8 +361,10 @@ class TestBot:
             assert telegram.last_message.reply_to_message is not None
 
             telegram.send_callback_query(text="Si")
-            assert telegram.last_message.text == "Il tuo post è in fase di valutazione\n"\
+            assert (
+                telegram.last_message.text == "Il tuo post è in fase di valutazione\n"
                 f"Una volta pubblicato, lo potrai trovare su {Config.meme_get('channel_tag')}"
+            )
 
             telegram.send_command("/spot")
             assert telegram.last_message.text == "Hai già un post in approvazione 🧐"
@@ -358,13 +380,14 @@ class TestBot:
             telegram.send_command("/spot")
             assert telegram.last_message.text == "Invia il post che vuoi pubblicare"
 
-            telegram.send_message("Hai vinto un iPad 🎉",
-                                  entities=[
-                                      MessageEntity(type=MessageEntity.URL,
-                                                    offset=0,
-                                                    length=19,
-                                                    url="https://www.youtube.com/watch?v=dQw4w9WgXcQ")
-                                  ])
+            telegram.send_message(
+                "Hai vinto un iPad 🎉",
+                entities=[
+                    MessageEntity(
+                        type=MessageEntity.URL, offset=0, length=19, url="https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+                    )
+                ],
+            )
 
             assert telegram.last_message.text == "Il post contiene link, vuoi pubblicare con l'anteprima?"
 
@@ -417,8 +440,9 @@ class TestBot:
             assert telegram.last_message.text == "***Come vuoi che sia il tuo post:***"
 
             telegram.send_callback_query(text=" Anonimo ")
-            assert telegram.last_message.text == "La tua preferenza è stata aggiornata\n"\
-                                                    "Ora i tuoi post saranno anonimi"
+            assert (
+                telegram.last_message.text == "La tua preferenza è stata aggiornata\n" "Ora i tuoi post saranno anonimi"
+            )
             assert not User(1).is_credited
 
         def test_settings_credited_from_anonym_cmd(self, telegram: TelegramSimulator):
@@ -429,8 +453,10 @@ class TestBot:
             assert telegram.last_message.text == "***Come vuoi che sia il tuo post:***"
 
             telegram.send_callback_query(text=" Con credit ")
-            assert telegram.last_message.text == "La tua preferenza è stata aggiornata\n"\
-                                                    f"I tuoi post avranno come credit @{telegram.user.username}"
+            assert (
+                telegram.last_message.text == "La tua preferenza è stata aggiornata\n"
+                f"I tuoi post avranno come credit @{telegram.TGUsername}"
+            )
 
             assert User(1).is_credited
 
@@ -443,8 +469,10 @@ class TestBot:
             assert telegram.last_message.text == "***Come vuoi che sia il tuo post:***"
 
             telegram.send_callback_query(text=" Con credit ")
-            assert telegram.last_message.text == "Sei già creditato nei post\n"\
-                                                    f"I tuoi post avranno come credit @{telegram.user.username}"
+            assert (
+                telegram.last_message.text == "Sei già creditato nei post\n"
+                f"I tuoi post avranno come credit @{telegram.TGUsername}"
+            )
 
             assert User(1).is_credited
 
@@ -477,7 +505,9 @@ class TestBot:
             telegram.send_message("Motivo segnalazione")
 
             assert telegram.messages[-2].text.startswith("🚨🚨 SEGNALAZIONE 🚨🚨\n\n")
-            assert telegram.last_message.text == "Gli admins verificheranno quanto accaduto. Grazie per la collaborazione!"
+            assert (
+                telegram.last_message.text == "Gli admins verificheranno quanto accaduto. Grazie per la collaborazione!"
+            )
             assert Report.get_last_user_report(telegram.user.id) is not None
 
         def test_report_user_cooldown_cmd(self, telegram: TelegramSimulator):
@@ -493,7 +523,9 @@ class TestBot:
             telegram.send_message("Motivo segnalazione")
 
             assert telegram.messages[-2].text.startswith("🚨🚨 SEGNALAZIONE 🚨🚨\n\n")
-            assert telegram.last_message.text == "Gli admins verificheranno quanto accaduto. Grazie per la collaborazione!"
+            assert (
+                telegram.last_message.text == "Gli admins verificheranno quanto accaduto. Grazie per la collaborazione!"
+            )
             assert Report.get_last_user_report(telegram.user.id) is not None
 
             telegram.send_command("/report")
@@ -507,31 +539,49 @@ class TestBot:
             The user successfully reports a post already published in the channel
             """
             telegram.send_callback_query(data="meme_report_spot,", message=published_post_message)
-            assert telegram.last_message.text == "Scrivi il motivo della segnalazione del post, altrimenti digita /cancel"
+            assert (
+                telegram.last_message.text == "Scrivi il motivo della segnalazione del post, altrimenti digita /cancel"
+            )
 
             telegram.send_message("Motivo segnalazione")
             assert telegram.messages[-2].text.startswith("🚨🚨 SEGNALAZIONE 🚨🚨\n\n")
-            assert telegram.last_message.text == "Gli admins verificheranno quanto accaduto. Grazie per la collaborazione!"
-            assert Report.get_post_report(telegram.user.id, published_post_message.chat_id,
-                                          published_post_message.reply_to_message.message_id) is not None
+            assert (
+                telegram.last_message.text == "Gli admins verificheranno quanto accaduto. Grazie per la collaborazione!"
+            )
+            assert (
+                Report.get_post_report(
+                    telegram.user.id, published_post_message.chat_id, published_post_message.reply_to_message.message_id
+                )
+                is not None
+            )
 
         def test_report_post_again_query(self, telegram: TelegramSimulator, published_post_message: Message):
             """Tests the /report user query.
             The user cannot report again a post already published in the channel
             """
             telegram.send_callback_query(data="meme_report_spot,", message=published_post_message)
-            assert telegram.last_message.text == "Scrivi il motivo della segnalazione del post, altrimenti digita /cancel"
+            assert (
+                telegram.last_message.text == "Scrivi il motivo della segnalazione del post, altrimenti digita /cancel"
+            )
 
             telegram.send_message("Motivo segnalazione")
             assert telegram.messages[-2].text.startswith("🚨🚨 SEGNALAZIONE 🚨🚨\n\n")
-            assert telegram.last_message.text == "Gli admins verificheranno quanto accaduto. Grazie per la collaborazione!"
-            assert Report.get_post_report(telegram.user.id, published_post_message.chat_id,
-                                          published_post_message.reply_to_message.message_id) is not None
+            assert (
+                telegram.last_message.text == "Gli admins verificheranno quanto accaduto. Grazie per la collaborazione!"
+            )
+            assert (
+                Report.get_post_report(
+                    telegram.user.id, published_post_message.chat_id, published_post_message.reply_to_message.message_id
+                )
+                is not None
+            )
 
             telegram.send_callback_query(data="meme_report_spot,", message=published_post_message)
             # The next message is the same as the last, because if the user try to report again
             # the query will be answered with a warning but no new messages will be sent by the bot
-            assert telegram.last_message.text == "Gli admins verificheranno quanto accaduto. Grazie per la collaborazione!"
+            assert (
+                telegram.last_message.text == "Gli admins verificheranno quanto accaduto. Grazie per la collaborazione!"
+            )
 
     class TestSpotLinkPreview:
         """Test the spot link preview"""
@@ -543,13 +593,14 @@ class TestBot:
             telegram.send_command("/spot")
             assert telegram.last_message.text == "Invia il post che vuoi pubblicare"
 
-            telegram.send_message("Hai vinto un iPad 🎉",
-                                  entities=[
-                                      MessageEntity(type=MessageEntity.URL,
-                                                    offset=0,
-                                                    length=19,
-                                                    url="https://www.youtube.com/watch?v=dQw4w9WgXcQ")
-                                  ])
+            telegram.send_message(
+                "Hai vinto un iPad 🎉",
+                entities=[
+                    MessageEntity(
+                        type=MessageEntity.URL, offset=0, length=19, url="https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+                    )
+                ],
+            )
 
             assert telegram.last_message.text == "Il post contiene link, vuoi pubblicare con l'anteprima?"
             assert telegram.last_message.reply_to_message is not None
@@ -589,7 +640,9 @@ class TestBot:
     class TestPublishSpot:
         """Tests the complete publishing spot pipeline"""
 
-        def test_spot_pipeline(self, telegram: TelegramSimulator, admin_group: Chat, channel: Chat, channel_group: Chat):
+        def test_spot_pipeline(
+            self, telegram: TelegramSimulator, admin_group: Chat, channel: Chat, channel_group: Chat
+        ):
             """Tests the /spot command.
             Complete with yes the spot conversation
             """
@@ -603,12 +656,16 @@ class TestBot:
             telegram.send_callback_query(text="Si")
             g_message = telegram.messages[-2]
             assert g_message.text == "Test spot"
-            assert telegram.last_message.text == "Il tuo post è in fase di valutazione\n"\
+            assert (
+                telegram.last_message.text == "Il tuo post è in fase di valutazione\n"
                 f"Una volta pubblicato, lo potrai trovare su {Config.meme_get('channel_tag')}"
+            )
             assert PendingPost.from_group(g_message_id=g_message.message_id, group_id=admin_group.id) is not None
 
             telegram.send_callback_query(text="🟢 0", message=g_message)
-            telegram.send_callback_query(text="🟢 1", message=g_message, user=user.User(2, first_name="Test2", is_bot=False))
+            telegram.send_callback_query(
+                text="🟢 1", message=g_message, user=TGUser(2, first_name="Test2", is_bot=False)
+            )
 
             assert telegram.messages[-3].text == "Test spot"
             assert telegram.messages[-2].text.startswith("Il tuo ultimo post è stato pubblicato")
@@ -616,10 +673,12 @@ class TestBot:
 
             assert PendingPost.from_group(g_message_id=g_message.message_id, group_id=admin_group.id) is None
 
-            telegram.send_forward_message(forward_message=telegram.messages[-3],
-                                          chat=channel_group,
-                                          is_automatic_forward=True,
-                                          user=user.User(1, first_name="Telegram", is_bot=False))
+            telegram.send_forward_message(
+                forward_message=telegram.messages[-3],
+                chat=channel_group,
+                is_automatic_forward=True,
+                user=TGUser(1, first_name="Telegram", is_bot=False),
+            )
             assert telegram.last_message.text.startswith("by: ")
             assert PublishedPost(channel_id=channel.id, c_message_id=telegram.last_message.message_id)
 
@@ -641,7 +700,9 @@ class TestBot:
             """
             g_message = telegram.messages[-2]
             telegram.send_callback_query(text="🔴 0", message=g_message)
-            telegram.send_callback_query(text="🔴 1", message=g_message, user=user.User(2, first_name="Test2", is_bot=False))
+            telegram.send_callback_query(
+                text="🔴 1", message=g_message, user=TGUser(2, first_name="Test2", is_bot=False)
+            )
             assert telegram.messages[-4].text == "Test spot"
             assert telegram.messages[-2].text.startswith("Il tuo ultimo post è stato rifiutato")
             assert telegram.last_message.reply_markup.inline_keyboard[1][0].text == REJECTED_KB
@@ -656,15 +717,17 @@ class TestBot:
 
             g_message = telegram.messages[-2]
             telegram.send_callback_query(text="⏹ Stop", message=g_message)
-            autoreplies = Config.autoreplies_get('autoreplies')
+            autoreplies = Config.autoreplies_get("autoreplies")
             first_autoreply_key = list(autoreplies.keys())[0]
-            telegram.send_callback_query(text=first_autoreply_key,
-                                            message=g_message,
-                                            data=f"meme_autoreply,{first_autoreply_key}")
+            telegram.send_callback_query(
+                text=first_autoreply_key, message=g_message, data=f"autoreply,{first_autoreply_key}"
+            )
             assert telegram.messages[-3].text == autoreplies[first_autoreply_key]
             assert telegram.messages[-2].text.startswith("Il tuo ultimo post è stato rifiutato")
-            assert telegram.last_message.reply_markup.inline_keyboard[-1][0].text == f"{REJECTED_KB} [{first_autoreply_key}]"
-
+            assert (
+                telegram.last_message.reply_markup.inline_keyboard[-1][0].text
+                == f"{REJECTED_KB} [{first_autoreply_key}]"
+            )
 
     class TestStoppedSpot:
         """Tests the stopped spot and its navigation for autoreplies"""
@@ -680,13 +743,13 @@ class TestBot:
             g_message = telegram.messages[-2]
             telegram.send_callback_query(text="⏹ Stop", message=g_message)
 
-        @pytest.mark.parametrize("autoreply_key", list(Config.autoreplies_get('autoreplies').keys()))
+        @pytest.mark.parametrize("autoreply_key", list(Config.autoreplies_get("autoreplies").keys()))
         def test_stop_spot(self, telegram: TelegramSimulator, admin_group: Chat, autoreply_key: str):
             """
             Test autoreplies and navigation on the stopped spot
             """
             g_message = telegram.messages[-3]
-            autoreply_message = Config.autoreplies_get('autoreplies')[autoreply_key]
+            autoreply_message = Config.autoreplies_get("autoreplies")[autoreply_key]
 
             # find if the autoreply is in the keyboard
             autoreply_found = False
@@ -703,9 +766,7 @@ class TestBot:
 
             assert autoreply_found is True
 
-            telegram.send_callback_query(text=autoreply_key,
-                                         data=f"meme_autoreply,{autoreply_key}",
-                                         message=g_message)
+            telegram.send_callback_query(text=autoreply_key, data=f"autoreply,{autoreply_key}", message=g_message)
 
             if Config.settings_get("meme", "reject_after_autoreply"):
                 assert telegram.messages[-3].text == autoreply_message
@@ -714,35 +775,42 @@ class TestBot:
 
             assert telegram.last_message.text == autoreply_message
 
-
     class TestComments:
         """Tests the comments feature in the channel group"""
 
-        def test_non_anonymous_comment_msg(self, telegram: TelegramSimulator, published_post_message: Message,
-                                           channel_group: Chat):
+        def test_non_anonymous_comment_msg(
+            self, telegram: TelegramSimulator, published_post_message: Message, channel_group: Chat
+        ):
             """Tests a public comment.
             The bot should not react to the message if the user is not anonymous
             """
-            public_comment = telegram.send_message("Public comment",
-                                                   chat=channel_group,
-                                                   reply_to_message=published_post_message.reply_to_message,
-                                                   user=user.User(10, first_name="user", is_bot=False))
+            public_comment = telegram.send_message(
+                "Public comment",
+                chat=channel_group,
+                reply_to_message=published_post_message.reply_to_message,
+                user=TGUser(10, first_name="user", is_bot=False),
+            )
 
             assert telegram.get_message_with_id(public_comment.message_id) is not None
             assert telegram.last_message.text == "Public comment"
             assert telegram.last_message.from_user.is_bot is False
 
-        def test_anonymous_comment_msg(self, telegram: TelegramSimulator, published_post_message: Message, channel: Chat,
-                                       channel_group: Chat):
+        def test_anonymous_comment_msg(
+            self, telegram: TelegramSimulator, published_post_message: Message, channel: Chat, channel_group: Chat
+        ):
             """Tests the replacement of an anonymous comment.
             Copies the message and deletes the original
             """
-            anonymous_comment = telegram.send_message("Anonymous comment",
-                                                      chat=channel_group,
-                                                      reply_to_message=published_post_message.reply_to_message,
-                                                      user=user.User(10, first_name="user", is_bot=False),
-                                                      sender_chat=channel)
+            anonymous_comment = telegram.send_message(
+                "Anonymous comment",
+                chat=channel_group,
+                reply_to_message=published_post_message.reply_to_message,
+                user=TGUser(10, first_name="user", is_bot=False),
+                sender_chat=channel,
+            )
 
-            assert telegram.get_message_with_id(anonymous_comment.message_id) is None  # the anonymous comment is deleted
+            assert (
+                telegram.get_message_with_id(anonymous_comment.message_id) is None
+            )  # the anonymous comment is deleted
             assert telegram.last_message.text == "Anonymous comment"
             assert telegram.last_message.from_user.is_bot is True

@@ -3,31 +3,38 @@
 from datetime import datetime
 from typing import List, Optional, Union
 import warnings
-from telegram import Message, ReplyMarkup, MessageEntity, User, Chat, Update, CallbackQuery, InlineKeyboardButton
-from telegram.ext import Updater
-from telegram.inline.inlinekeyboardmarkup import InlineKeyboardMarkup
+from telegram import (
+    Message,
+    ReplyKeyboardMarkup,
+    MessageEntity,
+    User,
+    Chat,
+    Update,
+    CallbackQuery,
+    InlineKeyboardButton,
+    InlineKeyboardMarkup,
+)
+from telegram.ext import Application
 from main import add_handlers
 
 
-class TelegramSimulator(): # pylint: disable=too-many-public-methods
+class TelegramSimulator:  # pylint: disable=too-many-public-methods
     """Weaves the standard bot class to intercept any contact with the telegram api and store the message"""
+
     __name = "BOT"
     __bot_id = 1234567890
     __current_id = 200
-    __default_chat = Chat(id=1, type='private')
-    __default_user = User(id=1, first_name='User', username="Username", is_bot=False)
+    __default_chat = Chat(id=1, type="private")
+    __default_user = User(id=1, first_name="User", username="Username", is_bot=False)
     __chat = __default_chat
     __user = __default_user
 
     def __init__(self):
         warnings.filterwarnings("ignore", message=r"Setting custom attributes such as .*")
         self.messages: List[Message] = []
-        self.updater = Updater("1234567890:qY9gv7pRJgFj4EVmN3Z1gfJOgQpCbh0vmp5")
-        add_handlers(self.updater.dispatcher)
-        for group in self.updater.dispatcher.groups:
-            for handler in self.updater.dispatcher.handlers[group]:
-                handler.run_async = False
-        self.bot = self.updater.bot
+        self.app = Application.builder().token("1234567890:qY9gv7pRJgFj4EVmN3Z1gfJOgQpCbh0vmp5").build()
+        add_handlers(self.app)
+        self.bot = self.app.bot
         self.bot._bot = User(self.__bot_id, self.__name, is_bot=True, username=self.__name)
         self.bot._message = self.weaved_message().__get__(self.bot, self.bot.__class__)
         self.bot._post = self.weaved_post().__get__(self.bot, self.bot.__class__)
@@ -98,14 +105,17 @@ class TelegramSimulator(): # pylint: disable=too-many-public-methods
                     return button.callback_data
         return ""
 
-    def send_command(self,
-                     text: str = None,
-                     message: Message = None,
-                     user: User = None,
-                     chat: Chat = None,
-                     date: datetime = None,
-                     reply_markup: InlineKeyboardMarkup = None,
-                     **kwargs) -> Message:
+    def send_command(
+        self,
+        text: str = None,
+        message: Message = None,
+        user: User = None,
+        chat: Chat = None,
+        date: datetime = None,
+        reply_markup: InlineKeyboardMarkup = None,
+        entities: list[MessageEntity] = None,
+        **kwargs
+    ) -> Message:
         """Sends a command to the bot on behalf of the user
 
         Args:
@@ -115,27 +125,32 @@ class TelegramSimulator(): # pylint: disable=too-many-public-methods
             chat: chat where the message was sent
             date: date when the message was sent
             reply_markup: reply markup to use
+            entities: list of entities to use in the message
             **kwargs: additional parameters to be passed to the message
 
         Returns:
             message sent
         """
         if message is None:
-            message = self.make_message(text=text, user=user, chat=chat, date=date, reply_markup=reply_markup, **kwargs)
+            entities.append(MessageEntity(type=MessageEntity.BOT_COMMAND, offset=0, length=command_len))
+            message = self.make_message(
+                text=text, user=user, chat=chat, date=date, reply_markup=reply_markup, entities=entities, **kwargs
+            )
             command_len = len(text.split(" ")[0])
-            message.entities.append(MessageEntity(type=MessageEntity.BOT_COMMAND, offset=0, length=command_len))
         self.send_message(message=message)
 
-    def send_message(self,
-                     text: str = None,
-                     message: Message = None,
-                     user: User = None,
-                     chat: Chat = None,
-                     date: datetime = None,
-                     reply_markup: InlineKeyboardMarkup = None,
-                     reply_to_message: Union[Message, int] = None,
-                     entities: List[MessageEntity] = None,
-                     **kwargs) -> Message:
+    def send_message(
+        self,
+        text: str = None,
+        message: Message = None,
+        user: User = None,
+        chat: Chat = None,
+        date: datetime = None,
+        reply_markup: InlineKeyboardMarkup = None,
+        reply_to_message: Union[Message, int] = None,
+        entities: List[MessageEntity] = None,
+        **kwargs
+    ) -> Message:
         """Sends a message to the bot on behalf of the user
 
         Args:
@@ -153,27 +168,31 @@ class TelegramSimulator(): # pylint: disable=too-many-public-methods
             message sent
         """
         if message is None:
-            message = self.make_message(text=text,
-                                        user=user,
-                                        chat=chat,
-                                        date=date,
-                                        reply_markup=reply_markup,
-                                        reply_to_message=reply_to_message,
-                                        entities=entities,
-                                        **kwargs)
+            message = self.make_message(
+                text=text,
+                user=user,
+                chat=chat,
+                date=date,
+                reply_markup=reply_markup,
+                reply_to_message=reply_to_message,
+                entities=entities,
+                **kwargs
+            )
         self.add_message(message)
         update = self.make_update(message)
-        self.updater.dispatcher.process_update(update)
+        self.app.dispatcher.process_update(update)
         return message
 
-    def send_callback_query(self,
-                            data: str = None,
-                            message: Message = None,
-                            text: str = None,
-                            query: CallbackQuery = None,
-                            user: User = None,
-                            chat: Chat = None,
-                            **kwargs) -> CallbackQuery:
+    def send_callback_query(
+        self,
+        data: str = None,
+        message: Message = None,
+        text: str = None,
+        query: CallbackQuery = None,
+        user: User = None,
+        chat: Chat = None,
+        **kwargs
+    ) -> CallbackQuery:
         """Sends a callback query on an inline keyboard button to the bot on behalf of the user
 
         Args:
@@ -193,19 +212,21 @@ class TelegramSimulator(): # pylint: disable=too-many-public-methods
         if query is None:
             query = self.make_callback_query(user=user, chat=chat, data=data, message=message, **kwargs)
         update = self.make_update(query)
-        self.updater.dispatcher.process_update(update)
+        self.app.dispatcher.process_update(update)
         return query
 
-    def send_forward_message(self,
-                             forward_message: Message = None,
-                             message: Message = None,
-                             user: User = None,
-                             chat: Chat = None,
-                             date: datetime = None,
-                             reply_markup: InlineKeyboardMarkup = None,
-                             reply_to_message: Union[Message, int] = None,
-                             is_automatic_forward: bool = False,
-                             **kwargs) -> Message:
+    def send_forward_message(
+        self,
+        forward_message: Message = None,
+        message: Message = None,
+        user: User = None,
+        chat: Chat = None,
+        date: datetime = None,
+        reply_markup: InlineKeyboardMarkup = None,
+        reply_to_message: Union[Message, int] = None,
+        is_automatic_forward: bool = False,
+        **kwargs
+    ) -> Message:
         """Sends a message to the bot on behalf of the user
 
         Args:
@@ -223,32 +244,37 @@ class TelegramSimulator(): # pylint: disable=too-many-public-methods
             message sent
         """
         if message is None:
-            message = self.make_message(text=forward_message.text,
-                                        forward_from_chat=forward_message.chat,
-                                        forward_from=forward_message.from_user,
-                                        forward_message=forward_message,
-                                        forward_from_message_id=forward_message.message_id,
-                                        forward_date=forward_message.date,
-                                        user=user,
-                                        chat=chat,
-                                        date=date,
-                                        reply_markup=reply_markup,
-                                        reply_to_message=reply_to_message,
-                                        **kwargs)
+            message = self.make_message(
+                text=forward_message.text,
+                forward_from_chat=forward_message.chat,
+                forward_from=forward_message.from_user,
+                forward_message=forward_message,
+                forward_from_message_id=forward_message.message_id,
+                forward_date=forward_message.date,
+                user=user,
+                chat=chat,
+                date=date,
+                reply_markup=reply_markup,
+                reply_to_message=reply_to_message,
+                **kwargs
+            )
             message.is_automatic_forward = is_automatic_forward
         self.add_message(message)
         update = self.make_update(message)
-        self.updater.dispatcher.process_update(update)
+        self.app.dispatcher.process_update(update)
         return message
 
-    def make_message(self,
-                     text: str,
-                     user: User = None,
-                     chat: Chat = None,
-                     date: datetime = None,
-                     reply_markup: InlineKeyboardMarkup = None,
-                     reply_to_message: Union[Message, int] = None,
-                     **kwargs) -> Message:
+    def make_message(
+        self,
+        text: str,
+        user: User = None,
+        chat: Chat = None,
+        date: datetime = None,
+        reply_markup: InlineKeyboardMarkup = None,
+        reply_to_message: Message | int = None,
+        entities: list[MessageEntity] = None,
+        **kwargs
+    ) -> Message:
         """Creates a telegram message from the given parameters
 
         Args:
@@ -258,6 +284,7 @@ class TelegramSimulator(): # pylint: disable=too-many-public-methods
             date: date when the message was sent
             reply_markup: reply markup to use
             reply_to_message: message (or message_id of said message) to reply to
+            entities: list of entities to use in the message
             **kwargs: additional parameters to be passed to the message
 
         Returns:
@@ -265,22 +292,21 @@ class TelegramSimulator(): # pylint: disable=too-many-public-methods
         """
         if isinstance(reply_to_message, int):
             reply_to_message = self.get_message_with_id(reply_to_message)
-        return Message(message_id=self.current_id,
-                       from_user=user if user is not None else self.user,
-                       date=date if date is not None else datetime.now(),
-                       chat=chat if chat is not None else self.chat,
-                       text=text,
-                       bot=self.bot,
-                       reply_markup=reply_markup,
-                       reply_to_message=reply_to_message,
-                       **kwargs)
+        return Message(
+            message_id=self.current_id,
+            from_user=user if user is not None else self.user,
+            date=date if date is not None else datetime.now(),
+            chat=chat if chat is not None else self.chat,
+            text=text,
+            reply_markup=reply_markup,
+            reply_to_message=reply_to_message,
+            entities=entities,
+            **kwargs
+        )
 
-    def make_callback_query(self,
-                            message: Message,
-                            user: User = None,
-                            chat: Chat = None,
-                            data: str = None,
-                            **kwargs) -> Message:
+    def make_callback_query(
+        self, message: Message, user: User = None, chat: Chat = None, data: str = None, **kwargs
+    ) -> Message:
         """Creates a telegram message from the given parameters
 
         Args:
@@ -294,12 +320,14 @@ class TelegramSimulator(): # pylint: disable=too-many-public-methods
         Returns:
             message created from the given parameters
         """
-        return CallbackQuery(id=0,
-                             from_user=user if user is not None else self.user,
-                             chat_instance=str(chat.id) if chat is not None else str(self.chat.id),
-                             message=message,
-                             data=data,
-                             **kwargs)
+        return CallbackQuery(
+            id=0,
+            from_user=user if user is not None else self.user,
+            chat_instance=str(chat.id) if chat is not None else str(self.chat.id),
+            message=message,
+            data=data,
+            **kwargs
+        )
 
     def make_update(self, event: Union[CallbackQuery, Message], edited: bool = False, **kwargs):
         """Testing utility factory to create an update from a user event, as either a
@@ -313,9 +341,9 @@ class TelegramSimulator(): # pylint: disable=too-many-public-methods
             update with the given message
         """
         if isinstance(event, Message):
-            update_kwargs = {'message' if not edited else 'edited_message': event}
+            update_kwargs = {"message" if not edited else "edited_message": event}
         elif isinstance(event, CallbackQuery):
-            update_kwargs = {'callback_query': event}
+            update_kwargs = {"callback_query": event}
         return Update(0, **update_kwargs)
 
     def weaved_message(self):
@@ -325,22 +353,26 @@ class TelegramSimulator(): # pylint: disable=too-many-public-methods
             weaved bot's _message method
         """
 
-        def _message(bot_self,
-                     endpoint: str,
-                     data: dict,
-                     reply_to_message_id: int = None,
-                     disable_notification: bool = None,
-                     reply_markup: ReplyMarkup = None,
-                     allow_sending_without_reply: bool = None,
-                     timeout: float = None,
-                     api_kwargs: dict = None,
-                     message_thread_id: int = None,
-                     protect_content: bool = None) -> Union[bool, Message]:
-            data.update({
-                "message_id": self.current_id,
-                "date": datetime.now().timestamp(),
-                "message_thread_id": message_thread_id,
-            })
+        def _message(
+            bot_self,
+            endpoint: str,
+            data: dict,
+            reply_to_message_id: int = None,
+            disable_notification: bool = None,
+            reply_markup: ReplyKeyboardMarkup = None,
+            allow_sending_without_reply: bool = None,
+            timeout: float = None,
+            api_kwargs: dict = None,
+            message_thread_id: int = None,
+            protect_content: bool = None,
+        ) -> Union[bool, Message]:
+            data.update(
+                {
+                    "message_id": self.current_id,
+                    "date": datetime.now().timestamp(),
+                    "message_thread_id": message_thread_id,
+                }
+            )
 
             message = Message.de_json(data, bot_self)
             if reply_to_message_id is not None:
@@ -350,7 +382,7 @@ class TelegramSimulator(): # pylint: disable=too-many-public-methods
                     message.reply_to_message = reply_to_message_id
             message.reply_markup = reply_markup
             message.from_user = bot_self._bot
-            message.chat = Chat(id=data['chat_id'], type="")
+            message.chat = Chat(id=data["chat_id"], type="")
 
             self.add_message(message)
             return message
@@ -372,13 +404,11 @@ class TelegramSimulator(): # pylint: disable=too-many-public-methods
             weaved bot's _post method
         """
 
-        def _post(bot_self,
-                  endpoint: str,
-                  data: dict = None,
-                  timeout: float = None,
-                  api_kwargs: dict = None) -> Union[bool, dict, None]:
+        def _post(
+            bot_self, endpoint: str, data: dict = None, timeout: float = None, api_kwargs: dict = None
+        ) -> Union[bool, dict, None]:
             if endpoint == "deleteMessage":
-                self.messages = [m for m in self.messages if m.message_id != data['message_id']]
+                self.messages = [m for m in self.messages if m.message_id != data["message_id"]]
 
             return True
 
@@ -391,22 +421,28 @@ class TelegramSimulator(): # pylint: disable=too-many-public-methods
             weaved bot's copy_message method
         """
 
-        def copy_message(bot_self,
-                         chat_id: Union[int, str],
-                         from_chat_id: Union[str, int],
-                         message_id: Union[str, int],
-                         *args,
-                         reply_markup: ReplyMarkup = None,
-                         **kwargs) -> int:
+        def copy_message(
+            bot_self,
+            chat_id: Union[int, str],
+            from_chat_id: Union[str, int],
+            message_id: Union[str, int],
+            *args,
+            reply_markup: ReplyKeyboardMarkup = None,
+            **kwargs
+        ) -> int:
             message_to_copy: Optional[Message] = next(
-                filter(lambda message: message.message_id == message_id and message.chat_id == from_chat_id, self.messages),
-                None)
-            chat = Chat(id=chat_id, type='')
+                filter(
+                    lambda message: message.message_id == message_id and message.chat_id == from_chat_id, self.messages
+                ),
+                None,
+            )
+            chat = Chat(id=chat_id, type="")
             message = self.make_message(
                 text=message_to_copy.text,
                 reply_markup=reply_markup if reply_markup is not None else message_to_copy.reply_markup,
                 chat=chat,
-                user=bot_self._bot)
+                user=bot_self._bot,
+            )
 
             self.add_message(message)
             return message
@@ -427,8 +463,9 @@ class TelegramSimulator(): # pylint: disable=too-many-public-methods
             api_kwargs: dict = None,
         ) -> Chat:
             str_chat_id = str(chat_id)
-            return Chat(id=chat_id, type=Chat.PRIVATE, username=str_chat_id, first_name=str_chat_id,
-                        last_name=str_chat_id)  # type: ignore
+            return Chat(
+                id=chat_id, type=Chat.PRIVATE, username=str_chat_id, first_name=str_chat_id, last_name=str_chat_id
+            )  # type: ignore
 
         return get_chat
 
