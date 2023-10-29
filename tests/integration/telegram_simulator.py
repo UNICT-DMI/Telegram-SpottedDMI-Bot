@@ -334,8 +334,13 @@ class TelegramSimulator(): # pylint: disable=too-many-public-methods
                      allow_sending_without_reply: bool = None,
                      timeout: float = None,
                      api_kwargs: dict = None,
+                     message_thread_id: int = None,
                      protect_content: bool = None) -> Union[bool, Message]:
-            data.update({'message_id': self.current_id, 'date': datetime.now().timestamp()})
+            data.update({
+                "message_id": self.current_id,
+                "date": datetime.now().timestamp(),
+                "message_thread_id": message_thread_id,
+            })
 
             message = Message.de_json(data, bot_self)
             if reply_to_message_id is not None:
