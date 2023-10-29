@@ -135,7 +135,7 @@ class Config():
 
     def __init__(self):
         if type(self).__instance is not None:
-            raise Exception("This class is a singleton!")
+            raise RuntimeError("This class is a singleton!")
 
         root_path = os.path.join(os.path.dirname(__file__), "..", "..")
         self.settings_path = os.path.join(root_path, *self.SETTINGS_PATH)

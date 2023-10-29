@@ -12,7 +12,19 @@ class DbManager():
     """Class that handles the management of databases"""
 
     db_path = ("data", "db", "db.sqlite3")
-    row_factory = lambda cursor, row: {col[0]: row[idx] for idx, col in enumerate(cursor.description)}
+
+    @staticmethod
+    def row_factory(cursor: sqlite3.Cursor, row: dict) -> dict:
+        """Converts the rows from the database into a dictionary
+
+        Args:
+            cursor: database cursor
+            row: row from the database
+
+        Returns:
+            dictionary containing the row. The keys are the column names
+        """
+        return {col[0]: row[idx] for idx, col in enumerate(cursor.description)}
 
     @classmethod
     def __query_execute(cls,
