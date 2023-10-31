@@ -26,6 +26,8 @@ from .settings import settings_cmd
 from .spot import spot_conv_handler
 from .start import start_cmd
 from .stats import stats_callback, stats_cmd
+from .follow_spot import follow_spot_callback
+from .follow_comment import follow_spot_comment
 
 
 def add_commands(updater: Updater):
@@ -90,6 +92,7 @@ def add_handlers(disp: Dispatcher):
     # Callback handlers
     disp.add_handler(CallbackQueryHandler(meme_callback, pattern=r"^meme_\.*"))
     disp.add_handler(CallbackQueryHandler(stats_callback, pattern=r"^stats_\.*"))
+    disp.add_handler(CallbackQueryHandler(follow_spot_callback, pattern=r"^follow_\.*"))
 
     if Config.meme_get('comments'):
         disp.add_handler(
@@ -100,6 +103,7 @@ def add_handlers(disp: Dispatcher):
                            anonymous_comment_msg,
                            run_async=True))
 
+    disp.add_handler(MessageHandler(Filters.reply & Filters.chat_type.groups, follow_spot_comment, run_async=True))
 
 def add_jobs(disp: Dispatcher):
     """Adds all the jobs to be scheduled to the dispatcher

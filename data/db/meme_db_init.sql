@@ -68,3 +68,10 @@ CREATE TABLE IF NOT EXISTS user_report
   message_date TIMESTAMP NOT NULL,
   PRIMARY KEY (user_id, target_username, message_date)
 );
+-----
+CREATE TABLE IF NOT EXISTS user_follow
+(
+  user_id BIGINT NOT NULL,
+  message_id BIGINT NOT NULL,
+  private_message_id BIGINT NOT NULL
+);
