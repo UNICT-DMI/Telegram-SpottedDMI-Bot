@@ -88,7 +88,6 @@ def add_handlers(disp: Dispatcher):
     disp.add_handler(MessageHandler(Filters.reply & admin_filter & Filters.regex(r"^/ban$"), ban_cmd))
     disp.add_handler(MessageHandler(Filters.reply & admin_filter & Filters.regex(r"^/reply"), reply_cmd))
     disp.add_handler(MessageHandler(Filters.reply & admin_filter & Filters.regex(r"^/autoreply"), autoreply_cmd))
-    disp.add_handler(MessageHandler(Filters.reply & Filters.chat_type.groups, follow_spot_comment, run_async=True))
 
     # Callback handlers
     disp.add_handler(CallbackQueryHandler(meme_callback, pattern=r"^meme_\.*"))
@@ -104,6 +103,7 @@ def add_handlers(disp: Dispatcher):
                            anonymous_comment_msg,
                            run_async=True))
 
+    disp.add_handler(MessageHandler(Filters.reply & Filters.chat_type.groups, follow_spot_comment, run_async=True))
 
 def add_jobs(disp: Dispatcher):
     """Adds all the jobs to be scheduled to the dispatcher
