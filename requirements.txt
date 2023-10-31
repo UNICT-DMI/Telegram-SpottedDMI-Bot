@@ -1,7 +1,8 @@
 APScheduler==3.6.3
-astroid==2.9.3
+astroid==3.0.1
 atomicwrites==1.4.0
 attrs==21.4.0
+cachetools==4.2.2
 certifi==2021.10.8
 cffi==1.15.0
 charset-normalizer==2.0.12
@@ -35,5 +36,5 @@ typing_extensions==4.1.1
 tzdata==2022.1
 tzlocal==4.1
 urllib3==1.26.9
-wrapt<=1.14.0
+wrapt==1.15.0
 yapf==0.32.0
