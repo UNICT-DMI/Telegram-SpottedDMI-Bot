@@ -23,7 +23,6 @@ jobs:
       - name: Setup enviroment
         run: |
           mv config/settings.yaml.default config/settings.yaml
-          mv data/yaml/reactions.yaml.default data/yaml/reactions.yaml
       - name: Lint with pylint
         run: |
           pylint main.py modules
@@ -54,7 +53,6 @@ jobs:
       - name: Setup enviroment
         run: |
           mv config/settings.yaml.default config/settings.yaml
-          mv data/yaml/reactions.yaml.default data/yaml/reactions.yaml
       - name: Sphinx build
         run: |
           sphinx-build -b html docs/source docs/build/docs
