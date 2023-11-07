@@ -34,7 +34,7 @@ class Config:
     __instance: Optional["Config"] = None
 
     @classmethod
-    def reset_settings(cls):
+    def reload(cls):
         """Reset the configuration.
         The next time a setting parameter is required, the whole configuration will be reloaded
         """

@@ -51,14 +51,14 @@ def config() -> Config:
         yaml.safe_dump(TEST_SETTINGS, settings)
     with open("tests/settings.yaml.types", 'w', encoding='utf-8') as settings:
         yaml.safe_dump(TEST_SETTINGS_TYPES, settings)
-    Config.reset_settings()
+    Config.reload()
 
     yield Config
 
     os.remove("tests/settings.yaml")
     os.remove("tests/settings.yaml.types")
     Config.SETTINGS_PATH = old_path
-    Config.reset_settings()
+    Config.reload()
 
 
 class TestConfig:
@@ -107,7 +107,7 @@ class TestConfig:
         Only string values can be loaded this way
         """
         os.environ["new_setting"] = "new value"
-        config.reset_settings()
+        config.reload()
         assert config.settings_get("new_setting") == "new value"
         self.assert_config(config) # Other settings are unchanged
         del os.environ["new_setting"]
@@ -115,7 +115,7 @@ class TestConfig:
     def test_load_env_flat_settings_int(self, config: Config):
         """Tests the ability of the config object to load int settings from the env vars"""
         os.environ["int"] = "2"
-        config.reset_settings()
+        config.reload()
         assert config.settings_get("int") == 2
         self.assert_config(config, exclude_keys=("int",)) # Other settings are unchanged
         del os.environ["int"]
@@ -123,7 +123,7 @@ class TestConfig:
     def test_load_env_flat_settings_float(self, config: Config):
         """Tests the ability of the config object to load float settings from the env vars"""
         os.environ["float"] = "3.4"
-        config.reset_settings()
+        config.reload()
         assert config.settings_get("float") == 3.4
         self.assert_config(config, exclude_keys=("float",)) # Other settings are unchanged
         del os.environ["float"]
@@ -131,7 +131,7 @@ class TestConfig:
     def test_load_env_flat_settings_bool(self, config: Config):
         """Tests the ability of the config object to load bool settings from the env vars"""
         os.environ["bool"] = "False"
-        config.reset_settings()
+        config.reload()
         assert config.settings_get("bool") is False
         self.assert_config(config, exclude_keys=("bool",)) # Other settings are unchanged
         del os.environ["bool"]
@@ -139,7 +139,7 @@ class TestConfig:
     def test_load_env_flat_settings_list(self, config: Config):
         """Tests the ability of the config object to load list settings from the env vars"""
         os.environ["list"] = "e,f,g"
-        config.reset_settings()
+        config.reload()
         assert config.settings_get("list") == ["e", "f", "g"]
         self.assert_config(config, exclude_keys=("list",)) # Other settings are unchanged
         del os.environ["list"]
@@ -147,7 +147,7 @@ class TestConfig:
     def test_load_env_flat_settings_str(self, config: Config):
         """Tests the ability of the config object to load str settings from the env vars"""
         os.environ["string"] = "another string"
-        config.reset_settings()
+        config.reload()
         assert config.settings_get("string") == "another string"
         self.assert_config(config, exclude_keys=("string",)) # Other settings are unchanged
         del os.environ["string"]
@@ -157,7 +157,7 @@ class TestConfig:
         with the nested meme key
         """
         os.environ["meme_key2"] = "2"
-        config.reset_settings()
+        config.reload()
         assert config.settings_get("meme", "key2") == 2
         self.assert_config(config, exclude_keys=("meme",))  # Other settings are unchanged
         self.assert_config(config, base_key="meme", exclude_keys=("key2"))  # Other settings in meme are unchanged
@@ -168,7 +168,7 @@ class TestConfig:
         with the nested debug key
         """
         os.environ["debug_logs"] = "val1,val2,val3"
-        config.reset_settings()
+        config.reload()
         assert config.settings_get("debug", "logs") == ["val1", "val2", "val3"]
         self.assert_config(config, exclude_keys=("debug",))  # Other settings are unchanged
         self.assert_config(config, base_key="debug", exclude_keys=("logs",))  # Other settings in meme are unchanged
@@ -179,7 +179,7 @@ class TestConfig:
         with the nested test key
         """
         os.environ["test_key"] = "test"
-        config.reset_settings()
+        config.reload()
         assert config.settings_get("test", "key") == "test"
         self.assert_config(config, exclude_keys=("test",))  # Other settings are unchanged
         del os.environ["test_key"]
