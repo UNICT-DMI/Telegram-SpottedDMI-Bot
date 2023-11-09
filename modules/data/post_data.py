@@ -4,7 +4,7 @@ from .db_manager import DbManager
 
 
 class PostData:
-    """Class that handles the management of persistent data fetch or manipulation in the meme bot"""
+    """Class that handles the management of persistent data fetch or manipulation in the post bot"""
 
     @staticmethod
     def get_n_posts() -> int:
@@ -13,7 +13,7 @@ class PostData:
         Returns:
             total number of posts
         """
-        return DbManager.count_from(table_name="published_meme")
+        return DbManager.count_from(table_name="published_post")
 
     @staticmethod
     def get_n_votes(vote: Optional[str] = None) -> int:

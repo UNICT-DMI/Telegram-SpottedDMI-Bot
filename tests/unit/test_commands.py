@@ -23,8 +23,8 @@ def local_table(init_local_test_db: DbManager) -> DbManager:
     """Called once per at the beginning of each function.
     Resets the state of the database
     """
-    init_local_test_db.query_from_file("data", "db", "meme_db_del.sql")
-    init_local_test_db.query_from_file("data", "db", "meme_db_init.sql")
+    init_local_test_db.query_from_file("data", "db", "post_db_del.sql")
+    init_local_test_db.query_from_file("data", "db", "post_db_init.sql")
     return init_local_test_db
 
 

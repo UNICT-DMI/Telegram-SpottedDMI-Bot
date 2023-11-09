@@ -15,16 +15,16 @@ async def clean_pending_job(context: CallbackContext):
         context: context passed by the jobqueue
     """
     info = EventInfo.from_job(context)
-    admin_group_id = Config.meme_get("group_id")
+    admin_group_id = Config.post_get("group_id")
 
-    before_time = datetime.now(tz=timezone.utc) - timedelta(hours=Config.meme_get("remove_after_h"))
+    before_time = datetime.now(tz=timezone.utc) - timedelta(hours=Config.post_get("remove_after_h"))
     pending_posts = PendingPost.get_all(group_id=admin_group_id, before=before_time)
 
-    # For each pending meme older than before_time
+    # For each pending post older than before_time
     removed = 0
     for pending_post in pending_posts:
         message_id = pending_post.g_message_id
-        try:  # deleting the message associated with the pending meme to remote
+        try:  # deleting the message associated with the pending post to remote
             await info.bot.delete_message(chat_id=admin_group_id, message_id=message_id)
             removed += 1
             try:  # sending a notification to the user
@@ -36,7 +36,7 @@ async def clean_pending_job(context: CallbackContext):
                 logger.warning("Notifying the user on /clean_pending: %s", ex)
         except BadRequest as ex:
             logger.error("Deleting old pending message: %s", ex)
-        finally:  # delete the data associated with the pending meme
+        finally:  # delete the data associated with the pending post
             pending_post.delete_post()
 
     await info.bot.send_message(
@@ -52,7 +52,7 @@ async def db_backup_job(context: CallbackContext):
         context: context passed by the jobqueue
     """
     path = get_abs_path(*DbManager.db_path)
-    admin_group_id = Config.meme_get("group_id")
+    admin_group_id = Config.post_get("group_id")
     with open(path, "rb") as database_file:
         try:
             await context.bot.send_document(

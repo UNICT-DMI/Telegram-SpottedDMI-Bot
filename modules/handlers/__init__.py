@@ -55,7 +55,7 @@ async def add_commands(app: Application):
         BotCommand("ban", "banna un utente"),
     ]
     await app.bot.set_my_commands(private_chat_commands, scope=BotCommandScopeAllPrivateChats())
-    await app.bot.set_my_commands(admin_commands, scope=BotCommandScopeChat(Config.meme_get("group_id")))
+    await app.bot.set_my_commands(admin_commands, scope=BotCommandScopeChat(Config.post_get("group_id")))
 
 
 def add_handlers(app: Application):
@@ -71,7 +71,7 @@ def add_handlers(app: Application):
     if Config.settings_get("debug", "local_log"):  # add MessageHandler only if log_message is enabled
         app.add_handler(MessageHandler(filters.ALL, log_message), 1)
 
-    admin_filter = filters.Chat(chat_id=Config.meme_get("group_id"))
+    admin_filter = filters.Chat(chat_id=Config.post_get("group_id"))
 
     # Error handler
     app.add_error_handler(error_handler)
@@ -113,13 +113,13 @@ def add_handlers(app: Application):
     app.add_handler(CallbackQueryHandler(autoreply_callback, pattern=r"^autoreply\.*"))
     app.add_handler(CallbackQueryHandler(follow_spot_callback, pattern=r"^follow_\.*"))
 
-    if Config.meme_get("comments"):
+    if Config.post_get("comments"):
         app.add_handler(
             MessageHandler(
                 filters.FORWARDED & filters.ChatType.GROUPS & filters.IS_AUTOMATIC_FORWARD, forwarded_post_msg
             )
         )
-    if Config.meme_get("delete_anonymous_comments"):
+    if Config.post_get("delete_anonymous_comments"):
         app.add_handler(
             MessageHandler(
                 filters.SenderChat.CHANNEL & filters.ChatType.GROUPS & ~filters.IS_AUTOMATIC_FORWARD,

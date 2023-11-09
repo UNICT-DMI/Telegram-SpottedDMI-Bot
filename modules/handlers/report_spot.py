@@ -50,7 +50,7 @@ async def report_spot_callback(update: Update, context: CallbackContext) -> int:
         next state of the conversation
     """
     info = EventInfo.from_callback(update, context)
-    abusive_message_id = info.message.reply_to_message.message_id if Config.meme_get("comments") else info.message_id
+    abusive_message_id = info.message.reply_to_message.message_id if Config.post_get("comments") else info.message_id
 
     report = Report.get_post_report(user_id=info.user_id, channel_id=info.chat_id, c_message_id=abusive_message_id)
     if report is not None:  # this user has already reported this post
@@ -95,7 +95,7 @@ async def report_spot_msg(update: Update, context: CallbackContext) -> int:
     if context.user_data is None or "current_post_reported" not in context.user_data:
         return STATE["end"]
 
-    chat_id = Config.meme_get("group_id")  # should be admin group
+    chat_id = Config.post_get("group_id")  # should be admin group
     channel_id, target_message_id = context.user_data["current_post_reported"].split(",")
 
     await info.bot.forward_message(chat_id=chat_id, from_chat_id=channel_id, message_id=target_message_id)

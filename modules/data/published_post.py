@@ -42,7 +42,7 @@ class PublishedPost:
             instance of the class
         """
         is_present = DbManager.count_from(
-            table_name="published_meme",
+            table_name="published_post",
             where="channel_id = %s and c_message_id = %s",
             where_args=(channel_id, c_message_id),
         )
@@ -54,7 +54,7 @@ class PublishedPost:
     def save_post(self) -> "PublishedPost":
         """Saves the published_post in the database"""
         DbManager.insert_into(
-            table_name="published_meme",
+            table_name="published_post",
             columns=("channel_id", "c_message_id"),
             values=(self.channel_id, self.c_message_id),
         )

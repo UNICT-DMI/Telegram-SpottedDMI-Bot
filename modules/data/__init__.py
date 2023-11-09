@@ -18,5 +18,5 @@ async def init_db(_: Application):
         _: telegram application passed by the handler
     """
     if Config.settings_get("debug", "reset_on_load"):
-        DbManager.query_from_file("data", "db", "meme_db_del.sql")
-    DbManager.query_from_file("data", "db", "meme_db_init.sql")
+        DbManager.query_from_file("data", "db", "post_db_del.sql")
+    DbManager.query_from_file("data", "db", "post_db_init.sql")

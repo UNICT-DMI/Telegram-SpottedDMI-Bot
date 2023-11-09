@@ -198,7 +198,7 @@ class EventInfo:  # pylint: disable=too-many-public-methods
     @property
     def is_forwarded_post(self) -> bool:
         """Whether the message is in fact a forwarded post from the channel to the group"""
-        return self.chat_id == Config.meme_get("channel_group_id") and self.forward_from_chat_id == Config.meme_get(
+        return self.chat_id == Config.post_get("channel_group_id") and self.forward_from_chat_id == Config.post_get(
             "channel_id"
         )
 
@@ -281,7 +281,7 @@ class EventInfo:  # pylint: disable=too-many-public-methods
             whether or not the operation was successful
         """
         message = self.__message.reply_to_message
-        group_id = Config.meme_get("group_id")
+        group_id = Config.post_get("group_id")
         poll = message.poll  # if the message is a poll, get its reference
 
         try:
@@ -323,12 +323,12 @@ class EventInfo:  # pylint: disable=too-many-public-methods
         """Sends the post to  the channel, so it can be enjoyed by the users (and voted, if comments are disabled)"""
 
         message = self.__message
-        channel_id = Config.meme_get("channel_id")
+        channel_id = Config.post_get("channel_id")
         poll = message.poll  # if the message is a poll, get its reference
 
         reply_markup = None
         # ... append the voting Inline Keyboard, if comments are not to be supported
-        if not Config.meme_get("comments"):
+        if not Config.post_get("comments"):
             reply_markup = get_published_post_kb()
         if poll:  # makes sure the poll is anonym
             c_message = await self.__bot.send_poll(
@@ -348,7 +348,7 @@ class EventInfo:  # pylint: disable=too-many-public-methods
                 reply_markup=reply_markup,
             )
 
-        if not Config.meme_get("comments"):  # if the user can vote directly on the post
+        if not Config.post_get("comments"):  # if the user can vote directly on the post
             PublishedPost.create(c_message_id=c_message.message_id, channel_id=channel_id)
         else:  # ... else, if comments are enabled, save the user_id, so the user can be credited
             self.bot_data[f"{channel_id},{c_message.message_id}"] = user_id
@@ -357,7 +357,7 @@ class EventInfo:  # pylint: disable=too-many-public-methods
         """Sends the post to the group associated to the channel, so that users can vote the post (if comments are enabled)"""
 
         message = self.__message
-        channel_group_id = Config.meme_get("channel_group_id")
+        channel_group_id = Config.post_get("channel_group_id")
         user_id = self.bot_data.pop(f"{self.forward_from_chat_id},{self.forward_from_id}", -1)
 
         sign = User(user_id).get_user_sign(bot=self.__bot)

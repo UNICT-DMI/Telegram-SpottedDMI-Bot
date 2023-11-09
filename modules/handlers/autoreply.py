@@ -63,7 +63,7 @@ async def autoreply_callback(update: Update, context: CallbackContext):
     if pending_post:
         await info.bot.send_message(chat_id=pending_post.user_id, text=current_reply)
 
-        if Config.settings_get("meme", "reject_after_autoreply"):
+        if Config.settings_get("post", "reject_after_autoreply"):
             await reject_post(info=info, pending_post=pending_post, reason=arg)
 
     return None

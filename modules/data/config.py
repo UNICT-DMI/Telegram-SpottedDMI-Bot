@@ -4,9 +4,9 @@ import re
 from typing import Any, Iterable, Literal, Optional
 import yaml
 
-SettingsKeys = Literal["debug", "meme", "test", "token", "bot_tag"]
+SettingsKeys = Literal["debug", "post", "test", "token", "bot_tag"]
 SettingsDebugKeys = Literal["local_log", "reset_on_load"]
-SettingsMemeKeys = Literal[
+SettingsPostKeys = Literal[
     "channel_group_id",
     "channel_id",
     "channel_tag",
@@ -20,8 +20,8 @@ SettingsMemeKeys = Literal[
     "replace_anonymous_comments",
     "delete_anonymous_comments",
 ]
-SettingsTestKeys = Literal[Literal["api_hash", "api_id", "session", "bot_tag", "token"], SettingsMemeKeys]
-SettingsKeysType = Literal[SettingsKeys, SettingsMemeKeys, SettingsDebugKeys, SettingsTestKeys]
+SettingsTestKeys = Literal[Literal["api_hash", "api_id", "session", "bot_tag", "token"], SettingsPostKeys]
+SettingsKeysType = Literal[SettingsKeys, SettingsPostKeys, SettingsDebugKeys, SettingsTestKeys]
 
 AutorepliesKeysType = Literal["autoreplies"]
 
@@ -73,8 +73,8 @@ class Config:
         return cls.__instance
 
     @classmethod
-    def meme_get(cls, key: SettingsMemeKeys, default: Any = None) -> Any:
-        """Get the value of the specified key in the configuration under the 'meme' section.
+    def post_get(cls, key: SettingsPostKeys, default: Any = None) -> Any:
+        """Get the value of the specified key in the configuration under the 'post' section.
         If the key is not present, it will return the default value.
 
         Args:
@@ -84,7 +84,7 @@ class Config:
         Returns:
             value of the key or default value
         """
-        return cls.settings_get("meme", key, default=default)
+        return cls.settings_get("post", key, default=default)
 
     @classmethod
     def settings_get(cls, *keys: SettingsKeysType, default: Any = None) -> Any:
@@ -125,8 +125,8 @@ class Config:
         for test_key in cls.settings_get("test"):
             if test_key in instance.settings:
                 instance.settings[test_key] = cls.settings_get("test", test_key)
-            if test_key in instance.settings["meme"]:
-                instance.settings["meme"][test_key] = cls.settings_get("test", test_key)
+            if test_key in instance.settings["post"]:
+                instance.settings["post"][test_key] = cls.settings_get("test", test_key)
 
     def __init__(self):
         if type(self).__instance is not None:
@@ -193,7 +193,7 @@ class Config:
         """
         new_vars: dict[str, str] = {}
         self.settings["test"] = self.settings.get("test", {})
-        self.settings["meme"] = self.settings.get("meme", {})
+        self.settings["post"] = self.settings.get("post", {})
         self.settings["debug"] = self.settings.get("debug", {})
         env_path = os.path.join(os.path.dirname(__file__), "..", "..", ".env")
         if os.path.exists(env_path):
@@ -210,15 +210,15 @@ class Config:
         for key, value in new_vars.items():
             if key.startswith("test_"):
                 self.settings["test"][key[5:]] = value
-            elif key.startswith("meme_"):
-                self.settings["meme"][key[5:]] = value
+            elif key.startswith("post_"):
+                self.settings["post"][key[5:]] = value
             elif key.startswith("debug_"):
                 self.settings["debug"][key[6:]] = value
             else:
                 self.settings[key] = value
 
     def __validate_types_settings(self):
-        """Validates the settings values in the 'meme' section, casting them when necessary"""
+        """Validates the settings values in the 'post' section, casting them when necessary"""
 
         if not os.path.exists(f"{self.settings_path}.types"):
             return

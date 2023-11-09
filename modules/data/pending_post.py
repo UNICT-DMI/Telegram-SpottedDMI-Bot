@@ -57,7 +57,7 @@ class PendingPost:
         """
         pending_post_arr = DbManager.select_from(
             select="*",
-            table_name="pending_meme",
+            table_name="pending_post",
             where="group_id = %s and g_message_id = %s",
             where_args=(group_id, g_message_id),
         )
@@ -84,7 +84,7 @@ class PendingPost:
             instance of the class
         """
         pending_post_arr = DbManager.select_from(
-            select="*", table_name="pending_meme", where="user_id = %s", where_args=(user_id,)
+            select="*", table_name="pending_post", where="user_id = %s", where_args=(user_id,)
         )
         if not pending_post_arr:
             return None
@@ -100,7 +100,7 @@ class PendingPost:
 
     @staticmethod
     def get_all(group_id: int, before: Optional[datetime] = None) -> list["PendingPost"]:
-        """Gets the list of pending memes in the specified admin group.
+        """Gets the list of pending posts in the specified admin group.
         If before is specified, returns only the one sent before that timestamp
 
         Args:
@@ -108,18 +108,18 @@ class PendingPost:
             before: timestamp before which messages will be considered
 
         Returns:
-            list of ids of pending memes
+            list of ids of pending posts
         """
         if before:
             pending_posts_id = DbManager.select_from(
                 select="g_message_id",
-                table_name="pending_meme",
+                table_name="pending_post",
                 where="group_id = %s and (message_date < %s or message_date IS NULL)",
                 where_args=(group_id, before),
             )
         else:
             pending_posts_id = DbManager.select_from(
-                select="g_message_id", table_name="pending_meme", where="group_id = %s", where_args=(group_id,)
+                select="g_message_id", table_name="pending_post", where="group_id = %s", where_args=(group_id,)
             )
         pending_posts = []
         for post in pending_posts_id:
@@ -130,7 +130,7 @@ class PendingPost:
     def save_post(self) -> "PendingPost":
         """Saves the pending_post in the database"""
         DbManager.insert_into(
-            table_name="pending_meme",
+            table_name="pending_post",
             columns=("user_id", "u_message_id", "g_message_id", "group_id", "message_date"),
             values=(self.user_id, self.u_message_id, self.g_message_id, self.group_id, self.date),
         )
@@ -232,7 +232,7 @@ class PendingPost:
         """Removes all entries on a post that is no longer pending"""
 
         DbManager.delete_from(
-            table_name="pending_meme",
+            table_name="pending_post",
             where="g_message_id = %s and group_id = %s",
             where_args=(self.g_message_id, self.group_id),
         )

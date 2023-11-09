@@ -63,7 +63,7 @@ The main ones are:
 - \[_OPTIONAL_\] You could also leave the settings files alone, and use [_environment variables_](#settings-override) on the container instead.
 - Make sure the bot is in present both in the admin group and in the spot channel. It may need to have admin privileges. If comments are enabled, the bot has to be in the comment group too as an admin.
 - All the env vars with the same name (case insensitive) will override the ones in the settings file.
-  To update the **meme** settings, prefix the env var name with **MEME\_**. The same is true for the **test** settings, that have to be prefixed with **TEST\_**.
+  To update the **post** settings, prefix the env var name with **POST\_**. The same is true for the **test** settings, that have to be prefixed with **TEST\_**.
 - **Run** `docker build --tag botimage .`
 - **Run** `docker run -d --name botcontainer -e TOKEN=<token_arg> [other env vars] botimage`
 
@@ -78,7 +78,7 @@ docker build --tag botimage .
 Then something like
 
 ```bash
-docker run -d --name botcontainer -e TOKEN=<token_arg> -e MEME_CHANNEL_ID=-4 -e MEME_GROUP_ID=-5 TEST_TOKEN=<token_test> botimage
+docker run -d --name botcontainer -e TOKEN=<token_arg> -e POST_CHANNEL_ID=-4 -e POST_GROUP_ID=-5 TEST_TOKEN=<token_test> botimage
 ```
 
 ### To stop/remove the container:
@@ -110,12 +110,12 @@ debug:
   local_log: false # save each and every message in a log file. Make sure the path "logs/messages.log" is valid when enabled
   reset_on_load: false # whether or not the database should reset every time the bot launches. USE CAREFULLY
 
-meme:
+post:
   channel_group_id: -100 # id of the group associated with the channel. Required if comments are enabled
-  channel_id: -200 # id of the channel to which the bot will send the approved memes
-  channel_tag: "@channel" # tag of the channel to which the bot will send the approved memes
-  comments: true # whether or not the channel the bot will send the memes to has comments enabled
-  group_id: -300 # id of the admin group the memebot will use
+  channel_id: -200 # id of the channel to which the bot will send the approved posts
+  channel_tag: "@channel" # tag of the channel to which the bot will send the approved posts
+  comments: true # whether or not the channel the bot will send the posts to has comments enabled
+  group_id: -300 # id of the admin group the bot will use
   n_votes: 2 # votes needed to approve/reject a pending post
   remove_after_h: 12 # number of hours after wich pending posts will be automatically by /clean_pending
   report_wait_mins: 30 # number of minutes the user has to wait before being able to report another user again
@@ -149,12 +149,12 @@ bot_tag: "@bot" # tag of the telegram bot
 
 The settings may also be set through environment variables.  
 All the env vars with the same name (case insensitive) will override the ones in the settings file.
-To update the **meme** settings, prefix the env var name with **MEME\_**. The same is true for the **test** settings, which have to be prefixed with **TEST\_** and the **debug** settings, to be prefixed with **DEBUG\_**.
+To update the **post** settings, prefix the env var name with **POST\_**. The same is true for the **test** settings, which have to be prefixed with **TEST\_** and the **debug** settings, to be prefixed with **DEBUG\_**.
 
 ```env
 # Environment values
 TOKEN=xxxxxx        # will override the *token* value found in settings.yaml
-MEME_N_VOTES=4      # will override the *meme.n_votes* value found in settings.yaml
+POST_N_VOTES=4      # will override the *post.n_votes* value found in settings.yaml
 DEBUG_LOCAL_LOG=4   # will override the *debug.local_log* value found in settings.yaml
 ```
 
@@ -188,7 +188,7 @@ This means that env var will remain strings.
 debug:
   local_log: bool
   reset_on_load: bool
-meme:
+post:
   channel_group_id: int
   channel_id: int
   channel_tag: str

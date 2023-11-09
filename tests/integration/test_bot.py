@@ -16,8 +16,8 @@ def local_table(init_local_test_db: DbManager) -> DbManager:
     """Called once per at the beginning of each function.
     Resets the state of the database
     """
-    init_local_test_db.query_from_file("data", "db", "meme_db_del.sql")
-    init_local_test_db.query_from_file("data", "db", "meme_db_init.sql")
+    init_local_test_db.query_from_file("data", "db", "post_db_del.sql")
+    init_local_test_db.query_from_file("data", "db", "post_db_init.sql")
     return init_local_test_db
 
 
@@ -63,11 +63,11 @@ async def published_post(telegram: TelegramSimulator, channel: Chat, channel_gro
     Returns:
         published post message
     """
-    for i in range(Config.meme_get("n_votes")):
+    for i in range(Config.post_get("n_votes")):
         await telegram.send_callback_query(
             text=f"🟢 {i}", message=telegram.last_message, user=TGUser(i + 1, first_name=str(i), is_bot=False)
         )
-    if Config.meme_get("comments"):
+    if Config.post_get("comments"):
         await telegram.send_forward_message(
             forward_message=telegram.messages[-2],
             chat=channel_group,
@@ -163,7 +163,7 @@ def channel() -> Chat:
     Returns:
         channel chat
     """
-    return Chat(id=Config.meme_get("channel_id"), type=Chat.CHANNEL)
+    return Chat(id=Config.post_get("channel_id"), type=Chat.CHANNEL)
 
 
 @pytest.fixture(scope="class")
@@ -174,7 +174,7 @@ def admin_group() -> Chat:
     Returns:
         admin group chat
     """
-    return Chat(id=Config.meme_get("group_id"), type=Chat.GROUP)
+    return Chat(id=Config.post_get("group_id"), type=Chat.GROUP)
 
 
 @pytest.fixture(scope="class")
@@ -185,7 +185,7 @@ def channel_group() -> Chat:
     Returns:
         public group for comments
     """
-    return Chat(id=Config.meme_get("channel_group_id"), type=Chat.GROUP)
+    return Chat(id=Config.post_get("channel_group_id"), type=Chat.GROUP)
 
 
 @pytest.mark.asyncio
@@ -318,7 +318,7 @@ class TestBot:
             _ = await pending_post(telegram, user=user)
             g_message2 = await pending_post(telegram, user=user2)
             local_table.update_from(
-                "pending_meme", "message_date=%s", "g_message_id=%s", (datetime.fromtimestamp(1), g_message2.message_id)
+                "pending_post", "message_date=%s", "g_message_id=%s", (datetime.fromtimestamp(1), g_message2.message_id)
             )
             await telegram.send_command("/clean_pending", chat=admin_group)
             assert (
@@ -399,7 +399,7 @@ class TestBot:
             await telegram.send_callback_query(text="Si")
             assert (
                 telegram.messages[-2].text == "Il tuo post è in fase di valutazione\n"
-                f"Una volta pubblicato, lo potrai trovare su {Config.meme_get('channel_tag')}"
+                f"Una volta pubblicato, lo potrai trovare su {Config.post_get('channel_tag')}"
             )
 
             await telegram.send_command("/spot")
@@ -565,7 +565,7 @@ class TestBot:
             assert Report.get_last_user_report(telegram.user.id) is not None
 
             await telegram.send_command("/report")
-            assert telegram.last_message.text == f"Aspetta {Config.meme_get('report_wait_mins') - 1} minuti"
+            assert telegram.last_message.text == f"Aspetta {Config.post_get('report_wait_mins') - 1} minuti"
 
     class TestReportSpot:
         """Tests the report spot commands"""
@@ -653,7 +653,7 @@ class TestBot:
             # The last edited message will not have the reply_to_message attribute (because of bot APIs)
             # So instead we use the original message (the one that was sent before the callback query)
             # and specify the data of the callback query manually
-            await telegram.send_callback_query(data="meme_confirm,submit", message=telegram.last_message)
+            await telegram.send_callback_query(data="post_confirm,submit", message=telegram.last_message)
             types = [entity.type for entity in telegram.last_message.entities]
             assert MessageEntity.URL in types
 
@@ -666,7 +666,7 @@ class TestBot:
             await telegram.send_callback_query(text="No")
             assert telegram.last_message.text == "Sei sicuro di voler pubblicare questo post?"
 
-            await telegram.send_callback_query(data="meme_confirm,submit", message=telegram.last_message)
+            await telegram.send_callback_query(data="post_confirm,submit", message=telegram.last_message)
             types = [entity.type for entity in telegram.last_message.entities]
             assert MessageEntity.URL in types
             # NOTE: There is no way to check if message has preview
@@ -692,7 +692,7 @@ class TestBot:
             assert g_message.text == "Test spot"
             assert (
                 telegram.messages[-2].text == "Il tuo post è in fase di valutazione\n"
-                f"Una volta pubblicato, lo potrai trovare su {Config.meme_get('channel_tag')}"
+                f"Una volta pubblicato, lo potrai trovare su {Config.post_get('channel_tag')}"
             )
             assert PendingPost.from_group(g_message_id=g_message.message_id, group_id=admin_group.id) is not None
 
@@ -738,7 +738,7 @@ class TestBot:
             """
             Test the reject spot after the autoreply
             """
-            if not Config.settings_get("meme", "reject_after_autoreply"):
+            if not Config.settings_get("post", "reject_after_autoreply"):
                 pytest.skip("Reject after autoreply is disabled")
 
             await telegram.send_callback_query(text="⏹ Stop", message=pending_post)
@@ -790,7 +790,7 @@ class TestBot:
                 text=autoreply_key, data=f"autoreply,{autoreply_key}", message=telegram.last_message
             )
 
-            if Config.settings_get("meme", "reject_after_autoreply"):
+            if Config.settings_get("post", "reject_after_autoreply"):
                 assert telegram.messages[-2].text == autoreply_message
                 assert telegram.last_message.text.startswith("Il tuo ultimo post è stato rifiutato")
                 return

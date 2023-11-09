@@ -24,7 +24,7 @@ async def approve_status_callback(update: Update, context: CallbackContext):
     info = EventInfo.from_callback(update, context)
     action = info.args[0]
     pause_page = int(info.args[1]) if len(info.args) > 1 else 0
-    items_per_page = Config.settings_get("meme", "autoreplies_per_page")
+    items_per_page = Config.settings_get("post", "autoreplies_per_page")
 
     new_keyboard = None
     if action == "pause":  # if the the admin wants to pause approval of the post
@@ -84,13 +84,13 @@ async def approve_yes_callback(update: Update, context: CallbackContext):
     n_approve = pending_post.set_admin_vote(info.user_id, True)
 
     # The post passed the approval phase and is to be published
-    if n_approve >= Config.meme_get("n_votes"):
+    if n_approve >= Config.post_get("n_votes"):
         user_id = pending_post.user_id
         await info.send_post_to_channel(user_id=user_id)
 
         try:
             await info.bot.send_message(
-                chat_id=user_id, text=f"Il tuo ultimo post è stato pubblicato su {Config.meme_get('channel_tag')}"
+                chat_id=user_id, text=f"Il tuo ultimo post è stato pubblicato su {Config.post_get('channel_tag')}"
             )  # notify the user
         except (BadRequest, Forbidden) as ex:
             logger.warning("Notifying the user on approve_yes: %s", ex)
@@ -124,7 +124,7 @@ async def approve_no_callback(update: Update, context: CallbackContext):
     n_reject = pending_post.set_admin_vote(info.user_id, False)
 
     # The post has been refused
-    if n_reject >= Config.meme_get("n_votes"):
+    if n_reject >= Config.post_get("n_votes"):
         await reject_post(info=info, pending_post=pending_post)
         return
 

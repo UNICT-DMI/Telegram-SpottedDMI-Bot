@@ -8,7 +8,7 @@ This is the schema of the database used to store informations about the spots an
 
 This image has been created with the following script on `dbdiagram.io <https://dbdiagram.io/home>`_::
 
-   Table pending_meme as PE {
+   Table pending_post as PE {
    user_id bigint [not null]
    u_message_id bigint [not null]
    g_message_id bigint [pk]
@@ -16,7 +16,7 @@ This image has been created with the following script on `dbdiagram.io <https://
    message_date timestamp
    }
 
-   Table published_meme as PU {
+   Table published_post as PU {
    channel_id bigint [pk]
    c_message_id bigint [pk]
    }

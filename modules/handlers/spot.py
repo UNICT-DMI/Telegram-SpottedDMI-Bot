@@ -34,8 +34,8 @@ def spot_conv_handler() -> ConversationHandler:
             STATE["posting"]: [
                 MessageHandler(~filters.COMMAND & ~filters.UpdateType.EDITED_MESSAGE, spot_msg),
             ],
-            STATE["previw"]: [CallbackQueryHandler(spot_preview_query, pattern=r"^meme_preview,.+")],
-            STATE["confirm"]: [CallbackQueryHandler(spot_confirm_query, pattern=r"^meme_confirm,.+")],
+            STATE["previw"]: [CallbackQueryHandler(spot_preview_query, pattern=r"^post_preview,.+")],
+            STATE["confirm"]: [CallbackQueryHandler(spot_confirm_query, pattern=r"^post_confirm,.+")],
         },
         fallbacks=[CommandHandler("cancel", conv_cancel("spot"))],
         allow_reentry=False,
@@ -158,7 +158,7 @@ async def spot_confirm_query(update: Update, context: CallbackContext) -> int:
         elif await info.send_post_to_admins():
             text = (
                 "Il tuo post è in fase di valutazione\n"
-                f"Una volta pubblicato, lo potrai trovare su {Config.meme_get('channel_tag')}"
+                f"Una volta pubblicato, lo potrai trovare su {Config.post_get('channel_tag')}"
             )
         else:
             text = "Si è verificato un problema\nAssicurati che il tipo di post sia fra quelli consentiti"

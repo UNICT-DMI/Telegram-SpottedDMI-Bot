@@ -11,7 +11,7 @@ TEST_SETTINGS = {
     "float": 2.3,
     "bool": True,
     "list": ["a", "b", "c", "d"],
-    "meme": {
+    "post": {
         "key": "value",
         "key2": 1
     },
@@ -26,7 +26,7 @@ TEST_SETTINGS_TYPES = {
     "float": "float",
     "bool": "bool",
     "list": "list",
-    "meme": {
+    "post": {
         "key": "string",
         "key2": "int"
     },
@@ -81,8 +81,8 @@ class TestConfig:
 
     def test_load_nested_settings(self, config: Config):
         """Tests the ability of the config object to load settings from a file with nested properties"""
-        for key, value in TEST_SETTINGS['meme'].items():
-            assert config.settings_get("meme", key) == value
+        for key, value in TEST_SETTINGS['post'].items():
+            assert config.settings_get("post", key) == value
 
     def test_default_flat_settings(self, config: Config):
         """Tests the ability of the config object to return the default value
@@ -152,16 +152,16 @@ class TestConfig:
         self.assert_config(config, exclude_keys=("string",)) # Other settings are unchanged
         del os.environ["string"]
 
-    def test_load_env_nested_meme_settings(self, config: Config):
+    def test_load_env_nested_post_settings(self, config: Config):
         """Tests the ability of the config object to load settings from the env vars
-        with the nested meme key
+        with the nested post key
         """
-        os.environ["meme_key2"] = "2"
+        os.environ["post_key2"] = "2"
         config.reload()
-        assert config.settings_get("meme", "key2") == 2
-        self.assert_config(config, exclude_keys=("meme",))  # Other settings are unchanged
-        self.assert_config(config, base_key="meme", exclude_keys=("key2"))  # Other settings in meme are unchanged
-        del os.environ["meme_key2"]
+        assert config.settings_get("post", "key2") == 2
+        self.assert_config(config, exclude_keys=("post",))  # Other settings are unchanged
+        self.assert_config(config, base_key="post", exclude_keys=("key2"))  # Other settings in post are unchanged
+        del os.environ["post_key2"]
 
     def test_load_env_nested_debug_settings(self, config: Config):
         """Tests the ability of the config object to load settings from the env vars
@@ -171,7 +171,7 @@ class TestConfig:
         config.reload()
         assert config.settings_get("debug", "logs") == ["val1", "val2", "val3"]
         self.assert_config(config, exclude_keys=("debug",))  # Other settings are unchanged
-        self.assert_config(config, base_key="debug", exclude_keys=("logs",))  # Other settings in meme are unchanged
+        self.assert_config(config, base_key="debug", exclude_keys=("logs",))  # Other settings in post are unchanged
         del os.environ["debug_logs"]
 
     def test_load_env_nested_test_settings(self, config: Config):

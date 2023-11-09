@@ -54,7 +54,7 @@ async def report_cmd(update: Update, context: CallbackContext) -> int:
 
     if user_report is not None:
         minutes_elapsed = user_report.minutes_passed
-        remain_minutes = int(Config.meme_get("report_wait_mins") - minutes_elapsed)
+        remain_minutes = int(Config.post_get("report_wait_mins") - minutes_elapsed)
 
         if remain_minutes > 0:
             await info.bot.send_message(chat_id=info.chat_id, text=f"Aspetta {remain_minutes} minuti")
@@ -95,7 +95,7 @@ async def report_user_msg(update: Update, context: CallbackContext) -> int:
         chat_id=info.chat_id,
         text="Scrivi il motivo della tua segnalazione.\n"
         "Cerca di essere esaustivo, potrai inviare un altro report "
-        f"dopo {Config.meme_get('report_wait_mins')} minuti.\n"
+        f"dopo {Config.post_get('report_wait_mins')} minuti.\n"
         "Puoi annullare il processo con /cancel",
     )
 
@@ -123,7 +123,7 @@ async def report_user_sent_msg(update: Update, context: CallbackContext) -> int:
 
     target_username = context.user_data["current_report_target"]
 
-    chat_id = Config.meme_get("group_id")  # should be admin group
+    chat_id = Config.post_get("group_id")  # should be admin group
     admin_message = await info.bot.sendMessage(
         chat_id=chat_id, text="🚨🚨 SEGNALAZIONE 🚨🚨\n\n" + "Username: " + target_username + "\n\n" + info.text
     )

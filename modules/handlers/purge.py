@@ -21,15 +21,15 @@ async def purge_cmd(update: Update, context: CallbackContext):
     if not purge_in_progress:  # there is no purge already in progress
         purge_in_progress = True
         await info.bot.send_message(info.chat_id, text="Avvio del comando /purge")
-        published_memes = DbManager.select_from("published_meme")
-        total_posts = len(published_memes)
+        published_posts = DbManager.select_from("published_post")
+        total_posts = len(published_posts)
         lost_posts = 0
-        for published_meme in published_memes:
+        for published_post in published_posts:
             try:
                 message = await info.bot.forward_message(
                     info.chat_id,
-                    from_chat_id=published_meme["channel_id"],
-                    message_id=published_meme["c_message_id"],
+                    from_chat_id=published_post["channel_id"],
+                    message_id=published_post["c_message_id"],
                     disable_notification=True,
                 )
                 message.delete()

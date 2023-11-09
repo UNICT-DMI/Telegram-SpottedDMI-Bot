@@ -18,8 +18,8 @@ def get_confirm_kb() -> InlineKeyboardMarkup:
     return InlineKeyboardMarkup(
         [
             [
-                InlineKeyboardButton(text="Si", callback_data="meme_confirm,submit"),
-                InlineKeyboardButton(text="No", callback_data="meme_confirm,cancel"),
+                InlineKeyboardButton(text="Si", callback_data="post_confirm,submit"),
+                InlineKeyboardButton(text="No", callback_data="post_confirm,cancel"),
             ]
         ]
     )
@@ -34,8 +34,8 @@ def get_preview_kb() -> InlineKeyboardMarkup:
     return InlineKeyboardMarkup(
         [
             [
-                InlineKeyboardButton(text="Si", callback_data="meme_preview,accept"),
-                InlineKeyboardButton(text="No", callback_data="meme_preview,reject"),
+                InlineKeyboardButton(text="Si", callback_data="post_preview,accept"),
+                InlineKeyboardButton(text="No", callback_data="post_preview,reject"),
             ]
         ]
     )
@@ -156,7 +156,7 @@ def get_published_post_kb() -> Optional[InlineKeyboardMarkup]:
     # the last button in the last row will be the report button
     report_button = InlineKeyboardButton("🚩 Report", callback_data="report_spot")
     follow_button = InlineKeyboardButton("👁 Follow", callback_data="follow_spot")
-    if Config.meme_get("report"):
+    if Config.post_get("report"):
         if len(keyboard) > 0:
             keyboard[-1].append(report_button)
         else:

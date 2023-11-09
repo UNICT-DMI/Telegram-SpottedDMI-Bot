@@ -1,5 +1,5 @@
 /*Used to instantiate the database the first time*/
-CREATE TABLE IF NOT EXISTS pending_meme
+CREATE TABLE IF NOT EXISTS pending_post
 (
   user_id BIGINT NOT NULL,
   u_message_id BIGINT NOT NULL,
@@ -9,7 +9,7 @@ CREATE TABLE IF NOT EXISTS pending_meme
   PRIMARY KEY (group_id, g_message_id)
 );
 -----
-CREATE TABLE IF NOT EXISTS published_meme
+CREATE TABLE IF NOT EXISTS published_post
 (
   channel_id BIGINT NOT NULL,
   c_message_id BIGINT NOT NULL,
@@ -23,7 +23,7 @@ CREATE TABLE IF NOT EXISTS votes
   channel_id BIGINT NOT NULL,
   vote varchar(4) NOT NULL,
   PRIMARY KEY (user_id, c_message_id, channel_id),
-  FOREIGN KEY (c_message_id, channel_id) REFERENCES published_meme (c_message_id, channel_id) ON DELETE CASCADE ON UPDATE CASCADE
+  FOREIGN KEY (c_message_id, channel_id) REFERENCES published_post (c_message_id, channel_id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 -----
 CREATE TABLE IF NOT EXISTS admin_votes
@@ -33,7 +33,7 @@ CREATE TABLE IF NOT EXISTS admin_votes
   group_id BIGINT NOT NULL,
   is_upvote boolean NOT NULL,
   PRIMARY KEY (admin_id, g_message_id, group_id),
-  FOREIGN KEY (g_message_id, group_id) REFERENCES pending_meme (g_message_id, group_id) ON DELETE CASCADE ON UPDATE CASCADE
+  FOREIGN KEY (g_message_id, group_id) REFERENCES pending_post (g_message_id, group_id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 -----
 CREATE TABLE IF NOT EXISTS credited_users
@@ -56,7 +56,7 @@ CREATE TABLE IF NOT EXISTS spot_report
   g_message_id BIGINT NOT NULL,
   group_id BIGINT NOT NULL,
   PRIMARY KEY (user_id, c_message_id),
-  FOREIGN KEY (c_message_id) REFERENCES published_meme (c_message_id) ON DELETE CASCADE ON UPDATE CASCADE
+  FOREIGN KEY (c_message_id) REFERENCES published_post (c_message_id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 -----
 CREATE TABLE IF NOT EXISTS user_report

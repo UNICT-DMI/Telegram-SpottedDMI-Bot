@@ -1,7 +1,7 @@
 debug:
   local_log: false
   reset_on_load: false
-meme:
+post:
   channel_group_id: -1
   channel_id: -2
   channel_tag: ''

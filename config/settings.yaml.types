@@ -1,7 +1,7 @@
 debug:
   local_log: bool
   reset_on_load: bool
-meme:
+post:
   channel_group_id: int
   channel_id: int
   channel_tag: str

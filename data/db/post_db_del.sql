@@ -5,9 +5,9 @@ DROP TABLE IF EXISTS credited_users
 -----
 DROP TABLE IF EXISTS admin_votes
 -----
-DROP TABLE IF EXISTS pending_meme
+DROP TABLE IF EXISTS pending_post
 -----
-DROP TABLE IF EXISTS published_meme
+DROP TABLE IF EXISTS published_post
 -----
 DROP TABLE IF EXISTS banned_users
 -----
