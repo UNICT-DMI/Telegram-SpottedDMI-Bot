@@ -10,7 +10,7 @@ from .report import Report
 from .user import User
 
 
-async def init_db(_: Application):
+def init_db():
     """Initialize the database.
     If the debug.reset_on_load setting is True, it will delete the database and create a new one.
 
