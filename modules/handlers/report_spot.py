@@ -27,7 +27,7 @@ def report_spot_conv_handler() -> ConversationHandler:
         conversation handler
     """
     return ConversationHandler(
-        entry_points=[CallbackQueryHandler(report_spot_callback, pattern=r"^meme_report\.*")],
+        entry_points=[CallbackQueryHandler(report_spot_callback, pattern=r"^report\.*")],
         states={
             STATE["reporting_spot"]: [
                 MessageHandler(~filters.COMMAND & ~filters.UpdateType.EDITED_MESSAGE, report_spot_msg)

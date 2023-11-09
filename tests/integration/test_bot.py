@@ -574,7 +574,7 @@ class TestBot:
             """Tests the /report user query.
             The user successfully reports a post already published in the channel
             """
-            await telegram.send_callback_query(data="meme_report_spot,", message=published_post)
+            await telegram.send_callback_query(data="report_spot,", message=published_post)
             assert (
                 telegram.last_message.text == "Scrivi il motivo della segnalazione del post, altrimenti digita /cancel"
             )
@@ -595,7 +595,7 @@ class TestBot:
             """Tests the /report user query.
             The user cannot report again a post already published in the channel
             """
-            await telegram.send_callback_query(data="meme_report_spot,", message=published_post)
+            await telegram.send_callback_query(data="report_spot,", message=published_post)
             assert (
                 telegram.last_message.text == "Scrivi il motivo della segnalazione del post, altrimenti digita /cancel"
             )
@@ -612,7 +612,7 @@ class TestBot:
                 is not None
             )
 
-            await telegram.send_callback_query(data="meme_report_spot,", message=published_post)
+            await telegram.send_callback_query(data="report_spot,", message=published_post)
             # The next message is the same as the last, because if the user try to report again
             # the query will be answered with a warning but no new messages will be sent by the bot
             assert (
