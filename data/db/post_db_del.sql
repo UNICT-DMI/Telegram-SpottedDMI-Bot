@@ -12,3 +12,5 @@ DROP TABLE IF EXISTS banned_users
 DROP TABLE IF EXISTS spot_report
 -----
 DROP TABLE IF EXISTS user_report
+-----
+DROP TABLE IF EXISTS user_follow

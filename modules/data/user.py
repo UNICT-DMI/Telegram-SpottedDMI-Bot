@@ -39,6 +39,35 @@ class User:
             cls(user_id=row["user_id"]) for row in DbManager.select_from(table_name="banned_users", select="user_id")
         ]
 
+    @classmethod
+    def credited_users(cls) -> "list[User]":
+        """Returns a list of all the credited users"""
+        return [
+            cls(user_id=row["user_id"]) for row in DbManager.select_from(table_name="credited_users", select="user_id")
+        ]
+
+    @classmethod
+    def following_users(cls, message_id: int) -> "list[tuple[User, int]]":
+        """Returns a list of all the users following the post with the associated private message id
+        used by the bot to send updates about the post by replying to it
+
+        Args:
+            message_id: id of the post the users are following
+
+        Returns:
+            list of tuples (user, private_message_id), where private_message_id is the id of the private message
+            in the user's conversation with the bot
+        """
+        return [
+            (cls(user_id=row["user_id"]), row["private_message_id"])
+            for row in DbManager.select_from(
+                table_name="user_follow",
+                select="user_id, private_message_id",
+                where="message_id = %s",
+                where_args=(message_id,),
+            )
+        ]
+
     def ban(self):
         """Adds the user to the banned list"""
 
@@ -94,6 +123,45 @@ class User:
                 sign = "@" + username
 
         return sign
+
+    def get_follow_private_message_id(self, message_id: int) -> int | None:
+        """Verifies if the user is following a post
+
+        Args:
+            message_id: id of the post
+
+        Returns:
+            whether the user is following the post or not
+        """
+        result = DbManager.select_from(
+            table_name="user_follow",
+            select="private_message_id",
+            where="user_id = %s and message_id = %s",
+            where_args=(self.user_id, message_id),
+        )
+        return result[0]["private_message_id"] if result else None
+
+    def set_follow(self, message_id: int, private_message_id: int | None):
+        """Sets the follow status of the user.
+        If the private_message_id is None, the user is not following the post anymore,
+        and the record is deleted from the database.
+        Otherwise, the user is following the post and a new record is created.
+
+        Args:
+            message_id: id of the post
+            private_message_id: id of the private message. If None, the record is deleted
+        """
+        if private_message_id is None:
+            DbManager.delete_from(
+                table_name="user_follow",
+                where="user_id = %s and message_id = %s",
+                where_args=(self.user_id, message_id),
+            )
+        DbManager.insert_into(
+            table_name="user_follow",
+            columns=("user_id", "message_id", "private_message_id"),
+            values=(self.user_id, message_id, private_message_id),
+        )
 
     def __repr__(self) -> str:
         return (

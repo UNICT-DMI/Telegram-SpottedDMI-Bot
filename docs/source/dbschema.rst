@@ -20,14 +20,6 @@ This image has been created with the following script on `dbdiagram.io <https://
    channel_id bigint [pk]
    c_message_id bigint [pk]
    }
-   
-
-   Table votes {
-   user_id bigint [pk]
-   channel_id bigint [pk, ref: > PU.channel_id]
-   c_message_id bigint [pk, ref: > PU.c_message_id]
-   vote varchar(4) [not null]
-   }
 
    Table admin_votes {
    admin_id bigint [pk]
@@ -58,4 +50,10 @@ This image has been created with the following script on `dbdiagram.io <https://
    g_message_id bigint [not null]
    group_id bigint [not null]
    message_date timestamp [pk]
+   }
+
+   Table user_follow {
+   user_id bigint [not null]
+   message_id BIGINT [not null]
+   private_message_id BIGINT [not null]
    }
