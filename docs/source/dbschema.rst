@@ -1,9 +1,9 @@
 Database schema
 ===========================================
-This is the schema of the database used to store informations about the spots and their reactions
+This is the schema of the database used to store information about the spots and their reactions
 
-.. image:: _static/img/DbSchema.jpg
-   :target: _static/img/DbSchema.jpg
+.. image:: _static/img/DbSchema.png
+   :target: _static/img/DbSchema.png
    :alt: Database schema
 
 This image has been created with the following script on `dbdiagram.io <https://dbdiagram.io/home>`_::

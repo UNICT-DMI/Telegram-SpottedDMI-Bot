@@ -16,16 +16,6 @@ CREATE TABLE IF NOT EXISTS published_post
   PRIMARY KEY (channel_id, c_message_id)
 );
 -----
-CREATE TABLE IF NOT EXISTS votes
-(
-  user_id BIGINT NOT NULL,
-  c_message_id BIGINT NOT NULL,
-  channel_id BIGINT NOT NULL,
-  vote varchar(4) NOT NULL,
-  PRIMARY KEY (user_id, c_message_id, channel_id),
-  FOREIGN KEY (c_message_id, channel_id) REFERENCES published_post (c_message_id, channel_id) ON DELETE CASCADE ON UPDATE CASCADE
-);
------
 CREATE TABLE IF NOT EXISTS admin_votes
 (
   admin_id BIGINT NOT NULL,
