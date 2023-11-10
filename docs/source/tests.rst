@@ -12,18 +12,34 @@ Tests modules
 conftest
 ---------------------
 
-.. automodule:: tests.unit.conftest
+.. automodule:: tests.conftest
    :members:
    :undoc-members:
    :show-inheritance:
+
+Integration
+=================
 
 test\_bot
 ----------------------
 
-.. automodule:: tests.unit.test_bot
+.. automodule:: tests.integration.telegram_api
    :members:
    :undoc-members:
    :show-inheritance:
+
+.. automodule:: tests.integration.telegram_simulator
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+.. automodule:: tests.integration.test_bot
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Unit
+=================
 
 tests.unit.test\_db
 ---------------------
@@ -37,14 +53,6 @@ test\_util
 -----------------------
 
 .. automodule:: tests.unit.test_util
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-util
------------------
-
-.. automodule:: tests.unit.util
    :members:
    :undoc-members:
    :show-inheritance:

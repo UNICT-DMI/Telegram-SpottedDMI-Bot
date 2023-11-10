@@ -16,6 +16,14 @@ anonym\_comment
    :undoc-members:
    :show-inheritance:
 
+approve
+---------------------------
+
+.. automodule:: modules.handlers.approve
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 autoreply
 ---------------------------
 
@@ -28,14 +36,6 @@ ban
 ---------------------------
 
 .. automodule:: modules.handlers.ban
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-callback\_handlers
-------------------------------------------
-
-.. automodule:: modules.handlers.callback_handlers
    :members:
    :undoc-members:
    :show-inheritance:
@@ -56,6 +56,14 @@ clean\_pending
    :undoc-members:
    :show-inheritance:
 
+constants
+---------------------------------
+
+.. automodule:: modules.handlers.constants
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 db\_backup
 --------------------------------------
 
@@ -64,10 +72,18 @@ db\_backup
    :undoc-members:
    :show-inheritance:
 
-constants
----------------------------------
+follow\_comment
+--------------------------------------
 
-.. automodule:: modules.handlers.constants
+.. automodule:: modules.handlers.follow_comment
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+follow\_spot
+--------------------------------------
+
+.. automodule:: modules.handlers.follow_spot
    :members:
    :undoc-members:
    :show-inheritance:
@@ -164,14 +180,6 @@ start
 -----------------------------
 
 .. automodule:: modules.handlers.start
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-stats
------------------------------
-
-.. automodule:: modules.handlers.stats
    :members:
    :undoc-members:
    :show-inheritance:
