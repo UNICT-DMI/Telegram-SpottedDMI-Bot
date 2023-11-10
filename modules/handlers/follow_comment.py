@@ -15,14 +15,13 @@ async def follow_spot_comment(update: Update, context: CallbackContext):
     """
     info = EventInfo.from_message(update, context)
 
-    if info.chat_id == Config.post_get("channel_group_id"):
-        # Get the spot's message_id
-        reply_to_message_id = info.message.message_thread_id
-        # Get a list of users who are following the spot
-        users_and_private_message_ids = User.following_users(reply_to_message_id)
+    # Get the spot's message_id
+    reply_to_message_id = info.message.message_thread_id
+    # Get a list of users who are following the spot
+    users_and_private_message_ids = User.following_users(reply_to_message_id)
 
-        # Send them an update about the new comment
-        for user, private_message_id in users_and_private_message_ids:
-            # Avoid sending if it's made by the same user
-            if not user.user_id == info.message.from_user.id:
-                await info.message.copy(chat_id=user.user_id, reply_to_message_id=private_message_id)
+    # Send them an update about the new comment
+    for user, private_message_id in users_and_private_message_ids:
+        # Avoid sending if it's made by the same user
+        if not user.user_id == info.message.from_user.id:
+            await info.message.copy(chat_id=user.user_id, reply_to_message_id=private_message_id)

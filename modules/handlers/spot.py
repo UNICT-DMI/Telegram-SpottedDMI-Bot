@@ -29,7 +29,7 @@ def spot_conv_handler() -> ConversationHandler:
         conversation handler
     """
     return ConversationHandler(
-        entry_points=[CommandHandler("spot", spot_cmd)],
+        entry_points=[CommandHandler("spot", spot_cmd, filters=filters.ChatType.PRIVATE)],
         states={
             STATE["posting"]: [
                 MessageHandler(~filters.COMMAND & ~filters.UpdateType.EDITED_MESSAGE, spot_msg),

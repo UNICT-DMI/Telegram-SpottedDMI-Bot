@@ -72,6 +72,7 @@ def add_handlers(app: Application):
         app.add_handler(MessageHandler(filters.ALL, log_message), 1)
 
     admin_filter = filters.Chat(chat_id=Config.post_get("group_id"))
+    channel_group_filter = filters.Chat(chat_id=Config.post_get("channel_group_id"))
 
     # Error handler
     app.add_error_handler(error_handler)
@@ -89,11 +90,12 @@ def add_handlers(app: Application):
                            run_async=True))
 
     # Command handlers
-    app.add_handler(CommandHandler("start", start_cmd))
-    app.add_handler(CommandHandler("help", help_cmd))
-    app.add_handler(CommandHandler("rules", rules_cmd))
-    app.add_handler(CommandHandler("settings", settings_cmd))
-    app.add_handler(CommandHandler("cancel", cancel_cmd))  # it must be after the conversation handler's 'cancel'
+    app.add_handler(CommandHandler("start", start_cmd, filters=filters.ChatType.PRIVATE))
+    app.add_handler(CommandHandler("help", help_cmd, filters=filters.ChatType.PRIVATE))
+    app.add_handler(CommandHandler("rules", rules_cmd, filters=filters.ChatType.PRIVATE))
+    app.add_handler(CommandHandler("settings", settings_cmd, filters=filters.ChatType.PRIVATE))
+    # it must be after the conversation handler's 'cancel'
+    app.add_handler(CommandHandler("cancel", cancel_cmd, filters=filters.ChatType.PRIVATE))
 
     # Command handlers: Admin commands
     app.add_handler(CommandHandler("sban", sban_cmd, filters=admin_filter))
@@ -114,20 +116,17 @@ def add_handlers(app: Application):
     app.add_handler(CallbackQueryHandler(follow_spot_callback, pattern=r"^follow_\.*"))
 
     if Config.post_get("comments"):
-        app.add_handler(
-            MessageHandler(
-                filters.FORWARDED & filters.ChatType.GROUPS & filters.IS_AUTOMATIC_FORWARD, forwarded_post_msg
-            )
-        )
+        app.add_handler(MessageHandler(channel_group_filter & filters.IS_AUTOMATIC_FORWARD, forwarded_post_msg))
     if Config.post_get("delete_anonymous_comments"):
         app.add_handler(
             MessageHandler(
-                filters.SenderChat.CHANNEL & filters.ChatType.GROUPS & ~filters.IS_AUTOMATIC_FORWARD,
+                channel_group_filter & filters.SenderChat.CHANNEL & ~filters.IS_AUTOMATIC_FORWARD,
                 anonymous_comment_msg,
             )
         )
 
-    app.add_handler(MessageHandler(filters.REPLY & filters.ChatType.GROUPS, follow_spot_comment))
+    app.add_handler(MessageHandler(channel_group_filter & filters.REPLY, follow_spot_comment))
+
 
 def add_jobs(app: Application):
     """Adds all the jobs to be scheduled to the application

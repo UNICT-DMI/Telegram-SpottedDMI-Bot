@@ -20,7 +20,7 @@ def report_user_conv_handler() -> ConversationHandler:
         conversation handler
     """
     return ConversationHandler(
-        entry_points=[CommandHandler("report", report_cmd)],
+        entry_points=[CommandHandler("report", report_cmd, filters=filters.ChatType.PRIVATE)],
         states={
             STATE["reporting_user"]: [
                 MessageHandler(~filters.COMMAND & ~filters.UpdateType.EDITED_MESSAGE, report_user_msg)
