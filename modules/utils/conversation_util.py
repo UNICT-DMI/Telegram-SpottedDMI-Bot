@@ -1,5 +1,5 @@
 """Common functions needed in conversation handlers"""
-from typing import Callable, Optional, Union
+from typing import Callable
 from telegram import Update
 from telegram.constants import ParseMode
 from telegram.ext import CallbackContext
@@ -9,7 +9,7 @@ from modules.utils.info_util import EventInfo
 
 def conv_fail(
     family: str,
-) -> Callable[[Union[tuple[Update, CallbackContext], EventInfo], str, Optional[int]], Optional[int]]:
+) -> Callable[[tuple[Update, CallbackContext] | EventInfo, str, int | None], int | None]:
     """Creates a function used to handle any error in the conversation
 
     Args:
@@ -20,13 +20,13 @@ def conv_fail(
     """
 
     async def fail(
-        event: Union[tuple[Update, CallbackContext], EventInfo],
+        event: tuple[Update, CallbackContext] | EventInfo,
         fail_file: str = "generic",
-        return_value: Optional[int] = None,
+        return_value: int | None = None,
         **kwargs,
-    ) -> Optional[int]:
+    ) -> int | None:
         """Handles an invalid message in the conversation.
-        Optional[int]he filename is expected to be in the format of <family>_error_<fail_file>.md.
+        int | Nonehe filename is expected to be in the format of <family>_error_<fail_file>.md.
         Returns a warning message
 
         Args:

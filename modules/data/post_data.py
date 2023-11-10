@@ -1,5 +1,4 @@
 """Data management for the bot"""
-from typing import Optional, Tuple
 from .db_manager import DbManager
 
 
@@ -16,7 +15,7 @@ class PostData:
         return DbManager.count_from(table_name="published_post")
 
     @staticmethod
-    def get_n_votes(vote: Optional[str] = None) -> int:
+    def get_n_votes(vote: str | None = None) -> int:
         """Gets the total number of votes of the specified
 
         Args:
@@ -30,7 +29,7 @@ class PostData:
         return DbManager.count_from(table_name="votes")
 
     @staticmethod
-    def get_avg(vote: Optional[str] = None) -> int:
+    def get_avg(vote: str | None = None) -> int:
         """Shows the average number of votes of the specified type per post
 
         Args:
@@ -44,7 +43,7 @@ class PostData:
         return round(avg, 2)
 
     @staticmethod
-    def get_max_id(vote: Optional[str] = None) -> Tuple[int, int, str]:
+    def get_max_id(vote: str | None = None) -> tuple[int, int, str]:
         """Gets the id of the post with the most votes of the specified type
 
         Args:

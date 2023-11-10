@@ -1,7 +1,7 @@
 # pylint: disable=unused-argument,protected-access,no-value-for-parameter
 """TelegramSimulator class"""
 from datetime import datetime
-from typing import Optional, Union, TYPE_CHECKING, overload
+from typing import overload
 import warnings
 from telegram import (
     Message,
@@ -16,21 +16,6 @@ from telegram import (
 from telegram.ext import Application
 from .telegram_api import TelegramApi
 from main import add_handlers
-
-if TYPE_CHECKING:
-    from typing import TypedDict
-    from telegram.constants import ParseMode
-
-    class MessageData(TypedDict):
-        chat_id: int
-        text: str
-        message_id: int
-        entities: list[MessageEntity] | None
-        disable_notification: bool | None
-        allow_sending_without_reply: bool | None
-        protect_content: bool | None
-        parse_mode: ParseMode | None
-        disable_web_page_preview: bool | None
 
 
 class TelegramSimulator:  # pylint: disable=too-many-public-methods
@@ -81,7 +66,7 @@ class TelegramSimulator:  # pylint: disable=too-many-public-methods
         self.__chat = self.__default_chat
         self.__user = self.__default_user
 
-    def get_message_by_id(self, message_id: int | str) -> Optional[Message]:
+    def get_message_by_id(self, message_id: int | str) -> Message | None:
         """Return the first message with the given message id or None if no message with this id was found
 
         Args:
@@ -243,7 +228,7 @@ class TelegramSimulator:  # pylint: disable=too-many-public-methods
         chat: Chat = None,
         date: datetime = None,
         reply_markup: InlineKeyboardMarkup = None,
-        reply_to_message: Union[Message, int] = None,
+        reply_to_message: Message | int = None,
         is_automatic_forward: bool = False,
         **kwargs,
     ) -> Message:
@@ -353,7 +338,7 @@ class TelegramSimulator:  # pylint: disable=too-many-public-methods
             **kwargs,
         )
 
-    def make_update(self, event: Union[CallbackQuery, Message], edited: bool = False, **kwargs):
+    def make_update(self, event: CallbackQuery | Message, edited: bool = False, **kwargs):
         """Testing utility factory to create an update from a user event, as either a
         :class:`Message`` or a :class:`CallbackQuery` from an inline keyboard
 
@@ -387,7 +372,7 @@ class TelegramSimulator:  # pylint: disable=too-many-public-methods
             connect_timeout: float = None,
             pool_timeout: float = None,
             api_kwargs: dict = None,
-        ) -> Union[bool, dict, None]:
+        ) -> bool | dict | None:
             return self.__api.post(endpoint, data)
 
         return _post
@@ -412,7 +397,7 @@ class TelegramSimulator:  # pylint: disable=too-many-public-methods
         else:
             self.messages.remove(message)
 
-    def find_button_on_keyboard(self, text: str, message: Message) -> Optional[InlineKeyboardButton]:
+    def find_button_on_keyboard(self, text: str, message: Message) -> InlineKeyboardButton | None:
         """Find a button on the keyboard with the given text
 
         Args:

@@ -1,7 +1,6 @@
 """Handles the management of databases"""
 import os
 import logging
-from typing import Optional, Tuple, Union
 import sqlite3
 from .data_reader import get_abs_path, read_file
 
@@ -28,7 +27,7 @@ class DbManager:
 
     @classmethod
     def __query_execute(
-        cls, cur: sqlite3.Cursor, query: str, args: Optional[tuple] = None, error_str: str = "", is_many: bool = False
+        cls, cur: sqlite3.Cursor, query: str, args: tuple | None = None, error_str: str = "", is_many: bool = False
     ):
         """Materially executes the requested query, while also catching and logging any exception that may be thrown
 
@@ -50,7 +49,7 @@ class DbManager:
             logger.error("DbManager.%s(): %s", error_str, ex)
 
     @classmethod
-    def get_db(cls) -> Tuple[sqlite3.Connection, sqlite3.Cursor]:
+    def get_db(cls) -> tuple[sqlite3.Connection, sqlite3.Cursor]:
         """Creates the connection to the database. It can be sqlite or postgres
 
         Returns:
@@ -103,7 +102,7 @@ class DbManager:
         table_name: str,
         select: str = "*",
         where: str = "",
-        where_args: Optional[tuple] = None,
+        where_args: tuple | None = None,
         group_by: str = "",
         order_by: str = "",
     ) -> list:
@@ -142,7 +141,7 @@ class DbManager:
         return query_result
 
     @classmethod
-    def count_from(cls, table_name: str, select: str = "*", where: str = "", where_args: Optional[tuple] = None) -> int:
+    def count_from(cls, table_name: str, select: str = "*", where: str = "", where_args: tuple | None = None) -> int:
         """Returns the number of rows found with the query.
         Executes "SELECT COUNT(select) FROM table_name [WHERE where (with where_args)]"
 
@@ -174,7 +173,7 @@ class DbManager:
         return query_result[0]["number"] if len(query_result) > 0 else None
 
     @classmethod
-    def insert_into(cls, table_name: str, values: tuple, columns: Union[tuple, str] = "", multiple_rows: bool = False):
+    def insert_into(cls, table_name: str, values: tuple, columns: tuple | str = "", multiple_rows: bool = False):
         """Inserts the specified values in the database.
         Executes "INSERT INTO table_name ([columns]) VALUES (placeholders)"
 
@@ -207,7 +206,7 @@ class DbManager:
         conn.close()
 
     @classmethod
-    def update_from(cls, table_name: str, set_clause: str, where: str = "", args: Optional[tuple] = None):
+    def update_from(cls, table_name: str, set_clause: str, where: str = "", args: tuple | None = None):
         """Updates the rows from the specified table, where the condition, when set, is satisfied.
         Executes "UPDATE table_name SET set_clause (with args) [WHERE where (with args)]"
 
@@ -232,7 +231,7 @@ class DbManager:
         conn.close()
 
     @classmethod
-    def delete_from(cls, table_name: str, where: str = "", where_args: Optional[tuple] = None):
+    def delete_from(cls, table_name: str, where: str = "", where_args: tuple | None = None):
         """Deletes the rows from the specified table, where the condition, when set, is satisfied.
         Executes "DELETE FROM table_name [WHERE where (with where_args)]"
 

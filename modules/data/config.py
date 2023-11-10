@@ -1,7 +1,7 @@
 """Read the bot configuration from the settings.yaml and the autoreplies.yaml files"""
 import os
 import re
-from typing import Any, Iterable, Literal, Optional
+from typing import Any, Iterable, Literal
 import yaml
 
 SettingsKeys = Literal["debug", "post", "test", "token", "bot_tag"]
@@ -31,7 +31,7 @@ class Config:
 
     SETTINGS_PATH = ("config", "settings.yaml")
     AUTOREPLIES_PATH = ("data", "yaml", "autoreplies.yaml")
-    __instance: Optional["Config"] = None
+    __instance: "Config | None" = None
 
     @classmethod
     def reload(cls):

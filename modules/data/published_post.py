@@ -1,6 +1,5 @@
 """Published post management"""
 from dataclasses import dataclass
-from typing import Optional
 from .db_manager import DbManager
 
 
@@ -30,7 +29,7 @@ class PublishedPost:
         return cls(channel_id=channel_id, c_message_id=c_message_id).save_post()
 
     @classmethod
-    def from_channel(cls, channel_id: int, c_message_id: int) -> Optional["PublishedPost"]:
+    def from_channel(cls, channel_id: int, c_message_id: int) -> "PublishedPost | None":
         """Retrieves a published post from the info related to the channel
 
         Args:

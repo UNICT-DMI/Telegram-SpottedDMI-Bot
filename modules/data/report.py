@@ -1,7 +1,6 @@
 """Reports management"""
 from dataclasses import dataclass
 from datetime import datetime
-from typing import Optional
 from telegram import Message
 from .db_manager import DbManager
 
@@ -40,7 +39,7 @@ class Report:
     @classmethod
     def create_post_report(
         cls, user_id: int, channel_id: int, c_message_id: int, admin_message: Message
-    ) -> Optional["Report"]:
+    ) -> "Report | None":
         """Adds the report of the user on a specific post
 
         Args:
@@ -91,7 +90,7 @@ class Report:
         ).save_report()
 
     @classmethod
-    def get_post_report(cls, user_id: int, channel_id: int, c_message_id: int) -> Optional["Report"]:
+    def get_post_report(cls, user_id: int, channel_id: int, c_message_id: int) -> "Report | None":
         """Gets the report of a specific user on a published post
 
         Args:
@@ -122,7 +121,7 @@ class Report:
         )
 
     @classmethod
-    def get_last_user_report(cls, user_id: int) -> Optional["Report"]:
+    def get_last_user_report(cls, user_id: int) -> "Report | None":
         """Gets the last user report of a specific user
 
         Args:
@@ -151,7 +150,7 @@ class Report:
         )
 
     @classmethod
-    def from_group(cls, group_id: int, g_message_id: int) -> Optional["Report"]:
+    def from_group(cls, group_id: int, g_message_id: int) -> "Report | None":
         """Gets a report of any type related to the specified message in the admin group
 
         Args:

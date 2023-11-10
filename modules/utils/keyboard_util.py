@@ -1,7 +1,6 @@
 """Creates the inlinekeyboard sent by the bot in its messages.
 Callback_data format: <callback_family>_<callback_name>,[arg]"""
 from itertools import islice, zip_longest
-from typing import List, Optional
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Bot
 from modules.data import Config, PendingPost
 from modules.utils.constants import APPROVED_KB, REJECTED_KB
@@ -89,7 +88,7 @@ def get_approve_kb(pending_post: PendingPost = None, approve: int = -1, reject: 
     )
 
 
-def get_autoreply_kb(page: int, items_per_page: int) -> List[List[InlineKeyboardButton]]:
+def get_autoreply_kb(page: int, items_per_page: int) -> list[list[InlineKeyboardButton]]:
     """Generates the keyboard for the autoreplies
 
     Args:
@@ -146,7 +145,7 @@ def get_paused_kb(page: int, items_per_page: int) -> InlineKeyboardMarkup:
     return InlineKeyboardMarkup(keyboard)
 
 
-def get_published_post_kb() -> Optional[InlineKeyboardMarkup]:
+def get_published_post_kb() -> InlineKeyboardMarkup | None:
     """Generates the InlineKeyboard for the published post adding the report button if needed
 
     Returns:
@@ -167,7 +166,7 @@ def get_published_post_kb() -> Optional[InlineKeyboardMarkup]:
 
 
 async def get_post_outcome_kb(
-    bot: Bot, votes: list[tuple[int, bool]], reason: Optional[str] = None
+    bot: Bot, votes: list[tuple[int, bool]], reason: str | None = None
 ) -> InlineKeyboardMarkup:
     """Generates the InlineKeyboard for the outcome of a post
 

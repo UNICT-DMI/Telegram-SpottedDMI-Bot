@@ -1,6 +1,5 @@
 """Pending post management"""
 from dataclasses import dataclass
-from typing import Optional
 from datetime import datetime, timezone
 from telegram import Message
 from .db_manager import DbManager
@@ -45,7 +44,7 @@ class PendingPost:
         ).save_post()
 
     @classmethod
-    def from_group(cls, g_message_id: int, group_id: int) -> Optional["PendingPost"]:
+    def from_group(cls, g_message_id: int, group_id: int) -> "PendingPost | None":
         """Retrieves a pending post from the info related to the admin group
 
         Args:
@@ -74,7 +73,7 @@ class PendingPost:
         )
 
     @classmethod
-    def from_user(cls, user_id: int) -> Optional["PendingPost"]:
+    def from_user(cls, user_id: int) -> "PendingPost | None":
         """Retrieves a pending post from the user_id
 
         Args:
@@ -99,7 +98,7 @@ class PendingPost:
         )
 
     @staticmethod
-    def get_all(group_id: int, before: Optional[datetime] = None) -> list["PendingPost"]:
+    def get_all(group_id: int, before: datetime | None = None) -> list["PendingPost"]:
         """Gets the list of pending posts in the specified admin group.
         If before is specified, returns only the one sent before that timestamp
 
@@ -177,7 +176,7 @@ class PendingPost:
 
         return [vote["admin_id"] for vote in votes]
 
-    def __get_admin_vote(self, admin_id: int) -> Optional[bool]:
+    def __get_admin_vote(self, admin_id: int) -> bool | None:
         """Gets the vote of a specific admin on a pending post
 
         Args:

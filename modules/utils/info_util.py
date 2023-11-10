@@ -1,5 +1,4 @@
 """Common info needed in both command and callback handlers"""
-from typing import Optional
 from telegram import Bot, Update, Message, CallbackQuery, Chat, InlineKeyboardMarkup
 from telegram.ext import CallbackContext
 from telegram.error import BadRequest
@@ -370,7 +369,7 @@ class EventInfo:  # pylint: disable=too-many-public-methods
 
         PublishedPost.create(channel_id=channel_group_id, c_message_id=post_message.message_id)
 
-    async def show_admins_votes(self, pending_post: PendingPost, reason: Optional[str] = None):
+    async def show_admins_votes(self, pending_post: PendingPost, reason: str | None = None):
         """After a post is been approved or rejected, shows the admins that approved or rejected it \
             and edit the message to show the admin's votes
 

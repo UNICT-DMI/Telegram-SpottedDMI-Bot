@@ -1,7 +1,6 @@
 # pylint: disable=unused-argument redefined-outer-name
 """Tests the utility package"""
 from datetime import datetime
-from typing import Tuple
 import pytest
 from telegram import Update, Message, Chat, User, CallbackQuery
 from telegram.ext import Application, CallbackContext
@@ -80,7 +79,7 @@ def get_callback_query(get_user: User, get_chat: Chat, get_message: Message) -> 
 
 
 @pytest.fixture(scope="function")
-def message_update(app: Application, get_message: Message) -> Tuple[Update, CallbackContext]:
+def message_update(app: Application, get_message: Message) -> tuple[Update, CallbackContext]:
     """Simulates a message update
 
     Returns:
@@ -92,7 +91,7 @@ def message_update(app: Application, get_message: Message) -> Tuple[Update, Call
 
 
 @pytest.fixture(scope="function")
-def callback_update(app: Application, get_callback_query: CallbackQuery) -> Tuple[Update, CallbackContext]:
+def callback_update(app: Application, get_callback_query: CallbackQuery) -> tuple[Update, CallbackContext]:
     """Simulates a callback query update
 
     Returns:
@@ -122,7 +121,7 @@ class TestUtil:
         """Tests the EventInfo class"""
 
         def test_message_info(
-            self, message_update: Tuple[Update, CallbackContext], get_user: User, get_chat: Chat, get_message: Message
+            self, message_update: tuple[Update, CallbackContext], get_user: User, get_chat: Chat, get_message: Message
         ):
             """Tests the :meth:`from_message` :class:`EventInfo` initialization"""
             info = EventInfo.from_message(message_update[0], message_update[1])
@@ -153,7 +152,7 @@ class TestUtil:
 
         def test_callback_info(
             self,
-            callback_update: Tuple[Update, CallbackContext],
+            callback_update: tuple[Update, CallbackContext],
             get_user: User,
             get_chat: Chat,
             get_callback_query: CallbackQuery,

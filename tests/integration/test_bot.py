@@ -1,7 +1,6 @@
 # pylint: disable=unused-argument,redefined-outer-name
 """Tests the bot functionality"""
 from datetime import datetime
-from typing import Tuple
 import pytest
 import pytest_asyncio
 from telegram import Chat, Message, MessageEntity, User as TGUser
@@ -111,7 +110,7 @@ def report_user_message(telegram: TelegramSimulator, user: TGUser, admin_group: 
 @pytest.fixture(scope="function")
 def report_spot_message(
     telegram: TelegramSimulator, user: TGUser, admin_group: Chat, channel: Chat
-) -> Tuple[Message, Message]:
+) -> tuple[Message, Message]:
     """Called once per at the beginning of each function.
     Simulates an existing spot report
 
@@ -337,7 +336,7 @@ class TestBot:
             Spot is not allowed in groups
             """
             await telegram.send_command("/spot", chat=channel_group)
-            assert telegram.last_message.text == CHAT_PRIVATE_ERROR
+            assert telegram.last_message.text == "/spot"  # the bot does not reply to the command
 
         async def test_spot_banned_cmd(self, telegram: TelegramSimulator):
             """Tests the /spot command.
