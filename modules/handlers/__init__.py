@@ -72,17 +72,25 @@ def add_handlers(disp: Dispatcher):
     disp.add_handler(report_user_conv_handler())
     disp.add_handler(report_spot_conv_handler())
 
+    # remove anonymous comments
+    if Config.meme_get('delete_anonymous_comments'):
+        disp.add_handler(
+            MessageHandler(Filters.sender_chat.channel & Filters.chat_type.groups & ~Filters.is_automatic_forward,
+                           anonymous_comment_msg,
+                           run_async=True))
+
     # Command handlers
-    disp.add_handler(CommandHandler("start", start_cmd))
-    disp.add_handler(CommandHandler("help", help_cmd))
-    disp.add_handler(CommandHandler("rules", rules_cmd))
-    disp.add_handler(CommandHandler("stats", stats_cmd))
-    disp.add_handler(CommandHandler("settings", settings_cmd))
+    disp.add_handler(CommandHandler("start", start_cmd, filters=Filters.chat_type.private))
+    disp.add_handler(CommandHandler("help", help_cmd, filters=Filters.chat_type.private | admin_filter))
+    disp.add_handler(CommandHandler("rules", rules_cmd, filters=Filters.chat_type.private))
+    disp.add_handler(CommandHandler("stats", stats_cmd, filters=Filters.chat_type.private))
+    disp.add_handler(CommandHandler("settings", settings_cmd, filters=Filters.chat_type.private))
     disp.add_handler(CommandHandler("sban", sban_cmd, filters=admin_filter))
     disp.add_handler(CommandHandler("clean_pending", clean_pending_cmd, filters=admin_filter))
     disp.add_handler(CommandHandler("db_backup", db_backup_cmd, run_async=True, filters=admin_filter))
     disp.add_handler(CommandHandler("purge", purge_cmd, run_async=True, filters=admin_filter))
-    disp.add_handler(CommandHandler("cancel", cancel_cmd))  # it must be after the conversation handler's 'cancel'
+    # it must be after the conversation handler's 'cancel'
+    disp.add_handler(CommandHandler("cancel", cancel_cmd, filters=Filters.chat_type.private))
 
     # MessageHandler
     disp.add_handler(MessageHandler(Filters.reply & admin_filter & Filters.regex(r"^/ban$"), ban_cmd))
@@ -97,11 +105,6 @@ def add_handlers(disp: Dispatcher):
     if Config.meme_get('comments'):
         disp.add_handler(
             MessageHandler(Filters.forwarded & Filters.chat_type.groups & Filters.is_automatic_forward, forwarded_post_msg))
-    if Config.meme_get('delete_anonymous_comments'):
-        disp.add_handler(
-            MessageHandler(Filters.sender_chat.channel & Filters.chat_type.groups & ~Filters.is_automatic_forward,
-                           anonymous_comment_msg,
-                           run_async=True))
 
     disp.add_handler(MessageHandler(Filters.reply & Filters.chat_type.groups, follow_spot_comment, run_async=True))
 
