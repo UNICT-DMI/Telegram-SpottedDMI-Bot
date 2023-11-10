@@ -91,7 +91,7 @@ def add_handlers(app: Application):
 
     # Command handlers
     app.add_handler(CommandHandler("start", start_cmd, filters=filters.ChatType.PRIVATE))
-    app.add_handler(CommandHandler("help", help_cmd, filters=filters.ChatType.PRIVATE))
+    app.add_handler(CommandHandler("help", help_cmd, filters=filters.ChatType.PRIVATE | admin_filter))
     app.add_handler(CommandHandler("rules", rules_cmd, filters=filters.ChatType.PRIVATE))
     app.add_handler(CommandHandler("settings", settings_cmd, filters=filters.ChatType.PRIVATE))
     # it must be after the conversation handler's 'cancel'
