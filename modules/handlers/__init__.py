@@ -72,9 +72,16 @@ def add_handlers(disp: Dispatcher):
     disp.add_handler(report_user_conv_handler())
     disp.add_handler(report_spot_conv_handler())
 
+    # remove anonymous comments
+    if Config.meme_get('delete_anonymous_comments'):
+        disp.add_handler(
+            MessageHandler(Filters.sender_chat.channel & Filters.chat_type.groups & ~Filters.is_automatic_forward,
+                           anonymous_comment_msg,
+                           run_async=True))
+
     # Command handlers
     disp.add_handler(CommandHandler("start", start_cmd, filters=Filters.private))
-    disp.add_handler(CommandHandler("help", help_cmd, filters=Filters.private))
+    disp.add_handler(CommandHandler("help", help_cmd))
     disp.add_handler(CommandHandler("rules", rules_cmd, filters=Filters.private))
     disp.add_handler(CommandHandler("stats", stats_cmd, filters=Filters.private))
     disp.add_handler(CommandHandler("settings", settings_cmd, filters=Filters.private))
@@ -98,11 +105,6 @@ def add_handlers(disp: Dispatcher):
     if Config.meme_get('comments'):
         disp.add_handler(
             MessageHandler(Filters.forwarded & Filters.chat_type.groups & Filters.is_automatic_forward, forwarded_post_msg))
-    if Config.meme_get('delete_anonymous_comments'):
-        disp.add_handler(
-            MessageHandler(Filters.sender_chat.channel & Filters.chat_type.groups & ~Filters.is_automatic_forward,
-                           anonymous_comment_msg,
-                           run_async=True))
 
     disp.add_handler(MessageHandler(Filters.reply & Filters.chat_type.groups, follow_spot_comment, run_async=True))
 
