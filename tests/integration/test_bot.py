@@ -834,3 +834,83 @@ class TestBot:
             assert telegram.get_message_by_id(anonymous_comment.message_id) is None  # the anonymous comment is deleted
             assert telegram.last_message.text == "Anonymous comment"
             assert telegram.last_message.from_user.is_bot is True
+
+    class TestFollow:
+        """Tests the follow feature"""
+
+        async def test_follow_callback(
+            self, telegram: TelegramSimulator, published_post: Message, channel_group: Chat, user: TGUser
+        ):
+            """Tests the follow callback under the spot.
+            The user shall be added to the followers of the post in the database
+            """
+
+            await telegram.send_callback_query(text="👁 Follow", message=published_post, user=user)
+
+            assert telegram.last_message.text == "Stai seguendo questo spot"
+            followed_message_id = (
+                published_post.reply_to_message.message_id if Config.post_get("comments") else published_post.message_id
+            )
+            assert User(user.id).is_following(followed_message_id)
+
+        async def test_unfollow_callback(
+            self, telegram: TelegramSimulator, published_post: Message, channel_group: Chat, user: TGUser
+        ):
+            """Tests the follow callback under the spot.
+            Since it was already following the spot, the user shall now be removed from the followers of the post
+            """
+
+            await self.test_follow_callback(telegram, published_post, channel_group, user)
+
+            await telegram.send_callback_query(text="👁 Follow", message=published_post, user=user)
+
+            assert telegram.last_message.text == "Non stai più seguendo questo spot"
+            followed_message_id = (
+                published_post.reply_to_message.message_id if Config.post_get("comments") else published_post.message_id
+            )
+            assert not User(user.id).is_following(followed_message_id)
+
+        async def test_receive_follow_message(
+            self, telegram: TelegramSimulator, published_post: Message, channel_group: Chat, user: TGUser
+        ):
+            """Tests the follow functionality.
+            Since the user is following the spot, they shall receive a message when a new comment is posted
+            """
+            user2 = TGUser(2, first_name="User2", is_bot=False, username="user2")
+
+            await self.test_follow_callback(telegram, published_post, channel_group, user)
+
+            message_thread_id = (
+                published_post.reply_to_message.message_id if Config.post_get("comments") else published_post.message_id
+            )
+            await telegram.send_message(
+                "Test follow",
+                chat=channel_group,
+                user=user2,
+                reply_to_message=message_thread_id,
+                message_thread_id=message_thread_id,
+            )
+            assert telegram.last_message.text == "Test follow"
+            assert telegram.last_message.from_user.is_bot is True
+            assert telegram.last_message.chat_id == user.id
+
+        async def test_skip_follow_message_same_user(
+            self, telegram: TelegramSimulator, published_post: Message, channel_group: Chat, user: TGUser
+        ):
+            """Tests the follow functionality.
+            Although the user is following the spot, they shall not receive a message when they post a comment
+            """
+            await self.test_follow_callback(telegram, published_post, channel_group, user)
+
+            message_thread_id = (
+                published_post.reply_to_message.message_id if Config.post_get("comments") else published_post.message_id
+            )
+            await telegram.send_message(
+                "Test follow",
+                chat=channel_group,
+                user=user,
+                reply_to_message=message_thread_id,
+                message_thread_id=message_thread_id,
+            )
+            assert telegram.last_message.from_user.is_bot is False
+            assert telegram.last_message.chat_id == channel_group.id  # The last message is stil the post

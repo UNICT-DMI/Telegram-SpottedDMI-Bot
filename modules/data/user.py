@@ -124,6 +124,22 @@ class User:
 
         return sign
 
+    def is_following(self, message_id: int) -> bool:
+        """Verifies if the user is following a post
+
+        Args:
+            message_id: id of the post
+
+        Returns:
+            whether the user is following the post or not
+        """
+        n_rows = DbManager.count_from(
+            table_name="user_follow",
+            where="user_id = %s and message_id = %s",
+            where_args=(self.user_id, message_id),
+        )
+        return n_rows > 0
+
     def get_follow_private_message_id(self, message_id: int) -> int | None:
         """Verifies if the user is following a post
 

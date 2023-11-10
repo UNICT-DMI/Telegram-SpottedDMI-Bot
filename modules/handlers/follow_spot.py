@@ -27,8 +27,8 @@ async def follow_spot_callback(update: Update, context: CallbackContext):
 
     # If the user is already following this spot, there is a reference to the private message.
     # Since the user clicked the button, he wants to stop following the spot.
-    if private_message_id := user.get_follow_private_message_id(message_id):
-        answer_text = "Non stai più seguendo questo spot."
+    if (private_message_id := user.get_follow_private_message_id(message_id)) is not None:
+        answer_text = "Non stai più seguendo questo spot"
         # Forget the stored data
         user.set_follow(message_id, None)
 
@@ -40,7 +40,7 @@ async def follow_spot_callback(update: Update, context: CallbackContext):
         )
     else:  # The user is not following this spot, so he wants to start following it.
         post_url = f"https://t.me/c/{str(info.chat_id).replace('-100', '')}/{info.message_id}"
-        answer_text = "Stai seguendo questo spot."
+        answer_text = "Stai seguendo questo spot"
         try:
             # Forward the spot in user's conversation with the bot, so that
             # future comments will be sent in response to this forwarded message.
@@ -57,7 +57,9 @@ async def follow_spot_callback(update: Update, context: CallbackContext):
                 chat_id=info.user_id, text=answer_text, reply_to_message_id=private_message.message_id
             )
         except Forbidden:
-            await info.answer_callback_query(text=f"Assicurati di aver avviato la chat con {Config.settings_get('bot_tag')}")
+            await info.answer_callback_query(
+                text=f"Assicurati di aver avviato la chat con {Config.settings_get('bot_tag')}"
+            )
             return
 
         # Remember the user_id and message_id

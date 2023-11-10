@@ -161,6 +161,7 @@ class TelegramSimulator:  # pylint: disable=too-many-public-methods
         chat: "Chat" = None,
         entities: "list[MessageEntity] | None" = None,
         reply_to_message: "Message | int | None" = None,
+        message_thread_id: "int | None" = None,
     ) -> "Message":
         ...
 
