@@ -1,7 +1,7 @@
 """Detect Comment on a post in the comment group"""
 from telegram import Update
 from telegram.ext import CallbackContext
-from modules.data import Config, User
+from modules.data import User
 from modules.utils import EventInfo
 
 

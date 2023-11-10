@@ -1,7 +1,6 @@
 """Published post management"""
 from dataclasses import dataclass
 from typing import Optional
-from telegram import InlineKeyboardMarkup
 from .db_manager import DbManager
 
 
