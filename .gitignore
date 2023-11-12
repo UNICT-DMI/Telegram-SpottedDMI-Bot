@@ -126,3 +126,7 @@ logs/*.log
 
 # Dev
 test.py
+
+# Local config
+/settings.yaml
+/autoreplies.yaml

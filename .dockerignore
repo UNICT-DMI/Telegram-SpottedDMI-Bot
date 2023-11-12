@@ -123,10 +123,16 @@ logs/*.log
 .vscode
 
 # Dev
+.devcontainer/
+script/
+logs/
 tests/
 docs/
-test.py
+icon.png
 
 # Git
 .git/
 .github/
+
+# Dockerfile
+Dockerfile

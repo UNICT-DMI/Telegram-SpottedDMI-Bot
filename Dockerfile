@@ -6,4 +6,4 @@ COPY . .
 RUN pip3 install .
 
 #Start the bot
-ENTRYPOINT [ "python3", "-m" "spotted" ]
+ENTRYPOINT [ "python3", "-m", "spotted" ]

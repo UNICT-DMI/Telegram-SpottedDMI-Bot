@@ -128,21 +128,21 @@ pip3 install telegram-spotted-dmi-bot
 - Create a [_"settings.yaml"_](#⚙️-settings) and edit the desired parameters. **It must contain at least a valid _'token'_ and _'post.group_id'_ values**.
   - You could also skip the files and use [_environment variables_](#settings-override) instead.
 - Make sure the bot is in present both in the admin group and in the spot channel. It may need to have admin privileges. If comments are enabled, the bot has to be in the comment group too as an admin.
-- **Run** `docker build --tag botimage .`
-- **Run** `docker run -d --name botcontainer -e TOKEN=<token_arg> [other env vars] botimage`
+- **Run** `docker build --tag spotted-image .`
+- **Run** `docker run -d --name spotted -e TOKEN=<token_arg> [other env vars] spotted-image`
 
 ### Examples
 
 First run
 
 ```bash
-docker build --tag botimage .
+docker build --tag spotted-image .
 ```
 
 Then something like
 
 ```bash
-docker run -d --name botcontainer -e TOKEN=<token_arg> -e POST_CHANNEL_ID=-4 -e POST_GROUP_ID=-5 botimage
+docker run -d --name botcontainer -e TOKEN=<token_arg> -e POST_CHANNEL_ID=-4 -e POST_GROUP_ID=-5 spotted-image
 ```
 
 ### To stop/remove the container:
@@ -303,8 +303,8 @@ pip3 install -e .[lint]
 
 - **Run** `pytest tests/unit` to run the unit tests
 - **Run** `pytest tests/integration` to run the integration tests
-<!-- TODO -->
-<!-- - **Run** `pytest tests/e2e` to run the e2e tests (this requires test configurations) -->
+  <!-- TODO -->
+  <!-- - **Run** `pytest tests/e2e` to run the e2e tests (this requires test configurations) -->
 
 #### Linting:
 

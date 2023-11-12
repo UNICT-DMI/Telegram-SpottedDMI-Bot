@@ -76,7 +76,6 @@ Changelog = "https://github.com/UNICT-DMI/Telegram-SpottedDMI-Bot/blob/main/.git
 [tool.setuptools]
 include-package-data = true
 package-dir = { "" = "src" }
-packages = ["spotted"]
 
 [tool.setuptools.dynamic]
 version = { attr = "spotted.__version__" }
