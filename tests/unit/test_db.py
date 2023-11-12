@@ -2,30 +2,31 @@
 """Test all the modules related to data management"""
 import pytest
 import yaml
-from modules.data import DbManager
+
+from spotted.data import DbManager
 
 TABLE_NAME = "test_table"
 
 
 @pytest.fixture(scope="class")
-def db_results(init_local_test_db: DbManager) -> dict:
+def db_results(create_test_db: DbManager) -> dict:
     """Called at the beginning of the testing session.
     Creates initializes the database
 
     Yields:
         Iterator[dict]: dictionary containing the results for the test queries
     """
-    init_local_test_db.row_factory = lambda cursor, row: list(row) if cursor.description[0][0] != "number" else {
+    create_test_db.row_factory = lambda cursor, row: list(row) if cursor.description[0][0] != "number" else {
         "number": row[0]
     }
-    init_local_test_db.query_from_file("data/db/db_test.sql")
+    create_test_db.query_from_file("config/db/db_test.sql")
 
     with open("tests/unit/db_results.yaml", 'r', encoding='utf-8') as yaml_config:
         results = yaml.load(yaml_config, Loader=yaml.SafeLoader)
 
     yield results
 
-    init_local_test_db.query_from_string("DROP TABLE IF EXISTS test_table;")
+    create_test_db.query_from_string("DROP TABLE IF EXISTS test_table;")
 
 
 class TestDB:

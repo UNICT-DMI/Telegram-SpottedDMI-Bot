@@ -1,21 +1,23 @@
 # pylint: disable=unused-argument,protected-access,no-value-for-parameter
 """TelegramSimulator class"""
+import warnings
 from datetime import datetime
 from typing import overload
-import warnings
+
 from telegram import (
-    Message,
-    User,
-    Chat,
-    Update,
     CallbackQuery,
+    Chat,
     InlineKeyboardButton,
     InlineKeyboardMarkup,
+    Message,
     MessageEntity,
+    Update,
+    User,
 )
 from telegram.ext import Application
-from .telegram_api import TelegramApi
-from main import add_handlers
+from telegram_api import TelegramApi
+
+from spotted.handlers import add_handlers
 
 
 class TelegramSimulator:  # pylint: disable=too-many-public-methods

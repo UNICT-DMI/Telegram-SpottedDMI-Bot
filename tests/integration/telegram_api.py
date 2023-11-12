@@ -2,19 +2,23 @@
 """TelegramApi class"""
 from datetime import datetime
 from typing import TYPE_CHECKING
+
 from telegram import (
-    Message,
-    ReplyKeyboardMarkup,
-    User,
     Chat,
     InlineKeyboardMarkup,
+    Message,
     MessageEntity,
+    ReplyKeyboardMarkup,
+    User,
 )
-from modules.data import Config
+
+from spotted.data import Config
 
 if TYPE_CHECKING:
     from typing import TypedDict
+
     from telegram.constants import ParseMode
+
     from .telegram_simulator import TelegramSimulator
 
     class MessageData(TypedDict):
@@ -65,7 +69,15 @@ class TelegramApi:
         if endpoint == "answerCallbackQuery":
             return True
         if endpoint == "getChat":
-            return self.__chats.get(data["chat_id"], Chat(id=data["chat_id"], type=Chat.PRIVATE)).to_dict()
+            return self.__chats.get(
+                data["chat_id"],
+                Chat(
+                    id=data["chat_id"],
+                    username=f"@{data['chat_id']}",
+                    first_name=str(data["chat_id"]),
+                    type=Chat.PRIVATE,
+                ),
+            ).to_dict()
         if endpoint == "forwardMessage":
             return self.__forward_message(data)
         raise NotImplementedError(f"Endpoint {endpoint} not implemented")

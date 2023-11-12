@@ -1,10 +1,12 @@
 # pylint: disable=unused-argument redefined-outer-name
 """Tests the utility package"""
 from datetime import datetime
+
 import pytest
-from telegram import Update, Message, Chat, User, CallbackQuery
+from telegram import CallbackQuery, Chat, Message, Update, User
 from telegram.ext import Application, CallbackContext
-from modules.utils import EventInfo
+
+from spotted.utils import EventInfo
 
 
 @pytest.fixture(scope="class")

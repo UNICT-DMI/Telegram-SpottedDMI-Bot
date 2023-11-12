@@ -25,30 +25,96 @@ If you want to deploy your own version of this bot, you will need to have a tele
 - You will recieve a token. Whoever knows that token has complete control over your bot, so handle it with care
 - You will need that token later, for it is a needed value in the settings
 
-## 💻 Setting up a local istance
+---
+
+## 📂 Project structure
+
+```shell
+.
+├── .devcontainer # DevContainer configuration for VsCode
+├── .github/workflows # CI/CD workflows
+├── docs # Documentation
+├── scripts # Utility script for setting up the project
+├── src
+│   ├── spotted # Main package
+│   │   ├── __init__.py # Init file for the package
+│   │   ├── __main__.py # Entry point for the package
+│   │   ├── config # Configuration files
+│   │   ├── data # Data related function
+│   │   ├── debug # Debug related functions
+│   │   ├── handlers # Collection of handlers for the bot
+│   │   └── utils # Utility functions
+├── tests # Tests
+│   ├── e2e # End to end tests
+│   ├── integration # Integration tests
+│   └── unit # Unit tests
+├── Dockerfile # Dockerfile used to build the image
+├── pyproject.toml # Package configuration file
+└── README.md # This file
+```
+
+## 💻 Setting up a local instance for contributing (from git)
 
 #### System requirements
 
-- [Python 3 (3.9)](https://www.python.org/downloads/)
-- python-pip3
+- [Python 3 (3.10)](https://www.python.org/downloads/)
+- [pip3](https://pip.pypa.io/en/stable/)
 
-#### Install with _pip3_
+#### Dependencies
 
-Listed in requirements.txt.  
-The main ones are:
+All the requirements are listed in the `pyproject.toml` file.
+The most important ones are:
 
 - [python-telegram-bot](https://pypi.org/project/python-telegram-bot/)
 - [requests](https://pypi.org/project/requests/)
 - [PyYAML](https://pypi.org/project/PyYAML/)
 
+#### Install with _pip3_
+
+```shell
+# [Optional] Create a virtual environment
+python3 -m venv .venv
+
+# [Optional] Activate the virtual environment
+source .venv/bin/activate # Linux
+.venv\Scripts\activate.bat # Windows
+
+# Using the -e flag will install the package in editable mode
+# If you change the code, you won't need to reinstall the package
+# If you want to install it in a non-editable mode, just remove the -e flag
+pip3 install -e .
+```
+
 ### Steps:
 
 - Clone this repository
-- Create [_"config/settings.yaml"_](#⚙️-settings) and edit the desired parameters. **Make sure to add a valid _token_ setting**.
+- Create a [_"settings.yaml"_](#⚙️-settings) file and edit the desired parameters. **It must contain at least a valid _'token'_ and _'post.group_id'_ values**.
+  - You could also skip the files and use [_environment variables_](#settings-override) instead.
 - Make sure the bot is in present both in the admin group and in the spot channel. It may need to have admin privileges. If comments are enabled, the bot has to be in the comment group too as an admin.
-- What follows are some example settings with explaination for each:
+- **Run** `python3 -m spotted` to start the bot
+  - You can change the default path of the config files. Check how with `python -m spotted --help`
 
-- **Run** `python3 main.py`
+## 💻 Setting up a local instance for running (from pip)
+
+#### System requirements
+
+- [Python 3 (3.10)](https://www.python.org/downloads/)
+- [pip3](https://pip.pypa.io/en/stable/)
+
+#### Install with _pip3_
+
+Install the package:
+
+```shell
+pip3 install telegram-spotted-dmi-bot
+```
+
+### Steps:
+
+- Create a [_"settings.yaml"_](#⚙️-settings) file and edit the desired parameters. **It must contain at least a valid _'token'_ and _'post.group_id'_ values**.
+  - You could also skip the files and use [_environment variables_](#settings-override) instead.
+- **Run** `python3 -m spotted` to start the bot
+  - You can change the default path of the config files. Check how with `python -m spotted --help`
 
 ## 🐳 Setting up a Docker container
 
@@ -59,11 +125,9 @@ The main ones are:
 ### Steps:
 
 - Clone this repository
-- Create [_"config/settings.yaml"_](#⚙️-settings) and edit the desired parameters. **Make sure to add a valid _token_ setting**.
-- \[_OPTIONAL_\] You could also leave the settings files alone, and use [_environment variables_](#settings-override) on the container instead.
+- Create a [_"settings.yaml"_](#⚙️-settings) and edit the desired parameters. **It must contain at least a valid _'token'_ and _'post.group_id'_ values**.
+  - You could also skip the files and use [_environment variables_](#settings-override) instead.
 - Make sure the bot is in present both in the admin group and in the spot channel. It may need to have admin privileges. If comments are enabled, the bot has to be in the comment group too as an admin.
-- All the env vars with the same name (case insensitive) will override the ones in the settings file.
-  To update the **post** settings, prefix the env var name with **POST\_**. The same is true for the **test** settings, that have to be prefixed with **TEST\_**.
 - **Run** `docker build --tag botimage .`
 - **Run** `docker run -d --name botcontainer -e TOKEN=<token_arg> [other env vars] botimage`
 
@@ -78,7 +142,7 @@ docker build --tag botimage .
 Then something like
 
 ```bash
-docker run -d --name botcontainer -e TOKEN=<token_arg> -e POST_CHANNEL_ID=-4 -e POST_GROUP_ID=-5 TEST_TOKEN=<token_test> botimage
+docker run -d --name botcontainer -e TOKEN=<token_arg> -e POST_CHANNEL_ID=-4 -e POST_GROUP_ID=-5 botimage
 ```
 
 ### To stop/remove the container:
@@ -101,14 +165,25 @@ The VsCode [Remote - Containers](https://marketplace.visualstudio.com/items?item
 
 ## ⚙️ Settings
 
-When it is initialized, the bot reads both the _"data/yaml/autoreplies.yaml"_ and the _"config/settings.yaml"_ files.  
-Feel free to customize the settings file. Make sure to add a valid **token** value to run the bot.
+When it is initialized, the bot reads both the _"config/yaml/autoreplies.yaml"_ and the _"config/settings.yaml"_ files inside the package, which contain the default values for the settings.
+Then the configuration gets overwritten using the _"settings.yaml"_ and the _"auto_replies.yaml"_ files you provide.
+The bot expects to find both files in the `pwd` directory, meaning the directory from which you run the bot.
+You can change this behaviour by specifying the path to the files with the `--config` and `--auto-replies` flags.
+
+```shell
+python3 -m spotted -c /path/to/settings.yaml -a /path/to/autoreplies.yaml
+```
+
+Feel free to customize the settings file,but make sure to add a valid **token** and **post.group_id** values, since they are mandatory.
 
 ```yaml
 # config/settings.yaml
 debug:
   local_log: false # save each and every message in a log file. Make sure the path "logs/messages.log" is valid when enabled
   reset_on_load: false # whether or not the database should reset every time the bot launches. USE CAREFULLY
+  log_file: "logs/spotted.log" # path to the log file, if local_log is enabled. Relative to the pwd
+  log_error_file: "logs/spotted_error.log" # path to the error log file. Relative to the pwd
+  db_file: "db.sqlite3" # path to the database file. Relative to the pwd
 
 post:
   channel_group_id: -100 # id of the group associated with the channel. Required if comments are enabled
@@ -132,15 +207,6 @@ post:
     # The bots must have delete permission in the group and comments must be enabled
   replace_anonymous_comments: false
 
-test:
-  api_hash: XXXXXXXXXXX # hash of the telegram app used for testing
-  api_id: 123456 # id of the telegram app used for testing
-  remote: false # whether you want to test the remote database, the local one or both
-  session: XXXXXXXXXXXX # session of the telegram app used for testing
-  bot_tag: "@test_bot" # tag of the telegram bot used for testing. Include the '@' character
-  token: xxxxxxxxxxxx # token for the telegram bot used for testing
-  #... all the tags above. They will be overwritten when testing
-
 token: xxxxxxxxxxxx # token of the telegram bot
 bot_tag: "@bot" # tag of the telegram bot
 ```
@@ -149,7 +215,7 @@ bot_tag: "@bot" # tag of the telegram bot
 
 The settings may also be set through environment variables.  
 All the env vars with the same name (case insensitive) will override the ones in the settings file.
-To update the **post** settings, prefix the env var name with **POST\_**. The same is true for the **test** settings, which have to be prefixed with **TEST\_** and the **debug** settings, to be prefixed with **DEBUG\_**.
+To update the **post** settings, prefix the env var name with **POST\_**. The same is true for the **debug** settings, to be prefixed with **DEBUG\_**.
 
 ```env
 # Environment values
@@ -188,6 +254,9 @@ This means that env var will remain strings.
 debug:
   local_log: bool
   reset_on_load: bool
+  log_file: str
+  log_error_file: str
+  db_file: str
 post:
   channel_group_id: int
   channel_id: int
@@ -201,31 +270,48 @@ post:
   report_wait_mins: int
   replace_anonymous_comments: bool
   delete_anonymous_comments: bool
-test:
-  api_hash: str
-  api_id: int
-  session: str
-  bot_tag: str
-  token: str
 token: str
 bot_tag: str
 ```
 
-## 🧪 _[Optional]_ Setting up testing
+## 🧪 _[Optional]_ Setting up testing and linting
+
+If you plan to contribute to this project, you may want to run the tests and the linters locally.
+
+#### Dependencies
+
+All the dev requirements are listed in the `pyproject.toml` file under `[project.optional-dependencies]`.
+
+- [pytest](https://pypi.org/project/pytest/)
+- [pytest-cov](https://pypi.org/project/pytest-cov/)
+- [pytest-mock](https://pypi.org/project/pytest-mock/)
+- [pytest-asyncio](https://pypi.org/project/pytest-asyncio/)
+- [pylint](https://pypi.org/project/pylint/)
+- [black](https://pypi.org/project/black/)
+- [mypy](https://pypi.org/project/my-py/)
 
 #### Install with _pip3_
 
-Listed in requirements_dev.txt
+After having cloned the repository and having installed the main package with `pip3 install -e .`, you can install the dev dependencies with:
 
-- [pytest](https://pypi.org/project/pytest/)
+```shell
+pip3 install -e .[test]
+pip3 install -e .[lint]
+```
 
-#### Steps:
+#### Testing:
 
 - **Run** `pytest tests/unit` to run the unit tests
-- **Run** `pytest tests/e2e` to run the e2e tests (this requires test configurations)
+- **Run** `pytest tests/integration` to run the integration tests
+<!-- TODO -->
+<!-- - **Run** `pytest tests/e2e` to run the e2e tests (this requires test configurations) -->
+
+#### Linting:
+
+- **Run** `pylint src` to lint the code
+- **Run** `black --check src` to make sure the code is formatted correctly. If it is not, you can run `black src` to format it automatically
+- **Run** `mypy src` to check the typing
 
 ## 📚 Documentation
-
-Check the gh-pages branch
 
 [Link to the documentation](https://unict-dmi.github.io/Telegram-SpottedDMI-Bot/)

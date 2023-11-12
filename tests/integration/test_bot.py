@@ -1,27 +1,27 @@
 # pylint: disable=unused-argument,redefined-outer-name
 """Tests the bot functionality"""
 from datetime import datetime
+
 import pytest
 import pytest_asyncio
-from telegram import Chat, Message, MessageEntity, User as TGUser
-from modules.utils.constants import APPROVED_KB, REJECTED_KB
-from modules.data import Config, read_md, DbManager, User, PendingPost, PublishedPost, Report
-from modules.handlers.constants import CHAT_PRIVATE_ERROR
-from .telegram_simulator import TelegramSimulator
+from telegram import Chat, Message, MessageEntity
+from telegram import User as TGUser
+from telegram_simulator import TelegramSimulator
+
+from spotted.data import (
+    Config,
+    DbManager,
+    PendingPost,
+    PublishedPost,
+    Report,
+    User,
+    read_md,
+)
+from spotted.utils.constants import APPROVED_KB, REJECTED_KB
 
 
 @pytest.fixture(scope="function")
-def local_table(init_local_test_db: DbManager) -> DbManager:
-    """Called once per at the beginning of each function.
-    Resets the state of the database
-    """
-    init_local_test_db.query_from_file("data", "db", "post_db_del.sql")
-    init_local_test_db.query_from_file("data", "db", "post_db_init.sql")
-    return init_local_test_db
-
-
-@pytest.fixture(scope="function")
-def telegram(local_table: DbManager) -> TelegramSimulator:
+def telegram(test_table: DbManager) -> TelegramSimulator:
     """Called once per at the beginning of each function.
     Creates a telegram simulator object
 
@@ -308,7 +308,7 @@ class TestBot:
             assert telegram.last_message.text == "L'utente ha ricevuto il messaggio"
 
         async def test_clean_pending(
-            self, local_table: DbManager, telegram: TelegramSimulator, admin_group: Chat, user: TGUser
+            self, test_table: DbManager, telegram: TelegramSimulator, admin_group: Chat, user: TGUser
         ):
             """Tests the /clean_pending command.
             The bot cleans the old pending posts, while ignoring the more recent ones
@@ -316,7 +316,7 @@ class TestBot:
             user2 = TGUser(2, first_name="User2", is_bot=False, username="user2")
             _ = await pending_post(telegram, user=user)
             g_message2 = await pending_post(telegram, user=user2)
-            local_table.update_from(
+            test_table.update_from(
                 "pending_post", "message_date=%s", "g_message_id=%s", (datetime.fromtimestamp(1), g_message2.message_id)
             )
             await telegram.send_command("/clean_pending", chat=admin_group)
@@ -674,7 +674,7 @@ class TestBot:
         """Tests the complete publishing spot pipeline"""
 
         async def test_spot_pipeline(
-            self, telegram: TelegramSimulator, admin_group: Chat, channel: Chat, channel_group: Chat
+            self, telegram: TelegramSimulator, user: TGUser, admin_group: Chat, channel: Chat, channel_group: Chat
         ):
             """Tests the /spot command.
             Complete with yes the spot conversation
@@ -687,20 +687,25 @@ class TestBot:
             assert telegram.last_message.reply_to_message is not None
 
             await telegram.send_callback_query(text="Si")
-            g_message = telegram.last_message
-            assert g_message.text == "Test spot"
+
+            assert telegram.last_message.text == "Test spot"
             assert (
                 telegram.messages[-2].text == "Il tuo post è in fase di valutazione\n"
                 f"Una volta pubblicato, lo potrai trovare su {Config.post_get('channel_tag')}"
             )
-            assert PendingPost.from_group(g_message_id=g_message.message_id, group_id=admin_group.id) is not None
-
-            await telegram.send_callback_query(text="🟢 0", message=g_message)
-            await telegram.send_callback_query(
-                text="🟢 1", message=g_message, user=TGUser(2, first_name="Test2", is_bot=False)
+            assert (
+                PendingPost.from_group(g_message_id=telegram.last_message.message_id, group_id=admin_group.id)
+                is not None
             )
 
-            assert telegram.messages[-3].reply_markup.inline_keyboard[1][0].text == APPROVED_KB
+            user2 = TGUser(2, first_name="Test2", is_bot=False)
+            await telegram.send_callback_query(text="🟢 0", message=telegram.last_message)
+            await telegram.send_callback_query(text="🟢 1", message=telegram.last_message, user=user2)
+
+            g_message = telegram.messages[-3]
+            assert g_message.reply_markup.inline_keyboard[0][0].text == f"🟢 @{user.id}"
+            assert g_message.reply_markup.inline_keyboard[1][0].text == f"🟢 @{user2.id}"
+            assert g_message.reply_markup.inline_keyboard[2][0].text == APPROVED_KB
             assert telegram.last_message.text.startswith("Il tuo ultimo post è stato pubblicato")
 
             c_message = telegram.messages[-2]
@@ -720,17 +725,20 @@ class TestBot:
     class TestRejectSpot:
         """Tests the complete publishing spot pipeline"""
 
-        async def test_reject_spot(self, telegram: TelegramSimulator, admin_group: Chat, pending_post: Message):
+        async def test_reject_spot(
+            self, telegram: TelegramSimulator, user: TGUser, admin_group: Chat, pending_post: Message
+        ):
             """
             Complete with no the spot conversation
             """
+            user2 = TGUser(2, first_name="Test2", is_bot=False)
             await telegram.send_callback_query(text="🔴 0", message=pending_post)
-            await telegram.send_callback_query(
-                text="🔴 1", message=pending_post, user=TGUser(2, first_name="Test2", is_bot=False)
-            )
+            await telegram.send_callback_query(text="🔴 1", message=telegram.last_message, user=user2)
 
             assert telegram.last_message.text.startswith("Il tuo ultimo post è stato rifiutato")
-            assert telegram.messages[-2].reply_markup.inline_keyboard[1][0].text == REJECTED_KB
+            assert telegram.messages[-2].reply_markup.inline_keyboard[0][1].text == f"🔴 @{user.id}"
+            assert telegram.messages[-2].reply_markup.inline_keyboard[1][1].text == f"🔴 @{user2.id}"
+            assert telegram.messages[-2].reply_markup.inline_keyboard[2][0].text == REJECTED_KB
             assert PendingPost.from_group(g_message_id=pending_post.message_id, group_id=admin_group.id) is None
 
         async def test_reject_after_autoreply_spot(self, telegram: TelegramSimulator, pending_post: Message):

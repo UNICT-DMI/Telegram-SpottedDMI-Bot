@@ -2,30 +2,22 @@
 """Tests the bot commands"""
 from datetime import datetime
 from unittest.mock import AsyncMock
+
 import pytest
-from telegram import Update, User, Message, Chat
+from telegram import Chat, Message, Update, User
 from telegram.constants import ParseMode
-from telegram.ext import CallbackContext, Application
-from modules.data import DbManager, read_md
-from modules.handlers import start_cmd, help_cmd, rules_cmd, settings_cmd
-from modules.handlers.constants import CHAT_PRIVATE_ERROR
-from modules.utils import get_settings_kb
+from telegram.ext import Application, CallbackContext
+
+from spotted.data import read_md
+from spotted.handlers import help_cmd, rules_cmd, settings_cmd, start_cmd
+from spotted.handlers.constants import CHAT_PRIVATE_ERROR
+from spotted.utils import get_settings_kb
 
 
 class FixtureRequest:
     """Fixture request class used for type hinting"""
 
     param: str
-
-
-@pytest.fixture(scope="function")
-def local_table(init_local_test_db: DbManager) -> DbManager:
-    """Called once per at the beginning of each function.
-    Resets the state of the database
-    """
-    init_local_test_db.query_from_file("data", "db", "post_db_del.sql")
-    init_local_test_db.query_from_file("data", "db", "post_db_init.sql")
-    return init_local_test_db
 
 
 @pytest.fixture(scope="function")
