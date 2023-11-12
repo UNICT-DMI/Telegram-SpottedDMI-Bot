@@ -91,8 +91,7 @@ pip3 install -e .
 - Create a [_"settings.yaml"_](#⚙️-settings) file and edit the desired parameters. **It must contain at least a valid _'token'_ and _'post.group_id'_ values**.
   - You could also skip the files and use [_environment variables_](#settings-override) instead.
 - Make sure the bot is in present both in the admin group and in the spot channel. It may need to have admin privileges. If comments are enabled, the bot has to be in the comment group too as an admin.
-- **Run** `python3 -m spotted` to start the bot
-  - You can change the default path of the config files. Check how with `python -m spotted --help`
+- **Run** `python3 -m spotted` to [start the bot](#▶️-running-the-bot)
 
 ## 💻 Setting up a local instance for running (from pip)
 
@@ -113,8 +112,7 @@ pip3 install telegram-spotted-dmi-bot
 
 - Create a [_"settings.yaml"_](#⚙️-settings) file and edit the desired parameters. **It must contain at least a valid _'token'_ and _'post.group_id'_ values**.
   - You could also skip the files and use [_environment variables_](#settings-override) instead.
-- **Run** `python3 -m spotted` to start the bot
-  - You can change the default path of the config files. Check how with `python -m spotted --help`
+- **Run** `python3 -m spotted` to [start the bot](#▶️-running-the-bot)
 
 ## 🐳 Setting up a Docker container
 
@@ -125,10 +123,9 @@ pip3 install telegram-spotted-dmi-bot
 ### Steps:
 
 - Clone this repository
-- Create a [_"settings.yaml"_](#⚙️-settings) and edit the desired parameters. **It must contain at least a valid _'token'_ and _'post.group_id'_ values**.
-  - You could also skip the files and use [_environment variables_](#settings-override) instead.
 - Make sure the bot is in present both in the admin group and in the spot channel. It may need to have admin privileges. If comments are enabled, the bot has to be in the comment group too as an admin.
 - **Run** `docker build --tag spotted-image .`
+- When starting the container, use [_environment variables_](#settings-override) to configure the bot.
 - **Run** `docker run -d --name spotted -e TOKEN=<token_arg> [other env vars] spotted-image`
 
 ### Examples
@@ -162,6 +159,24 @@ The VsCode [Remote - Containers](https://marketplace.visualstudio.com/items?item
 ### Steps
 
 - Start VsCode, run the **Remote-Containers: Reopen in container** command from the Command Palette (F1)
+
+## ▶️ Running the bot
+
+After installation, the bot can be started with the command:
+
+```shell
+python3 -m spotted
+```
+
+There are a few command-line arguments you can use to customize the bot behaviour:
+
+- `--settings` or `-s`: path to the _"settings.yaml"_ file. Default: _"./settings.yaml"_ (relative to the pwd)
+- `--auto-replies` or `-a`: path to the _"auto_replies.yaml"_ file. Default: _"./auto_replies.yaml"_ (relative to the pwd)
+
+Also, keep in mind that the bot will generate an sqlite database file in the path indicated by the _settings.yaml_ file named _"spotted.sqlite3"_ by default. The file will be created if missing, but the **path must be valid**.
+Lastly, if logs are enabled, the bot will log under the path specified in _settings.yaml_.
+By default, it would be _"logs/spotted.log"_ and _"logs/spotted_error.log"_.
+The path **will be created** if it does not exist.
 
 ## ⚙️ Settings
 
