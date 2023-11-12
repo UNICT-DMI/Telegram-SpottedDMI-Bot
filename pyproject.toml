@@ -62,7 +62,7 @@ lint = ["pylint", "black", "isort"]
 # URLs of the project
 [project.urls]
 Homepage = "https://unict-dmi.github.io/Telegram-SpottedDMI-Bot/"
-Documentation = "https://unict-dmi.github.io/Telegram-SpottedDMI-Bot/api/modules"
+Documentation = "https://unict-dmi.github.io/Telegram-SpottedDMI-Bot/modules"
 Repository = "https://github.com/UNICT-DMI/Telegram-SpottedDMI-Bot"
 Changelog = "https://github.com/UNICT-DMI/Telegram-SpottedDMI-Bot/blob/main/.github/CHANGELOG.md"
 
