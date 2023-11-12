@@ -107,7 +107,7 @@ class User:
             DbManager.insert_into(table_name="credited_users", columns=("user_id",), values=(self.user_id,))
         return already_credited
 
-    def get_user_sign(self, bot: Bot) -> str:
+    async def get_user_sign(self, bot: Bot) -> str:
         """Generates a sign for the user. It will be a random name for an anonym user
 
         Args:
@@ -118,9 +118,9 @@ class User:
         """
         sign = choice(read_md("anonym_names").split("\n"))  # random sign
         if self.is_credited:  # the user wants to be credited
-            username = bot.get_chat(self.user_id).username
-            if username:
-                sign = "@" + username
+            chat = await bot.get_chat(self.user_id)
+            if chat.username:
+                sign = f"@{chat.username}"
 
         return sign
 

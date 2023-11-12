@@ -36,8 +36,6 @@ class TelegramSimulator:  # pylint: disable=too-many-public-methods
         self.bot = self.app.bot
         self.bot._post = self.weaved_post().__get__(self.bot, self.bot.__class__)
         self.__api = TelegramApi(self)
-        # self.bot.copy_message = self.weaved_copy_message().__get__(self.bot, self.bot.__class__)
-        # self.bot.get_chat = self.weaved_get_chat().__get__(self.bot, self.bot.__class__)
 
     @property
     def last_message(self) -> Message:

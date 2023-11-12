@@ -1,3 +1,4 @@
+# pylint: disable=redefined-outer-name
 """Test configuration"""
 import os
 
@@ -11,6 +12,8 @@ def setup():
     """Called at the beginning of the testing session.
     Sets up the test configuration
     """
+    Config.SETTINGS_PATH = ""  # ensure that no user config are loaded
+    Config.AUTOREPLIES_PATH = ""  # ensure that no user autoreplies are loaded
     Config.reload(True)
     Config.override_settings(
         {

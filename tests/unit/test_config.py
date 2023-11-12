@@ -35,10 +35,8 @@ def config() -> Config:
     Yields:
         Iterator[dict]: dictionary containing the results for the test queries
     """
-    old_path = Config.SETTINGS_PATH
     old_default_path = Config.DEFAULT_SETTINGS_PATH
 
-    Config.SETTINGS_PATH = ""  # ensure that no config are loaded
     Config.DEFAULT_SETTINGS_PATH = os.path.join("tests", "settings.yaml")  # set the test config path
     # create some custom default settings.yaml files
     with open(Config.DEFAULT_SETTINGS_PATH, "w", encoding="utf-8") as settings:
@@ -53,7 +51,6 @@ def config() -> Config:
     os.remove(Config.DEFAULT_SETTINGS_PATH)
     os.remove(f"{Config.DEFAULT_SETTINGS_PATH}.types")
     # restore the old settings
-    Config.SETTINGS_PATH = old_path
     Config.DEFAULT_SETTINGS_PATH = old_default_path
 
 

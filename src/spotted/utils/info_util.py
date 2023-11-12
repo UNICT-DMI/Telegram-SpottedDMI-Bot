@@ -359,7 +359,7 @@ class EventInfo:  # pylint: disable=too-many-public-methods
         channel_group_id = Config.post_get("channel_group_id")
         user_id = self.bot_data.pop(f"{self.forward_from_chat_id},{self.forward_from_id}", -1)
 
-        sign = User(user_id).get_user_sign(bot=self.__bot)
+        sign = await User(user_id).get_user_sign(bot=self.__bot)
         post_message = await self.__bot.send_message(
             chat_id=channel_group_id,
             text=f"by: {sign}",
