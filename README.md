@@ -288,7 +288,7 @@ All the dev requirements are listed in the `pyproject.toml` file under `[project
 - [pytest-asyncio](https://pypi.org/project/pytest-asyncio/)
 - [pylint](https://pypi.org/project/pylint/)
 - [black](https://pypi.org/project/black/)
-- [mypy](https://pypi.org/project/my-py/)
+- [isort](https://pypi.org/project/isort/)
 
 #### Install with _pip3_
 
@@ -308,9 +308,9 @@ pip3 install -e .[lint]
 
 #### Linting:
 
-- **Run** `pylint src` to lint the code
-- **Run** `black --check src` to make sure the code is formatted correctly. If it is not, you can run `black src` to format it automatically
-- **Run** `mypy src` to check the typing
+- **Run** `pylint src tests` to lint the code
+- **Run** `black --check src tests` to make sure the code is formatted correctly. If it is not, you can run `black src` to format it automatically
+- **Run** `isort --check-only src tests` to make sure the imports are sorted correctly. If they are not, you can run `isort src` to sort them automatically
 
 ## 📚 Documentation
 
