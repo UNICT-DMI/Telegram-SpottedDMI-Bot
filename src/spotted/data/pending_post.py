@@ -1,7 +1,9 @@
 """Pending post management"""
 from dataclasses import dataclass
 from datetime import datetime, timezone
+
 from telegram import Message
+
 from .db_manager import DbManager
 
 

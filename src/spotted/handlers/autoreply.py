@@ -1,8 +1,10 @@
 """/autoreply command"""
 from telegram import Update
 from telegram.ext import CallbackContext
+
 from spotted.data import Config, PendingPost, Report
 from spotted.utils import EventInfo
+
 from .approve import reject_post
 
 

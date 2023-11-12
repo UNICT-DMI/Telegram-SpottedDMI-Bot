@@ -1,9 +1,10 @@
 """Handles the management of databases"""
-import os
 import logging
+import os
 import sqlite3
-from .data_reader import read_file
+
 from .config import Config
+from .data_reader import read_file
 
 logger = logging.getLogger(__name__)
 

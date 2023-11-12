@@ -1,6 +1,7 @@
 """Anonym Comment on a post in the comment group"""
 from telegram import Update
 from telegram.ext import CallbackContext
+
 from spotted.data import Config
 from spotted.utils import EventInfo
 
@@ -15,8 +16,8 @@ async def anonymous_comment_msg(update: Update, context: CallbackContext):
     """
     info = EventInfo.from_message(update, context)
 
-    if info.chat_id == Config.post_get('channel_group_id'):
-        if Config.post_get('replace_anonymous_comments'):
+    if info.chat_id == Config.post_get("channel_group_id"):
+        if Config.post_get("replace_anonymous_comments"):
             reply_to_message_id = info.message.reply_to_message.message_id if info.message.reply_to_message else None
             await info.message.copy(chat_id=info.chat_id, reply_to_message_id=reply_to_message_id)
         await info.message.delete()

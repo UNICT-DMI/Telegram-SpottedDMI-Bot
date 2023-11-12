@@ -1,10 +1,13 @@
 """/settings command"""
 import logging
+
 from telegram import Update
 from telegram.constants import ParseMode
 from telegram.ext import CallbackContext
-from spotted.utils import EventInfo, get_settings_kb
+
 from spotted.data import User
+from spotted.utils import EventInfo, get_settings_kb
+
 from .constants import CHAT_PRIVATE_ERROR
 
 logger = logging.getLogger(__name__)

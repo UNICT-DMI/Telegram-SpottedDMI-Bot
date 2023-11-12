@@ -1,6 +1,7 @@
 """Detect Comment on a post in the comment group"""
 from telegram import Update
 from telegram.ext import CallbackContext
+
 from spotted.data import User
 from spotted.utils import EventInfo
 

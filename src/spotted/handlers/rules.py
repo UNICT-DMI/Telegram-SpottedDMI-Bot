@@ -2,6 +2,7 @@
 from telegram import Update
 from telegram.constants import ParseMode
 from telegram.ext import CallbackContext
+
 from spotted.data import read_md
 from spotted.utils import EventInfo
 

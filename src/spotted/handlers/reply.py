@@ -1,6 +1,7 @@
 """/reply command"""
 from telegram import Update
 from telegram.ext import CallbackContext
+
 from spotted.data import PendingPost, Report
 from spotted.utils import EventInfo
 

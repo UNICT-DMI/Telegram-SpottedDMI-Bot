@@ -1,5 +1,6 @@
 """Published post management"""
 from dataclasses import dataclass
+
 from .db_manager import DbManager
 
 

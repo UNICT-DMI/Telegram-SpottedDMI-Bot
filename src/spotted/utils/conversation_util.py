@@ -1,8 +1,10 @@
 """Common functions needed in conversation handlers"""
 from typing import Callable
+
 from telegram import Update
 from telegram.constants import ParseMode
 from telegram.ext import CallbackContext
+
 from spotted.data import read_md
 from spotted.utils.info_util import EventInfo
 

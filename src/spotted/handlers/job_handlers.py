@@ -1,9 +1,11 @@
 """Scheduled jobs of the bot"""
-from datetime import datetime, timezone, timedelta
-from telegram.ext import CallbackContext
+from datetime import datetime, timedelta, timezone
+
 from telegram.error import BadRequest, Forbidden
+from telegram.ext import CallbackContext
+
+from spotted.data import Config, PendingPost
 from spotted.debug import logger
-from spotted.data import get_abs_path, Config, PendingPost, DbManager
 from spotted.utils import EventInfo
 
 
@@ -51,7 +53,7 @@ async def db_backup_job(context: CallbackContext):
     Args:
         context: context passed by the jobqueue
     """
-    path = get_abs_path(*DbManager.db_path)
+    path = Config.debug_get("db_file")
     admin_group_id = Config.post_get("group_id")
     with open(path, "rb") as database_file:
         try:

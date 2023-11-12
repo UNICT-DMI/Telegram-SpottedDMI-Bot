@@ -1,10 +1,12 @@
 """Approve actions the admin can take on a pending post."""
 import logging
+
 from telegram import Update
-from telegram.ext import CallbackContext
 from telegram.error import BadRequest, Forbidden
-from spotted.utils import EventInfo
+from telegram.ext import CallbackContext
+
 from spotted.data import Config, PendingPost
+from spotted.utils import EventInfo
 from spotted.utils.keyboard_util import get_approve_kb, get_paused_kb
 
 logger = logging.getLogger(__name__)

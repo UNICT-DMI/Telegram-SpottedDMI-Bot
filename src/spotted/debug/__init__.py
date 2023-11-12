@@ -1,2 +1,2 @@
 """Modules used during debug"""
-from .log_manager import logger, error_handler, log_message
+from .log_manager import error_handler, log_message, logger

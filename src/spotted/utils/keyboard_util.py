@@ -1,7 +1,9 @@
 """Creates the inlinekeyboard sent by the bot in its messages.
 Callback_data format: <callback_family>_<callback_name>,[arg]"""
 from itertools import islice, zip_longest
-from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Bot
+
+from telegram import Bot, InlineKeyboardButton, InlineKeyboardMarkup
+
 from spotted.data import Config, PendingPost
 from spotted.utils.constants import APPROVED_KB, REJECTED_KB
 

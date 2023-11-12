@@ -1,7 +1,9 @@
 """/purge command"""
 from time import sleep
+
 from telegram import Update
 from telegram.ext import CallbackContext
+
 from spotted.data import DbManager
 from spotted.utils import EventInfo
 

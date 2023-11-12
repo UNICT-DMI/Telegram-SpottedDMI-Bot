@@ -1,7 +1,9 @@
 """Users management"""
-from random import choice
 from dataclasses import dataclass
+from random import choice
+
 from telegram import Bot
+
 from .data_reader import read_md
 from .db_manager import DbManager
 from .pending_post import PendingPost

@@ -1,13 +1,13 @@
 "Handles callback when the 'Follow Spot' button is clicked."
 import logging
-from telegram import Update
-from telegram.ext import CallbackContext
+
+from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
 from telegram.error import Forbidden
-from telegram import InlineKeyboardButton, InlineKeyboardMarkup
-from spotted.utils import EventInfo
+from telegram.ext import CallbackContext
+
 from spotted.data import Config
 from spotted.data.user import User
-
+from spotted.utils import EventInfo
 
 logger = logging.getLogger(__name__)
 

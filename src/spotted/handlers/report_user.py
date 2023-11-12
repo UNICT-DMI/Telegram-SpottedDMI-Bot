@@ -1,9 +1,16 @@
 """/report command"""
 from telegram import Update
-from telegram.ext import CallbackContext, ConversationHandler, CommandHandler, MessageHandler, filters
-from spotted.data import Report
+from telegram.ext import (
+    CallbackContext,
+    CommandHandler,
+    ConversationHandler,
+    MessageHandler,
+    filters,
+)
+
+from spotted.data import Config, Report
 from spotted.utils import EventInfo, conv_cancel
-from spotted.data import Config
+
 from .constants import CHAT_PRIVATE_ERROR, INVALID_MESSAGE_TYPE_ERROR
 
 STATE = {"reporting_user": 1, "reporting_user_reason": 2, "end": -1}

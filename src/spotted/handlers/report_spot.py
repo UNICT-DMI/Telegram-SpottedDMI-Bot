@@ -1,17 +1,18 @@
 """report callback"""
 from telegram import Update
+from telegram.error import Forbidden
 from telegram.ext import (
     CallbackContext,
-    ConversationHandler,
-    CommandHandler,
-    MessageHandler,
     CallbackQueryHandler,
+    CommandHandler,
+    ConversationHandler,
+    MessageHandler,
     filters,
 )
-from telegram.error import Forbidden
-from spotted.data import Report
+
+from spotted.data import Config, Report
 from spotted.utils import EventInfo, conv_cancel
-from spotted.data import Config
+
 from .constants import INVALID_MESSAGE_TYPE_ERROR
 
 STATE = {"reporting_spot": 1, "end": -1}

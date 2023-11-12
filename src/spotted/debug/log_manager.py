@@ -1,15 +1,15 @@
 """Handles the logging of events"""
+import html
 import logging
 import traceback
-import html
-import os
 from datetime import datetime
+from pathlib import Path
+
 from telegram import Update
 from telegram.constants import ParseMode
 from telegram.ext import CallbackContext
-from spotted.data import Config, get_abs_path
-from pathlib import Path
 
+from spotted.data import Config
 
 logging.basicConfig(format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", level=logging.INFO)
 logger = logging.getLogger(__name__)

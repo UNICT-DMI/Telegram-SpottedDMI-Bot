@@ -1,10 +1,15 @@
 """Common info needed in both command and callback handlers"""
-from telegram import Bot, Update, Message, CallbackQuery, Chat, InlineKeyboardMarkup
-from telegram.ext import CallbackContext
+from telegram import Bot, CallbackQuery, Chat, InlineKeyboardMarkup, Message, Update
 from telegram.error import BadRequest
-from spotted.debug.log_manager import logger
+from telegram.ext import CallbackContext
+
 from spotted.data import Config, PendingPost, PublishedPost, User
-from spotted.utils.keyboard_util import get_approve_kb, get_published_post_kb, get_post_outcome_kb
+from spotted.debug.log_manager import logger
+from spotted.utils.keyboard_util import (
+    get_approve_kb,
+    get_post_outcome_kb,
+    get_published_post_kb,
+)
 
 
 class EventInfo:  # pylint: disable=too-many-public-methods
@@ -353,7 +358,9 @@ class EventInfo:  # pylint: disable=too-many-public-methods
             self.bot_data[f"{channel_id},{c_message.message_id}"] = user_id
 
     async def send_post_to_channel_group(self):
-        """Sends the post to the group associated to the channel, so that users can vote the post (if comments are enabled)"""
+        """Sends the post to the group associated to the channel,
+        so that users can vote the post (if comments are enabled)
+        """
 
         message = self.__message
         channel_group_id = Config.post_get("channel_group_id")

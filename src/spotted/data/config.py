@@ -2,12 +2,10 @@
 import logging
 import os
 import re
+from importlib import resources
 from typing import Any, Iterable, Literal
 
 import yaml
-from pkg_resources import resource_filename
-
-import spotted
 
 SettingsKeys = Literal["debug", "post", "test", "token", "bot_tag"]
 SettingsDebugKeys = Literal["local_log", "reset_on_load", "log_file", "log_error_file", "db_file"]
@@ -34,8 +32,8 @@ logger = logging.getLogger(__name__)
 class Config:
     """Configurations"""
 
-    DEFAULT_SETTINGS_PATH = resource_filename(spotted.__name__, os.path.join("config", "yaml", "settings.yaml"))
-    DEFAULT_AUTOREPLIES_PATH = resource_filename(spotted.__name__, os.path.join("config", "yaml", "autoreplies.yaml"))
+    DEFAULT_SETTINGS_PATH = os.path.join(resources.files("spotted"), "config", "yaml", "settings.yaml")
+    DEFAULT_AUTOREPLIES_PATH = os.path.join(resources.files("spotted"), "config", "yaml", "autoreplies.yaml")
     __instance: "Config | None" = None
 
     SETTINGS_PATH = "settings.yaml"

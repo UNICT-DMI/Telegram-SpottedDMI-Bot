@@ -1,18 +1,20 @@
 """/spot command"""
 from random import choice
+
 from telegram import Update
 from telegram.ext import (
     CallbackContext,
-    ConversationHandler,
+    CallbackQueryHandler,
     CommandHandler,
+    ConversationHandler,
     MessageHandler,
     filters,
-    CallbackQueryHandler,
 )
-from spotted.data import User
-from spotted.utils import EventInfo, conv_cancel, get_confirm_kb, get_preview_kb
-from spotted.data import Config
+
+from spotted.data import Config, User
 from spotted.data.data_reader import read_md
+from spotted.utils import EventInfo, conv_cancel, get_confirm_kb, get_preview_kb
+
 from .constants import CHAT_PRIVATE_ERROR, INVALID_MESSAGE_TYPE_ERROR
 
 STATE = {"posting": 1, "previw": 2, "confirm": 3, "end": -1}

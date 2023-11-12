@@ -1,10 +1,8 @@
 """Read data from files"""
 import os
+from importlib import resources
 
-from pkg_resources import resource_filename
 from telegram.helpers import escape_markdown
-
-import spotted
 
 from .config import Config
 
@@ -18,7 +16,7 @@ def get_abs_path(*root_file_path: str) -> str:
     Returns:
         corresponding abs path
     """
-    return resource_filename(spotted.__name__, os.path.join(*root_file_path))
+    return os.path.join(resources.files("spotted"), *root_file_path)
 
 
 def read_file(*root_file_path: str) -> str:
