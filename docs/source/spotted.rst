@@ -1,9 +1,9 @@
-All modules
+Spotted
 ===============
 
 **Description**
 
-.. automodule:: modules
+.. automodule:: spotted
    :members:
    :undoc-members:
    :show-inheritance:
@@ -13,7 +13,7 @@ All modules
 .. toctree::
    :maxdepth: 2
 
-   modules.data
-   modules.debug
-   modules.handlers
-   modules.utils
+   spotted.data
+   spotted.debug
+   spotted.handlers
+   spotted.utils

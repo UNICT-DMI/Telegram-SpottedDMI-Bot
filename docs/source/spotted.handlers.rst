@@ -3,7 +3,7 @@ Handlers modules
 
 **Description**
 
-.. automodule:: modules.handlers
+.. automodule:: spotted.handlers
    :members:
    :undoc-members:
    :show-inheritance:
@@ -11,7 +11,7 @@ Handlers modules
 anonym\_comment
 ---------------------------
 
-.. automodule:: modules.handlers.anonym_comment
+.. automodule:: spotted.handlers.anonym_comment
    :members:
    :undoc-members:
    :show-inheritance:
@@ -19,7 +19,7 @@ anonym\_comment
 approve
 ---------------------------
 
-.. automodule:: modules.handlers.approve
+.. automodule:: spotted.handlers.approve
    :members:
    :undoc-members:
    :show-inheritance:
@@ -27,7 +27,7 @@ approve
 autoreply
 ---------------------------
 
-.. automodule:: modules.handlers.autoreply
+.. automodule:: spotted.handlers.autoreply
    :members:
    :undoc-members:
    :show-inheritance:
@@ -35,7 +35,7 @@ autoreply
 ban
 ---------------------------
 
-.. automodule:: modules.handlers.ban
+.. automodule:: spotted.handlers.ban
    :members:
    :undoc-members:
    :show-inheritance:
@@ -43,7 +43,7 @@ ban
 cancel
 ------------------------------
 
-.. automodule:: modules.handlers.cancel
+.. automodule:: spotted.handlers.cancel
    :members:
    :undoc-members:
    :show-inheritance:
@@ -51,7 +51,7 @@ cancel
 clean\_pending
 --------------------------------------
 
-.. automodule:: modules.handlers.clean_pending
+.. automodule:: spotted.handlers.clean_pending
    :members:
    :undoc-members:
    :show-inheritance:
@@ -59,7 +59,7 @@ clean\_pending
 constants
 ---------------------------------
 
-.. automodule:: modules.handlers.constants
+.. automodule:: spotted.handlers.constants
    :members:
    :undoc-members:
    :show-inheritance:
@@ -67,7 +67,7 @@ constants
 db\_backup
 --------------------------------------
 
-.. automodule:: modules.handlers.db_backup
+.. automodule:: spotted.handlers.db_backup
    :members:
    :undoc-members:
    :show-inheritance:
@@ -75,7 +75,7 @@ db\_backup
 follow\_comment
 --------------------------------------
 
-.. automodule:: modules.handlers.follow_comment
+.. automodule:: spotted.handlers.follow_comment
    :members:
    :undoc-members:
    :show-inheritance:
@@ -83,7 +83,7 @@ follow\_comment
 follow\_spot
 --------------------------------------
 
-.. automodule:: modules.handlers.follow_spot
+.. automodule:: spotted.handlers.follow_spot
    :members:
    :undoc-members:
    :show-inheritance:
@@ -91,7 +91,7 @@ follow\_spot
 forwarded\_post
 ---------------------------------------
 
-.. automodule:: modules.handlers.forwarded_post
+.. automodule:: spotted.handlers.forwarded_post
    :members:
    :undoc-members:
    :show-inheritance:
@@ -99,7 +99,7 @@ forwarded\_post
 help
 ----------------------------
 
-.. automodule:: modules.handlers.help
+.. automodule:: spotted.handlers.help
    :members:
    :undoc-members:
    :show-inheritance:
@@ -107,7 +107,7 @@ help
 job\_handlers
 -------------------------------------
 
-.. automodule:: modules.handlers.job_handlers
+.. automodule:: spotted.handlers.job_handlers
    :members:
    :undoc-members:
    :show-inheritance:
@@ -115,7 +115,7 @@ job\_handlers
 purge
 -----------------------------
 
-.. automodule:: modules.handlers.purge
+.. automodule:: spotted.handlers.purge
    :members:
    :undoc-members:
    :show-inheritance:
@@ -123,7 +123,7 @@ purge
 reply
 -----------------------------
 
-.. automodule:: modules.handlers.reply
+.. automodule:: spotted.handlers.reply
    :members:
    :undoc-members:
    :show-inheritance:
@@ -131,7 +131,7 @@ reply
 report\_spot
 ------------------------------------
 
-.. automodule:: modules.handlers.report_spot
+.. automodule:: spotted.handlers.report_spot
    :members:
    :undoc-members:
    :show-inheritance:
@@ -139,7 +139,7 @@ report\_spot
 report\_user
 ------------------------------------
 
-.. automodule:: modules.handlers.report_user
+.. automodule:: spotted.handlers.report_user
    :members:
    :undoc-members:
    :show-inheritance:
@@ -147,7 +147,7 @@ report\_user
 rules
 -----------------------------
 
-.. automodule:: modules.handlers.rules
+.. automodule:: spotted.handlers.rules
    :members:
    :undoc-members:
    :show-inheritance:
@@ -155,7 +155,7 @@ rules
 sban
 ----------------------------
 
-.. automodule:: modules.handlers.sban
+.. automodule:: spotted.handlers.sban
    :members:
    :undoc-members:
    :show-inheritance:
@@ -163,7 +163,7 @@ sban
 settings
 --------------------------------
 
-.. automodule:: modules.handlers.settings
+.. automodule:: spotted.handlers.settings
    :members:
    :undoc-members:
    :show-inheritance:
@@ -171,7 +171,7 @@ settings
 spot
 ----------------------------
 
-.. automodule:: modules.handlers.spot
+.. automodule:: spotted.handlers.spot
    :members:
    :undoc-members:
    :show-inheritance:
@@ -179,7 +179,7 @@ spot
 start
 -----------------------------
 
-.. automodule:: modules.handlers.start
+.. automodule:: spotted.handlers.start
    :members:
    :undoc-members:
    :show-inheritance:

@@ -3,7 +3,7 @@ Utils modules
 
 **Description**
 
-.. automodule:: modules.utils
+.. automodule:: spotted.utils
    :members:
    :undoc-members:
    :show-inheritance:
@@ -11,7 +11,7 @@ Utils modules
 info\_util
 -------------------------------
 
-.. automodule:: modules.utils.info_util
+.. automodule:: spotted.utils.info_util
    :members:
    :undoc-members:
    :show-inheritance:
@@ -19,7 +19,7 @@ info\_util
 keyboard\_util
 -----------------------------------
 
-.. automodule:: modules.utils.keyboard_util
+.. automodule:: spotted.utils.keyboard_util
    :members:
    :undoc-members:
    :show-inheritance:
@@ -27,7 +27,7 @@ keyboard\_util
 conversation\_util
 -----------------------------------
 
-.. automodule:: modules.utils.conversation_util
+.. automodule:: spotted.utils.conversation_util
    :members:
    :undoc-members:
    :show-inheritance:

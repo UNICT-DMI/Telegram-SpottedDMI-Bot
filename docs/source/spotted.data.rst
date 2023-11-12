@@ -3,7 +3,7 @@ Data modules
 
 **Description**
 
-.. automodule:: modules.data
+.. automodule:: spotted.data
    :members:
    :undoc-members:
    :show-inheritance:
@@ -11,7 +11,7 @@ Data modules
 config
 --------------------------------
 
-.. automodule:: modules.data.config
+.. automodule:: spotted.data.config
    :members:
    :undoc-members:
    :show-inheritance:
@@ -19,7 +19,7 @@ config
 data\_reader
 --------------------------------
 
-.. automodule:: modules.data.data_reader
+.. automodule:: spotted.data.data_reader
    :members:
    :undoc-members:
    :show-inheritance:
@@ -27,7 +27,7 @@ data\_reader
 db\_manager
 -------------------------------
 
-.. automodule:: modules.data.db_manager
+.. automodule:: spotted.data.db_manager
    :members:
    :undoc-members:
    :show-inheritance:
@@ -35,7 +35,7 @@ db\_manager
 pending\_post
 ---------------------------------
 
-.. automodule:: modules.data.pending_post
+.. automodule:: spotted.data.pending_post
    :members:
    :undoc-members:
    :show-inheritance:
@@ -43,7 +43,7 @@ pending\_post
 post\_data
 ------------------------------
 
-.. automodule:: modules.data.post_data
+.. automodule:: spotted.data.post_data
    :members:
    :undoc-members:
    :show-inheritance:
@@ -51,7 +51,7 @@ post\_data
 published\_post
 -----------------------------------
 
-.. automodule:: modules.data.published_post
+.. automodule:: spotted.data.published_post
    :members:
    :undoc-members:
    :show-inheritance:
@@ -59,7 +59,7 @@ published\_post
 report
 --------------------------
 
-.. automodule:: modules.data.report
+.. automodule:: spotted.data.report
    :members:
    :undoc-members:
    :show-inheritance:
@@ -67,7 +67,7 @@ report
 user
 ------------------------
 
-.. automodule:: modules.data.user
+.. automodule:: spotted.data.user
    :members:
    :undoc-members:
    :show-inheritance:

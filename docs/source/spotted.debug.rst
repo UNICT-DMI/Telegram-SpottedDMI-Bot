@@ -3,7 +3,7 @@ Debug Modules
 
 **Description**
 
-.. automodule:: modules.debug
+.. automodule:: spotted.debug
    :members:
    :undoc-members:
    :show-inheritance:
@@ -11,7 +11,7 @@ Debug Modules
 log\_manager
 ---------------------------------
 
-.. automodule:: modules.debug.log_manager
+.. automodule:: spotted.debug.log_manager
    :members:
    :undoc-members:
    :show-inheritance:

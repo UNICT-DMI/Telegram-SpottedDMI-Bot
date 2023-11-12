@@ -13,10 +13,8 @@ For the complete source code, check this github `repo <https://github.com/UNICT-
    :maxdepth: 3
    :caption: Contents:
 
-   main
-   modules
+   spotted
    dbschema
-   tests
 
 Indices and tables
 ==================
