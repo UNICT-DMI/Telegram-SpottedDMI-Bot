@@ -57,7 +57,7 @@ dynamic = ['version']
 # e.g. `pip install telegram-spotted-dmi-bot[test]`
 [project.optional-dependencies]
 test = ["pytest", "pytest-asyncio", "pytest-cov", "pytest-mock"]
-lint = ["pylint", "black", "mypy", "isort"]
+lint = ["pylint", "black", "isort"]
 
 # URLs of the project
 [project.urls]
@@ -109,7 +109,7 @@ ignore = ['tests']
 fail-under = '10.0'
 
 [tool.pylint.'MESSAGES CONTROL']
-disable = ["missing-module-docstring"]
+disable = ["missing-module-docstring", "too-few-public-methods"]
 
 [tool.pylint.format]
 max-line-length = 120
