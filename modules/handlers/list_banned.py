@@ -31,6 +31,4 @@ def write_banned_list(users: list)->str:
         datetime_object = datetime.strptime(user['ban_date'], '%Y-%m-%d %H:%M:%S')
         date = datetime_object.strftime('%d/%m/%Y %H:%M')
         text += f"• {user['user_id']} bannato il {date}\n"
-        
     return text
-
