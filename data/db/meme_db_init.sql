@@ -45,6 +45,7 @@ CREATE TABLE IF NOT EXISTS credited_users
 CREATE TABLE IF NOT EXISTS banned_users
 (
   user_id BIGINT NOT NULL,
+  ban_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (user_id)
 );
 -----
