@@ -28,7 +28,7 @@ from .start import start_cmd
 from .stats import stats_callback, stats_cmd
 from .follow_spot import follow_spot_callback
 from .follow_comment import follow_spot_comment
-
+from .list_banned import list_banned_cmd
 
 def add_commands(updater: Updater):
     """Adds the list of commands with their description to the bot
@@ -86,6 +86,7 @@ def add_handlers(disp: Dispatcher):
     disp.add_handler(CommandHandler("stats", stats_cmd, filters=Filters.chat_type.private))
     disp.add_handler(CommandHandler("settings", settings_cmd, filters=Filters.chat_type.private))
     disp.add_handler(CommandHandler("sban", sban_cmd, filters=admin_filter))
+    disp.add_handler(CommandHandler("list_banned", list_banned_cmd, filters=admin_filter))
     disp.add_handler(CommandHandler("clean_pending", clean_pending_cmd, filters=admin_filter))
     disp.add_handler(CommandHandler("db_backup", db_backup_cmd, run_async=True, filters=admin_filter))
     disp.add_handler(CommandHandler("purge", purge_cmd, run_async=True, filters=admin_filter))
