@@ -6,8 +6,8 @@ from modules.data import DbManager
 from modules.utils import EventInfo
 
 def list_banned_cmd(update: Update, context: CallbackContext):
-    """The command to get a list of the current banned users
-    with the user_id and date and time of the ban   
+    """Handles the /ban command.
+    Send a message with a list of the currently banned users
 
     Args:
         update (Update): update event
