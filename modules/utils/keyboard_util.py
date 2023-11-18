@@ -227,7 +227,7 @@ def get_post_outcome_kb(bot: Bot, votes: list[tuple[int, bool]], reason: Optiona
             InlineKeyboardButton(f"🔴 {bot.get_chat(reject).username}" if reject else '', callback_data="none")
         ])
 
-    is_approved = len(approved_by) > len(rejected_by)
+    is_approved = len(approved_by) > len(rejected_by) and reason is None
     outcome_text = APPROVED_KB if is_approved else REJECTED_KB
 
     if reason is not None and not is_approved:
