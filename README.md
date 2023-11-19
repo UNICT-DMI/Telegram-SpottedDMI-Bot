@@ -128,6 +128,16 @@ pip3 install telegram-spotted-dmi-bot
 - When starting the container, use [_environment variables_](#settings-override) to configure the bot.
 - **Run** `docker run -d --name spotted -e TOKEN=<token_arg> [other env vars] spotted-image`
 
+> [!Tip]  
+> When it is built, the container will copy the _"settings.yaml"_ and the _"autoreplies.yaml"_ files, in the root directory, if present.
+> While it is possible to provide the configuration this way, it is recommended to use the environment variables instead, as they will override the values from the files.
+
+> [!Warning]  
+> The database file created inside the container will be lost when the container is removed.
+> If you want to keep the database, you should mount a volume to the container.
+> You can do so by adding the `-v <host_path>:<container_path>` flag to the `docker run` command.
+> See the [examples](#mounting-a-volume) for more details.
+
 ### Examples
 
 First run
@@ -139,7 +149,37 @@ docker build --tag spotted-image .
 Then something like
 
 ```bash
-docker run -d --name botcontainer -e TOKEN=<token_arg> -e POST_CHANNEL_ID=-4 -e POST_GROUP_ID=-5 spotted-image
+docker run -d --name botcontainer -e TOKEN=<token_arg> -e POST_CHANNEL_ID=-4 -e POST_GROUP_ID=-5 -e POST_CHANNEL_GROUP_ID=-6 spotted-image
+```
+
+If you want to check the logs in real time, you can run
+
+```bash
+# -f flag to follow the logs, otherwise it will just print the last ones
+docker logs -f botcontainer
+```
+
+If you want to access the container's shell, you can run
+
+```bash
+docker exec -it botcontainer /bin/bash
+```
+
+#### Mounting a volume
+
+If you want to keep the database file, you can mount a volume to the container.
+This will assume the default database path, which is _"./spotted.sqlite3"_.
+
+```bash
+# The file will survive the container removal, stored in the volume "spotted-db"
+docker run -d --name botcontainer -v spotted-db:/app -e TOKEN=<token_arg> -e POST_CHANNEL_ID=-4 -e POST_GROUP_ID=-5 -e POST_CHANNEL_GROUP_ID=-6 spotted-image
+```
+
+If you want to be able to access the database file from the host, you can use a bind mount instead.
+
+```bash
+# The file will be available in the host under the path "./spotted.sqlite3"
+docker run -d --name botcontainer -v .:/app -e TOKEN=<token_arg> -e POST_CHANNEL_ID=-4 -e POST_GROUP_ID=-5 -e POST_CHANNEL_GROUP_ID=-6 spotted-image
 ```
 
 ### To stop/remove the container:
@@ -198,7 +238,7 @@ debug:
   reset_on_load: false # whether or not the database should reset every time the bot launches. USE CAREFULLY
   log_file: "logs/spotted.log" # path to the log file, if local_log is enabled. Relative to the pwd
   log_error_file: "logs/spotted_error.log" # path to the error log file. Relative to the pwd
-  db_file: "db.sqlite3" # path to the database file. Relative to the pwd
+  db_file: "spotted.sqlite3" # path to the database file. Relative to the pwd
 
 post:
   channel_group_id: -100 # id of the group associated with the channel. Required if comments are enabled
@@ -292,6 +332,11 @@ bot_tag: str
 ## 🧪 _[Optional]_ Setting up testing and linting
 
 If you plan to contribute to this project, you may want to run the tests and the linters locally.
+
+> [!Note]  
+> When creating a pull request, all the tests and linters will be run automatically using the [github actions](.github/workflows).
+> If the tests fail, the pull request won't be merged until all the errors are fixed.
+> Hence, it is recommended to run the tests and the linters locally before pushing your changes.
 
 #### Dependencies
 
