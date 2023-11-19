@@ -29,6 +29,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Split the `callback_handlers` functions in multiple files and avoid using `globals`
 - All configuration files are now intern to the bot and serve as the default. When launched, the bot will look for some user-provided configurations that will override the defaults. Their path can be configured through command-line arguments.
 - Support for changing the main branch from good old "upgrade" to "main" (must be done in the repo settings)
+- Use `sqlite3.PARSE_DECLTYPES` for the database connection to perform an automatic conversion between `datetime` (python) and `timestamp` (sqlite) types
 
 ### Removed
 

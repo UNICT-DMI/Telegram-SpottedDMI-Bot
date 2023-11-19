@@ -59,7 +59,7 @@ class DbManager:
         if not os.path.exists(db_file):
             with open(db_file, "w", encoding="utf-8"):
                 pass
-        conn = sqlite3.connect(db_file)
+        conn = sqlite3.connect(db_file, detect_types=sqlite3.PARSE_DECLTYPES)
         conn.row_factory = cls.row_factory
         cur = conn.cursor()
         return conn, cur

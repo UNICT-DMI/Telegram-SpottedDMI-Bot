@@ -146,7 +146,7 @@ class Report:
         return cls(
             user_id=report["user_id"],
             target_username=report["target_username"],
-            date=datetime.strptime(report["message_date"], "%Y-%m-%d %H:%M:%S.%f"),
+            date=report["message_date"],
             group_id=report["group_id"],
             g_message_id=report["g_message_id"],
         )
@@ -174,7 +174,7 @@ class Report:
             return cls(
                 user_id=report["user_id"],
                 target_username=report["target_username"],
-                date=datetime.strptime(report["message_date"], "%Y-%m-%d %H:%M:%S.%f"),
+                date=report["message_date"],
                 group_id=report["group_id"],
                 g_message_id=report["g_message_id"],
             )
