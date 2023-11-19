@@ -127,7 +127,7 @@ async def spot_preview_query(update: Update, context: CallbackContext) -> int:
     """
     info = EventInfo.from_callback(update, context)
     arg = info.query_data.split(",")[1]
-    info.user_data["preview"] = arg == "accept"
+    info.user_data["show_preview"] = arg == "accept"
     await info.bot.edit_message_text(
         chat_id=info.chat_id,
         message_id=info.message_id,
