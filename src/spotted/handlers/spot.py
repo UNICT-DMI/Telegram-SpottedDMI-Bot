@@ -17,7 +17,7 @@ from spotted.utils import EventInfo, conv_cancel, get_confirm_kb, get_preview_kb
 
 from .constants import CHAT_PRIVATE_ERROR, INVALID_MESSAGE_TYPE_ERROR
 
-STATE = {"posting": 1, "previw": 2, "confirm": 3, "end": -1}
+STATE = {"posting": 1, "preview": 2, "confirm": 3, "end": -1}
 
 
 def spot_conv_handler() -> ConversationHandler:
@@ -36,7 +36,7 @@ def spot_conv_handler() -> ConversationHandler:
             STATE["posting"]: [
                 MessageHandler(~filters.COMMAND & ~filters.UpdateType.EDITED_MESSAGE, spot_msg),
             ],
-            STATE["previw"]: [CallbackQueryHandler(spot_preview_query, pattern=r"^post_preview,.+")],
+            STATE["preview"]: [CallbackQueryHandler(spot_preview_query, pattern=r"^post_preview,.+")],
             STATE["confirm"]: [CallbackQueryHandler(spot_confirm_query, pattern=r"^post_confirm,.+")],
         },
         fallbacks=[CommandHandler("cancel", conv_cancel("spot"))],
@@ -100,7 +100,7 @@ async def spot_msg(update: Update, context: CallbackContext) -> int:
                 reply_to_message_id=info.message_id,
                 reply_markup=get_preview_kb(),
             )
-            return STATE["previw"]
+            return STATE["preview"]
 
     await info.bot.send_message(
         chat_id=info.chat_id,
