@@ -118,13 +118,12 @@ class User:
         Returns:
             the sign of the user
         """
-        sign = choice(read_md("anonym_names").split("\n"))  # random sign
         if self.is_credited:  # the user wants to be credited
             chat = await bot.get_chat(self.user_id)
             if chat.username:
-                sign = f"@{chat.username}"
+                return f"@{chat.username}"
 
-        return sign
+        return choice(read_md("anonym_names").split("\n"))  # random sign
 
     def is_following(self, message_id: int) -> bool:
         """Verifies if the user is following a post
