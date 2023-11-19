@@ -12,6 +12,7 @@
 #
 import os
 import sys
+import shutil
 
 sys.path.insert(0, os.path.abspath("../.."))  # path to the actual project root folder
 
@@ -66,9 +67,43 @@ html_logo = "_static/img/spotted-logo.jpg"
 
 # -- Extension configuration -------------------------------------------------
 
-# Configuration of "sphinx_autodoc_typehints"
+# -- Configuration of "sphinx_autodoc_typehints" -----------------------------
 typehints_use_rtype = False
 typehints_defaults = "comma"
+
+# -- Run sphinx-apidoc -------------------------------------------------------
+# This hack is necessary since RTD does not issue `sphinx-apidoc` before running
+# `sphinx-build -b html . _build/html`. See Issue:
+# https://github.com/readthedocs/readthedocs.org/issues/1139
+# DON'T FORGET: Check the box "Install your project inside a virtualenv using
+# setup.py install" in the RTD Advanced Settings.
+# Additionally it helps us to avoid running apidoc manually
+
+try:  # for Sphinx >= 1.7
+    from sphinx.ext import apidoc
+except ImportError:
+    from sphinx import apidoc
+
+output_dir = os.path.join(os.path.dirname(__file__), "api")
+module_dir = os.path.join(os.path.dirname(__file__), "../../src/spotted")
+try:
+    shutil.rmtree(output_dir)
+except FileNotFoundError:
+    pass
+
+try:
+    import sphinx
+
+    cmd_line = f"sphinx-apidoc --implicit-namespaces -f -o {output_dir} {module_dir}"
+
+    args = cmd_line.split(" ")
+    if tuple(sphinx.__version__.split(".")) >= ("1", "7"):
+        # This is a rudimentary parse_version to avoid external dependencies
+        args = args[1:]
+
+    apidoc.main(args)
+except Exception as e:
+    print("Running `sphinx-apidoc` failed!\n{}".format(e))
 
 # -- External mapping --------------------------------------------------------
 python_version = ".".join(map(str, sys.version_info[0:2]))

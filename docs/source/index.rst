@@ -10,11 +10,11 @@ You can find this bot live on telegram `@Spotted_DMI_bot <https://telegram.me/Sp
 For the complete source code, check this github `repo <https://github.com/UNICT-DMI/Telegram-SpottedDMI-Bot/tree/upgrade>`_
 
 .. toctree::
-   :maxdepth: 3
+   :maxdepth: 2
    :caption: Contents:
 
-   spotted
-   dbschema
+   Modules <api/modules>
+   Database Schema <dbschema>
 
 Indices and tables
 ==================
