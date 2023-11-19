@@ -29,6 +29,7 @@ from .forwarded_post import forwarded_post_msg
 from .help import help_cmd
 from .job_handlers import clean_pending_job, db_backup_job
 from .purge import purge_cmd
+from .reload import reload_cmd
 from .reply import reply_cmd
 from .report_spot import report_spot_conv_handler
 from .report_user import report_user_conv_handler
@@ -58,11 +59,12 @@ async def add_commands(app: Application):
         BotCommand("settings", "cambia le impostazioni di privacy"),
     ]
     admin_commands = [
-        BotCommand("sban", "banna un utente"),
-        BotCommand("clean_pending", "elimina tutti gli spot in sospeso"),
-        BotCommand("db_backup", "esegui il backup del database"),
-        BotCommand("reply", "rispondi ad uno spot o un report"),
         BotCommand("ban", "banna un utente"),
+        BotCommand("sban", "banna un utente"),
+        BotCommand("reply", "rispondi ad uno spot o un report"),
+        BotCommand("reload", "ricarica la configurazione del bot"),
+        BotCommand("db_backup", "esegui il backup del database"),
+        BotCommand("clean_pending", "elimina tutti gli spot in sospeso"),
     ]
     await app.bot.set_my_commands(private_chat_commands, scope=BotCommandScopeAllPrivateChats())
     await app.bot.set_my_commands(admin_commands, scope=BotCommandScopeChat(Config.post_get("group_id")))
@@ -112,6 +114,7 @@ def add_handlers(app: Application):
     app.add_handler(CommandHandler("clean_pending", clean_pending_cmd, filters=admin_filter))
     app.add_handler(CommandHandler("db_backup", db_backup_cmd, filters=admin_filter))
     app.add_handler(CommandHandler("purge", purge_cmd, filters=admin_filter))
+    app.add_handler(CommandHandler("reload", reload_cmd, filters=admin_filter))
 
     # MessageHandler
     app.add_handler(MessageHandler(filters.REPLY & admin_filter & filters.Regex(r"^/ban$"), ban_cmd))

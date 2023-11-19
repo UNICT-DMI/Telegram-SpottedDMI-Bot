@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Add **/reload** command to reload the bot configuration without restarting it
 - Add banned users list to the **/sban** command [ closes #124 ]
 - Add scoped command list to differentiate between user and admin commands
 - Added python package anyone can install to immediately run the bot, without going through git
@@ -19,6 +20,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - Anonymous messages are deleted [ rebase over #132 ]
+- Preview feature [ cherry-pick #138 ]
+- Display the right message when the post is rejected with a reason [ cherry-pick #139 ]
 
 ### Changed
 

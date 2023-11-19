@@ -120,6 +120,14 @@ purge
    :undoc-members:
    :show-inheritance:
 
+reload
+-----------------------------
+
+.. automodule:: spotted.handlers.reload
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 reply
 -----------------------------
 
