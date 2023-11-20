@@ -16,8 +16,7 @@ async def anonymous_comment_msg(update: Update, context: CallbackContext):
     """
     info = EventInfo.from_message(update, context)
 
-    if info.chat_id == Config.post_get("community_group_id"):
-        if Config.post_get("replace_anonymous_comments"):
-            reply_to_message_id = info.message.reply_to_message.message_id if info.message.reply_to_message else None
-            await info.message.copy(chat_id=info.chat_id, reply_to_message_id=reply_to_message_id)
-        await info.message.delete()
+    if Config.post_get("replace_anonymous_comments"):
+        reply_to_message_id = info.message.reply_to_message.message_id if info.message.reply_to_message else None
+        await info.message.copy(chat_id=info.chat_id, reply_to_message_id=reply_to_message_id)
+    await info.message.delete()

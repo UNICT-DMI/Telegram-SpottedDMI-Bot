@@ -84,7 +84,7 @@ def add_handlers(app: Application):
         app.add_handler(MessageHandler(filters.ALL, log_message), 1)
 
     admin_filter = filters.Chat(chat_id=Config.post_get("admin_group_id"))
-    channel_group_filter = filters.Chat(chat_id=Config.post_get("community_group_id"))
+    community_filter = filters.Chat(chat_id=Config.post_get("community_group_id"))
 
     # Error handler
     app.add_error_handler(error_handler)
@@ -122,16 +122,16 @@ def add_handlers(app: Application):
     app.add_handler(CallbackQueryHandler(follow_spot_callback, pattern=r"^follow_\.*"))
 
     if Config.post_get("comments"):
-        app.add_handler(MessageHandler(channel_group_filter & filters.IS_AUTOMATIC_FORWARD, forwarded_post_msg))
+        app.add_handler(MessageHandler(community_filter & filters.IS_AUTOMATIC_FORWARD, forwarded_post_msg))
     if Config.post_get("delete_anonymous_comments"):
         app.add_handler(
             MessageHandler(
-                channel_group_filter & filters.SenderChat.CHANNEL & ~filters.IS_AUTOMATIC_FORWARD,
+                community_filter & filters.SenderChat.CHANNEL & ~filters.IS_AUTOMATIC_FORWARD,
                 anonymous_comment_msg,
             )
         )
 
-    app.add_handler(MessageHandler(channel_group_filter & filters.REPLY, follow_spot_comment))
+    app.add_handler(MessageHandler(community_filter & filters.REPLY, follow_spot_comment))
 
 
 def add_jobs(app: Application):

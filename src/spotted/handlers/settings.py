@@ -8,8 +8,6 @@ from telegram.ext import CallbackContext
 from spotted.data import User
 from spotted.utils import EventInfo, get_settings_kb
 
-from .constants import CHAT_PRIVATE_ERROR
-
 logger = logging.getLogger(__name__)
 
 
@@ -22,10 +20,6 @@ async def settings_cmd(update: Update, context: CallbackContext):
         context: context passed by the handler
     """
     info = EventInfo.from_message(update, context)
-    if not info.is_private_chat:  # you can only post with a private message
-        await info.bot.send_message(chat_id=info.chat_id, text=CHAT_PRIVATE_ERROR)
-        return
-
     await info.bot.send_message(
         chat_id=info.chat_id,
         text="***Come vuoi che sia il tuo post:***",

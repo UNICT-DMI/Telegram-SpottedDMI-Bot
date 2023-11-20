@@ -8,16 +8,15 @@ from telegram import Chat, Message, Update, User
 from telegram.constants import ParseMode
 from telegram.ext import Application, CallbackContext
 
-from spotted.data import read_md
+from spotted.data import Config, read_md
 from spotted.handlers import help_cmd, rules_cmd, settings_cmd, start_cmd
-from spotted.handlers.constants import CHAT_PRIVATE_ERROR
 from spotted.utils import get_settings_kb
 
 
 class FixtureRequest:
     """Fixture request class used for type hinting"""
 
-    param: str
+    param: tuple[int, str]
 
 
 @pytest.fixture(scope="function")
@@ -28,10 +27,11 @@ def context() -> CallbackContext:
     return CallbackContext(app)
 
 
-@pytest.fixture(scope="function", params=[Chat.GROUP])
+@pytest.fixture(scope="function", params=[(0, Chat.GROUP)])
 def update(request: FixtureRequest) -> Update:
     """Return a Telegram event, consisting of an Update and a CallbackContext"""
-    chat = Chat(id=0, type=request.param)
+    chat_id, chat_type = request.param
+    chat = Chat(id=chat_id, type=chat_type)
     user = User(id=0, first_name="user", is_bot=False, username="user")
     message = Message(message_id=0, from_user=user, chat=chat, date=datetime.now())
     return Update(update_id=0, message=message)
@@ -68,6 +68,19 @@ class TestCommands:
                 disable_web_page_preview=True,
             )
 
+        @pytest.mark.parametrize("update", [(Config.post_get("admin_group_id"), Chat.GROUP)], indirect=True)
+        async def test_help_admin_cmd(self, update: Update, context: CallbackContext):
+            """Tests the /help command.
+            The bot sends the help response to the user
+            """
+            await help_cmd(update, context)
+            context.bot.send_message.assert_called_once_with(
+                chat_id=update.message.chat_id,
+                text=read_md("instructions"),
+                parse_mode=ParseMode.MARKDOWN_V2,
+                disable_web_page_preview=True,
+            )
+
         async def test_rules_cmd(self, update: Update, context: CallbackContext):
             """Tests the /rules command.
             The bot sends the rules response to the user
@@ -80,7 +93,6 @@ class TestCommands:
                 disable_web_page_preview=True,
             )
 
-        @pytest.mark.parametrize("update", [Chat.PRIVATE], indirect=True)
         async def test_settings_cmd(self, update: Update, context: CallbackContext):
             """Tests the /settings command.
             The bot sends the settings response to the user
@@ -92,11 +104,3 @@ class TestCommands:
                 parse_mode=ParseMode.MARKDOWN_V2,
                 reply_markup=get_settings_kb(),
             )
-
-        @pytest.mark.parametrize("update", [Chat.GROUP, Chat.CHANNEL], indirect=True)
-        async def test_settings_cmd_not_private(self, update: Update, context: CallbackContext):
-            """Tests the /settings command.
-            The user is not in a private chat with the bot, so the bot sends an error message
-            """
-            await settings_cmd(update, context)
-            context.bot.send_message.assert_called_once_with(chat_id=update.message.chat_id, text=CHAT_PRIVATE_ERROR)
