@@ -19,10 +19,10 @@ async def follow_spot_comment(update: Update, context: CallbackContext):
     # Get the spot's message_id
     reply_to_message_id = info.message.message_thread_id
     # Get a list of users who are following the spot
-    users_and_private_message_ids = User.following_users(reply_to_message_id)
+    users = User.following_users(reply_to_message_id)
 
     # Send them an update about the new comment
-    for user, private_message_id in users_and_private_message_ids:
+    for user in users:
         # Avoid sending if it's made by the same user
         if not user.user_id == info.message.from_user.id:
-            await info.message.copy(chat_id=user.user_id, reply_to_message_id=private_message_id)
+            await info.message.copy(chat_id=user.user_id, reply_to_message_id=user.private_message_id)

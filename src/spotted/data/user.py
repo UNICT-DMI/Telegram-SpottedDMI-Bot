@@ -15,8 +15,10 @@ class User:
 
     Args:
         user_id: id of the user
+        private_message_id: id of the private message sent by the user to the bot. Only used for following
     """
 
+    private_message_id: int | None = None
     user_id: int
 
     @property
@@ -38,7 +40,8 @@ class User:
     def banned_users(cls) -> "list[User]":
         """Returns a list of all the banned users"""
         return [
-            cls(user_id=row["user_id"]) for row in DbManager.select_from(table_name="banned_users", select="user_id")
+            cls(user_id=row["user_id"], ban_date=row["ban_date"])
+            for row in DbManager.select_from(table_name="banned_users", select="user_id, ban_date")
         ]
 
     @classmethod
@@ -49,7 +52,7 @@ class User:
         ]
 
     @classmethod
-    def following_users(cls, message_id: int) -> "list[tuple[User, int]]":
+    def following_users(cls, message_id: int) -> "list[User]":
         """Returns a list of all the users following the post with the associated private message id
         used by the bot to send updates about the post by replying to it
 
@@ -57,11 +60,11 @@ class User:
             message_id: id of the post the users are following
 
         Returns:
-            list of tuples (user, private_message_id), where private_message_id is the id of the private message
+            list of users with private_message_id set to the id of the private message
             in the user's conversation with the bot
         """
         return [
-            (cls(user_id=row["user_id"]), row["private_message_id"])
+            cls(user_id=row["user_id"], private_message_id=row["private_message_id"])
             for row in DbManager.select_from(
                 table_name="user_follow",
                 select="user_id, private_message_id",
