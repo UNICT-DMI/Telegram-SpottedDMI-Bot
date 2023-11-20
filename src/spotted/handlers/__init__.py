@@ -138,7 +138,7 @@ def add_jobs(app: Application):
     """Adds all the jobs to be scheduled to the application
 
     Args:
-        app: supplyed application
+        app: supplied application
     """
     app.job_queue.run_daily(clean_pending_job, time=time(hour=5, tzinfo=utc))  # run each day at 05:00 utc
     app.job_queue.run_daily(db_backup_job, time=time(hour=5, tzinfo=utc))  # run each day at 05:00 utc

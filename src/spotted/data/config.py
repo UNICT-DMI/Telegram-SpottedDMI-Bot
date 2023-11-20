@@ -220,10 +220,10 @@ class Config:
         self.settings["debug"] = self.settings.get("debug", {})
         env_path = os.path.join(os.path.dirname(__file__), "..", "..", ".env")
         if os.path.exists(env_path):
-            envre = re.compile(r"""^([^\s=]+)=(?:[\s"']*)(.+?)(?:[\s"']*)$""")
+            env_re = re.compile(r"""^([^\s=]+)=(?:[\s"']*)(.+?)(?:[\s"']*)$""")
             with open(env_path, "r", encoding="utf-8") as env:
                 for line in env:
-                    match = envre.match(line)
+                    match = env_re.match(line)
                     if match is not None:
                         new_vars[match.group(1).lower()] = match.group(2)
 
