@@ -1,5 +1,6 @@
 # pylint: disable=unused-argument,redefined-outer-name
 """Tests the bot functionality"""
+import os
 from datetime import datetime
 
 import pytest
@@ -251,8 +252,8 @@ class TestBot:
             """
             User(5).ban()  # the user 5 and 6 have been banned
             User(6).ban()
-            ban_date = datetime.now() # to make sure no weird stuff happens with the date
-            DbManager.update_from(table_name="banned_users", set_clause="ban_date=%s", args=(ban_date, ))
+            ban_date = datetime.now()  # to make sure no weird stuff happens with the date
+            DbManager.update_from(table_name="banned_users", set_clause="ban_date=%s", args=(ban_date,))
             await telegram.send_command("/sban", chat=admin_group)
             assert (
                 telegram.last_message.text == "[uso]: /sban <user_id1> [...user_id2]\n"
@@ -329,6 +330,16 @@ class TestBot:
             assert telegram.last_message.text == "Sono stati eliminati 1 messaggi rimasti in sospeso"
             assert PendingPost.from_user(user.id) is not None  # the recent pending post has not been deleted
             assert PendingPost.from_user(user2.id) is None  # the old pending post has been deleted
+
+    async def test_reload_cmd(self, telegram: TelegramSimulator, admin_group: Chat):
+        """Tests the /reload command.
+        The bot reloads the settings
+        """
+        os.environ["BOT_TAG"] = "test_reload_cmd"
+        await telegram.send_command("/reload", chat=admin_group)
+        assert telegram.last_message.text == "Configurazione ricaricata"
+        assert Config.settings_get("bot_tag") == "test_reload_cmd"
+        del os.environ["BOT_TAG"]
 
     class TestBotSpotConversation:
         """Tests the spot conversation"""
