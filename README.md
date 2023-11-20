@@ -372,6 +372,11 @@ pip3 install -e .[lint]
 - **Run** `black --check src tests` to make sure the code is formatted correctly. If it is not, you can run `black src` to format it automatically
 - **Run** `isort --check-only src tests` to make sure the imports are sorted correctly. If they are not, you can run `isort src` to sort them automatically
 
+### Scripts
+
+The `scripts` folder contains some utility scripts that can be used to simulate the whole CI pipeline locally.
+Make sure to have the dev dependencies installed before running them.
+
 ## 📚 Documentation
 
 [Link to the documentation](https://unict-dmi.github.io/Telegram-SpottedDMI-Bot/)

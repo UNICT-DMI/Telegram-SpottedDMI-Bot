@@ -1,7 +1,7 @@
 """Users management"""
 from dataclasses import dataclass
-from random import choice
 from datetime import datetime
+from random import choice
 
 from telegram import Bot
 
