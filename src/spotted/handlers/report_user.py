@@ -130,7 +130,7 @@ async def report_user_sent_msg(update: Update, context: CallbackContext) -> int:
 
     target_username = context.user_data["current_report_target"]
 
-    chat_id = Config.post_get("group_id")  # should be admin group
+    chat_id = Config.post_get("admin_group_id")  # should be admin group
     admin_message = await info.bot.sendMessage(
         chat_id=chat_id, text="🚨🚨 SEGNALAZIONE 🚨🚨\n\n" + "Username: " + target_username + "\n\n" + info.text
     )

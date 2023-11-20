@@ -12,7 +12,7 @@ This image has been created with the following script on `dbdiagram.io <https://
    user_id bigint [not null]
    u_message_id bigint [not null]
    g_message_id bigint [pk]
-   group_id bigint [pk]
+   admin_group_id bigint [pk]
    message_date timestamp
    }
 
@@ -24,7 +24,7 @@ This image has been created with the following script on `dbdiagram.io <https://
    Table admin_votes {
    admin_id bigint [pk]
    g_message_id bigint [pk, ref: > PE.g_message_id]
-   group_id bigint [pk, ref: > PE.group_id]
+   admin_group_id bigint [pk, ref: > PE.admin_group_id]
    is_upvote boolean [not null]
    }
 
@@ -41,14 +41,14 @@ This image has been created with the following script on `dbdiagram.io <https://
    channel_id bigint [pk, ref: > PU.channel_id]
    c_message_id bigint [pk, ref: > PU.c_message_id]
    g_message_id bigint [not null]
-   group_id bigint [not null]
+   admin_group_id bigint [not null]
    }
 
    Table user_report {
    user_id bigint [pk]
    target_username varchar(32) [pk]
    g_message_id bigint [not null]
-   group_id bigint [not null]
+   admin_group_id bigint [not null]
    message_date timestamp [pk]
    }
 

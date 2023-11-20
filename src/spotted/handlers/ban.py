@@ -16,7 +16,7 @@ async def ban_cmd(update: Update, context: CallbackContext):
     """
     info = EventInfo.from_message(update, context)
     g_message_id = update.message.reply_to_message.message_id
-    pending_post = PendingPost.from_group(group_id=info.chat_id, g_message_id=g_message_id)
+    pending_post = PendingPost.from_group(admin_group_id=info.chat_id, g_message_id=g_message_id)
 
     if pending_post is None:
         await info.bot.send_message(chat_id=info.chat_id, text="Per bannare qualcuno, rispondi al suo post con /ban")

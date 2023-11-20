@@ -16,7 +16,7 @@ async def help_cmd(update: Update, context: CallbackContext):
         context: context passed by the handler
     """
     info = EventInfo.from_message(update, context)
-    if info.chat_id == Config.post_get("group_id"):  # if you are in the admin group
+    if info.chat_id == Config.post_get("admin_group_id"):  # if you are in the admin group
         text = read_md("instructions")
     else:  # you are NOT in the admin group
         text = read_md("help")

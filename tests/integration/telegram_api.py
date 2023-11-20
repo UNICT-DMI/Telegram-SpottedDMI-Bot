@@ -41,10 +41,10 @@ class TelegramApi:
         self.__simulator = simulator
         self.__bot = self.__simulator.bot
         self.__chats: dict[int, Chat] = {}
-        self.__chats[Config.post_get("group_id")] = Chat(id=Config.post_get("group_id"), type=Chat.GROUP)
+        self.__chats[Config.post_get("admin_group_id")] = Chat(id=Config.post_get("admin_group_id"), type=Chat.GROUP)
         self.__chats[Config.post_get("channel_id")] = Chat(id=Config.post_get("channel_id"), type=Chat.CHANNEL)
-        self.__chats[Config.post_get("channel_group_id")] = Chat(
-            id=Config.post_get("channel_group_id"), type=Chat.GROUP
+        self.__chats[Config.post_get("community_group_id")] = Chat(
+            id=Config.post_get("community_group_id"), type=Chat.GROUP
         )
 
     @classmethod

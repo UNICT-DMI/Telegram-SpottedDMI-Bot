@@ -13,7 +13,7 @@ class Report:
 
     Args:
         user_id: id of the user that reported
-        group_id: id of the admin group
+        admin_group_id: id of the admin group
         g_message_id: id of the post in the group
         channel_id: id of the channel
         c_message_id: id of the post in question in the channel
@@ -22,7 +22,7 @@ class Report:
     """
 
     user_id: int
-    group_id: int
+    admin_group_id: int
     g_message_id: int
     channel_id: int = None
     c_message_id: int = None
@@ -55,7 +55,7 @@ class Report:
         """
 
         g_message_id = admin_message.message_id
-        group_id = admin_message.chat_id
+        admin_group_id = admin_message.chat_id
 
         current_report = cls.get_post_report(user_id, channel_id, c_message_id)
 
@@ -66,7 +66,7 @@ class Report:
             user_id=user_id,
             channel_id=channel_id,
             c_message_id=c_message_id,
-            group_id=group_id,
+            admin_group_id=admin_group_id,
             g_message_id=g_message_id,
         ).save_report()
 
@@ -84,11 +84,11 @@ class Report:
         """
 
         g_message_id = admin_message.message_id
-        group_id = admin_message.chat_id
+        admin_group_id = admin_message.chat_id
         date = datetime.now()
 
         return cls(
-            user_id=user_id, group_id=group_id, g_message_id=g_message_id, target_username=target_username, date=date
+            user_id=user_id, admin_group_id=admin_group_id, g_message_id=g_message_id, target_username=target_username, date=date
         ).save_report()
 
     @classmethod
@@ -118,7 +118,7 @@ class Report:
             user_id=report["user_id"],
             channel_id=report["channel_id"],
             c_message_id=report["c_message_id"],
-            group_id=report["group_id"],
+            admin_group_id=report["admin_group_id"],
             g_message_id=report["g_message_id"],
         )
 
@@ -147,16 +147,16 @@ class Report:
             user_id=report["user_id"],
             target_username=report["target_username"],
             date=report["message_date"],
-            group_id=report["group_id"],
+            admin_group_id=report["admin_group_id"],
             g_message_id=report["g_message_id"],
         )
 
     @classmethod
-    def from_group(cls, group_id: int, g_message_id: int) -> "Report | None":
+    def from_group(cls, admin_group_id: int, g_message_id: int) -> "Report | None":
         """Gets a report of any type related to the specified message in the admin group
 
         Args:
-            group_id: id of the admin group
+            admin_group_id: id of the admin group
             g_message_id: id of the report in the group
 
         Returns:
@@ -165,8 +165,8 @@ class Report:
         reports = DbManager.select_from(
             select="*",
             table_name="user_report",
-            where="group_id = %s and g_message_id = %s",
-            where_args=(group_id, g_message_id),
+            where="admin_group_id = %s and g_message_id = %s",
+            where_args=(admin_group_id, g_message_id),
         )
 
         if len(reports) > 0:  # the vote is not present
@@ -175,15 +175,15 @@ class Report:
                 user_id=report["user_id"],
                 target_username=report["target_username"],
                 date=report["message_date"],
-                group_id=report["group_id"],
+                admin_group_id=report["admin_group_id"],
                 g_message_id=report["g_message_id"],
             )
 
         reports = DbManager.select_from(
             select="*",
             table_name="spot_report",
-            where="group_id = %s and g_message_id = %s",
-            where_args=(group_id, g_message_id),
+            where="admin_group_id = %s and g_message_id = %s",
+            where_args=(admin_group_id, g_message_id),
         )
 
         if len(reports) > 0:  # the vote is not present
@@ -191,7 +191,7 @@ class Report:
             return cls(
                 user_id=report["user_id"],
                 c_message_id=report["c_message_id"],
-                group_id=report["group_id"],
+                admin_group_id=report["admin_group_id"],
                 g_message_id=report["g_message_id"],
             )
 
@@ -202,14 +202,14 @@ class Report:
         if self.c_message_id is not None:
             DbManager.insert_into(
                 table_name="spot_report",
-                columns=("user_id", "channel_id", "c_message_id", "group_id", "g_message_id"),
-                values=(self.user_id, self.channel_id, self.c_message_id, self.group_id, self.g_message_id),
+                columns=("user_id", "channel_id", "c_message_id", "admin_group_id", "g_message_id"),
+                values=(self.user_id, self.channel_id, self.c_message_id, self.admin_group_id, self.g_message_id),
             )
         else:
             DbManager.insert_into(
                 table_name="user_report",
-                columns=("user_id", "target_username", "message_date", "group_id", "g_message_id"),
-                values=(self.user_id, self.target_username, self.date, self.group_id, self.g_message_id),
+                columns=("user_id", "target_username", "message_date", "admin_group_id", "g_message_id"),
+                values=(self.user_id, self.target_username, self.date, self.admin_group_id, self.g_message_id),
             )
         return self
 
@@ -219,13 +219,13 @@ class Report:
                 f"PostReport: [ user_id: {self.user_id}\n"
                 f"channel_id: {self.channel_id}\n"
                 f"c_message_id: {self.c_message_id}\n"
-                f"group_id: {self.group_id}\n"
+                f"admin_group_id: {self.admin_group_id}\n"
                 f"g_message_id: {self.g_message_id} ]"
             )
         return (
             f"UserReport: [ user_id: {self.user_id}\n"
             f"target_username: {self.target_username}\n"
             f"date: {self.date}\n"
-            f"group_id: {self.group_id}\n"
+            f"admin_group_id: {self.admin_group_id}\n"
             f"g_message_id: {self.g_message_id} ]"
         )

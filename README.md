@@ -88,7 +88,7 @@ pip3 install -e .
 ### Steps:
 
 - Clone this repository
-- Create a [_"settings.yaml"_](#settings) file and edit the desired parameters. **It must contain at least a valid _'token'_ and _'post.group_id'_ values**.
+- Create a [_"settings.yaml"_](#settings) file and edit the desired parameters. **It must contain at least a valid _'token'_ and _'post.admin_group_id'_ values**.
   - You could also skip the files and use [_environment variables_](#settings-override) instead.
 - Make sure the bot is in present both in the admin group and in the spot channel. It may need to have admin privileges. If comments are enabled, the bot has to be in the comment group too as an admin.
 - **Run** `python3 -m spotted` to [start the bot](#running-the-bot)
@@ -110,7 +110,7 @@ pip3 install telegram-spotted-dmi-bot
 
 ### Steps:
 
-- Create a [_"settings.yaml"_](#settings) file and edit the desired parameters. **It must contain at least a valid _'token'_ and _'post.group_id'_ values**.
+- Create a [_"settings.yaml"_](#settings) file and edit the desired parameters. **It must contain at least a valid _'token'_ and _'post.admin_group_id'_ values**.
   - You could also skip the files and use [_environment variables_](#settings-override) instead.
 - **Run** `python3 -m spotted` to [start the bot](#running-the-bot)
 
@@ -229,7 +229,7 @@ You can change this behaviour by specifying the path to the files with the `--co
 python3 -m spotted -c /path/to/settings.yaml -a /path/to/autoreplies.yaml
 ```
 
-Feel free to customize the settings file,but make sure to add a valid **token** and **post.group_id** values, since they are mandatory.
+Feel free to customize the settings file,but make sure to add a valid **token** and **post.admin_group_id** values, since they are mandatory.
 
 ```yaml
 # config/settings.yaml
@@ -241,11 +241,12 @@ debug:
   db_file: "spotted.sqlite3" # path to the database file. Relative to the pwd
 
 post:
-  channel_group_id: -100 # id of the group associated with the channel. Required if comments are enabled
+  # id of the group associated with the channel. Telegram will send automatically forward the posts there. Required if comments are enabled
+  community_group_id: -100
   channel_id: -200 # id of the channel to which the bot will send the approved posts
   channel_tag: "@channel" # tag of the channel to which the bot will send the approved posts
   comments: true # whether or not the channel the bot will send the posts to has comments enabled
-  group_id: -300 # id of the admin group the bot will use
+  admin_group_id: -300 # id of the admin group the bot will use
   n_votes: 2 # votes needed to approve/reject a pending post
   remove_after_h: 12 # number of hours after wich pending posts will be automatically by /clean_pending
   report_wait_mins: 30 # number of minutes the user has to wait before being able to report another user again
@@ -313,11 +314,11 @@ debug:
   log_error_file: str
   db_file: str
 post:
-  channel_group_id: int
+  community_group_id: int
   channel_id: int
   channel_tag: str
   comments: bool
-  group_id: int
+  admin_group_id: int
   n_votes: int
   remove_after_h: int
   tag: bool

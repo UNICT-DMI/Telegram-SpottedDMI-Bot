@@ -10,11 +10,11 @@ import yaml
 SettingsKeys = Literal["debug", "post", "test", "token", "bot_tag"]
 SettingsDebugKeys = Literal["local_log", "reset_on_load", "log_file", "log_error_file", "db_file"]
 SettingsPostKeys = Literal[
-    "channel_group_id",
+    "community_group_id",
     "channel_id",
     "channel_tag",
     "comments",
-    "group_id",
+    "admin_group_id",
     "n_votes",
     "remove_after_h",
     "tag",

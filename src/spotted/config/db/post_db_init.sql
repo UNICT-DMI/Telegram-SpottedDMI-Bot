@@ -4,9 +4,9 @@ CREATE TABLE IF NOT EXISTS pending_post
   user_id BIGINT NOT NULL,
   u_message_id BIGINT NOT NULL,
   g_message_id BIGINT NOT NULL,
-  group_id BIGINT NOT NULL,
+  admin_group_id BIGINT NOT NULL,
   message_date TIMESTAMP,
-  PRIMARY KEY (group_id, g_message_id)
+  PRIMARY KEY (admin_group_id, g_message_id)
 );
 -----
 CREATE TABLE IF NOT EXISTS published_post
@@ -20,10 +20,10 @@ CREATE TABLE IF NOT EXISTS admin_votes
 (
   admin_id BIGINT NOT NULL,
   g_message_id BIGINT NOT NULL,
-  group_id BIGINT NOT NULL,
+  admin_group_id BIGINT NOT NULL,
   is_upvote boolean NOT NULL,
-  PRIMARY KEY (admin_id, g_message_id, group_id),
-  FOREIGN KEY (g_message_id, group_id) REFERENCES pending_post (g_message_id, group_id) ON DELETE CASCADE ON UPDATE CASCADE
+  PRIMARY KEY (admin_id, g_message_id, admin_group_id),
+  FOREIGN KEY (g_message_id, admin_group_id) REFERENCES pending_post (g_message_id, admin_group_id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 -----
 CREATE TABLE IF NOT EXISTS credited_users
@@ -45,7 +45,7 @@ CREATE TABLE IF NOT EXISTS spot_report
   channel_id BIGINT NOT NULL,
   c_message_id BIGINT NOT NULL,
   g_message_id BIGINT NOT NULL,
-  group_id BIGINT NOT NULL,
+  admin_group_id BIGINT NOT NULL,
   PRIMARY KEY (user_id, c_message_id),
   FOREIGN KEY (c_message_id) REFERENCES published_post (c_message_id) ON DELETE CASCADE ON UPDATE CASCADE
 );
@@ -55,7 +55,7 @@ CREATE TABLE IF NOT EXISTS user_report
   user_id BIGINT NOT NULL,
   target_username VARCHAR(32) NOT NULL,
   g_message_id BIGINT NOT NULL,
-  group_id BIGINT NOT NULL,
+  admin_group_id BIGINT NOT NULL,
   message_date TIMESTAMP NOT NULL,
   PRIMARY KEY (user_id, target_username, message_date)
 );

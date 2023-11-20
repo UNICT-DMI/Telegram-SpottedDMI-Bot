@@ -174,7 +174,7 @@ def admin_group() -> Chat:
     Returns:
         admin group chat
     """
-    return Chat(id=Config.post_get("group_id"), type=Chat.GROUP)
+    return Chat(id=Config.post_get("admin_group_id"), type=Chat.GROUP)
 
 
 @pytest.fixture(scope="class")
@@ -185,7 +185,7 @@ def channel_group() -> Chat:
     Returns:
         public group for comments
     """
-    return Chat(id=Config.post_get("channel_group_id"), type=Chat.GROUP)
+    return Chat(id=Config.post_get("community_group_id"), type=Chat.GROUP)
 
 
 @pytest.mark.asyncio
@@ -363,7 +363,7 @@ class TestBot:
             """Tests the /spot command.
             Spot is not allowed for users with a pending post
             """
-            PendingPost(user_id=1, u_message_id=1, g_message_id=1, group_id=1, date=datetime.now()).save_post()
+            PendingPost(user_id=1, u_message_id=1, g_message_id=1, admin_group_id=1, date=datetime.now()).save_post()
             await telegram.send_command("/spot")
             assert telegram.last_message.text == "Hai già un post in approvazione 🧐"
 
@@ -707,7 +707,7 @@ class TestBot:
                 f"Una volta pubblicato, lo potrai trovare su {Config.post_get('channel_tag')}"
             )
             assert (
-                PendingPost.from_group(g_message_id=telegram.last_message.message_id, group_id=admin_group.id)
+                PendingPost.from_group(g_message_id=telegram.last_message.message_id, admin_group_id=admin_group.id)
                 is not None
             )
 
@@ -724,7 +724,7 @@ class TestBot:
             c_message = telegram.messages[-2]
             assert c_message.text == "Test spot"
 
-            assert PendingPost.from_group(g_message_id=g_message.message_id, group_id=admin_group.id) is None
+            assert PendingPost.from_group(g_message_id=g_message.message_id, admin_group_id=admin_group.id) is None
 
             await telegram.send_forward_message(
                 forward_message=c_message,
@@ -752,7 +752,7 @@ class TestBot:
             assert telegram.messages[-2].reply_markup.inline_keyboard[0][1].text == f"🔴 @{user.id}"
             assert telegram.messages[-2].reply_markup.inline_keyboard[1][1].text == f"🔴 @{user2.id}"
             assert telegram.messages[-2].reply_markup.inline_keyboard[2][0].text == REJECTED_KB
-            assert PendingPost.from_group(g_message_id=pending_post.message_id, group_id=admin_group.id) is None
+            assert PendingPost.from_group(g_message_id=pending_post.message_id, admin_group_id=admin_group.id) is None
 
         async def test_reject_after_autoreply_spot(self, telegram: TelegramSimulator, pending_post: Message):
             """

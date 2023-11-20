@@ -24,11 +24,11 @@ async def cancel_cmd(update: Update, context: CallbackContext) -> int:
         return STATE["end"]
     pending_post = PendingPost.from_user(user_id=info.user_id)
     if pending_post:  # if the user has a pending post in evaluation, delete it
-        group_id = pending_post.group_id
+        admin_group_id = pending_post.admin_group_id
         g_message_id = pending_post.g_message_id
         pending_post.delete_post()
 
-        await info.bot.delete_message(chat_id=group_id, message_id=g_message_id)
+        await info.bot.delete_message(chat_id=admin_group_id, message_id=g_message_id)
         await info.bot.send_message(chat_id=info.chat_id, text="Lo spot precedentemente inviato è stato cancellato")
     else:
         await info.bot.send_message(chat_id=info.chat_id, text="Operazione annullata")

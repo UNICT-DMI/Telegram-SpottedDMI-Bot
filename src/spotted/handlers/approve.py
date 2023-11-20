@@ -33,7 +33,7 @@ async def approve_status_callback(update: Update, context: CallbackContext):
         await info.answer_callback_query("In pausa")
         new_keyboard = get_paused_kb(pause_page, items_per_page)
     elif action == "play":  # if the the admin wants to resume approval of the post
-        pending_post = PendingPost.from_group(group_id=info.chat_id, g_message_id=info.message_id)
+        pending_post = PendingPost.from_group(admin_group_id=info.chat_id, g_message_id=info.message_id)
         if pending_post:
             await info.answer_callback_query("Ripreso")
             new_keyboard = get_approve_kb(pending_post=pending_post)
@@ -78,7 +78,7 @@ async def approve_yes_callback(update: Update, context: CallbackContext):
         context: context passed by the handler
     """
     info = EventInfo.from_callback(update, context)
-    pending_post = PendingPost.from_group(group_id=info.chat_id, g_message_id=info.message_id)
+    pending_post = PendingPost.from_group(admin_group_id=info.chat_id, g_message_id=info.message_id)
     if pending_post is None:  # this pending post is not present in the database
         return
 
@@ -118,7 +118,7 @@ async def approve_no_callback(update: Update, context: CallbackContext):
         context: context passed by the handler
     """
     info = EventInfo.from_callback(update, context)
-    pending_post = PendingPost.from_group(group_id=info.chat_id, g_message_id=info.message_id)
+    pending_post = PendingPost.from_group(admin_group_id=info.chat_id, g_message_id=info.message_id)
     if pending_post is None:  # this pending post is not present in the database
         return
 

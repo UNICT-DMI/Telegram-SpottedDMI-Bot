@@ -28,9 +28,9 @@ async def autoreply_cmd(update: Update, context: CallbackContext):
         return
 
     g_message_id = update.message.reply_to_message.message_id
-    if (pending_post := PendingPost.from_group(group_id=info.chat_id, g_message_id=g_message_id)) is not None:
+    if (pending_post := PendingPost.from_group(admin_group_id=info.chat_id, g_message_id=g_message_id)) is not None:
         user_id = pending_post.user_id
-    elif (report := Report.from_group(group_id=info.chat_id, g_message_id=g_message_id)) is not None:
+    elif (report := Report.from_group(admin_group_id=info.chat_id, g_message_id=g_message_id)) is not None:
         user_id = report.user_id
     else:  # the message was not a pending post or a report
         await info.bot.send_message(
@@ -60,7 +60,7 @@ async def autoreply_callback(update: Update, context: CallbackContext):
 
     all_autoreplies = Config.autoreplies_get("autoreplies")
     current_reply = all_autoreplies.get(arg)
-    pending_post = PendingPost.from_group(group_id=info.chat_id, g_message_id=info.message_id)
+    pending_post = PendingPost.from_group(admin_group_id=info.chat_id, g_message_id=info.message_id)
 
     if pending_post:
         await info.bot.send_message(chat_id=pending_post.user_id, text=current_reply)

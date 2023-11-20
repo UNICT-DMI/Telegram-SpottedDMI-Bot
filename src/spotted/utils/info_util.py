@@ -202,7 +202,7 @@ class EventInfo:  # pylint: disable=too-many-public-methods
     @property
     def is_forwarded_post(self) -> bool:
         """Whether the message is in fact a forwarded post from the channel to the group"""
-        return self.chat_id == Config.post_get("channel_group_id") and self.forward_from_chat_id == Config.post_get(
+        return self.chat_id == Config.post_get("community_group_id") and self.forward_from_chat_id == Config.post_get(
             "channel_id"
         )
 
@@ -285,13 +285,13 @@ class EventInfo:  # pylint: disable=too-many-public-methods
             whether or not the operation was successful
         """
         message = self.__message.reply_to_message
-        group_id = Config.post_get("group_id")
+        admin_group_id = Config.post_get("admin_group_id")
         poll = message.poll  # if the message is a poll, get its reference
 
         try:
             if poll:  # makes sure the poll is anonym
                 g_message = await self.__bot.send_poll(
-                    chat_id=group_id,
+                    chat_id=admin_group_id,
                     question=poll.question,
                     options=[option.text for option in poll.options],
                     type=poll.type,
@@ -302,7 +302,7 @@ class EventInfo:  # pylint: disable=too-many-public-methods
             elif message.text and message.entities:  # maintains the previews, if present
                 show_preview = self.user_data.get("show_preview", True)
                 g_message = await self.__bot.send_message(
-                    chat_id=group_id,
+                    chat_id=admin_group_id,
                     text=message.text,
                     reply_markup=get_approve_kb(),
                     entities=message.entities,
@@ -310,7 +310,7 @@ class EventInfo:  # pylint: disable=too-many-public-methods
                 )
             else:
                 g_message = await self.__bot.copy_message(
-                    chat_id=group_id,
+                    chat_id=admin_group_id,
                     from_chat_id=message.chat_id,
                     message_id=message.message_id,
                     reply_markup=get_approve_kb(),
@@ -319,7 +319,7 @@ class EventInfo:  # pylint: disable=too-many-public-methods
             logger.error("Sending the post on send_post_to: %s", ex)
             return False
 
-        PendingPost.create(user_message=message, group_id=group_id, g_message_id=g_message.message_id)
+        PendingPost.create(user_message=message, admin_group_id=admin_group_id, g_message_id=g_message.message_id)
 
         return True
 
@@ -363,18 +363,18 @@ class EventInfo:  # pylint: disable=too-many-public-methods
         """
 
         message = self.__message
-        channel_group_id = Config.post_get("channel_group_id")
+        community_group_id = Config.post_get("community_group_id")
         user_id = self.bot_data.pop(f"{self.forward_from_chat_id},{self.forward_from_id}", -1)
 
         sign = await User(user_id).get_user_sign(bot=self.__bot)
         post_message = await self.__bot.send_message(
-            chat_id=channel_group_id,
+            chat_id=community_group_id,
             text=f"by: {sign}",
             reply_markup=get_published_post_kb(),
             reply_to_message_id=message.message_id,
         )
 
-        PublishedPost.create(channel_id=channel_group_id, c_message_id=post_message.message_id)
+        PublishedPost.create(channel_id=community_group_id, c_message_id=post_message.message_id)
 
     async def show_admins_votes(self, pending_post: PendingPost, reason: str | None = None):
         """After a post is been approved or rejected, shows the admins that approved or rejected it \
@@ -389,10 +389,10 @@ class EventInfo:  # pylint: disable=too-many-public-methods
         )
 
         await self.__bot.edit_message_reply_markup(
-            chat_id=pending_post.group_id, message_id=pending_post.g_message_id, reply_markup=inline_keyboard
+            chat_id=pending_post.admin_group_id, message_id=pending_post.g_message_id, reply_markup=inline_keyboard
         )
 
-        remaining_pending_posts = PendingPost.get_all(group_id=pending_post.group_id)
+        remaining_pending_posts = PendingPost.get_all(admin_group_id=pending_post.admin_group_id)
 
         # remove the post from the pending posts
         remaining_pending_posts = [
@@ -409,5 +409,5 @@ class EventInfo:  # pylint: disable=too-many-public-methods
             oldest_pending_post = remaining_pending_posts[0]
 
             await self.__bot.send_message(
-                chat_id=pending_post.group_id, text=text, reply_to_message_id=oldest_pending_post.g_message_id
+                chat_id=pending_post.admin_group_id, text=text, reply_to_message_id=oldest_pending_post.g_message_id
             )

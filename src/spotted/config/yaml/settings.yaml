@@ -5,11 +5,11 @@ debug:
   log_error_file: "logs/spotted_error.log"
   db_file: "spotted.sqlite3"
 post:
-  channel_group_id: -1
+  community_group_id: -1
   channel_id: -2
   channel_tag: "@channel_tag"
   comments: true
-  group_id: -3
+  admin_group_id: -3
   n_votes: 2
   remove_after_h: 12
   tag: false

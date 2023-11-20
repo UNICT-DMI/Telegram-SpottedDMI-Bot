@@ -68,7 +68,7 @@ async def notify_error_admin(context: CallbackContext, traceback_str: str):
     """
     traceback_str = traceback_str.replace(Config.settings_get("token"), "[bot_token]")
     text = f"An exception was raised:\n" f"<pre>{html.escape(traceback_str)}</pre>"
-    await context.bot.send_message(chat_id=Config.post_get("group_id"), text=text, parse_mode=ParseMode.HTML)
+    await context.bot.send_message(chat_id=Config.post_get("admin_group_id"), text=text, parse_mode=ParseMode.HTML)
 
 
 async def log_message(update: Update, _: CallbackContext):

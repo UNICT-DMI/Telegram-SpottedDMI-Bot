@@ -17,10 +17,10 @@ async def clean_pending_job(context: CallbackContext):
         context: context passed by the jobqueue
     """
     info = EventInfo.from_job(context)
-    admin_group_id = Config.post_get("group_id")
+    admin_group_id = Config.post_get("admin_group_id")
 
     before_time = datetime.now(tz=timezone.utc) - timedelta(hours=Config.post_get("remove_after_h"))
-    pending_posts = PendingPost.get_all(group_id=admin_group_id, before=before_time)
+    pending_posts = PendingPost.get_all(admin_group_id=admin_group_id, before=before_time)
 
     # For each pending post older than before_time
     removed = 0
@@ -54,7 +54,7 @@ async def db_backup_job(context: CallbackContext):
         context: context passed by the jobqueue
     """
     path = Config.debug_get("db_file")
-    admin_group_id = Config.post_get("group_id")
+    admin_group_id = Config.post_get("admin_group_id")
     with open(path, "rb") as database_file:
         try:
             await context.bot.send_document(

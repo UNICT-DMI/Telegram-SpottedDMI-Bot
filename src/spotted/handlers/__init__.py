@@ -67,7 +67,7 @@ async def add_commands(app: Application):
         BotCommand("clean_pending", "elimina tutti gli spot in sospeso"),
     ]
     await app.bot.set_my_commands(private_chat_commands, scope=BotCommandScopeAllPrivateChats())
-    await app.bot.set_my_commands(admin_commands, scope=BotCommandScopeChat(Config.post_get("group_id")))
+    await app.bot.set_my_commands(admin_commands, scope=BotCommandScopeChat(Config.post_get("admin_group_id")))
 
 
 def add_handlers(app: Application):
@@ -83,8 +83,8 @@ def add_handlers(app: Application):
     if Config.settings_get("debug", "local_log"):  # add MessageHandler only if log_message is enabled
         app.add_handler(MessageHandler(filters.ALL, log_message), 1)
 
-    admin_filter = filters.Chat(chat_id=Config.post_get("group_id"))
-    channel_group_filter = filters.Chat(chat_id=Config.post_get("channel_group_id"))
+    admin_filter = filters.Chat(chat_id=Config.post_get("admin_group_id"))
+    channel_group_filter = filters.Chat(chat_id=Config.post_get("community_group_id"))
 
     # Error handler
     app.add_error_handler(error_handler)

@@ -4,11 +4,11 @@ debug:
   log_file: str
   log_error_file: str
 post:
-  channel_group_id: int
+  community_group_id: int
   channel_id: int
   channel_tag: str
   comments: bool
-  group_id: int
+  admin_group_id: int
   n_votes: int
   remove_after_h: int
   tag: bool
