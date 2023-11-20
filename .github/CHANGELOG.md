@@ -10,7 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Add **/reload** command to reload the bot configuration without restarting it
-- Add banned users list to the **/sban** command [ closes #124 ]
+- Add banned users list to the **/sban** command [ closes #124 ] [ from #140 ]
 - Add scoped command list to differentiate between user and admin commands
 - Added python package anyone can install to immediately run the bot, without going through git
   - The python package name will be `telegram-spotted-dmi-bot` (hence `pip install telegram-spotted-dmi-bot`)

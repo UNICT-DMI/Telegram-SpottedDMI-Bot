@@ -251,12 +251,14 @@ class TestBot:
             """
             User(5).ban()  # the user 5 and 6 have been banned
             User(6).ban()
+            ban_date = datetime.now() # to make sure no weird stuff happens with the date
+            DbManager.update_from(table_name="banned_users", set_clause="ban_date=%s", args=(ban_date, ))
             await telegram.send_command("/sban", chat=admin_group)
             assert (
                 telegram.last_message.text == "[uso]: /sban <user_id1> [...user_id2]\n"
                 "Gli utenti attualmente bannati sono:\n"
-                "5\n"
-                "6"  # list the banned users
+                f"5 ({ban_date:%d/%m/%Y %H:%M})\n"
+                f"6 ({ban_date:%d/%m/%Y %H:%M})"  # list the banned users
             )
 
         async def test_sban_cmd(self, telegram: TelegramSimulator, admin_group: Chat):

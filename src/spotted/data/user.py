@@ -1,6 +1,7 @@
 """Users management"""
 from dataclasses import dataclass
 from random import choice
+from datetime import datetime
 
 from telegram import Bot
 
@@ -16,10 +17,12 @@ class User:
     Args:
         user_id: id of the user
         private_message_id: id of the private message sent by the user to the bot. Only used for following
+        ban_date: datetime of when the user was banned. Only used for banned users
     """
 
-    private_message_id: int | None = None
     user_id: int
+    private_message_id: int | None = None
+    ban_date: datetime | None = None
 
     @property
     def is_pending(self) -> bool:
