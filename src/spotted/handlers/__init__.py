@@ -94,13 +94,6 @@ def add_handlers(app: Application):
     app.add_handler(report_user_conv_handler())
     app.add_handler(report_spot_conv_handler())
 
-    # remove anonymous comments
-    if Config.meme_get('delete_anonymous_comments'):
-        disp.add_handler(
-            MessageHandler(Filters.sender_chat.channel & Filters.chat_type.groups & ~Filters.is_automatic_forward,
-                           anonymous_comment_msg,
-                           run_async=True))
-
     # Command handlers
     app.add_handler(CommandHandler("start", start_cmd, filters=filters.ChatType.PRIVATE))
     app.add_handler(CommandHandler("help", help_cmd, filters=filters.ChatType.PRIVATE | admin_filter))
