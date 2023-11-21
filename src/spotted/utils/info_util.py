@@ -100,12 +100,20 @@ class EventInfo:  # pylint: disable=too-many-public-methods
     def args(self) -> list[str]:
         """Return the args of the message that caused the update.
         If the update was caused by a callback, the callback data is splitted by ',' and returned"""
+        # if the update was caused by a callback, the callback data is splitted by ',' and returned
         if self.__query is not None and self.__query.data is not None:
             args = self.__query.data.split(",")
             if len(args) > 1:
                 return args[1:]
             return []
-        return self.__ctx.args if self.__ctx.args is not None else []
+        # if the update was caused by a command, use the built-in args
+        if self.__ctx.args is not None:
+            return self.__ctx.args
+        # if the update was caused by a text message, split the text and take all the words but the first one
+        if self.text is not None:
+            words = self.text.split(" ")
+            return words[1:] if len(words) > 1 else []
+        return []
 
     @property
     def message_id(self) -> int:
