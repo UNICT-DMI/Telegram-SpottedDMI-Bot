@@ -18,7 +18,7 @@ from spotted.debug import error_handler, log_message
 
 from .anonym_comment import anonymous_comment_msg
 from .approve import approve_no_callback, approve_status_callback, approve_yes_callback
-from .autoreply import autoreply_callback
+from .autoreply import autoreply_callback, autoreply_cmd
 from .ban import ban_cmd
 from .cancel import cancel_cmd
 from .clean_pending import clean_pending_cmd
@@ -62,6 +62,7 @@ async def add_commands(app: Application):
         BotCommand("ban", "banna un utente"),
         BotCommand("sban", "banna un utente"),
         BotCommand("reply", "rispondi ad uno spot o un report"),
+        BotCommand("autoreply", "rispondi ad uno spot o un report con un messaggio automatico"),
         BotCommand("reload", "ricarica la configurazione del bot"),
         BotCommand("db_backup", "esegui il backup del database"),
         BotCommand("clean_pending", "elimina tutti gli spot in sospeso"),
@@ -112,6 +113,7 @@ def add_handlers(app: Application):
     # MessageHandler
     app.add_handler(MessageHandler(filters.REPLY & admin_filter & filters.Regex(r"^/ban$"), ban_cmd))
     app.add_handler(MessageHandler(filters.REPLY & admin_filter & filters.Regex(r"^/reply"), reply_cmd))
+    app.add_handler(MessageHandler(filters.REPLY & admin_filter & filters.Regex(r"^/autoreply"), autoreply_cmd))
 
     # Callback handlers
     app.add_handler(CallbackQueryHandler(settings_callback, pattern=r"^settings\.*"))

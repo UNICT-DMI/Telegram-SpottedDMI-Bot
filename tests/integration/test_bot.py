@@ -287,6 +287,34 @@ class TestBot:
             assert telegram.messages[-2].text.endswith("TEST")
             assert telegram.last_message.text == "L'utente ha ricevuto il messaggio"
 
+        async def test_autoreply_list_cmd(self, telegram: TelegramSimulator, admin_group: Chat, pending_post: Message):
+            """Tests the /autoreply command.
+            Show the admins all the possible arguments for the autoreply command
+            """
+            await telegram.send_command("/autoreply list", chat=admin_group, reply_to_message=pending_post)
+            possible_args_text = "\n - ".join(Config.autoreplies_get("autoreplies").keys())
+            assert telegram.last_message.text == f"Possibili argomenti:\n - {possible_args_text}"
+
+        @pytest.mark.parametrize("autoreply", Config.autoreplies_get("autoreplies").keys())
+        async def test_autoreply_invalid_cmd(self, telegram: TelegramSimulator, admin_group: Chat, autoreply: str):
+            """Tests the /autoreply command.
+            The autoreply command can only be submitted by replying to a pending post or report
+            """
+            await telegram.send_message("Random message")
+            await telegram.send_command(f"/autoreply {autoreply}", chat=admin_group, reply_to_message=telegram.last_message)
+            assert telegram.last_message.text.startswith("Il messaggio selezionato non è valido")
+
+        @pytest.mark.parametrize("autoreply", Config.autoreplies_get("autoreplies").keys())
+        async def test_autoreply_cmd(
+            self, telegram: TelegramSimulator, admin_group: Chat, pending_post: Message, autoreply: str
+        ):
+            """Tests the /autoreply command.
+            The admins can send a reply to the user with an automatic message
+            """
+            await telegram.send_message(f"/autoreply {autoreply}", chat=admin_group, reply_to_message=pending_post)
+            assert telegram.messages[-2].text.endswith(Config.autoreplies_get("autoreplies")[autoreply])
+            assert telegram.last_message.text == "L'utente ha ricevuto il messaggio"
+
         async def test_reply_report_user_cmd(
             self, telegram: TelegramSimulator, admin_group: Chat, report_user_message: Message
         ):
@@ -331,15 +359,15 @@ class TestBot:
             assert PendingPost.from_user(user.id) is not None  # the recent pending post has not been deleted
             assert PendingPost.from_user(user2.id) is None  # the old pending post has been deleted
 
-    async def test_reload_cmd(self, telegram: TelegramSimulator, admin_group: Chat):
-        """Tests the /reload command.
-        The bot reloads the settings
-        """
-        os.environ["BOT_TAG"] = "test_reload_cmd"
-        await telegram.send_command("/reload", chat=admin_group)
-        assert telegram.last_message.text == "Configurazione ricaricata"
-        assert Config.settings_get("bot_tag") == "test_reload_cmd"
-        del os.environ["BOT_TAG"]
+        async def test_reload_cmd(self, telegram: TelegramSimulator, admin_group: Chat):
+            """Tests the /reload command.
+            The bot reloads the settings
+            """
+            os.environ["BOT_TAG"] = "test_reload_cmd"
+            await telegram.send_command("/reload", chat=admin_group)
+            assert telegram.last_message.text == "Configurazione ricaricata"
+            assert Config.settings_get("bot_tag") == "test_reload_cmd"
+            del os.environ["BOT_TAG"]
 
     class TestBotSpotConversation:
         """Tests the spot conversation"""

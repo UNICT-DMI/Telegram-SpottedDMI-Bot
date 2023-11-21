@@ -21,9 +21,10 @@ async def autoreply_cmd(update: Update, context: CallbackContext):
     info = EventInfo.from_message(update, context)
 
     arg = " ".join(info.args)
+    print("ARGS:", arg)
     if arg not in Config.autoreplies_get("autoreplies") or arg == "lista":
         possible_args_text = "\n - ".join(Config.autoreplies_get("autoreplies").keys())
-        text = f"Possibili argomenti: \n -{possible_args_text}"
+        text = f"Possibili argomenti:\n - {possible_args_text}"
         await info.bot.send_message(chat_id=info.chat_id, text=text)
         return
 

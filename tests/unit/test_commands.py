@@ -27,7 +27,7 @@ def context() -> CallbackContext:
     return CallbackContext(app)
 
 
-@pytest.fixture(scope="function", params=[(0, Chat.GROUP)])
+@pytest.fixture(scope="function", params=[(0, Chat.PRIVATE)])
 def update(request: FixtureRequest) -> Update:
     """Return a Telegram event, consisting of an Update and a CallbackContext"""
     chat_id, chat_type = request.param
@@ -68,11 +68,17 @@ class TestCommands:
                 disable_web_page_preview=True,
             )
 
-        @pytest.mark.parametrize("update", [(Config.post_get("admin_group_id"), Chat.GROUP)], indirect=True)
-        async def test_help_admin_cmd(self, update: Update, context: CallbackContext):
+        async def test_help_admin_cmd(self, context: CallbackContext):
             """Tests the /help command.
-            The bot sends the help response to the user
+            The bot sends the help response to the admins
             """
+            message = Message(
+                message_id=0,
+                from_user=User(id=0, first_name="user", is_bot=False),
+                date=datetime.now(),
+                chat=Chat(id=Config.post_get("admin_group_id"), type=Chat.GROUP),
+            )
+            update = Update(update_id=0, message=message)
             await help_cmd(update, context)
             context.bot.send_message.assert_called_once_with(
                 chat_id=update.message.chat_id,
