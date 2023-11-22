@@ -5,7 +5,7 @@ from telegram.ext import CallbackContext
 from spotted.data import PendingPost
 from spotted.utils import EventInfo
 
-from .constants import STATE
+from .constants import ConversationState
 
 
 async def cancel_cmd(update: Update, context: CallbackContext) -> int:
@@ -21,7 +21,7 @@ async def cancel_cmd(update: Update, context: CallbackContext) -> int:
     """
     info = EventInfo.from_message(update, context)
     if not info.is_private_chat:  # you can only cancel a post with a private message
-        return STATE["end"]
+        return ConversationState.END.value
     pending_post = PendingPost.from_user(user_id=info.user_id)
     if pending_post:  # if the user has a pending post in evaluation, delete it
         admin_group_id = pending_post.admin_group_id
@@ -32,4 +32,4 @@ async def cancel_cmd(update: Update, context: CallbackContext) -> int:
         await info.bot.send_message(chat_id=info.chat_id, text="Lo spot precedentemente inviato è stato cancellato")
     else:
         await info.bot.send_message(chat_id=info.chat_id, text="Operazione annullata")
-    return STATE["end"]
+    return ConversationState.END.value

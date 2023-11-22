@@ -13,9 +13,7 @@ from telegram.ext import (
 from spotted.data import Config, Report
 from spotted.utils import EventInfo, conv_cancel
 
-from .constants import INVALID_MESSAGE_TYPE_ERROR
-
-STATE = {"reporting_spot": 1, "end": -1}
+from .constants import INVALID_MESSAGE_TYPE_ERROR, ConversationState
 
 
 def report_spot_conv_handler() -> ConversationHandler:
@@ -30,7 +28,7 @@ def report_spot_conv_handler() -> ConversationHandler:
     return ConversationHandler(
         entry_points=[CallbackQueryHandler(report_spot_callback, pattern=r"^report\.*")],
         states={
-            STATE["reporting_spot"]: [
+            ConversationState.REPORTING_SPOT.value: [
                 MessageHandler(~filters.COMMAND & ~filters.UpdateType.EDITED_MESSAGE, report_spot_msg)
             ],
         },
@@ -56,7 +54,7 @@ async def report_spot_callback(update: Update, context: CallbackContext) -> int:
     report = Report.get_post_report(user_id=info.user_id, channel_id=info.chat_id, c_message_id=abusive_message_id)
     if report is not None:  # this user has already reported this post
         await info.answer_callback_query(text="Hai già segnalato questo spot")
-        return STATE["end"]
+        return ConversationState.END.value
     try:
         await info.bot.forward_message(chat_id=info.user_id, from_chat_id=info.chat_id, message_id=abusive_message_id)
         await info.bot.send_message(
@@ -67,10 +65,10 @@ async def report_spot_callback(update: Update, context: CallbackContext) -> int:
         await info.answer_callback_query(
             text=f"Assicurati di aver avviato la chat con {Config.settings_get('bot_tag')}"
         )
-        return STATE["end"]
+        return ConversationState.END.value
 
     info.user_data["current_post_reported"] = f"{info.chat_id},{abusive_message_id}"
-    return STATE["reporting_spot"]
+    return ConversationState.REPORTING_SPOT.value
 
 
 async def report_spot_msg(update: Update, context: CallbackContext) -> int:
@@ -87,14 +85,14 @@ async def report_spot_msg(update: Update, context: CallbackContext) -> int:
     info = EventInfo.from_message(update, context)
 
     if not info.is_private_chat:
-        return STATE["reporting_spot"]
+        return ConversationState.REPORTING_SPOT.value
 
     if not info.is_valid_message_type:  # the type is NOT supported
         await info.bot.send_message(chat_id=info.chat_id, text=INVALID_MESSAGE_TYPE_ERROR)
-        return STATE["reporting_spot"]
+        return ConversationState.REPORTING_SPOT.value
 
     if context.user_data is None or "current_post_reported" not in context.user_data:
-        return STATE["end"]
+        return ConversationState.END.value
 
     chat_id = Config.post_get("admin_group_id")  # should be admin group
     channel_id, target_message_id = context.user_data["current_post_reported"].split(",")
@@ -109,4 +107,4 @@ async def report_spot_msg(update: Update, context: CallbackContext) -> int:
         user_id=info.user_id, channel_id=channel_id, c_message_id=target_message_id, admin_message=admin_message
     )
 
-    return STATE["end"]
+    return ConversationState.END.value

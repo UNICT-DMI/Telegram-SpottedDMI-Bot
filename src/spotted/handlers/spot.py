@@ -15,9 +15,7 @@ from spotted.data import Config, User
 from spotted.data.data_reader import read_md
 from spotted.utils import EventInfo, conv_cancel, get_confirm_kb, get_preview_kb
 
-from .constants import CHAT_PRIVATE_ERROR, INVALID_MESSAGE_TYPE_ERROR
-
-STATE = {"posting": 1, "preview": 2, "confirm": 3, "end": -1}
+from .constants import CHAT_PRIVATE_ERROR, INVALID_MESSAGE_TYPE_ERROR, ConversationState
 
 
 def spot_conv_handler() -> ConversationHandler:
@@ -33,11 +31,11 @@ def spot_conv_handler() -> ConversationHandler:
     return ConversationHandler(
         entry_points=[CommandHandler("spot", spot_cmd, filters=filters.ChatType.PRIVATE)],
         states={
-            STATE["posting"]: [
+            ConversationState.POSTING.value: [
                 MessageHandler(~filters.COMMAND & ~filters.UpdateType.EDITED_MESSAGE, spot_msg),
             ],
-            STATE["preview"]: [CallbackQueryHandler(spot_preview_query, pattern=r"^post_preview,.+")],
-            STATE["confirm"]: [CallbackQueryHandler(spot_confirm_query, pattern=r"^post_confirm,.+")],
+            ConversationState.POSTING_PREVIEW.value: [CallbackQueryHandler(spot_preview_query, pattern=r"^post_preview,.+")],
+            ConversationState.POSTING_CONFIRM.value: [CallbackQueryHandler(spot_confirm_query, pattern=r"^post_confirm,.+")],
         },
         fallbacks=[CommandHandler("cancel", conv_cancel("spot"))],
         allow_reentry=False,
@@ -59,18 +57,18 @@ async def spot_cmd(update: Update, context: CallbackContext) -> int:
     user = User(info.user_id)
     if not info.is_private_chat:  # you can only post from a private chat
         await info.bot.send_message(chat_id=info.chat_id, text=CHAT_PRIVATE_ERROR)
-        return STATE["end"]
+        return ConversationState.END.value
 
     if user.is_banned:  # the user is banned
         await info.bot.send_message(chat_id=info.chat_id, text="Sei stato bannato 😅")
-        return STATE["end"]
+        return ConversationState.END.value
 
     if user.is_pending:  # there is already a post in pending
         await info.bot.send_message(chat_id=info.chat_id, text="Hai già un post in approvazione 🧐")
-        return STATE["end"]
+        return ConversationState.END.value
 
     await info.bot.send_message(chat_id=info.chat_id, text="Invia il post che vuoi pubblicare")
-    return STATE["posting"]
+    return ConversationState.POSTING.value
 
 
 async def spot_msg(update: Update, context: CallbackContext) -> int:
@@ -88,7 +86,7 @@ async def spot_msg(update: Update, context: CallbackContext) -> int:
 
     if not info.is_valid_message_type:  # the type is NOT supported
         await info.bot.send_message(chat_id=info.chat_id, text=INVALID_MESSAGE_TYPE_ERROR)
-        return STATE["posting"]
+        return ConversationState.POSTING.value
 
     if info.message.entities:
         types = [entity.type for entity in info.message.entities]
@@ -100,7 +98,7 @@ async def spot_msg(update: Update, context: CallbackContext) -> int:
                 reply_to_message_id=info.message_id,
                 reply_markup=get_preview_kb(),
             )
-            return STATE["preview"]
+            return ConversationState.POSTING_PREVIEW.value
 
     await info.bot.send_message(
         chat_id=info.chat_id,
@@ -108,7 +106,7 @@ async def spot_msg(update: Update, context: CallbackContext) -> int:
         reply_to_message_id=info.message_id,
         reply_markup=get_confirm_kb(),
     )
-    return STATE["confirm"]
+    return ConversationState.POSTING_CONFIRM.value
 
 
 async def spot_preview_query(update: Update, context: CallbackContext) -> int:
@@ -134,7 +132,7 @@ async def spot_preview_query(update: Update, context: CallbackContext) -> int:
         text="Sei sicuro di voler pubblicare questo post?",
         reply_markup=get_confirm_kb(),
     )
-    return STATE["confirm"]
+    return ConversationState.POSTING_CONFIRM.value
 
 
 async def spot_confirm_query(update: Update, context: CallbackContext) -> int:
@@ -169,4 +167,4 @@ async def spot_confirm_query(update: Update, context: CallbackContext) -> int:
         text = choice(read_md("no_strings").split("\n"))
 
     await info.bot.edit_message_text(chat_id=info.chat_id, message_id=info.message_id, text=text)
-    return STATE["end"]
+    return ConversationState.END.value

@@ -11,9 +11,7 @@ from telegram.ext import (
 from spotted.data import Config, Report
 from spotted.utils import EventInfo, conv_cancel
 
-from .constants import CHAT_PRIVATE_ERROR, INVALID_MESSAGE_TYPE_ERROR
-
-STATE = {"reporting_user": 1, "reporting_user_reason": 2, "end": -1}
+from .constants import CHAT_PRIVATE_ERROR, INVALID_MESSAGE_TYPE_ERROR, ConversationState
 
 
 def report_user_conv_handler() -> ConversationHandler:
@@ -29,10 +27,10 @@ def report_user_conv_handler() -> ConversationHandler:
     return ConversationHandler(
         entry_points=[CommandHandler("report", report_cmd, filters=filters.ChatType.PRIVATE)],
         states={
-            STATE["reporting_user"]: [
+            ConversationState.REPORTING_USER.value: [
                 MessageHandler(~filters.COMMAND & ~filters.UpdateType.EDITED_MESSAGE, report_user_msg)
             ],
-            STATE["reporting_user_reason"]: [
+            ConversationState.REPORTING_USER_REASON.value: [
                 MessageHandler(~filters.COMMAND & ~filters.UpdateType.EDITED_MESSAGE, report_user_sent_msg)
             ],
         },
@@ -55,7 +53,7 @@ async def report_cmd(update: Update, context: CallbackContext) -> int:
     info = EventInfo.from_message(update, context)
     if not info.is_private_chat:  # you can only post with a private message
         await info.bot.send_message(chat_id=info.chat_id, text=CHAT_PRIVATE_ERROR)
-        return STATE["end"]
+        return ConversationState.END.value
 
     user_report = Report.get_last_user_report(user_id=info.user_id)
 
@@ -65,11 +63,11 @@ async def report_cmd(update: Update, context: CallbackContext) -> int:
 
         if remain_minutes > 0:
             await info.bot.send_message(chat_id=info.chat_id, text=f"Aspetta {remain_minutes} minuti")
-            return STATE["end"]
+            return ConversationState.END.value
 
     await info.bot.send_message(chat_id=info.chat_id, text="Invia l'username di chi vuoi segnalare. Es. @massimobene")
 
-    return STATE["reporting_user"]
+    return ConversationState.REPORTING_USER.value
 
 
 async def report_user_msg(update: Update, context: CallbackContext) -> int:
@@ -91,10 +89,10 @@ async def report_user_msg(update: Update, context: CallbackContext) -> int:
             text="Questo tipo di messaggio non è supportato\n"
             "È consentito solo username telegram. Puoi annullare il processo con /cancel",
         )
-        return STATE["reporting_user"]
+        return ConversationState.REPORTING_USER.value
 
     if context.user_data is None:
-        return STATE["end"]
+        return ConversationState.END.value
 
     context.user_data["current_report_target"] = reported_user
 
@@ -106,7 +104,7 @@ async def report_user_msg(update: Update, context: CallbackContext) -> int:
         "Puoi annullare il processo con /cancel",
     )
 
-    return STATE["reporting_user_reason"]
+    return ConversationState.REPORTING_USER_REASON.value
 
 
 async def report_user_sent_msg(update: Update, context: CallbackContext) -> int:
@@ -123,10 +121,10 @@ async def report_user_sent_msg(update: Update, context: CallbackContext) -> int:
     info = EventInfo.from_message(update, context)
     if not info.is_valid_message_type:  # the type is NOT supported
         await info.bot.send_message(chat_id=info.chat_id, text=INVALID_MESSAGE_TYPE_ERROR)
-        return STATE["reporting_user_reason"]
+        return ConversationState.REPORTING_USER_REASON.value
 
     if context.user_data is None or "current_report_target" not in context.user_data:
-        return STATE["end"]
+        return ConversationState.END.value
 
     target_username = context.user_data["current_report_target"]
 
@@ -141,4 +139,4 @@ async def report_user_sent_msg(update: Update, context: CallbackContext) -> int:
 
     Report.create_user_report(user_id=info.user_id, target_username=target_username, admin_message=admin_message)
 
-    return STATE["end"]
+    return ConversationState.END.value
