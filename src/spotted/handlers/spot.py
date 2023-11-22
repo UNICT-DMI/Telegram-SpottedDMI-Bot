@@ -34,8 +34,12 @@ def spot_conv_handler() -> ConversationHandler:
             ConversationState.POSTING.value: [
                 MessageHandler(~filters.COMMAND & ~filters.UpdateType.EDITED_MESSAGE, spot_msg),
             ],
-            ConversationState.POSTING_PREVIEW.value: [CallbackQueryHandler(spot_preview_query, pattern=r"^post_preview,.+")],
-            ConversationState.POSTING_CONFIRM.value: [CallbackQueryHandler(spot_confirm_query, pattern=r"^post_confirm,.+")],
+            ConversationState.POSTING_PREVIEW.value: [
+                CallbackQueryHandler(spot_preview_query, pattern=r"^post_preview,.+")
+            ],
+            ConversationState.POSTING_CONFIRM.value: [
+                CallbackQueryHandler(spot_confirm_query, pattern=r"^post_confirm,.+")
+            ],
         },
         fallbacks=[CommandHandler("cancel", conv_cancel("spot"))],
         allow_reentry=False,
