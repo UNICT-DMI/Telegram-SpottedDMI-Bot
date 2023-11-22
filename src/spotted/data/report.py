@@ -88,7 +88,11 @@ class Report:
         date = datetime.now()
 
         return cls(
-            user_id=user_id, admin_group_id=admin_group_id, g_message_id=g_message_id, target_username=target_username, date=date
+            user_id=user_id,
+            admin_group_id=admin_group_id,
+            g_message_id=g_message_id,
+            target_username=target_username,
+            date=date,
         ).save_report()
 
     @classmethod

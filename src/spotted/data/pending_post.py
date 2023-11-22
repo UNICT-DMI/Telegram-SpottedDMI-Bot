@@ -42,7 +42,11 @@ class PendingPost:
         date = datetime.now(tz=timezone.utc)
 
         return cls(
-            user_id=user_id, u_message_id=u_message_id, g_message_id=g_message_id, admin_group_id=admin_group_id, date=date
+            user_id=user_id,
+            u_message_id=u_message_id,
+            g_message_id=g_message_id,
+            admin_group_id=admin_group_id,
+            date=date,
         ).save_post()
 
     @classmethod
@@ -120,7 +124,10 @@ class PendingPost:
             )
         else:
             pending_posts_id = DbManager.select_from(
-                select="g_message_id", table_name="pending_post", where="admin_group_id = %s", where_args=(admin_group_id,)
+                select="g_message_id",
+                table_name="pending_post",
+                where="admin_group_id = %s",
+                where_args=(admin_group_id,),
             )
         pending_posts = []
         for post in pending_posts_id:

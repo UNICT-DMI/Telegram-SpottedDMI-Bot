@@ -301,7 +301,9 @@ class TestBot:
             The autoreply command can only be submitted by replying to a pending post or report
             """
             await telegram.send_message("Random message")
-            await telegram.send_command(f"/autoreply {autoreply}", chat=admin_group, reply_to_message=telegram.last_message)
+            await telegram.send_command(
+                f"/autoreply {autoreply}", chat=admin_group, reply_to_message=telegram.last_message
+            )
             assert telegram.last_message.text.startswith("Il messaggio selezionato non è valido")
 
         @pytest.mark.parametrize("autoreply", Config.autoreplies_get("autoreplies").keys())
