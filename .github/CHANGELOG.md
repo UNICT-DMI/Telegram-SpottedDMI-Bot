@@ -17,6 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - The name of the main module will be `spotted` (hence `import spotted`)
 - the project will be versioned, starting from 2.0.0. So you will need a tag with a new version to publish the new python package
 - Timestamp to the user_follow table to keep track of when a user started following a post
+- Utility script `run_sql` to run an arbitrary sql script on the indicated sqlite3 database
 
 ### Fixed
 

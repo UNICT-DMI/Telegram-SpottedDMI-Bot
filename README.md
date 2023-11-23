@@ -250,7 +250,8 @@ post:
   n_votes: 2 # votes needed to approve/reject a pending post
   remove_after_h: 12 # number of hours after wich pending posts will be automatically by /clean_pending
   report_wait_mins: 30 # number of minutes the user has to wait before being able to report another user again
-  report: true # whether to add a report button as an inline keyboard after each post
+  report:
+    true # whether to add a report button as an inline keyboard after each post
     # whether the bot should delete any anonym comment coming from a channel.
     # The bots must have delete permission in the group and comments must be enabled
   delete_anonymous_comments:
@@ -374,6 +375,12 @@ pip3 install -e .[lint]
 
 The `scripts` folder contains some utility scripts that can be used to simulate the whole CI pipeline locally.
 Make sure to have the dev dependencies installed before running them.
+
+Furthermore, the package provides a `run_sql` script that can be used to run an arbitrary sql script on the indicated sqlite3 database.
+
+```shell
+run_sql <path_to_sql_script> <path_to_db_file>
+```
 
 ## 📚 Documentation
 

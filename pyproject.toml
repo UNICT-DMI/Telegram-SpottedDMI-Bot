@@ -67,10 +67,8 @@ Repository = "https://github.com/UNICT-DMI/Telegram-SpottedDMI-Bot"
 Changelog = "https://github.com/UNICT-DMI/Telegram-SpottedDMI-Bot/blob/main/.github/CHANGELOG.md"
 
 # Entry points of the package
-# [project.scripts]
-# spotted-generate-db = "telegram-spotted-dmi-bot.skeleton:run"
-# spotted-reset-db = "telegram-spotted-dmi-bot.skeleton:run"
-# spotted-get-banned-db = "telegram-spotted-dmi-bot.skeleton:run"
+[project.scripts]
+run_sql = "spotted.scripts.run_sql:main"
 
 # Setuptool configuration (build system)
 [tool.setuptools]

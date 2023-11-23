@@ -15,7 +15,11 @@ if TYPE_CHECKING:
 
 
 def parse_args() -> "SpottedArgs":
-    """Parse the command line arguments"""
+    """Parse the command line arguments
+
+    Returns:
+        data structure containing the command line arguments
+    """
     parser = argparse.ArgumentParser(description="Telegram Spotted DMI bot")
     parser.add_argument("--version", action="version", version=__version__)
     parser.add_argument("-s", "--settings", help="Path to the settings file", default="settings.yaml")
