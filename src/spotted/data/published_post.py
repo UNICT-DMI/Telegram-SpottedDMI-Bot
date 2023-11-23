@@ -50,7 +50,8 @@ class PublishedPost:
         if len(result) == 0:
             return None
 
-        return cls(channel_id=result["channel_id"], c_message_id=result["c_message_id"], date=result["message_date"])
+        post = result[0]
+        return cls(channel_id=post["channel_id"], c_message_id=post["c_message_id"], date=post["message_date"])
 
     def save_post(self) -> "PublishedPost":
         """Saves the published_post in the database"""

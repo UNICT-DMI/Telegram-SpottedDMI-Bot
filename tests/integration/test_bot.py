@@ -763,7 +763,10 @@ class TestBot:
                 user=TGUser(1, first_name="Telegram", is_bot=False),
             )
             assert telegram.last_message.text.startswith("by: ")
-            assert PublishedPost(channel_id=channel.id, c_message_id=c_message.message_id)
+            if Config.post_get("comments"):
+                assert PublishedPost.from_channel(channel_group.id, telegram.last_message.id) is not None
+            else:
+                assert PublishedPost.from_channel(channel.id, c_message.id) is not None
 
     class TestRejectSpot:
         """Tests the complete publishing spot pipeline"""
