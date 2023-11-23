@@ -64,5 +64,7 @@ CREATE TABLE IF NOT EXISTS user_follow
 (
   user_id BIGINT NOT NULL,
   message_id BIGINT NOT NULL,
-  private_message_id BIGINT NOT NULL
+  private_message_id BIGINT NOT NULL,
+  follow_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (user_id, message_id)
 );

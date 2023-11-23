@@ -18,11 +18,13 @@ class User:
         user_id: id of the user
         private_message_id: id of the private message sent by the user to the bot. Only used for following
         ban_date: datetime of when the user was banned. Only used for banned users
+        follow_date: datetime of when the user started following a post. Only used for following users
     """
 
     user_id: int
     private_message_id: int | None = None
     ban_date: datetime | None = None
+    follow_date: datetime | None = None
 
     @property
     def is_pending(self) -> bool:
@@ -67,10 +69,10 @@ class User:
             in the user's conversation with the bot
         """
         return [
-            cls(user_id=row["user_id"], private_message_id=row["private_message_id"])
+            cls(user_id=row["user_id"], private_message_id=row["private_message_id"], follow_date=row["follow_date"])
             for row in DbManager.select_from(
                 table_name="user_follow",
-                select="user_id, private_message_id",
+                select="user_id, private_message_id, follow_date",
                 where="message_id = %s",
                 where_args=(message_id,),
             )
