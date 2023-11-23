@@ -68,6 +68,7 @@ class Report:
             c_message_id=c_message_id,
             admin_group_id=admin_group_id,
             g_message_id=g_message_id,
+            date=datetime.now(),
         ).save_report()
 
     @classmethod
@@ -85,14 +86,13 @@ class Report:
 
         g_message_id = admin_message.message_id
         admin_group_id = admin_message.chat_id
-        date = datetime.now()
 
         return cls(
             user_id=user_id,
             admin_group_id=admin_group_id,
             g_message_id=g_message_id,
             target_username=target_username,
-            date=date,
+            date=datetime.now(),
         ).save_report()
 
     @classmethod
@@ -124,6 +124,7 @@ class Report:
             c_message_id=report["c_message_id"],
             admin_group_id=report["admin_group_id"],
             g_message_id=report["g_message_id"],
+            date=report["message_date"],
         )
 
     @classmethod
@@ -173,7 +174,7 @@ class Report:
             where_args=(admin_group_id, g_message_id),
         )
 
-        if len(reports) > 0:  # the vote is not present
+        if len(reports) > 0:  # the report has been found
             report = reports[0]
             return cls(
                 user_id=report["user_id"],
@@ -190,13 +191,14 @@ class Report:
             where_args=(admin_group_id, g_message_id),
         )
 
-        if len(reports) > 0:  # the vote is not present
+        if len(reports) > 0:  # the report has been found
             report = reports[0]
             return cls(
                 user_id=report["user_id"],
                 c_message_id=report["c_message_id"],
                 admin_group_id=report["admin_group_id"],
                 g_message_id=report["g_message_id"],
+                date=report["message_date"],
             )
 
         return None
@@ -206,8 +208,15 @@ class Report:
         if self.c_message_id is not None:
             DbManager.insert_into(
                 table_name="spot_report",
-                columns=("user_id", "channel_id", "c_message_id", "admin_group_id", "g_message_id"),
-                values=(self.user_id, self.channel_id, self.c_message_id, self.admin_group_id, self.g_message_id),
+                columns=("user_id", "channel_id", "message_date", "c_message_id", "admin_group_id", "g_message_id"),
+                values=(
+                    self.user_id,
+                    self.channel_id,
+                    self.date,
+                    self.c_message_id,
+                    self.admin_group_id,
+                    self.g_message_id,
+                ),
             )
         else:
             DbManager.insert_into(
@@ -223,6 +232,7 @@ class Report:
                 f"PostReport: [ user_id: {self.user_id}\n"
                 f"channel_id: {self.channel_id}\n"
                 f"c_message_id: {self.c_message_id}\n"
+                f"date: {self.date}\n"
                 f"admin_group_id: {self.admin_group_id}\n"
                 f"g_message_id: {self.g_message_id} ]"
             )

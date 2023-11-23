@@ -46,6 +46,7 @@ CREATE TABLE IF NOT EXISTS spot_report
   c_message_id BIGINT NOT NULL,
   g_message_id BIGINT NOT NULL,
   admin_group_id BIGINT NOT NULL,
+  message_date TIMESTAMP NOT NULL,
   PRIMARY KEY (user_id, c_message_id),
   FOREIGN KEY (c_message_id) REFERENCES published_post (c_message_id) ON DELETE CASCADE ON UPDATE CASCADE
 );
