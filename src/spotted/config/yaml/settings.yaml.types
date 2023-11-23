@@ -11,7 +11,6 @@ post:
   admin_group_id: int
   n_votes: int
   remove_after_h: int
-  tag: bool
   report: bool
   report_wait_mins: int
   replace_anonymous_comments: bool

@@ -12,7 +12,6 @@ post:
   admin_group_id: -3
   n_votes: 2
   remove_after_h: 12
-  tag: false
   report: true
   report_wait_mins: 30
   replace_anonymous_comments: true

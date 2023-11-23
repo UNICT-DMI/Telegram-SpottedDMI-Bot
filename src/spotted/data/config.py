@@ -17,7 +17,6 @@ SettingsPostKeys = Literal[
     "admin_group_id",
     "n_votes",
     "remove_after_h",
-    "tag",
     "report",
     "report_wait_mins",
     "replace_anonymous_comments",

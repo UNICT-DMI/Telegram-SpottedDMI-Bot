@@ -251,8 +251,6 @@ post:
   remove_after_h: 12 # number of hours after wich pending posts will be automatically by /clean_pending
   report_wait_mins: 30 # number of minutes the user has to wait before being able to report another user again
   report: true # whether to add a report button as an inline keyboard after each post
-  tag:
-    false # whether or not the bot should tag the admins or just write their usernames
     # whether the bot should delete any anonym comment coming from a channel.
     # The bots must have delete permission in the group and comments must be enabled
   delete_anonymous_comments:
@@ -321,7 +319,6 @@ post:
   admin_group_id: int
   n_votes: int
   remove_after_h: int
-  tag: bool
   report: bool
   report_wait_mins: int
   replace_anonymous_comments: bool
