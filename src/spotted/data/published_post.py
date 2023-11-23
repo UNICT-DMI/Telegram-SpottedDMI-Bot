@@ -1,5 +1,6 @@
 """Published post management"""
 from dataclasses import dataclass
+from datetime import datetime
 
 from .db_manager import DbManager
 
@@ -15,6 +16,7 @@ class PublishedPost:
 
     channel_id: int
     c_message_id: int
+    date: datetime
 
     @classmethod
     def create(cls, channel_id: int, c_message_id: int) -> "PublishedPost":
@@ -27,7 +29,7 @@ class PublishedPost:
         Returns:
             instance of the class
         """
-        return cls(channel_id=channel_id, c_message_id=c_message_id).save_post()
+        return cls(channel_id=channel_id, c_message_id=c_message_id, date=datetime.now()).save_post()
 
     @classmethod
     def from_channel(cls, channel_id: int, c_message_id: int) -> "PublishedPost | None":
@@ -40,24 +42,28 @@ class PublishedPost:
         Returns:
             instance of the class
         """
-        is_present = DbManager.count_from(
+        result = DbManager.select_from(
             table_name="published_post",
             where="channel_id = %s and c_message_id = %s",
             where_args=(channel_id, c_message_id),
         )
-        if not is_present:
+        if len(result) == 0:
             return None
 
-        return cls(channel_id=channel_id, c_message_id=c_message_id)
+        return cls(channel_id=result["channel_id"], c_message_id=result["c_message_id"], date=result["message_date"])
 
     def save_post(self) -> "PublishedPost":
         """Saves the published_post in the database"""
         DbManager.insert_into(
             table_name="published_post",
-            columns=("channel_id", "c_message_id"),
-            values=(self.channel_id, self.c_message_id),
+            columns=("channel_id", "c_message_id", "message_date"),
+            values=(self.channel_id, self.c_message_id, self.date),
         )
         return self
 
     def __repr__(self) -> str:
-        return f"PublishedPost: [ channel_id: {self.channel_id}\n" f"c_message_id: {self.c_message_id} ]"
+        return (
+            f"PublishedPost: [ channel_id: {self.channel_id}\n"
+            f"c_message_id: {self.c_message_id} \n"
+            f"date: {self.date} ]"
+        )

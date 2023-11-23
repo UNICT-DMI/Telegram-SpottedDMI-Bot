@@ -5,7 +5,7 @@ CREATE TABLE IF NOT EXISTS pending_post
   u_message_id BIGINT NOT NULL,
   g_message_id BIGINT NOT NULL,
   admin_group_id BIGINT NOT NULL,
-  message_date TIMESTAMP,
+  message_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (admin_group_id, g_message_id)
 );
 -----
@@ -13,6 +13,7 @@ CREATE TABLE IF NOT EXISTS published_post
 (
   channel_id BIGINT NOT NULL,
   c_message_id BIGINT NOT NULL,
+  message_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (channel_id, c_message_id)
 );
 -----
@@ -46,7 +47,7 @@ CREATE TABLE IF NOT EXISTS spot_report
   c_message_id BIGINT NOT NULL,
   g_message_id BIGINT NOT NULL,
   admin_group_id BIGINT NOT NULL,
-  message_date TIMESTAMP NOT NULL,
+  message_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (user_id, c_message_id),
   FOREIGN KEY (c_message_id) REFERENCES published_post (c_message_id) ON DELETE CASCADE ON UPDATE CASCADE
 );
@@ -57,7 +58,7 @@ CREATE TABLE IF NOT EXISTS user_report
   target_username VARCHAR(32) NOT NULL,
   g_message_id BIGINT NOT NULL,
   admin_group_id BIGINT NOT NULL,
-  message_date TIMESTAMP NOT NULL,
+  message_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (user_id, target_username, message_date)
 );
 -----
