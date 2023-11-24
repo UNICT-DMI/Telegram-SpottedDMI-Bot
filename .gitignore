@@ -68,6 +68,7 @@ instance/
 # Sphinx documentation
 docs/_build/
 .sphinx/
+docs/source/api/
 
 # PyBuilder
 target/
@@ -126,3 +127,7 @@ logs/*.log
 
 # Dev
 test.py
+
+# Local config
+/settings.yaml
+/autoreplies.yaml

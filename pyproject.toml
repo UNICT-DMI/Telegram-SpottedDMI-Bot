@@ -1,0 +1,119 @@
+[build-system]
+requires = ["setuptools>=46.1.0", "setuptools_scm[toml]>=5"]
+build-backend = "setuptools.build_meta"
+
+# Metadata of the project
+[project]
+name = "telegram-spotted-dmi-bot"
+description = "Telegram-SpottedDMI-Bot is the platform that powers @Spotted_DMI_Bot, a Telegram bot that let students send an anonymous message to the channel community"
+readme = "README.md"
+requires-python = ">=3.10"
+license.file = "LICENSE"
+authors = [
+    { name = "TendTo", email = "casablancaerneto@gmail.com" },
+    { name = "drendog" },
+    { name = "Helias" },
+    { name = "Herbrant" },
+    { name = "alepiaz" },
+    { name = "TaToTanWeb" },
+    { name = "FilippoMarletta" },
+]
+maintainers = [
+    { name = "TendTo", email = "casablancaerneto@gmail.com" },
+    { name = "drendog" },
+    { name = "Helias" },
+    { name = "alepiaz" },
+    { name = "TaToTanWeb" },
+]
+keywords = ["python", "telegram", "bot", "spotted", "dmi", "unict"]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Programming Language :: Python",
+    "License :: OSI Approved :: MIT License",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Education",
+    "Topic :: Communications :: Chat",
+    "Operating System :: OS Independent",
+]
+dependencies = [
+    "anyio==4.0.0",
+    "APScheduler==3.10.4",
+    "certifi==2023.7.22",
+    "h11==0.14.0",
+    "httpcore==0.18.0",
+    "httpx==0.25.0",
+    "idna==3.4",
+    "python-telegram-bot==20.6",
+    "pytz==2023.3.post1",
+    "PyYAML==6.0.1",
+    "six==1.16.0",
+    "sniffio==1.3.0",
+    "tzlocal==5.2",
+]
+dynamic = ['version']
+
+# All the optional dependencies of the project
+# Can be installed with `pip install telegram-spotted-dmi-bot[dependency]`
+# e.g. `pip install telegram-spotted-dmi-bot[test]`
+[project.optional-dependencies]
+test = ["pytest", "pytest-asyncio", "pytest-cov", "pytest-mock"]
+lint = ["pylint", "black", "isort"]
+
+# URLs of the project
+[project.urls]
+Homepage = "https://unict-dmi.github.io/Telegram-SpottedDMI-Bot/"
+Documentation = "https://unict-dmi.github.io/Telegram-SpottedDMI-Bot/modules"
+Repository = "https://github.com/UNICT-DMI/Telegram-SpottedDMI-Bot"
+Changelog = "https://github.com/UNICT-DMI/Telegram-SpottedDMI-Bot/blob/main/.github/CHANGELOG.md"
+
+# Entry points of the package
+[project.scripts]
+run_sql = "spotted.scripts.run_sql:main"
+
+# Setuptool configuration (build system)
+[tool.setuptools]
+include-package-data = true
+package-dir = { "" = "src" }
+
+[tool.setuptools.dynamic]
+version = { attr = "spotted.__version__" }
+
+# Pytest configuration (test runner)
+[tool.pytest.ini_options]
+minversion = "6.0"
+addopts = [
+    "--cov=spotted",
+    "--cov-report=term-missing",
+    "--cov-report=html",
+    "--cov-fail-under=80",
+    "--verbose",
+]
+testpaths = ["tests"]
+
+# Black configuration (code formatter)
+[tool.black]
+target-version = ['py38', 'py39', 'py310', 'py311']
+line-length = 120
+include_trailing_comma = false
+include = '(src|tests)\/.*\.py'
+
+# Isort configuration (import sorter)
+[tool.isort]
+profile = "black"
+
+# Pylint configuration (code linter)
+[tool.pylint.MASTER]
+ignore = ['tests']
+fail-under = '10.0'
+
+[tool.pylint.'MESSAGES CONTROL']
+disable = ["missing-module-docstring", "too-few-public-methods"]
+
+[tool.pylint.format]
+max-line-length = 120
+
+[tool.pylint.checker]
+max-args = 7
+
+[tool.pylint.similarities]
+min-similarity-lines = 6

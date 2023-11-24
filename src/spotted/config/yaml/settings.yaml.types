@@ -1,0 +1,21 @@
+debug:
+  local_log: bool
+  reset_on_load: bool
+  log_file: str
+  log_error_file: str
+post:
+  community_group_id: int
+  channel_id: int
+  channel_tag: str
+  comments: bool
+  admin_group_id: int
+  n_votes: int
+  remove_after_h: int
+  report: bool
+  report_wait_mins: int
+  replace_anonymous_comments: bool
+  delete_anonymous_comments: bool
+  reject_after_autoreply: bool
+  autoreplies_per_page: int
+token: str
+bot_tag: str
