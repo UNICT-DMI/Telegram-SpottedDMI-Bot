@@ -1,1 +1,0 @@
-Mi dispi, hai repostato cringe.

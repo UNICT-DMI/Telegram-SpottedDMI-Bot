@@ -1,0 +1,22 @@
+debug:
+  local_log: false
+  reset_on_load: false
+  log_file: "logs/spotted.log"
+  log_error_file: "logs/spotted_error.log"
+  db_file: "spotted.sqlite3"
+post:
+  community_group_id: -1
+  channel_id: -2
+  channel_tag: "@channel_tag"
+  comments: true
+  admin_group_id: -3
+  n_votes: 2
+  remove_after_h: 12
+  report: true
+  report_wait_mins: 30
+  replace_anonymous_comments: true
+  delete_anonymous_comments: true
+  reject_after_autoreply: true
+  autoreplies_per_page: 6
+token: ""
+bot_tag: "@bot_tag"
