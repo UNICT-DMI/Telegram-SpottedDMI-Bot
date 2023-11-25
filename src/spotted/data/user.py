@@ -1,10 +1,11 @@
 """Users management"""
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import datetime, timedelta
 from random import choice
 
 from telegram import Bot
 
+from .config import Config
 from .data_reader import read_md
 from .db_manager import DbManager
 from .pending_post import PendingPost
@@ -40,6 +41,14 @@ class User:
     def is_credited(self) -> bool:
         """If the user is in the credited list"""
         return DbManager.count_from(table_name="credited_users", where="user_id = %s", where_args=(self.user_id,)) == 1
+
+    def get_n_warns(self) -> int:
+        """_summary_
+
+        Returns:
+            int: _description_
+        """
+        return DbManager.count_from(table_name="warned_users", where="user_id = %s", where_args=self.user_id)
 
     @classmethod
     def banned_users(cls) -> "list[User]":
@@ -94,6 +103,39 @@ class User:
             DbManager.delete_from(table_name="banned_users", where="user_id = %s", where_args=(self.user_id,))
             return True
         return False
+
+    def ban_from_community(self, bot: Bot):
+        bot.ban_chat_member(Config.post_get("community_group_id"), self.user_id)
+
+    def mute(self, bot: Bot, days: int = 0):
+        bot.restrict_chat_member(
+            chat_id=Config.post_get("channel_id"),
+            user_id=self.user_id,
+            can_send_messages=False,
+            can_send_media_messages=False,
+            can_send_other_messages=False,
+            can_add_web_page_previews=False,
+        )
+        current_date_time = datetime.now()
+        expiration_date_time = (current_date_time + timedelta(days=days)).strftime("%Y-%m-%d %H:%M:%S")
+        DbManager.insert_into(
+            table_name="muted_users",
+            columns=("user_id", "expiration_date"),
+            values=(self.user_id, expiration_date_time),
+        )
+
+    def warn(self, bot: Bot):
+        """_summary_"""
+        n_warns = self.get_n_warns()
+
+        if n_warns < 2:
+            text = f"L'utente {self.user_id} è stato warnato."
+            DbManager.insert_into(table_name="warned_users", columns="user_id", values=self.user_id)
+        else:
+            self.ban()
+            self.ban_from_community(bot)
+            text = f"L'utente {self.user_id} è stato bannato."
+        bot.send_message(chat_id=Config.post_get("community_group_id"), text=text)
 
     def become_anonym(self) -> bool:
         """Removes the user from the credited list, if he was present
