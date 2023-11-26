@@ -38,6 +38,7 @@ from .sban import sban_cmd
 from .settings import settings_callback, settings_cmd
 from .spot import spot_conv_handler
 from .start import start_cmd
+from .warn import warn_cmd
 
 
 async def add_commands(app: Application):
@@ -109,6 +110,7 @@ def add_handlers(app: Application):
     app.add_handler(CommandHandler("db_backup", db_backup_cmd, filters=admin_filter))
     app.add_handler(CommandHandler("purge", purge_cmd, filters=admin_filter))
     app.add_handler(CommandHandler("reload", reload_cmd, filters=admin_filter))
+    app.add_handler(CommandHandler("warn", warn_cmd, filters=admin_filter & community_filter))
 
     # MessageHandler
     app.add_handler(MessageHandler(filters.REPLY & admin_filter & filters.Regex(r"^/ban$"), ban_cmd))
