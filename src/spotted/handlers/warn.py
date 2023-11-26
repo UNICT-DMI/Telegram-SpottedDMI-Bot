@@ -1,6 +1,7 @@
 """/warn command"""
 from telegram import Update
 from telegram.ext import CallbackContext
+
 from spotted.data import Config, User
 from spotted.utils import EventInfo
 
