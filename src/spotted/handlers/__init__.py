@@ -85,7 +85,8 @@ def add_handlers(app: Application):
     if Config.settings_get("debug", "local_log"):  # add MessageHandler only if log_message is enabled
         app.add_handler(MessageHandler(filters.ALL, log_message), 1)
 
-    admin_filter = filters.Chat(chat_id=Config.post_get("admin_group_id"))
+    # admin_message_filter = filters.MessageFilter
+    admin_group_filter = filters.Chat(chat_id=Config.post_get("admin_group_id"))
     community_filter = filters.Chat(chat_id=Config.post_get("community_group_id"))
 
     # Error handler
@@ -98,24 +99,24 @@ def add_handlers(app: Application):
 
     # Command handlers
     app.add_handler(CommandHandler("start", start_cmd, filters=filters.ChatType.PRIVATE))
-    app.add_handler(CommandHandler("help", help_cmd, filters=filters.ChatType.PRIVATE | admin_filter))
+    app.add_handler(CommandHandler("help", help_cmd, filters=filters.ChatType.PRIVATE | admin_group_filter))
     app.add_handler(CommandHandler("rules", rules_cmd, filters=filters.ChatType.PRIVATE))
     app.add_handler(CommandHandler("settings", settings_cmd, filters=filters.ChatType.PRIVATE))
     # it must be after the conversation handler's 'cancel'
     app.add_handler(CommandHandler("cancel", cancel_cmd, filters=filters.ChatType.PRIVATE))
 
     # Command handlers: Admin commands
-    app.add_handler(CommandHandler("sban", sban_cmd, filters=admin_filter))
-    app.add_handler(CommandHandler("clean_pending", clean_pending_cmd, filters=admin_filter))
-    app.add_handler(CommandHandler("db_backup", db_backup_cmd, filters=admin_filter))
-    app.add_handler(CommandHandler("purge", purge_cmd, filters=admin_filter))
-    app.add_handler(CommandHandler("reload", reload_cmd, filters=admin_filter))
-    app.add_handler(CommandHandler("warn", warn_cmd, filters=admin_filter & community_filter))
+    app.add_handler(CommandHandler("sban", sban_cmd, filters=admin_group_filter))
+    app.add_handler(CommandHandler("clean_pending", clean_pending_cmd, filters=admin_group_filter))
+    app.add_handler(CommandHandler("db_backup", db_backup_cmd, filters=admin_group_filter))
+    app.add_handler(CommandHandler("purge", purge_cmd, filters=admin_group_filter))
+    app.add_handler(CommandHandler("reload", reload_cmd, filters=admin_group_filter))
+    app.add_handler(CommandHandler("warn", warn_cmd, filters=community_filter))
 
     # MessageHandler
-    app.add_handler(MessageHandler(filters.REPLY & admin_filter & filters.Regex(r"^/ban$"), ban_cmd))
-    app.add_handler(MessageHandler(filters.REPLY & admin_filter & filters.Regex(r"^/reply"), reply_cmd))
-    app.add_handler(MessageHandler(filters.REPLY & admin_filter & filters.Regex(r"^/autoreply"), autoreply_cmd))
+    app.add_handler(MessageHandler(filters.REPLY & admin_group_filter & filters.Regex(r"^/ban$"), ban_cmd))
+    app.add_handler(MessageHandler(filters.REPLY & admin_group_filter & filters.Regex(r"^/reply"), reply_cmd))
+    app.add_handler(MessageHandler(filters.REPLY & admin_group_filter & filters.Regex(r"^/autoreply"), autoreply_cmd))
 
     # Callback handlers
     app.add_handler(CallbackQueryHandler(settings_callback, pattern=r"^settings\.*"))

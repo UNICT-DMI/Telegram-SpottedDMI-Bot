@@ -48,7 +48,8 @@ class User:
         Returns:
             int: _description_
         """
-        return DbManager.count_from(table_name="warned_users", where="user_id = %s", where_args=self.user_id)
+        count = DbManager.count_from(table_name="warned_users", where="user_id = %s", where_args=(self.user_id,))
+        return count if count else 0
 
     @classmethod
     def banned_users(cls) -> "list[User]":
@@ -92,6 +93,7 @@ class User:
 
         if not self.is_banned:
             DbManager.insert_into(table_name="banned_users", columns=("user_id",), values=(self.user_id,))
+        DbManager.delete_from(table_name="warned_users", where="user_id = %s", where_args=(self.user_id,))
 
     def sban(self) -> bool:
         """Removes the user from the banned list
@@ -103,14 +105,6 @@ class User:
             DbManager.delete_from(table_name="banned_users", where="user_id = %s", where_args=(self.user_id,))
             return True
         return False
-
-    def ban_from_community(self, bot: Bot):
-        """Ban the user from the channel community group
-
-        Args:
-            bot (Bot): the telegram bot
-        """
-        bot.ban_chat_member(Config.post_get("community_group_id"), self.user_id)
 
     def mute(self, bot: Bot, days: int = 0):
         """_summary_
@@ -136,23 +130,15 @@ class User:
             values=(self.user_id, expiration_date_time),
         )
 
-    def warn(self, bot: Bot):
+    def warn(self):
         """Increase the number of warns of a user
         If this is number would reach 3 the user is banned
 
         Args:
             bot (Bot): the telegram bot
-        """
-        n_warns = self.get_n_warns()
 
-        if n_warns < 2:
-            text = f"L'utente {self.user_id} è stato warnato."
-            DbManager.insert_into(table_name="warned_users", columns="user_id", values=self.user_id)
-        else:
-            self.ban()
-            self.ban_from_community(bot)
-            text = f"L'utente {self.user_id} è stato bannato."
-        bot.send_message(chat_id=Config.post_get("community_group_id"), text=text)
+        """
+        DbManager.insert_into(table_name="warned_users", columns=("user_id",), values=(self.user_id,))
 
     def become_anonym(self) -> bool:
         """Removes the user from the credited list, if he was present
