@@ -105,9 +105,21 @@ class User:
         return False
 
     def ban_from_community(self, bot: Bot):
+        """Ban the user from the channel community group
+
+        Args:
+            bot (Bot): the telegram bot
+        """
         bot.ban_chat_member(Config.post_get("community_group_id"), self.user_id)
 
     def mute(self, bot: Bot, days: int = 0):
+        """_summary_
+
+        Args:
+            bot (Bot): the telegram bot
+            days (int, optional): The number of days the user should be muted for.
+                                    Defaults to 0.
+        """
         bot.restrict_chat_member(
             chat_id=Config.post_get("channel_id"),
             user_id=self.user_id,
@@ -125,7 +137,12 @@ class User:
         )
 
     def warn(self, bot: Bot):
-        """_summary_"""
+        """Increase the number of warns of a user
+        If this is number would reach 3 the user is banned
+
+        Args:
+            bot (Bot): the telegram bot
+        """
         n_warns = self.get_n_warns()
 
         if n_warns < 2:
