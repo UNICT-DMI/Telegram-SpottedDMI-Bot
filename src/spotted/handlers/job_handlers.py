@@ -68,13 +68,11 @@ async def clean_warned_users():
     """Job called each day at 05:00 utc.
     Removed users who have been warned for longer than setting duration
     Args:
-        context (CallbackContext): _description_
+        context: context passed by the jobqueue
     """
     warn_expiration = datetime.now() + timedelta(days=Config.post_get("warn_after_days"))
-    DbManager.select_from(
+    DbManager.delete_from(
         table_name="warned_users",
-        select=("user_id", "MAX(warn_time)"),
         where="warn_time > %s",
         where_args=(warn_expiration,),
-        group_by="user_id",
     )
