@@ -18,6 +18,6 @@ post:
   reject_after_autoreply: bool
   autoreplies_per_page: int
   warn_after_days: int
-  max_n_warns : int
+  max_n_warns: int
 token: str
 bot_tag: str
