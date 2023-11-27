@@ -85,7 +85,6 @@ def add_handlers(app: Application):
     if Config.settings_get("debug", "local_log"):  # add MessageHandler only if log_message is enabled
         app.add_handler(MessageHandler(filters.ALL, log_message), 1)
 
-    # admin_message_filter = filters.MessageFilter
     admin_group_filter = filters.Chat(chat_id=Config.post_get("admin_group_id"))
     community_filter = filters.Chat(chat_id=Config.post_get("community_group_id"))
 
