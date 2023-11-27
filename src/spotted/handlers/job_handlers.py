@@ -64,7 +64,7 @@ async def db_backup_job(context: CallbackContext):
             await context.bot.send_message(chat_id=admin_group_id, text=f"✖️ Impossibile effettuare il backup\n\n{ex}")
 
 
-async def clean_warned_users():  # TODO does it work without the argument?
+async def clean_warned_users():
     """Job called each day at 05:00 utc.
     Removed users who have been warned for longer than setting duration
     Args:
