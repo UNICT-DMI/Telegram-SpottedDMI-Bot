@@ -4,7 +4,7 @@ from datetime import datetime, timedelta, timezone
 from telegram.error import BadRequest, Forbidden
 from telegram.ext import CallbackContext
 
-from spotted.data import Config, PendingPost
+from spotted.data import Config, DbManager, PendingPost
 from spotted.debug import logger
 from spotted.utils import EventInfo
 
@@ -62,3 +62,19 @@ async def db_backup_job(context: CallbackContext):
             )
         except Exception as ex:  # pylint: disable=broad-except
             await context.bot.send_message(chat_id=admin_group_id, text=f"✖️ Impossibile effettuare il backup\n\n{ex}")
+
+
+async def clean_warned_users(context: CallbackContext):
+    """Job called each day at 05:00 utc.
+    Removed users who have been warned for longer than setting duration
+    Args:
+        context (CallbackContext): _description_
+    """
+    warn_expiration = datetime.now() + timedelta(days=Config.post_get("warn_after_days"))
+    DbManager.select_from(
+        table_name="warned_users",
+        select=("user_id", "MAX(warn_time)"),
+        where="warn_time > %s",
+        where_args=(warn_expiration,),
+        group_by="user_id",
+    )

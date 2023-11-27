@@ -1,5 +1,5 @@
 """Modules that handle the events the bot recognizes and reacts to"""
-from datetime import time
+from datetime import time, timedelta
 from warnings import filterwarnings
 
 from pytz import utc
@@ -27,7 +27,7 @@ from .follow_comment import follow_spot_comment
 from .follow_spot import follow_spot_callback
 from .forwarded_post import forwarded_post_msg
 from .help import help_cmd
-from .job_handlers import clean_pending_job, db_backup_job
+from .job_handlers import clean_pending_job, clean_warned_users, db_backup_job
 from .purge import purge_cmd
 from .reload import reload_cmd
 from .reply import reply_cmd
@@ -147,3 +147,4 @@ def add_jobs(app: Application):
     """
     app.job_queue.run_daily(clean_pending_job, time=time(hour=5, tzinfo=utc))  # run each day at 05:00 utc
     app.job_queue.run_daily(db_backup_job, time=time(hour=5, tzinfo=utc))  # run each day at 05:00 utc
+    app.job_queue.run_daily(clean_warned_users, time=time(hour=5, tzinfo=utc))  # run each day at 05:00 utc

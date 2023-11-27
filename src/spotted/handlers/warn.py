@@ -25,7 +25,8 @@ async def warn_cmd(update: Update, context: CallbackContext):
     user = User(g_message.from_user.id)
     n_warns = user.get_n_warns()
     text = f"L'utente {g_message.from_user.name} "
-    if n_warns < 2:
+    max_warns = Config.post_get("max_n_warns")
+    if n_warns < max_warns:
         user.warn()
         text += f"ha ricevuto {n_warns + 1} warn(s)"
     else:
