@@ -43,11 +43,7 @@ class User:
         return DbManager.count_from(table_name="credited_users", where="user_id = %s", where_args=(self.user_id,)) == 1
 
     def get_n_warns(self) -> int:
-        """_summary_
-
-        Returns:
-            int: _description_
-        """
+        """Returns the count of consecutive warns of the user"""
         count = DbManager.count_from(table_name="warned_users", where="user_id = %s", where_args=(self.user_id,))
         return count if count else 0
 
@@ -106,13 +102,13 @@ class User:
             return True
         return False
 
-    def mute(self, bot: Bot, days: int = 0):
-        """_summary_
+    def mute(self, bot: Bot, days: int = 1):
+        """Mute a user restricting its actions inside the community group
 
         Args:
-            bot (Bot): the telegram bot
-            days (int, optional): The number of days the user should be muted for.
-                                    Defaults to 0.
+            bot: the telegram bot
+            days(optional): The number of days the user should be muted for.
+                                    Defaults to 1.
         """
         bot.restrict_chat_member(
             chat_id=Config.post_get("channel_id"),
@@ -135,7 +131,7 @@ class User:
         If this is number would reach 3 the user is banned
 
         Args:
-            bot (Bot): the telegram bot
+            bot: the telegram bot
 
         """
         DbManager.insert_into(table_name="warned_users", columns=("user_id",), values=(self.user_id,))
