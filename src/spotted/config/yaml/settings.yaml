@@ -18,5 +18,7 @@ post:
   delete_anonymous_comments: true
   reject_after_autoreply: true
   autoreplies_per_page: 6
+  warn_after_days: 7
+  max_n_warns : 3
 token: ""
 bot_tag: "@bot_tag"
