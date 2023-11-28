@@ -7,7 +7,7 @@ Spotted dmi bot's documentation
 ===========================================
 You can find this bot live on telegram `@Spotted_DMI_bot <https://telegram.me/Spotted_DMI_bot>`_
 
-For the complete source code, check this github `repo <https://github.com/UNICT-DMI/Telegram-SpottedDMI-Bot/tree/upgrade>`_
+For the complete source code, check this github `repo <https://github.com/UNICT-DMI/Telegram-SpottedDMI-Bot/tree/main>`_
 
 .. toctree::
    :maxdepth: 2
