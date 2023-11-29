@@ -286,10 +286,15 @@ DEBUG_LOCAL_LOG=4   # will override the *debug.local_log* value found in setting
 The complete order of precedence for the application of configuration settings is
 
 ```
-env var > settings.yaml > settings.yaml.default
+env var > (user provided) settings.yaml > (package provided) settings.yaml
 ```
 
-Since every setting has a default value specified in _settings.yaml.default_ except for **token**, this is the only necessary setting to add when setting up the bot for the first time.
+> [!Note]
+> The bot provides a **/reload** command that will reload the settings without restarting the bot.
+> Keep in mind that the order of precedence will be the same, meaning that the env vars will always override the _settings.yaml_ files.
+
+Since every setting has a default value specified in the default _settings.yaml_ except for **token** and the **chat_id**s of the groups and the channel, those are the only necessary setting to add when setting up the bot for the first time.
+All other values will be assigned a valid default value if not specified.
 
 ### Settings typing
 
@@ -377,14 +382,19 @@ pip3 install -e .[lint]
 
 ### Scripts
 
-The `scripts` folder contains some utility scripts that can be used to simulate the whole CI pipeline locally.
+The `script` folder contains some utility scripts such as [_script/local-ci.sh_](./script/local-ci.sh) that can be used to simulate the whole CI pipeline locally.
 Make sure to have the dev dependencies installed before running them.
 
 Furthermore, the package provides a `run_sql` script that can be used to run an arbitrary sql script on the indicated sqlite3 database.
 
 ```shell
 run_sql <path_to_sql_script> <path_to_db_file>
+# Example
+run_sql ./script/create_db.sql ./spotted.sqlite3
 ```
+
+> [!Important]
+> Make sure to backup your database before running any scripts on it, since all alteration will happen in place, and there is no way to undo them.
 
 ## 📚 Documentation
 
