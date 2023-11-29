@@ -153,20 +153,20 @@ docker build --tag spotted-image .
 Then something like
 
 ```bash
-docker run -d --name botcontainer -e TOKEN=<token_arg> -e POST_CHANNEL_ID=-4 -e POST_GROUP_ID=-5 -e POST_CHANNEL_GROUP_ID=-6 spotted-image
+docker run -d --name spotted-container -e TOKEN=<token_arg> -e POST_CHANNEL_ID=-4 -e POST_GROUP_ID=-5 -e POST_CHANNEL_GROUP_ID=-6 spotted-image
 ```
 
 If you want to check the logs in real time, you can run
 
 ```bash
 # -f flag to follow the logs, otherwise it will just print the last ones
-docker logs -f botcontainer
+docker logs -f spotted-container
 ```
 
 If you want to access the container's shell, you can run
 
 ```bash
-docker exec -it botcontainer /bin/bash
+docker exec -it spotted-container /bin/bash
 ```
 
 #### Mounting a volume
@@ -176,20 +176,32 @@ This will assume the default database path, which is _"./spotted.sqlite3"_.
 
 ```bash
 # The file will survive the container removal, stored in the volume "spotted-db"
-docker run -d --name botcontainer -v spotted-db:/app -e TOKEN=<token_arg> -e POST_CHANNEL_ID=-4 -e POST_GROUP_ID=-5 -e POST_CHANNEL_GROUP_ID=-6 spotted-image
+docker run -d --name spotted-container -v spotted-db:/app -e TOKEN=<token_arg> -e POST_CHANNEL_ID=-4 -e POST_GROUP_ID=-5 -e POST_CHANNEL_GROUP_ID=-6 spotted-image
 ```
 
 If you want to be able to access the database file from the host, you can use a bind mount instead.
 
 ```bash
 # The file will be available in the host under the path "./spotted.sqlite3"
-docker run -d --name botcontainer -v .:/app -e TOKEN=<token_arg> -e POST_CHANNEL_ID=-4 -e POST_GROUP_ID=-5 -e POST_CHANNEL_GROUP_ID=-6 spotted-image
+docker run -d --name spotted-container -v .:/app -e TOKEN=<token_arg> -e POST_CHANNEL_ID=-4 -e POST_GROUP_ID=-5 -e POST_CHANNEL_GROUP_ID=-6 spotted-image
 ```
+
+#### Package version
+
+If you want to change the version displayed by the package inside the container, you can do when building the image:
+
+```bash
+docker build --tag spotted-image --build-arg VERSION=<version> .
+# Example
+docker build --tag spotted-image --build-arg VERSION=3.0.0 .
+```
+
+Keep in mind that this will only change the version displayed by `python3 -m spotted --version`, not the version of the package itself.
 
 ### To stop/remove the container:
 
-- **Run** `docker stop botcontainer` to stop the container
-- **Run** `docker rm -f botcontainer` to remove the container
+- **Run** `docker stop spotted-container` to stop the container
+- **Run** `docker rm -f spotted-container` to remove the container
 
 ## 📦 DevContainer
 
