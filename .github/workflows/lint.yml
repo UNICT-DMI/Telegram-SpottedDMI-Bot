@@ -1,4 +1,4 @@
-name: "Lint Python code and docs"
+name: Lint
 
 on:
   push:

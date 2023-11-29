@@ -1,8 +1,12 @@
 # Telegram-SpottedDMI-Bot
 
-[![Test and docs](https://github.com/UNICT-DMI/Telegram-SpottedDMI-Bot/actions/workflows/prod.workflow.yml/badge.svg)](https://github.com/UNICT-DMI/Telegram-SpottedDMI-Bot/actions/workflows/prod.workflow.yml)
+[![Docs](https://github.com/UNICT-DMI/Telegram-SpottedDMI-Bot/actions/workflows/docs.yml/badge.svg)](https://github.com/UNICT-DMI/Telegram-SpottedDMI-Bot/actions/workflows/docs.yml)
+[![Lint](https://github.com/UNICT-DMI/Telegram-SpottedDMI-Bot/actions/workflows/lint.yml/badge.svg)](https://github.com/UNICT-DMI/Telegram-SpottedDMI-Bot/actions/workflows/lint.yml)
+[![Test](https://github.com/UNICT-DMI/Telegram-SpottedDMI-Bot/actions/workflows/test.yml/badge.svg)](https://github.com/UNICT-DMI/Telegram-SpottedDMI-Bot/actions/workflows/test.yml)
 [![Docker image](https://github.com/UNICT-DMI/Telegram-SpottedDMI-Bot/actions/workflows/docker.yml/badge.svg)](https://github.com/UNICT-DMI/Telegram-SpottedDMI-Bot/actions/workflows/docker.yml)
+[![Publish](https://github.com/UNICT-DMI/Telegram-SpottedDMI-Bot/actions/workflows/publish.yml/badge.svg)](https://github.com/UNICT-DMI/Telegram-SpottedDMI-Bot/actions/workflows/publish.yml)
 [![CodeFactor](https://www.codefactor.io/repository/github/unict-dmi/telegram-spotteddmi-bot/badge)](https://www.codefactor.io/repository/github/unict-dmi/telegram-spotteddmi-bot)
+[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 
 **Telegram-SpottedDMI-Bot** is the platform that powers **[@Spotted_DMI_Bot](https://telegram.me/Spotted_DMI_Bot)**, a Telegram bot that let students send an anonymous message to the channel community.
 
