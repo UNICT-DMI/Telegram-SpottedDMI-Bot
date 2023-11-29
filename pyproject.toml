@@ -104,7 +104,7 @@ profile = "black"
 
 # Pylint configuration (code linter)
 [tool.pylint.MASTER]
-ignore = ['tests']
+ignore = ['tests', '_version.py']
 fail-under = '10.0'
 
 [tool.pylint.'MESSAGES CONTROL']
