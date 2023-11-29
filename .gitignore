@@ -72,6 +72,7 @@ docs/source/api/
 
 # PyBuilder
 target/
+_version.py
 
 # Jupyter Notebook
 .ipynb_checkpoints
