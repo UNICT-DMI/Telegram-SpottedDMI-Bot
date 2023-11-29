@@ -1,5 +1,5 @@
 [build-system]
-requires = ["setuptools>=46.1.0", "setuptools_scm[toml]>=5"]
+requires = ["setuptools>=46.1.0", "setuptools-scm>=8.0"]
 build-backend = "setuptools.build_meta"
 
 # Metadata of the project
@@ -75,8 +75,8 @@ run_sql = "spotted.scripts.run_sql:main"
 include-package-data = true
 package-dir = { "" = "src" }
 
-[tool.setuptools.dynamic]
-version = { attr = "spotted.__version__" }
+# Automatic versioning based on git tags
+[tool.setuptools_scm]
 
 # Pytest configuration (test runner)
 [tool.pytest.ini_options]
