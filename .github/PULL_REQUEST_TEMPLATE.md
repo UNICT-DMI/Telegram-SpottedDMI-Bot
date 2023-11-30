@@ -5,6 +5,7 @@
 - [ ] Tested the changes locally with a real Telegram bot.
 - [ ] Introduced tests for the changes have been added (for bug fixes / features).
 - [ ] Docs have been added/updated (for bug fixes / features).
+- [ ] I have updated the `CHANGELOG.rst` file with an overview of the changes made.
 
 ### Description
 

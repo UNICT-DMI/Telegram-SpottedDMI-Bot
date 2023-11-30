@@ -2,8 +2,13 @@
 import argparse
 from typing import TYPE_CHECKING
 
-from spotted import __version__, run_bot
+from spotted import run_bot
 from spotted.data import Config
+
+try:
+    from spotted._version import __version__
+except ImportError:
+    __version__ = "0.0.0"
 
 if TYPE_CHECKING:
 

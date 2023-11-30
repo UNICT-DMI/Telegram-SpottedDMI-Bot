@@ -1,8 +1,12 @@
 # Telegram-SpottedDMI-Bot
 
-[![Test and docs](https://github.com/UNICT-DMI/Telegram-SpottedDMI-Bot/actions/workflows/prod.workflow.yml/badge.svg)](https://github.com/UNICT-DMI/Telegram-SpottedDMI-Bot/actions/workflows/prod.workflow.yml)
+[![Docs](https://github.com/UNICT-DMI/Telegram-SpottedDMI-Bot/actions/workflows/docs.yml/badge.svg)](https://github.com/UNICT-DMI/Telegram-SpottedDMI-Bot/actions/workflows/docs.yml)
+[![Lint](https://github.com/UNICT-DMI/Telegram-SpottedDMI-Bot/actions/workflows/lint.yml/badge.svg)](https://github.com/UNICT-DMI/Telegram-SpottedDMI-Bot/actions/workflows/lint.yml)
+[![Test](https://github.com/UNICT-DMI/Telegram-SpottedDMI-Bot/actions/workflows/test.yml/badge.svg)](https://github.com/UNICT-DMI/Telegram-SpottedDMI-Bot/actions/workflows/test.yml)
 [![Docker image](https://github.com/UNICT-DMI/Telegram-SpottedDMI-Bot/actions/workflows/docker.yml/badge.svg)](https://github.com/UNICT-DMI/Telegram-SpottedDMI-Bot/actions/workflows/docker.yml)
+[![Publish](https://github.com/UNICT-DMI/Telegram-SpottedDMI-Bot/actions/workflows/publish.yml/badge.svg)](https://github.com/UNICT-DMI/Telegram-SpottedDMI-Bot/actions/workflows/publish.yml)
 [![CodeFactor](https://www.codefactor.io/repository/github/unict-dmi/telegram-spotteddmi-bot/badge)](https://www.codefactor.io/repository/github/unict-dmi/telegram-spotteddmi-bot)
+[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 
 **Telegram-SpottedDMI-Bot** is the platform that powers **[@Spotted_DMI_Bot](https://telegram.me/Spotted_DMI_Bot)**, a Telegram bot that let students send an anonymous message to the channel community.
 
@@ -149,20 +153,20 @@ docker build --tag spotted-image .
 Then something like
 
 ```bash
-docker run -d --name botcontainer -e TOKEN=<token_arg> -e POST_CHANNEL_ID=-4 -e POST_GROUP_ID=-5 -e POST_CHANNEL_GROUP_ID=-6 spotted-image
+docker run -d --name spotted-container -e TOKEN=<token_arg> -e POST_CHANNEL_ID=-4 -e POST_GROUP_ID=-5 -e POST_CHANNEL_GROUP_ID=-6 spotted-image
 ```
 
 If you want to check the logs in real time, you can run
 
 ```bash
 # -f flag to follow the logs, otherwise it will just print the last ones
-docker logs -f botcontainer
+docker logs -f spotted-container
 ```
 
 If you want to access the container's shell, you can run
 
 ```bash
-docker exec -it botcontainer /bin/bash
+docker exec -it spotted-container /bin/bash
 ```
 
 #### Mounting a volume
@@ -172,20 +176,32 @@ This will assume the default database path, which is _"./spotted.sqlite3"_.
 
 ```bash
 # The file will survive the container removal, stored in the volume "spotted-db"
-docker run -d --name botcontainer -v spotted-db:/app -e TOKEN=<token_arg> -e POST_CHANNEL_ID=-4 -e POST_GROUP_ID=-5 -e POST_CHANNEL_GROUP_ID=-6 spotted-image
+docker run -d --name spotted-container -v spotted-db:/app -e TOKEN=<token_arg> -e POST_CHANNEL_ID=-4 -e POST_GROUP_ID=-5 -e POST_CHANNEL_GROUP_ID=-6 spotted-image
 ```
 
 If you want to be able to access the database file from the host, you can use a bind mount instead.
 
 ```bash
 # The file will be available in the host under the path "./spotted.sqlite3"
-docker run -d --name botcontainer -v .:/app -e TOKEN=<token_arg> -e POST_CHANNEL_ID=-4 -e POST_GROUP_ID=-5 -e POST_CHANNEL_GROUP_ID=-6 spotted-image
+docker run -d --name spotted-container -v .:/app -e TOKEN=<token_arg> -e POST_CHANNEL_ID=-4 -e POST_GROUP_ID=-5 -e POST_CHANNEL_GROUP_ID=-6 spotted-image
 ```
+
+#### Package version
+
+If you want to change the version displayed by the package inside the container, you can do when building the image:
+
+```bash
+docker build --tag spotted-image --build-arg VERSION=<version> .
+# Example
+docker build --tag spotted-image --build-arg VERSION=3.0.0 .
+```
+
+Keep in mind that this will only change the version displayed by `python3 -m spotted --version`, not the version of the package itself.
 
 ### To stop/remove the container:
 
-- **Run** `docker stop botcontainer` to stop the container
-- **Run** `docker rm -f botcontainer` to remove the container
+- **Run** `docker stop spotted-container` to stop the container
+- **Run** `docker rm -f spotted-container` to remove the container
 
 ## 📦 DevContainer
 
@@ -282,10 +298,15 @@ DEBUG_LOCAL_LOG=4   # will override the *debug.local_log* value found in setting
 The complete order of precedence for the application of configuration settings is
 
 ```
-env var > settings.yaml > settings.yaml.default
+env var > (user provided) settings.yaml > (package provided) settings.yaml
 ```
 
-Since every setting has a default value specified in _settings.yaml.default_ except for **token**, this is the only necessary setting to add when setting up the bot for the first time.
+> [!Note]
+> The bot provides a **/reload** command that will reload the settings without restarting the bot.
+> Keep in mind that the order of precedence will be the same, meaning that the env vars will always override the _settings.yaml_ files.
+
+Since every setting has a default value specified in the default _settings.yaml_ except for **token** and the **chat_id**s of the groups and the channel, those are the only necessary setting to add when setting up the bot for the first time.
+All other values will be assigned a valid default value if not specified.
 
 ### Settings typing
 
@@ -373,14 +394,19 @@ pip3 install -e .[lint]
 
 ### Scripts
 
-The `scripts` folder contains some utility scripts that can be used to simulate the whole CI pipeline locally.
+The `script` folder contains some utility scripts such as [_script/local-ci.sh_](./script/local-ci.sh) that can be used to simulate the whole CI pipeline locally.
 Make sure to have the dev dependencies installed before running them.
 
 Furthermore, the package provides a `run_sql` script that can be used to run an arbitrary sql script on the indicated sqlite3 database.
 
 ```shell
 run_sql <path_to_sql_script> <path_to_db_file>
+# Example
+run_sql ./script/create_db.sql ./spotted.sqlite3
 ```
+
+> [!Important]
+> Make sure to backup your database before running any scripts on it, since all alteration will happen in place, and there is no way to undo them.
 
 ## 📚 Documentation
 
