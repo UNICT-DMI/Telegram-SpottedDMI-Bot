@@ -1,11 +1,13 @@
 """/mute command"""
 import re
 
+from datetime import timedelta
 from telegram import Update
 from telegram.ext import CallbackContext
 
 from spotted.data import User
 from spotted.utils import EventInfo
+from .job_handlers import unmute_user
 
 
 async def mute_cmd(update: Update, context: CallbackContext):
@@ -30,6 +32,7 @@ async def mute_cmd(update: Update, context: CallbackContext):
 
     days = 1 if match == "" else int(match)  # if no argv is provided, default is 1 day
 
-    user.mute(info.bot, days)
+    user.mute(info.bot)
     text = f"L'utente è stato mutato per {days} giorn{'o' if days == 1 else 'i'}."
     await info.bot.send_message(chat_id=info.chat_id, text=text)
+    context.job_queue.run_once(unmute_user, timedelta(days=days), context=user)

@@ -102,13 +102,12 @@ class User:
             return True
         return False
 
-    def mute(self, bot: Bot, days: int = 1):
+    def mute(self, bot: Bot, days: int):
         """Mute a user restricting its actions inside the community group
 
         Args:
             bot: the telegram bot
             days(optional): The number of days the user should be muted for.
-                                    Defaults to 1.
         """
         bot.restrict_chat_member(
             chat_id=Config.post_get("channel_id"),
