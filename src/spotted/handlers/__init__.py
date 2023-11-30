@@ -22,6 +22,7 @@ from .autoreply import autoreply_callback, autoreply_cmd
 from .ban import ban_cmd
 from .cancel import cancel_cmd
 from .clean_pending import clean_pending_cmd
+from .custom_filters import IsAdminFilter
 from .db_backup import db_backup_cmd
 from .follow_comment import follow_spot_comment
 from .follow_spot import follow_spot_callback
@@ -39,6 +40,7 @@ from .settings import settings_callback, settings_cmd
 from .spot import spot_conv_handler
 from .start import start_cmd
 from .warn import warn_cmd
+from .mute import mute_cmd
 
 
 async def add_commands(app: Application):
@@ -87,7 +89,7 @@ def add_handlers(app: Application):
 
     admin_group_filter = filters.Chat(chat_id=Config.post_get("admin_group_id"))
     community_filter = filters.Chat(chat_id=Config.post_get("community_group_id"))
-
+    is_admin_filter = IsAdminFilter()
     # Error handler
     app.add_error_handler(error_handler)
 
@@ -110,12 +112,15 @@ def add_handlers(app: Application):
     app.add_handler(CommandHandler("db_backup", db_backup_cmd, filters=admin_group_filter))
     app.add_handler(CommandHandler("purge", purge_cmd, filters=admin_group_filter))
     app.add_handler(CommandHandler("reload", reload_cmd, filters=admin_group_filter))
-    app.add_handler(CommandHandler("warn", warn_cmd, filters=community_filter))
+    app.add_handler(CommandHandler("warn", warn_cmd, filters=community_filter & is_admin_filter))
 
     # MessageHandler
     app.add_handler(MessageHandler(filters.REPLY & admin_group_filter & filters.Regex(r"^/ban$"), ban_cmd))
     app.add_handler(MessageHandler(filters.REPLY & admin_group_filter & filters.Regex(r"^/reply"), reply_cmd))
     app.add_handler(MessageHandler(filters.REPLY & admin_group_filter & filters.Regex(r"^/autoreply"), autoreply_cmd))
+    app.add_handler(
+        MessageHandler(filters.REPLY & community_filter & is_admin_filter & filters.Regex(r"^/mute"), mute_cmd)
+    )
 
     # Callback handlers
     app.add_handler(CallbackQueryHandler(settings_callback, pattern=r"^settings\.*"))
