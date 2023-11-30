@@ -14,3 +14,7 @@ DROP TABLE IF EXISTS spot_report
 DROP TABLE IF EXISTS user_report
 -----
 DROP TABLE IF EXISTS user_follow
+-----
+DROP TABLE IF EXISTS warned_users
+-----
+DROP TABLE IF EXISTS muted_users

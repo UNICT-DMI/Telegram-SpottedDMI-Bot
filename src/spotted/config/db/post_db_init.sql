@@ -47,6 +47,12 @@ CREATE TABLE IF NOT EXISTS warned_users
   PRIMARY KEY (user_id, warn_date)
 );
 -----
+CREATE TABLE IF NOT EXISTS muted_users
+(
+  user_id BIGINT NOT NULL,
+  PRIMARY KEY user_id
+);
+-----
 CREATE TABLE IF NOT EXISTS spot_report
 (
   user_id BIGINT NOT NULL,
