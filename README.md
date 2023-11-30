@@ -1,5 +1,6 @@
 # Telegram-SpottedDMI-Bot
 
+[![PyPI](https://img.shields.io/pypi/v/telegram-spotted-dmi-bot?label=telegram-spotted-dmi-bot)](https://pypi.org/project/telegram-spotted-dmi-bot/)
 [![Docs](https://github.com/UNICT-DMI/Telegram-SpottedDMI-Bot/actions/workflows/docs.yml/badge.svg)](https://github.com/UNICT-DMI/Telegram-SpottedDMI-Bot/actions/workflows/docs.yml)
 [![Lint](https://github.com/UNICT-DMI/Telegram-SpottedDMI-Bot/actions/workflows/lint.yml/badge.svg)](https://github.com/UNICT-DMI/Telegram-SpottedDMI-Bot/actions/workflows/lint.yml)
 [![Test](https://github.com/UNICT-DMI/Telegram-SpottedDMI-Bot/actions/workflows/test.yml/badge.svg)](https://github.com/UNICT-DMI/Telegram-SpottedDMI-Bot/actions/workflows/test.yml)
