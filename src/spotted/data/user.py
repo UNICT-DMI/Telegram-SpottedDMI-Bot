@@ -1,6 +1,6 @@
 """Users management"""
 from dataclasses import dataclass
-from datetime import datetime, timedelta
+from datetime import datetime
 from random import choice
 
 from telegram import Bot
@@ -102,7 +102,7 @@ class User:
             return True
         return False
 
-    def mute(self, bot: Bot, days: int):
+    def mute(self, bot: Bot):
         """Mute a user restricting its actions inside the community group
 
         Args:
@@ -117,13 +117,27 @@ class User:
             can_send_other_messages=False,
             can_add_web_page_previews=False,
         )
-        current_date_time = datetime.now()
-        expiration_date_time = (current_date_time + timedelta(days=days)).strftime("%Y-%m-%d %H:%M:%S")
         DbManager.insert_into(
             table_name="muted_users",
-            columns=("user_id", "expiration_date"),
-            values=(self.user_id, expiration_date_time),
+            columns=("user_id"),
+            values=(self.user_id),
         )
+
+    def unmute(self, bot: Bot):
+        """Unmute a user taking back all restrictions
+
+        Args:
+            bot : the telegram bot
+        """
+        bot.restrict_chat_member(
+            chat_id=Config.post_get("channel_id"),
+            user_id=self.user_id,
+            can_send_messages=True,
+            can_send_media_messages=True,
+            can_send_other_messages=True,
+            can_add_web_page_previews=True,
+        )
+        DbManager.delete_from(table_name="muted_users", where="user_id = %s", where_args=(self.user_id,))
 
     def warn(self):
         """Increase the number of warns of a user
