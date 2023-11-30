@@ -1,12 +1,13 @@
 """/mute command"""
 import re
-
 from datetime import timedelta
+
 from telegram import Update
 from telegram.ext import CallbackContext
 
 from spotted.data import User
 from spotted.utils import EventInfo
+
 from .job_handlers import unmute_user
 
 

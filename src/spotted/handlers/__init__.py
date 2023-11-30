@@ -29,6 +29,7 @@ from .follow_spot import follow_spot_callback
 from .forwarded_post import forwarded_post_msg
 from .help import help_cmd
 from .job_handlers import clean_pending_job, clean_warned_users, db_backup_job
+from .mute import mute_cmd
 from .purge import purge_cmd
 from .reload import reload_cmd
 from .reply import reply_cmd
@@ -40,7 +41,6 @@ from .settings import settings_callback, settings_cmd
 from .spot import spot_conv_handler
 from .start import start_cmd
 from .warn import warn_cmd
-from .mute import mute_cmd
 
 
 async def add_commands(app: Application):

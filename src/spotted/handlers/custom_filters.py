@@ -1,5 +1,5 @@
 """Defines custom filters to use for commands"""
-from telegram import Message, Chat
+from telegram import Chat, Message
 from telegram.ext.filters import MessageFilter
 
 
