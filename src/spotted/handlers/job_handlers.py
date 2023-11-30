@@ -76,3 +76,13 @@ async def clean_warned_users():
         where="warn_time > %s",
         where_args=(warn_expiration,),
     )
+
+
+async def unmute_user(context: CallbackContext):
+    """A callback function that unmute the user
+
+    Args:
+        context: context passed by the job queue
+    """
+    user = context.job.context
+    user.unmute(context.bot)
