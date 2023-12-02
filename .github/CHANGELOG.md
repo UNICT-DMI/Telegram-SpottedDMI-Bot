@@ -38,6 +38,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Anonymous messages are deleted [ rebase over #132 ]
 - Preview feature [ cherry-pick #138 ]
 - Display the right message when the post is rejected with a reason [ cherry-pick #139 ]
+- Reply command with empty content [ closes #147 ]
 
 ### Changed
 
