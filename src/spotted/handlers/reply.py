@@ -2,7 +2,7 @@
 from telegram import Update
 from telegram.ext import CallbackContext
 
-from spotted.data import PendingPost, Report
+from spotted.data import PendingPost, Report, Config
 from spotted.utils import EventInfo
 
 
@@ -16,7 +16,7 @@ async def reply_cmd(update: Update, context: CallbackContext):
     """
     info = EventInfo.from_message(update, context)
 
-    if len(info.text) <= 7:  # the reply is empty
+    if len(info.text) <= 7 or Config.post_get("channel_tag")[1:] in info.text.lower():  # the reply is empty
         await info.bot.send_message(
             chat_id=info.chat_id,
             text="La reply è vuota\n"
