@@ -14,5 +14,5 @@ class IsAdminFilter(MessageFilter):
         chat = message.chat
         sender_id = message.from_user.id
         if chat.type in [Chat.SUPERGROUP, Chat.GROUP]:
-            return sender_id in [admin.id for admin in chat.get_administrators(chat.id)]
+            return sender_id in [admin.id for admin in chat.get_administrators()]
         return False

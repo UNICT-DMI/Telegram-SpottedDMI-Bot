@@ -67,6 +67,7 @@ async def db_backup_job(context: CallbackContext):
 async def clean_warned_users():
     """Job called each day at 05:00 utc.
     Removed users who have been warned for longer than setting duration
+
     Args:
         context: context passed by the jobqueue
     """
