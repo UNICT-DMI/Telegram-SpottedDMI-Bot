@@ -34,5 +34,7 @@ async def sban_cmd(update: Update, context: CallbackContext):
         else:
             # the sban was unsuccessful (maybe the user id was not found)
             sban_fail.append(user_id)
-    reply_text = "Sban effettuato" if not sban_fail else "Impossibile sbannare i seguenti utenti:\n" + ",".join(sban_fail)
+    reply_text = (
+        "Sban effettuato" if not sban_fail else "Impossibile sbannare i seguenti utenti:\n" + ",".join(sban_fail)
+    )
     await info.bot.send_message(chat_id=info.chat_id, text=reply_text)
