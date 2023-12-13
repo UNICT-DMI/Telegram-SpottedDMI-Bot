@@ -16,7 +16,7 @@ async def sban_cmd(update: Update, context: CallbackContext):
         context: context passed by the handler
     """
     info = EventInfo.from_message(update, context)
-    sban_fail = False
+    sban_fail = []
     if context.args is None or len(context.args) == 0:  # if no args have been passed
         banned_users = "\n".join(f"{user.user_id} ({user.ban_date:%d/%m/%Y %H:%M})" for user in User.banned_users())
         banned_users = "Nessuno" if len(banned_users) == 0 else f"{banned_users}"
@@ -33,7 +33,6 @@ async def sban_cmd(update: Update, context: CallbackContext):
                 pass
         else:
             # the sban was unsuccessful (maybe the user id was not found)
-            sban_fail = True
-            continue
-    reply_text = "Sban effettuato" if not sban_fail else "Uno o più sban sono falliti"
+            sban_fail.append(user_id)
+    reply_text = "Sban effettuato" if not sban_fail else "Impossibile sbannare i seguenti utenti:\n" + ",".join(sban_fail)
     await info.bot.send_message(chat_id=info.chat_id, text=reply_text)
