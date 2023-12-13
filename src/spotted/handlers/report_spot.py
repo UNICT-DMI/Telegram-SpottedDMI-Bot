@@ -10,7 +10,7 @@ from telegram.ext import (
     filters,
 )
 
-from spotted.data import Config, Report
+from spotted.data import Config, Report, User
 from spotted.utils import EventInfo, conv_cancel
 
 from .constants import INVALID_MESSAGE_TYPE_ERROR, ConversationState
@@ -52,8 +52,12 @@ async def report_spot_callback(update: Update, context: CallbackContext) -> int:
     abusive_message_id = info.message.reply_to_message.message_id if Config.post_get("comments") else info.message_id
 
     report = Report.get_post_report(user_id=info.user_id, channel_id=info.chat_id, c_message_id=abusive_message_id)
+    user = User(info.user_id)
+    if user.is_banned:
+        await info.answer_callback_query(text="Sei stato bannato, non puoi segnalare post")
+        return ConversationState.END.value
     if report is not None:  # this user has already reported this post
-        await info.answer_callback_query(text="Hai già segnalato questo spot")
+        await info.answer_callback_query(text="Hai già segnalato questo post")
         return ConversationState.END.value
     try:
         await info.bot.forward_message(chat_id=info.user_id, from_chat_id=info.chat_id, message_id=abusive_message_id)
