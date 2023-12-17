@@ -11,15 +11,13 @@
 
 **Telegram-SpottedDMI-Bot** is the platform that powers **[@Spotted_DMI_Bot](https://telegram.me/Spotted_DMI_Bot)**, a Telegram bot that let students send an anonymous message to the channel community.
 
-### 🔴 Using the live version
+## 🔴 Using the live version
 
 The bot is live on Telegram with the username [**@Spotted_DMI_Bot**](https://telegram.me/Spotted_DMI_Bot).
 To see the posts, once published, check [**Spotted DMI**](https://t.me/Spotted_DMI)
 Send **'/start'** to start it, **'/help'** to see a list of commands.
 
 Please note that the commands and their answers are in Italian.
-
----
 
 ## 🤖 Telegram bot setup
 
@@ -29,8 +27,6 @@ If you want to deploy your own version of this bot, you will need to have a tele
 - Follow the guided procedure
 - You will recieve a token. Whoever knows that token has complete control over your bot, so handle it with care
 - You will need that token later, for it is a needed value in the settings
-
----
 
 ## 📂 Project structure
 
@@ -60,12 +56,12 @@ If you want to deploy your own version of this bot, you will need to have a tele
 
 ## 💻 Setting up a local instance for contributing (from git)
 
-#### System requirements
+### System requirements
 
 - [Python 3 (3.10)](https://www.python.org/downloads/)
 - [pip3](https://pip.pypa.io/en/stable/)
 
-#### Dependencies
+### Dependencies
 
 All the requirements are listed in the `pyproject.toml` file.
 The most important ones are:
@@ -74,7 +70,7 @@ The most important ones are:
 - [requests](https://pypi.org/project/requests/)
 - [PyYAML](https://pypi.org/project/PyYAML/)
 
-#### Install with _pip3_
+### Install with _pip3_
 
 ```shell
 # [Optional] Create a virtual environment
@@ -90,7 +86,7 @@ source .venv/bin/activate # Linux
 pip3 install -e .
 ```
 
-### Steps:
+### Steps
 
 - Clone this repository
 - Create a [_"settings.yaml"_](#settings) file and edit the desired parameters. **It must contain at least a valid _'token'_ and _'post.admin_group_id'_ values**.
@@ -100,12 +96,12 @@ pip3 install -e .
 
 ## 💻 Setting up a local instance for running (from pip)
 
-#### System requirements
+### System requirements
 
 - [Python 3 (3.10)](https://www.python.org/downloads/)
 - [pip3](https://pip.pypa.io/en/stable/)
 
-#### Install with _pip3_
+### Install with _pip3_
 
 Install the package:
 
@@ -113,7 +109,7 @@ Install the package:
 pip3 install telegram-spotted-dmi-bot
 ```
 
-### Steps:
+### Steps
 
 - Create a [_"settings.yaml"_](#settings) file and edit the desired parameters. **It must contain at least a valid _'token'_ and _'post.admin_group_id'_ values**.
   - You could also skip the files and use [_environment variables_](#settings-override) instead.
@@ -121,11 +117,11 @@ pip3 install telegram-spotted-dmi-bot
 
 ## 🐳 Setting up a Docker container
 
-#### System requirements
+### System requirements
 
 - [Docker](https://www.docker.com/)
 
-### Steps:
+### Steps
 
 - Clone this repository
 - Make sure the bot is in present both in the admin group and in the spot channel. It may need to have admin privileges. If comments are enabled, the bot has to be in the comment group too as an admin.
@@ -170,7 +166,7 @@ If you want to access the container's shell, you can run
 docker exec -it spotted-container /bin/bash
 ```
 
-#### Mounting a volume
+### Mounting a volume
 
 If you want to keep the database file, you can mount a volume to the container.
 This will assume the default database path, which is _"./spotted.sqlite3"_.
@@ -187,7 +183,7 @@ If you want to be able to access the database file from the host, you can use a 
 docker run -d --name spotted-container -v .:/app -e TOKEN=<token_arg> -e POST_CHANNEL_ID=-4 -e POST_GROUP_ID=-5 -e POST_CHANNEL_GROUP_ID=-6 spotted-image
 ```
 
-#### Package version
+### Package version
 
 If you want to change the version displayed by the package inside the container, you can do when building the image:
 
@@ -289,7 +285,7 @@ The settings may also be set through environment variables.
 All the env vars with the same name (case insensitive) will override the ones in the settings file.
 To update the **post** settings, prefix the env var name with **POST\_**. The same is true for the **debug** settings, to be prefixed with **DEBUG\_**.
 
-```env
+```conf
 # Environment values
 TOKEN=xxxxxx        # will override the *token* value found in settings.yaml
 POST_N_VOTES=4      # will override the *post.n_votes* value found in settings.yaml
@@ -359,7 +355,7 @@ If you plan to contribute to this project, you may want to run the tests and the
 > If the tests fail, the pull request won't be merged until all the errors are fixed.
 > Hence, it is recommended to run the tests and the linters locally before pushing your changes.
 
-#### Dependencies
+### Dependencies
 
 All the dev requirements are listed in the `pyproject.toml` file under `[project.optional-dependencies]`.
 
@@ -380,14 +376,14 @@ pip3 install -e .[test]
 pip3 install -e .[lint]
 ```
 
-#### Testing:
+### Testing:
 
 - **Run** `pytest tests/unit` to run the unit tests
 - **Run** `pytest tests/integration` to run the integration tests
   <!-- TODO -->
   <!-- - **Run** `pytest tests/e2e` to run the e2e tests (this requires test configurations) -->
 
-#### Linting:
+### Linting:
 
 - **Run** `pylint src tests` to lint the code
 - **Run** `black --check src tests` to make sure the code is formatted correctly. If it is not, you can run `black src` to format it automatically

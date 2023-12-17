@@ -13,6 +13,7 @@ For the complete source code, check this github `repo <https://github.com/UNICT-
    :maxdepth: 2
    :caption: Contents:
 
+   Overview <readme>
    Modules <api/modules>
    Database Schema <dbschema>
 
