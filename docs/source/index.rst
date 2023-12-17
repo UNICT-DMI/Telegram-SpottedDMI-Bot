@@ -14,8 +14,9 @@ For the complete source code, check this github `repo <https://github.com/UNICT-
    :caption: Contents:
 
    Overview <readme>
-   Modules <api/modules>
    Database Schema <dbschema>
+   Privacy Policy <privacy>
+   Modules <api/modules>
 
 Indices and tables
 ==================
