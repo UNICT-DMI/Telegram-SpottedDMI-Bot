@@ -2,3 +2,4 @@ sphinx
 sphinx_rtd_theme
 sphinx_autodoc_typehints
 sphinx-rtd-dark-mode
+m2r2

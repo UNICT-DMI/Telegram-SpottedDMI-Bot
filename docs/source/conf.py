@@ -19,8 +19,8 @@ sys.path.insert(0, os.path.abspath("../.."))  # path to the actual project root 
 # -- Project information -----------------------------------------------------
 
 project = "Spotted dmi bot"
-copyright = "2021, Tend, drendog, alepiaz, Helias"
-author = "Tend, drendog, alepiaz, Helias"
+copyright = "2021, UNICT Devs"
+author = "Tend, drendog, alepiaz, Helias, Herbrant, LightDestory, TaToTanWeb"
 
 # -- General configuration ---------------------------------------------------
 
@@ -38,6 +38,7 @@ extensions = [
     "sphinx.ext.viewcode",  # add source code links to the documentation
     "sphinx.ext.coverage",  # add coverage links to the documentation
     "sphinx.ext.intersphinx",  # add external mapping to other documentation
+    "m2r2",  # to convert markdown to rst
 ]
 
 # Add any paths that contain templates here, relative to this directory.
