@@ -1,5 +1,4 @@
 import argparse
-import os
 from typing import TYPE_CHECKING
 
 from spotted.data import Config, DbManager
@@ -32,7 +31,6 @@ def parse_args() -> "RunSQLArgs":
 def main():
     """Main function"""
     args = parse_args()
-    print(os.getcwd())
     Config.override_settings({"debug": {"db_file": args.db_file}})
     conn, cur = DbManager.get_db()
 
