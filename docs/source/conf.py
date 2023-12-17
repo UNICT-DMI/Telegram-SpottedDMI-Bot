@@ -39,6 +39,7 @@ extensions = [
     "sphinx.ext.coverage",  # add coverage links to the documentation
     "sphinx.ext.intersphinx",  # add external mapping to other documentation
     "m2r2",  # to convert markdown to rst
+    "sphinxcontrib.mermaid",  # to render mermaid diagrams
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -120,3 +121,11 @@ intersphinx_mapping = {
     "pyscaffold": ("https://pyscaffold.org/en/stable", None),
     "telegram": ("https://docs.python-telegram-bot.org/en/stable/", None),
 }
+
+# -- Options for sphinxcontrib.mermaid ---------------------------------------
+mermaid_init_js = """
+mermaid.initialize({
+    startOnLoad: true,
+    theme: 'dark',
+});
+"""
