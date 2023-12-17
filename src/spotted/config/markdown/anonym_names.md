@@ -62,9 +62,6 @@ Cacatore seriale
 Fabio Rovazzi
 Barbero
 81
-i soliti 4
-furry
-programming socks
 di sinistra
 Scheda Bianca-Chan
 il chiesitore
