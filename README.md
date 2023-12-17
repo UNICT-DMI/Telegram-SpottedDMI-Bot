@@ -252,7 +252,7 @@ debug:
   log_file: "logs/spotted.log" # path to the log file, if local_log is enabled. Relative to the pwd
   log_error_file: "logs/spotted_error.log" # path to the error log file. Relative to the pwd
   db_file: "spotted.sqlite3" # path to the database file. Relative to the pwd
-  # key used to encrypt the database backup sent to the admin periodically. 
+  # key used to encrypt the database backup sent to the admin periodically.
   # Must be 32 bytes long and base64 encoded.
   # If not specified (default), the backup will be sent in clear text
   crypto_key: "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
@@ -399,12 +399,24 @@ pip3 install -e .[lint]
 The `script` folder contains some utility scripts such as [_script/local-ci.sh_](./script/local-ci.sh) that can be used to simulate the whole CI pipeline locally.
 Make sure to have the dev dependencies installed before running them.
 
-Furthermore, the package provides a `run_sql` script that can be used to run an arbitrary sql script on the indicated sqlite3 database.
+Furthermore, the package provides some utility scripts:
+
+- `run_sql` script that can be used to run an arbitrary sql script on the indicated sqlite3 database.
+- `f_crypto` script that can be used to encrypt/decrypt files with a key or generate a new key.
 
 ```shell
 run_sql <path_to_sql_script> <path_to_db_file>
 # Example
 run_sql ./script/create_db.sql ./spotted.sqlite3
+```
+
+```shell
+f_crypto <encrypt|decrypt> <input_file> <output_file> --key <key>
+# Example
+f_crypto encrypt ./spotted.sqlite3 ./spotted.sqlite3.enc --key xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+# Generate a new key
+f_crypto generate_key
 ```
 
 > [!Important]

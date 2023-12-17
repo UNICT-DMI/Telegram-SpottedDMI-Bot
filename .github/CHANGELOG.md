@@ -10,6 +10,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - **/ban** command can now also be used on reports
+- The database backup periodically sent to the admin can now be encrypted with a key (see `crypto_key` in the _settings.yaml_ file)
+- Added utility script `f_crypto` to encrypt/decrypt files with a key or generate a new key
+
+### Changes
+
+- Added readme overview page in the docs
+- Added Privacy Policy in the docs. It is referenced in the bot **/start** command
+- Use mermaid to generate entity relationship diagrams in the docs
 
 ## [3.0.0] - 2023-11-30
 
