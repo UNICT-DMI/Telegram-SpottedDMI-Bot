@@ -7,7 +7,7 @@ from cryptography.fernet import Fernet
 from telegram.error import BadRequest, Forbidden
 from telegram.ext import CallbackContext
 
-from spotted.data import Config, PendingPost
+from spotted.data import Config, DbManager, PendingPost
 from spotted.debug import logger
 from spotted.utils import EventInfo
 
@@ -75,3 +75,28 @@ async def db_backup_job(context: CallbackContext):
             )
         except BinasciiError as ex:
             await context.bot.send_message(chat_id=admin_group_id, text=f"✖️ Impossibile effettuare il backup\n\n{ex}")
+
+
+async def clean_warned_users():
+    """Job called each day at 05:00 utc.
+    Removed users who have been warned for longer than setting duration
+
+    Args:
+        context: context passed by the jobqueue
+    """
+    warn_expiration = datetime.now() + timedelta(days=Config.post_get("warn_after_days"))
+    DbManager.delete_from(
+        table_name="warned_users",
+        where="warn_time > %s",
+        where_args=(warn_expiration,),
+    )
+
+
+async def unmute_user(context: CallbackContext):
+    """A callback function that unmute the user
+
+    Args:
+        context: context passed by the job queue
+    """
+    user = context.job.context
+    user.unmute(context.bot)

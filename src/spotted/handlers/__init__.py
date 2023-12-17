@@ -1,5 +1,5 @@
 """Modules that handle the events the bot recognizes and reacts to"""
-from datetime import time
+from datetime import time, timedelta
 from warnings import filterwarnings
 
 from pytz import utc
@@ -22,12 +22,14 @@ from .autoreply import autoreply_callback, autoreply_cmd
 from .ban import ban_cmd
 from .cancel import cancel_cmd
 from .clean_pending import clean_pending_cmd
+from .custom_filters import IsAdminFilter
 from .db_backup import db_backup_cmd
 from .follow_comment import follow_spot_comment
 from .follow_spot import follow_spot_callback
 from .forwarded_post import forwarded_post_msg
 from .help import help_cmd
-from .job_handlers import clean_pending_job, db_backup_job
+from .job_handlers import clean_pending_job, clean_warned_users, db_backup_job
+from .mute import mute_cmd
 from .purge import purge_cmd
 from .reload import reload_cmd
 from .reply import reply_cmd
@@ -38,6 +40,7 @@ from .sban import sban_cmd
 from .settings import settings_callback, settings_cmd
 from .spot import spot_conv_handler
 from .start import start_cmd
+from .warn import warn_cmd
 
 
 async def add_commands(app: Application):
@@ -84,9 +87,9 @@ def add_handlers(app: Application):
     if Config.settings_get("debug", "local_log"):  # add MessageHandler only if log_message is enabled
         app.add_handler(MessageHandler(filters.ALL, log_message), 1)
 
-    admin_filter = filters.Chat(chat_id=Config.post_get("admin_group_id"))
+    admin_group_filter = filters.Chat(chat_id=Config.post_get("admin_group_id"))
     community_filter = filters.Chat(chat_id=Config.post_get("community_group_id"))
-
+    is_admin_filter = IsAdminFilter()
     # Error handler
     app.add_error_handler(error_handler)
 
@@ -97,23 +100,27 @@ def add_handlers(app: Application):
 
     # Command handlers
     app.add_handler(CommandHandler("start", start_cmd, filters=filters.ChatType.PRIVATE))
-    app.add_handler(CommandHandler("help", help_cmd, filters=filters.ChatType.PRIVATE | admin_filter))
+    app.add_handler(CommandHandler("help", help_cmd, filters=filters.ChatType.PRIVATE | admin_group_filter))
     app.add_handler(CommandHandler("rules", rules_cmd, filters=filters.ChatType.PRIVATE))
     app.add_handler(CommandHandler("settings", settings_cmd, filters=filters.ChatType.PRIVATE))
     # it must be after the conversation handler's 'cancel'
     app.add_handler(CommandHandler("cancel", cancel_cmd, filters=filters.ChatType.PRIVATE))
 
     # Command handlers: Admin commands
-    app.add_handler(CommandHandler("sban", sban_cmd, filters=admin_filter))
-    app.add_handler(CommandHandler("clean_pending", clean_pending_cmd, filters=admin_filter))
-    app.add_handler(CommandHandler("db_backup", db_backup_cmd, filters=admin_filter))
-    app.add_handler(CommandHandler("purge", purge_cmd, filters=admin_filter))
-    app.add_handler(CommandHandler("reload", reload_cmd, filters=admin_filter))
+    app.add_handler(CommandHandler("sban", sban_cmd, filters=admin_group_filter))
+    app.add_handler(CommandHandler("clean_pending", clean_pending_cmd, filters=admin_group_filter))
+    app.add_handler(CommandHandler("db_backup", db_backup_cmd, filters=admin_group_filter))
+    app.add_handler(CommandHandler("purge", purge_cmd, filters=admin_group_filter))
+    app.add_handler(CommandHandler("reload", reload_cmd, filters=admin_group_filter))
+    app.add_handler(CommandHandler("warn", warn_cmd, filters=community_filter & is_admin_filter))
 
     # MessageHandler
-    app.add_handler(MessageHandler(filters.REPLY & admin_filter & filters.Regex(r"^/ban$"), ban_cmd))
-    app.add_handler(MessageHandler(filters.REPLY & admin_filter & filters.Regex(r"^/reply"), reply_cmd))
-    app.add_handler(MessageHandler(filters.REPLY & admin_filter & filters.Regex(r"^/autoreply"), autoreply_cmd))
+    app.add_handler(MessageHandler(filters.REPLY & admin_group_filter & filters.Regex(r"^/ban$"), ban_cmd))
+    app.add_handler(MessageHandler(filters.REPLY & admin_group_filter & filters.Regex(r"^/reply"), reply_cmd))
+    app.add_handler(MessageHandler(filters.REPLY & admin_group_filter & filters.Regex(r"^/autoreply"), autoreply_cmd))
+    app.add_handler(
+        MessageHandler(filters.REPLY & community_filter & is_admin_filter & filters.Regex(r"^/mute"), mute_cmd)
+    )
 
     # Callback handlers
     app.add_handler(CallbackQueryHandler(settings_callback, pattern=r"^settings\.*"))
@@ -144,3 +151,4 @@ def add_jobs(app: Application):
     """
     app.job_queue.run_daily(clean_pending_job, time=time(hour=5, tzinfo=utc))  # run each day at 05:00 utc
     app.job_queue.run_daily(db_backup_job, time=time(hour=5, tzinfo=utc))  # run each day at 05:00 utc
+    app.job_queue.run_daily(clean_warned_users, time=time(hour=5, tzinfo=utc))  # run each day at 05:00 utc

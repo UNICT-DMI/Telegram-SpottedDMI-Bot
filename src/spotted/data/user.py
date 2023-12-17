@@ -5,6 +5,7 @@ from random import choice
 
 from telegram import Bot
 
+from .config import Config
 from .data_reader import read_md
 from .db_manager import DbManager
 from .pending_post import PendingPost
@@ -40,6 +41,11 @@ class User:
     def is_credited(self) -> bool:
         """If the user is in the credited list"""
         return DbManager.count_from(table_name="credited_users", where="user_id = %s", where_args=(self.user_id,)) == 1
+
+    def get_n_warns(self) -> int:
+        """Returns the count of consecutive warns of the user"""
+        count = DbManager.count_from(table_name="warned_users", where="user_id = %s", where_args=(self.user_id,))
+        return count if count else 0
 
     @classmethod
     def banned_users(cls) -> "list[User]":
@@ -83,6 +89,7 @@ class User:
 
         if not self.is_banned:
             DbManager.insert_into(table_name="banned_users", columns=("user_id",), values=(self.user_id,))
+        DbManager.delete_from(table_name="warned_users", where="user_id = %s", where_args=(self.user_id,))
 
     def sban(self) -> bool:
         """Removes the user from the banned list
@@ -94,6 +101,53 @@ class User:
             DbManager.delete_from(table_name="banned_users", where="user_id = %s", where_args=(self.user_id,))
             return True
         return False
+
+    def mute(self, bot: Bot):
+        """Mute a user restricting its actions inside the community group
+
+        Args:
+            bot: the telegram bot
+            days(optional): The number of days the user should be muted for.
+        """
+        bot.restrict_chat_member(
+            chat_id=Config.post_get("channel_id"),
+            user_id=self.user_id,
+            can_send_messages=False,
+            can_send_media_messages=False,
+            can_send_other_messages=False,
+            can_add_web_page_previews=False,
+        )
+        DbManager.insert_into(
+            table_name="muted_users",
+            columns=("user_id"),
+            values=(self.user_id),
+        )
+
+    def unmute(self, bot: Bot):
+        """Unmute a user taking back all restrictions
+
+        Args:
+            bot : the telegram bot
+        """
+        bot.restrict_chat_member(
+            chat_id=Config.post_get("channel_id"),
+            user_id=self.user_id,
+            can_send_messages=True,
+            can_send_media_messages=True,
+            can_send_other_messages=True,
+            can_add_web_page_previews=True,
+        )
+        DbManager.delete_from(table_name="muted_users", where="user_id = %s", where_args=(self.user_id,))
+
+    def warn(self):
+        """Increase the number of warns of a user
+        If this is number would reach 3 the user is banned
+
+        Args:
+            bot: the telegram bot
+
+        """
+        DbManager.insert_into(table_name="warned_users", columns=("user_id",), values=(self.user_id,))
 
     def become_anonym(self) -> bool:
         """Removes the user from the credited list, if he was present
