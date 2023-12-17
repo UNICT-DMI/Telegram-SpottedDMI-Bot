@@ -5,7 +5,21 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [3.0.0] - 2023-11-12
+## [Unreleased]
+
+### Added
+
+- **/ban** command can now also be used on reports
+- The database backup periodically sent to the admin can now be encrypted with a key (see `crypto_key` in the _settings.yaml_ file)
+- Added utility script `f_crypto` to encrypt/decrypt files with a key or generate a new key
+
+### Changes
+
+- Added readme overview page in the docs
+- Added Privacy Policy in the docs. It is referenced in the bot **/start** command
+- Use mermaid to generate entity relationship diagrams in the docs
+
+## [3.0.0] - 2023-11-30
 
 ### Added
 
@@ -39,4 +53,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Identical links assigned in each translation file
 - Duplicate index file for the english version
 
-[3.0.0]: https://github.com/UNICT-DMI/Telegram-SpottedDMI-Bot/compare/upgrade...v3.0.0
+[3.0.0]: https://github.com/UNICT-DMI/Telegram-SpottedDMI-Bot/compare/upgrade...3.0.0

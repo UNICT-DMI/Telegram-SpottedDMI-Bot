@@ -17,3 +17,4 @@ Il codice sorgente del bot \(per gli ingegneri: i file che una volta avviati fan
 Questo garantisce che chiunque ha la possibilità di controllare come funziona il sistema o anche di creare un nuovo bot basato su questo\.
 
 Qualsiasi messaggio viene ricevuto da noi senza nessun riferimento al mittente\.
+Per maggiori informazioni, consulta la nostra [Privacy Policy](https://unict-dmi.github.io/Telegram-SpottedDMI-Bot/privacy)\.

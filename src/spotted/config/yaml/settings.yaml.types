@@ -3,6 +3,7 @@ debug:
   reset_on_load: bool
   log_file: str
   log_error_file: str
+  crypto_key: str
 post:
   community_group_id: int
   channel_id: int

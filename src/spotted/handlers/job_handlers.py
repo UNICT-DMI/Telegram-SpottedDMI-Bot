@@ -1,6 +1,9 @@
 """Scheduled jobs of the bot"""
+from base64 import b64decode
+from binascii import Error as BinasciiError
 from datetime import datetime, timedelta, timezone
 
+from cryptography.fernet import Fernet
 from telegram.error import BadRequest, Forbidden
 from telegram.ext import CallbackContext
 
@@ -57,8 +60,18 @@ async def db_backup_job(context: CallbackContext):
     admin_group_id = Config.post_get("admin_group_id")
     with open(path, "rb") as database_file:
         try:
+            if Config.debug_get("crypto_key"):
+                key = b64decode(Config.debug_get("crypto_key"))
+                cipher = Fernet(key)
+                db_backup = cipher.encrypt(database_file.read())
+            else:
+                db_backup = database_file.read()
+
             await context.bot.send_document(
-                chat_id=admin_group_id, document=database_file, caption="✅ Backup effettuato con successo"
+                chat_id=admin_group_id,
+                document=db_backup,
+                filename="spotted.backup.sqlite3",
+                caption="✅ Backup effettuato con successo",
             )
-        except Exception as ex:  # pylint: disable=broad-except
+        except BinasciiError as ex:
             await context.bot.send_message(chat_id=admin_group_id, text=f"✖️ Impossibile effettuare il backup\n\n{ex}")

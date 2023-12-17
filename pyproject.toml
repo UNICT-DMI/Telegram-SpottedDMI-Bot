@@ -39,6 +39,7 @@ dependencies = [
     "anyio==4.0.0",
     "APScheduler==3.10.4",
     "certifi==2023.7.22",
+    "cryptography==41.0.7",
     "h11==0.14.0",
     "httpcore==0.18.0",
     "httpx==0.25.0",
@@ -69,6 +70,7 @@ Changelog = "https://github.com/UNICT-DMI/Telegram-SpottedDMI-Bot/blob/main/.git
 # Entry points of the package
 [project.scripts]
 run_sql = "spotted.scripts.run_sql:main"
+f_crypto = "spotted.scripts.f_crypto:main"
 
 # Setuptool configuration (build system)
 [tool.setuptools]

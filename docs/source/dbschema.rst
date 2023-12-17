@@ -1,59 +1,73 @@
+.. _dbschema:
+
 Database schema
 ===========================================
 This is the schema of the database used to store information about the spots and their reactions
 
-.. image:: _static/img/DbSchema.png
-   :target: _static/img/DbSchema.png
-   :alt: Database schema
+.. mermaid::
 
-This image has been created with the following script on `dbdiagram.io <https://dbdiagram.io/home>`_::
-
-   Table pending_post as PE {
-   user_id bigint [not null]
-   u_message_id bigint [not null]
-   g_message_id bigint [pk]
-   admin_group_id bigint [pk]
-   message_date timestamp
+   erDiagram
+   "pending_post" {
+      user_id BIGINT
+      u_message_id BIGINT
+      g_message_id BIGINT PK
+      admin_group_id BIGINT PK
+      message_date TIMESTAMP
    }
 
-   Table published_post as PU {
-   channel_id bigint [pk]
-   c_message_id bigint [pk]
+   "admin_votes" {
+      admin_id BIGINT PK
+      g_message_id BIGINT PK
+      admin_group_id BIGINT PK
+      is_upvote BOOLEAN
    }
 
-   Table admin_votes {
-   admin_id bigint [pk]
-   g_message_id bigint [pk, ref: > PE.g_message_id]
-   admin_group_id bigint [pk, ref: > PE.admin_group_id]
-   is_upvote boolean [not null]
+   pending_post ||--o{ admin_votes : receives
+
+   "published_post" {
+      channel_id BIGINT PK
+      c_message_id BIGINT PK
+      message_date TIMESTAMP
    }
 
-   Table credited_users {
-   user_id bigint [pk]
+   "spot_report" {
+      user_id BIGINT PK
+      channel_id BIGINT
+      c_message_id BIGINT PK
+      g_message_id BIGINT
+      admin_group_id BIGINT
+      message_date TIMESTAMP
    }
 
-   Table banned_users {
-   user_id bigint [pk]
+   published_post ||--o{ spot_report : receives
+
+.. mermaid::
+
+   erDiagram
+   "credited_users" {
+      user_id BIGINT PK
    }
 
-   Table spot_report {
-   user_id bigint [pk]
-   channel_id bigint [pk, ref: > PU.channel_id]
-   c_message_id bigint [pk, ref: > PU.c_message_id]
-   g_message_id bigint [not null]
-   admin_group_id bigint [not null]
+   "banned_users" {
+      user_id BIGINT PK
+      ban_date TIMESTAMP
    }
 
-   Table user_report {
-   user_id bigint [pk]
-   target_username varchar(32) [pk]
-   g_message_id bigint [not null]
-   admin_group_id bigint [not null]
-   message_date timestamp [pk]
+.. mermaid::
+
+   erDiagram
+   "user_report" {
+      user_id BIGINT PK
+      target_username VARCHAR(32) PK
+      g_message_id BIGINT
+      admin_group_id BIGINT
+      message_date TIMESTAMP PK
    }
 
-   Table user_follow {
-   user_id bigint [not null]
-   message_id BIGINT [not null]
-   private_message_id BIGINT [not null]
+   "user_follow" {
+      user_id BIGINT PK
+      message_id BIGINT PK
+      private_message_id BIGINT
+      follow_date TIMESTAMP
    }
+
