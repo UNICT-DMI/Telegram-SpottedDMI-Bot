@@ -9,7 +9,7 @@
 [![CodeFactor](https://www.codefactor.io/repository/github/unict-dmi/telegram-spotteddmi-bot/badge)](https://www.codefactor.io/repository/github/unict-dmi/telegram-spotteddmi-bot)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 
-**Telegram-SpottedDMI-Bot** is the platform that powers **[@Spotted_DMI_Bot](https://telegram.me/Spotted_DMI_Bot)**, a Telegram bot that let students send an anonymous message to the channel community.
+**Telegram-SpottedDMI-Bot** is the platform that powers [**@Spotted_DMI_Bot**](https://telegram.me/Spotted_DMI_Bot), a Telegram bot that let students send an anonymous message to the channel community.
 
 ## 🔴 Using the live version
 
@@ -21,11 +21,11 @@ Please note that the commands and their answers are in Italian.
 
 ## 🤖 Telegram bot setup
 
-If you want to deploy your own version of this bot, you will need to have a telegram bot available. You should read [this guide](https://core.telegram.org/bots#3-how-do-i-create-a-bot) for more details, but in short:
+If you want to deploy your own version of this bot, you will need to have a telegram bot available. You should read [this guide](https://core.telegram.org/bots#how-do-i-create-a-bot) for more details, but in short:
 
 - Send a message to [@Botfather](https://t.me/botfather)
 - Follow the guided procedure
-- You will recieve a token. Whoever knows that token has complete control over your bot, so handle it with care
+- You will receive a token. Whoever knows that token has complete control over your bot, so handle it with care
 - You will need that token later, for it is a needed value in the settings
 
 ## 📂 Project structure
@@ -265,7 +265,7 @@ post:
   comments: true # whether or not the channel the bot will send the posts to has comments enabled
   admin_group_id: -300 # id of the admin group the bot will use
   n_votes: 2 # votes needed to approve/reject a pending post
-  remove_after_h: 12 # number of hours after wich pending posts will be automatically by /clean_pending
+  remove_after_h: 12 # pending posts older than this number of hours will be removed by /clean_pending
   report_wait_mins: 30 # number of minutes the user has to wait before being able to report another user again
   report:
     true # whether to add a report button as an inline keyboard after each post
@@ -356,7 +356,7 @@ bot_tag: str
 If you plan to contribute to this project, you may want to run the tests and the linters locally.
 
 > [!Note]  
-> When creating a pull request, all the tests and linters will be run automatically using the [github actions](.github/workflows).
+> When creating a pull request, all the tests and linters will be run automatically using the [github actions](https://github.com/UNICT-DMI/Telegram-SpottedDMI-Bot/tree/main/.github/workflows).
 > If the tests fail, the pull request won't be merged until all the errors are fixed.
 > Hence, it is recommended to run the tests and the linters locally before pushing your changes.
 
@@ -396,7 +396,7 @@ pip3 install -e .[lint]
 
 ### Scripts
 
-The `script` folder contains some utility scripts such as [_script/local-ci.sh_](./script/local-ci.sh) that can be used to simulate the whole CI pipeline locally.
+The `script` folder contains some utility scripts such as [_script/local-ci.sh_](https://github.com/UNICT-DMI/Telegram-SpottedDMI-Bot/tree/main/script/local-ci.sh) that can be used to simulate the whole CI pipeline locally.
 Make sure to have the dev dependencies installed before running them.
 
 Furthermore, the package provides some utility scripts:
