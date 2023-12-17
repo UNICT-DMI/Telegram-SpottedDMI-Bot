@@ -1,3 +1,5 @@
+.. _dbschema:
+
 Database schema
 ===========================================
 This is the schema of the database used to store information about the spots and their reactions
