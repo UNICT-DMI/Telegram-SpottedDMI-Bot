@@ -252,6 +252,10 @@ debug:
   log_file: "logs/spotted.log" # path to the log file, if local_log is enabled. Relative to the pwd
   log_error_file: "logs/spotted_error.log" # path to the error log file. Relative to the pwd
   db_file: "spotted.sqlite3" # path to the database file. Relative to the pwd
+  # key used to encrypt the database backup sent to the admin periodically. 
+  # Must be 32 bytes long and base64 encoded.
+  # If not specified (default), the backup will be sent in clear text
+  crypto_key: "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
 
 post:
   # id of the group associated with the channel. Telegram will send automatically forward the posts there. Required if comments are enabled
@@ -330,6 +334,7 @@ debug:
   log_file: str
   log_error_file: str
   db_file: str
+  crypto_key: str
 post:
   community_group_id: int
   channel_id: int
