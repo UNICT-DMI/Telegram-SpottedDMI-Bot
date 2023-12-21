@@ -21,6 +21,8 @@ post:
   reject_after_autoreply: true
   autoreplies_per_page: 6
   blacklist_messages: []
-
+  max_n_warns: 3
+  warn_expiration_days: 60
+  mute_default_duration_days: 7
 token: ""
 bot_tag: "@bot_tag"

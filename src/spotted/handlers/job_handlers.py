@@ -9,7 +9,7 @@ from cryptography.fernet import Fernet
 from telegram.error import BadRequest, Forbidden
 from telegram.ext import CallbackContext
 
-from spotted.data import Config, PendingPost
+from spotted.data import Config, DbManager, PendingPost, User
 from spotted.debug import logger
 from spotted.utils import EventInfo
 
@@ -109,3 +109,20 @@ async def db_backup_job(context: CallbackContext):
         )
     except BinasciiError as ex:
         await context.bot.send_message(chat_id=admin_group_id, text=f"✖️ Impossibile effettuare il backup\n\n{ex}")
+
+
+async def clean_muted_users(context: CallbackContext):
+    """Job called each day at 05:00 utc.
+    Removed expired users mute records from the database
+
+    Args:
+        context: context passed by the jobqueue
+    """
+    expired_muted = DbManager.select_from(
+        table_name="muted_users", select="user_id", where="expire_date < DATETIME('now')"
+    )
+    if len(expired_muted) == 0:
+        return
+    for user in expired_muted:
+        DbManager.delete_from(table_name="muted_users", where="user_id = %s", where_args=(user,))
+        User(user).unmute(context.bot)

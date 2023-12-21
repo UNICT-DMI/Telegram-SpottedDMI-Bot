@@ -1,11 +1,12 @@
 """Users management"""
 
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import datetime, timedelta
 from random import choice
 
-from telegram import Bot
+from telegram import Bot, ChatPermissions
 
+from .config import Config
 from .data_reader import read_md
 from .db_manager import DbManager
 from .pending_post import PendingPost
@@ -25,12 +26,19 @@ class User:
     user_id: int
     private_message_id: int | None = None
     ban_date: datetime | None = None
+    mute_date: datetime | None = None
+    mute_expire_date: datetime | None = None
     follow_date: datetime | None = None
 
     @property
     def is_pending(self) -> bool:
         """If the user has a post already pending or not"""
         return bool(PendingPost.from_user(self.user_id))
+
+    @property
+    def is_warn_bannable(self) -> bool:
+        """If the user is bannable due to warns"""
+        return self.get_n_warns() >= Config.post_get("max_n_warns")
 
     @property
     def is_banned(self) -> bool:
@@ -48,6 +56,14 @@ class User:
         return [
             cls(user_id=row["user_id"], ban_date=row["ban_date"])
             for row in DbManager.select_from(table_name="banned_users", select="user_id, ban_date")
+        ]
+
+    @classmethod
+    def muted_users(cls) -> "list[User]":
+        """Returns a list of all the muted users"""
+        return [
+            cls(user_id=row["user_id"], mute_date=row["mute_date"], mute_expire_date=row["expire_date"])
+            for row in DbManager.select_from(table_name="muted_users", select="user_id, mute_date, expire_date")
         ]
 
     @classmethod
@@ -79,6 +95,11 @@ class User:
             )
         ]
 
+    def get_n_warns(self) -> int:
+        """Returns the count of consecutive warns of the user"""
+        count = DbManager.count_from(table_name="warned_users", where="user_id = %s", where_args=(self.user_id,))
+        return count if count else 0
+
     def ban(self):
         """Adds the user to the banned list"""
 
@@ -93,8 +114,61 @@ class User:
         """
         if self.is_banned:
             DbManager.delete_from(table_name="banned_users", where="user_id = %s", where_args=(self.user_id,))
+            DbManager.delete_from(table_name="warned_users", where="user_id = %s", where_args=(self.user_id,))
             return True
         return False
+
+    async def mute(self, bot: Bot, days: int):
+        """Mute a user restricting its actions inside the community group
+
+        Args:
+            bot: the telegram bot
+            days(optional): The number of days the user should be muted for.
+        """
+        await bot.restrict_chat_member(
+            chat_id=Config.post_get("channel_id"),
+            user_id=self.user_id,
+            permissions=ChatPermissions(
+                can_send_messages=False,
+                can_send_other_messages=False,
+                can_add_web_page_previews=False,
+            ),
+        )
+        expiration_date = datetime.now() + timedelta(days=days)
+        DbManager.insert_into(
+            table_name="muted_users",
+            columns=("user_id", "expire_date"),
+            values=(self.user_id, expiration_date),
+        )
+
+    async def unmute(self, bot: Bot):
+        """Unmute a user taking back all restrictions
+
+        Args:
+            bot : the telegram bot
+        """
+        await bot.restrict_chat_member(
+            chat_id=Config.post_get("channel_id"),
+            user_id=self.user_id,
+            permissions=ChatPermissions(
+                can_send_messages=True,
+                can_send_other_messages=True,
+                can_add_web_page_previews=True,
+            ),
+        )
+        DbManager.delete_from(table_name="muted_users", where="user_id = %s", where_args=(self.user_id,))
+
+    def warn(self):
+        """Increase the number of warns of a user
+        If this is number would reach 3 the user is banned
+
+        Args:
+            bot: the telegram bot
+        """
+        valid_until_date = datetime.now() + timedelta(days=Config.post_get("warn_expiration_days"))
+        DbManager.insert_into(
+            table_name="warned_users", columns=("user_id", "valid_until_date"), values=(self.user_id, valid_until_date)
+        )
 
     def become_anonym(self) -> bool:
         """Removes the user from the credited list, if he was present
