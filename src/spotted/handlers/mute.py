@@ -33,7 +33,7 @@ async def mute_cmd(update: Update, context: CallbackContext):
     await user.mute(info.bot, days)
     await info.bot.send_message(
         chat_id=Config.post_get("admin_group_id"),
-        text=f"L'utente è stato mutato per {days} giorn{'o' if days == 1 else 'i'}.",
+        text=f"L'utente {user.user_id} è stato mutato per {days} giorn{'o' if days == 1 else 'i'}.",
     )
     await info.bot.send_message(
         chat_id=user.user_id, text=f"Sei stato mutato da Spotted DMI" f"per {days} giorn{'o' if days == 1 else 'i'}"

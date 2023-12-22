@@ -126,7 +126,7 @@ class User:
             days(optional): The number of days the user should be muted for.
         """
         await bot.restrict_chat_member(
-            chat_id=Config.post_get("channel_id"),
+            chat_id=Config.post_get("community_group_id"),
             user_id=self.user_id,
             permissions=ChatPermissions(
                 can_send_messages=False,
@@ -148,7 +148,7 @@ class User:
             bot : the telegram bot
         """
         await bot.restrict_chat_member(
-            chat_id=Config.post_get("channel_id"),
+            chat_id=Config.post_get("community_group_id"),
             user_id=self.user_id,
             permissions=ChatPermissions(
                 can_send_messages=True,
