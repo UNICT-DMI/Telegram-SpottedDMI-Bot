@@ -46,6 +46,11 @@ class User:
         return DbManager.count_from(table_name="banned_users", where="user_id = %s", where_args=(self.user_id,)) > 0
 
     @property
+    def is_muted(self) -> bool:
+        """If the user is muted or not"""
+        return DbManager.count_from(table_name="muted_users", where="user_id = %s", where_args=(self.user_id,)) > 0
+
+    @property
     def is_credited(self) -> bool:
         """If the user is in the credited list"""
         return DbManager.count_from(table_name="credited_users", where="user_id = %s", where_args=(self.user_id,)) == 1
@@ -118,22 +123,23 @@ class User:
             return True
         return False
 
-    async def mute(self, bot: Bot, days: int):
+    async def mute(self, bot: Bot | None, days: int):
         """Mute a user restricting its actions inside the community group
 
         Args:
             bot: the telegram bot
             days(optional): The number of days the user should be muted for.
         """
-        await bot.restrict_chat_member(
-            chat_id=Config.post_get("community_group_id"),
-            user_id=self.user_id,
-            permissions=ChatPermissions(
-                can_send_messages=False,
-                can_send_other_messages=False,
-                can_add_web_page_previews=False,
-            ),
-        )
+        if bot is not None:
+            await bot.restrict_chat_member(
+                chat_id=Config.post_get("community_group_id"),
+                user_id=self.user_id,
+                permissions=ChatPermissions(
+                    can_send_messages=False,
+                    can_send_other_messages=False,
+                    can_add_web_page_previews=False,
+                ),
+            )
         expiration_date = datetime.now() + timedelta(days=days)
         DbManager.insert_into(
             table_name="muted_users",
@@ -141,21 +147,22 @@ class User:
             values=(self.user_id, expiration_date),
         )
 
-    async def unmute(self, bot: Bot):
+    async def unmute(self, bot: Bot | None):
         """Unmute a user taking back all restrictions
 
         Args:
             bot : the telegram bot
         """
-        await bot.restrict_chat_member(
-            chat_id=Config.post_get("community_group_id"),
-            user_id=self.user_id,
-            permissions=ChatPermissions(
-                can_send_messages=True,
-                can_send_other_messages=True,
-                can_add_web_page_previews=True,
-            ),
-        )
+        if bot is not None:
+            await bot.restrict_chat_member(
+                chat_id=Config.post_get("community_group_id"),
+                user_id=self.user_id,
+                permissions=ChatPermissions(
+                    can_send_messages=True,
+                    can_send_other_messages=True,
+                    can_add_web_page_previews=True,
+                ),
+            )
         DbManager.delete_from(table_name="muted_users", where="user_id = %s", where_args=(self.user_id,))
 
     def warn(self):

@@ -2,7 +2,7 @@
 """Tests the bot functionality"""
 
 import os
-from datetime import datetime
+from datetime import datetime, timedelta
 
 import pytest
 import pytest_asyncio
@@ -274,6 +274,43 @@ class TestBot:
             await telegram.send_command("/sban 1", chat=admin_group)
             assert telegram.last_message.text == "Sban effettuato"
             assert not User(1).is_banned
+
+        async def test_unmute_invalid_cmd(self, telegram: TelegramSimulator, admin_group: Chat):
+            """Tests the /unmute command.
+            The bot warns about unmute invalid command
+            """
+            await telegram.send_command("/unmute", chat=admin_group)
+            assert (
+                telegram.last_message.text == "[uso]: /unmute <user_id1> [...user_id2]\n"
+                "Gli utenti attualmente mutati sono:\nNessuno"
+            )
+
+        async def test_unmute_list_invalid_cmd(self, telegram: TelegramSimulator, admin_group: Chat):
+            """Tests the /unmute command.
+            The bot warns about invalid command showing a list of muted users
+            """
+            await User(5).mute(None, 1)  # the user 5 and 6 have been muted
+            await User(6).mute(None, 1)
+            mute_date = datetime.now()  # to make sure no weird stuff happens with the date
+            expiration_date = datetime.now() + timedelta(days=1)
+            DbManager.update_from(
+                table_name="muted_users", set_clause="mute_date=%s, expire_date=%s", args=(mute_date, expiration_date)
+            )
+            await telegram.send_command("/unmute", chat=admin_group)
+            assert (
+                telegram.last_message.text == "[uso]: /unmute <user_id1> [...user_id2]\n"
+                "Gli utenti attualmente mutati sono:\n"
+                f"5 (Mute: {mute_date:%d/%m/%Y %H:%M} - Exp: {expiration_date:%d/%m/%Y %H:%M} )\n"
+                f"6 (Mute: {mute_date:%d/%m/%Y %H:%M} - Exp: {expiration_date:%d/%m/%Y %H:%M} )"  # list the muted users
+            )
+
+        async def test_unmute_cmd(self, telegram: TelegramSimulator, admin_group: Chat):
+            """Tests the /unmute command.
+            The bot unmutes the users specified user
+            """
+            await User(1).mute(None, 1)
+            await User(1).unmute(None)
+            assert not User(1).is_muted
 
         async def test_reply_invalid_cmd(self, telegram: TelegramSimulator, admin_group: Chat, pending_post: Message):
             """Tests the /reply command.

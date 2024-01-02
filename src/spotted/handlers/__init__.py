@@ -65,7 +65,7 @@ async def add_commands(app: Application):
     ]
     admin_commands = [
         BotCommand("ban", "banna un utente"),
-        BotCommand("sban", "banna un utente"),
+        BotCommand("sban", "sbanna un utente"),
         BotCommand("mute", "muta un utente"),
         BotCommand("unmute", "smuta un utente"),
         BotCommand("warn", "warna un utente"),
@@ -120,8 +120,8 @@ def add_handlers(app: Application):
     app.add_handler(CommandHandler("reload", reload_cmd, filters=admin_filter))
 
     # Command handlers: Community-based commands
-    app.add_handler(CommandHandler("warn", warn_cmd, filters=filters.ChatType.PRIVATE | community_filter))
-    app.add_handler(CommandHandler("mute", mute_cmd, filters=filters.ChatType.PRIVATE | community_filter))
+    app.add_handler(CommandHandler("warn", warn_cmd, filters=admin_filter | community_filter))
+    app.add_handler(CommandHandler("mute", mute_cmd, filters=admin_filter | community_filter))
 
     # MessageHandler
     app.add_handler(MessageHandler(filters.REPLY & admin_filter & filters.Regex(r"^/ban$"), ban_cmd))
