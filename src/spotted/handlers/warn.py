@@ -17,7 +17,7 @@ async def warn_cmd(update: Update, context: CallbackContext):
     info = EventInfo.from_message(update, context)
     admins = [admin.user.id for admin in await info.bot.get_chat_administrators(Config.post_get("community_group_id"))]
     g_message = update.message.reply_to_message
-    if (info.user_id not in admins):
+    if info.user_id not in admins:
         await info.bot.send_message(chat_id=info.user_id, text="Non sei admin")
         await info.message.delete()
         return
@@ -27,30 +27,31 @@ async def warn_cmd(update: Update, context: CallbackContext):
         await info.message.delete()
         return
     comment = " ".join(context.args)
-    fromCommunity = False
+    from_community = False
     user_id = -1
-    if (pending_post := PendingPost.from_group(admin_group_id=info.chat_id, g_message_id=g_message.message_id)) is not None:
+    if (
+        pending_post := PendingPost.from_group(admin_group_id=info.chat_id, g_message_id=g_message.message_id)
+    ) is not None:
         user_id = pending_post.user_id
         pending_post.delete_post()
         await info.edit_inline_keyboard(message_id=g_message.message_id)
     elif (report := Report.from_group(admin_group_id=info.chat_id, g_message_id=g_message.message_id)) is not None:
         user_id = report.user_id
-    elif (g_message.chat_id == Config.post_get("community_group_id")):
+    elif g_message.chat_id == Config.post_get("community_group_id"):
         user_id = g_message.from_user.id
-        fromCommunity = True
+        from_community = True
     else:
         return
-    await execute_warn(info, user_id, comment, fromCommunity)
-    
-    
-    
-async def execute_warn(info: EventInfo, user_id: int, comment: str, fromCommunity: bool = False):
+    await execute_warn(info, user_id, comment, from_community)
+
+
+async def execute_warn(info: EventInfo, user_id: int, comment: str, from_community: bool = False):
     """Execute the /warn command.
-   Add a warn to the user and auto-ban is necessary
-    Args:
-        user_id: The user_id of the interested user
-        bot: a telegram bot instance
-        fromCommunity: a flag for auto-delete command invokation
+    Add a warn to the user and auto-ban is necessary
+     Args:
+         user_id: The user_id of the interested user
+         bot: a telegram bot instance
+         from_community: a flag for auto-delete command invokation
     """
     user = User(user_id)
     user.warn()
@@ -65,10 +66,9 @@ async def execute_warn(info: EventInfo, user_id: int, comment: str, fromCommunit
     )
     await info.bot.send_message(
         chat_id=Config.post_get("admin_group_id"),
-        text=f"L'utente {user_id} ha ricevuto il {n_warns}° warn\n"
-        f"Motivo: {comment}",
+        text=f"L'utente {user_id} ha ricevuto il {n_warns}° warn\n" f"Motivo: {comment}",
     )
     if user.is_warn_bannable:
         await execute_ban(user.user_id, info)
-    if fromCommunity:
+    if from_community:
         await info.message.delete()
