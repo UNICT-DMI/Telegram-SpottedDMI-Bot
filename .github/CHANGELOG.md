@@ -26,6 +26,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **/ban** command can now also be used on reports
 - The database backup periodically sent to the admin can now be encrypted with a key (see `crypto_key` in the _settings.yaml_ file)
 - Added utility script `f_crypto` to encrypt/decrypt files with a key or generate a new key
+- **/warn** command, the admins can now warn users based on abusive reports, irregular spotting and comments.
+- **/mute** command, it is now possible to remove comment permission for a specific user for a specific time.
+- **/unmute** command, it is now possible to restore comment permission to a muted user.
+- **Warn Auto-Scrubbing**, the database will automatically clear outdated warns using lazy ways.
 
 ### Fixed
 

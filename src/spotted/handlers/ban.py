@@ -32,16 +32,15 @@ async def ban_cmd(update: Update, context: CallbackContext):
     await execute_ban(user_id, info)
 
 
-async def execute_ban(user_id: int, info: EventInfo, from_warn: bool = False):
+async def execute_ban(user_id: int, info: EventInfo):
     """Execute the ban of a user by his user_id
 
     Args:
         user_id: The user_id of the user to ban
         info: The EventInfo object
-        from_warn: A boolean indicating if the ban is executed from a warn
     """
     user = User(user_id)
-    receipt_chat_id = info.chat_id if not from_warn else Config.post_get("admin_group_id")
+    receipt_chat_id = Config.post_get("admin_group_id")
     if user.is_banned:
         await info.bot.send_message(chat_id=receipt_chat_id, text=f"L'utente {user_id} è già bannato")
         return
