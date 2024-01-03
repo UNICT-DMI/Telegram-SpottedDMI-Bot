@@ -167,14 +167,14 @@ class User:
 
     def warn(self):
         """Increase the number of warns of a user
-        If this is number would reach 3 the user is banned
+        If the number of warns is greater than the maximum allowed, the user is banned
 
         Args:
             bot: the telegram bot
         """
         valid_until_date = datetime.now() + timedelta(days=Config.post_get("warn_expiration_days"))
         DbManager.insert_into(
-            table_name="warned_users", columns=("user_id", "valid_until_date"), values=(self.user_id, valid_until_date)
+            table_name="warned_users", columns=("user_id", "expire_date"), values=(self.user_id, valid_until_date)
         )
 
     def become_anonym(self) -> bool:

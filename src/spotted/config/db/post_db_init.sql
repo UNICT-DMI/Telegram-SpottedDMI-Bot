@@ -45,7 +45,7 @@ CREATE TABLE IF NOT EXISTS warned_users
 (
     user_id BIGINT NOT NULL,
     warn_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    valid_until_date TIMESTAMP NOT NULL,
+    expire_date TIMESTAMP NOT NULL,
     PRIMARY KEY (user_id, warn_date)
 );
 -----
@@ -92,5 +92,5 @@ CREATE TRIGGER IF NOT EXISTS drop_old_warns
    BEFORE INSERT ON warned_users
     FOR EACH ROW
 BEGIN
-DELETE FROM warned_users WHERE user_id=NEW.user_id and valid_until_date < DATETIME('now');
+DELETE FROM warned_users WHERE user_id=NEW.user_id and expire_date < DATETIME('now');
 END;
