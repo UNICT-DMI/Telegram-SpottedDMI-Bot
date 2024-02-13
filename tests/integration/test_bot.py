@@ -285,9 +285,20 @@ class TestBot:
             """Tests the /reply command.
             The bot sends a message to the user on behalf of the admin
             """
-            await telegram.send_message("/reply TEST", chat=admin_group, reply_to_message=pending_post)
+            await telegram.send_message("/reply TEST Test2", chat=admin_group, reply_to_message=pending_post)
             assert telegram.messages[-2].text.startswith("COMUNICAZIONE DEGLI ADMIN SUL TUO ULTIMO POST:\n")
-            assert telegram.messages[-2].text.endswith("TEST")
+            assert telegram.messages[-2].text.endswith("TEST Test2")
+            assert telegram.last_message.text == "L'utente ha ricevuto il messaggio"
+
+        async def test_reply_bot_tag_post_cmd(
+            self, telegram: TelegramSimulator, admin_group: Chat, pending_post: Message
+        ):
+            """Tests the /reply command with the bot tag.
+            The bot sends a message to the user on behalf of the admin
+            """
+            await telegram.send_message("/reply@bot_tag TEST1 Test2", chat=admin_group, reply_to_message=pending_post)
+            assert telegram.messages[-2].text.startswith("COMUNICAZIONE DEGLI ADMIN SUL TUO ULTIMO POST:\n")
+            assert telegram.messages[-2].text.endswith("TEST1 Test2")
             assert telegram.last_message.text == "L'utente ha ricevuto il messaggio"
 
         async def test_autoreply_list_cmd(self, telegram: TelegramSimulator, admin_group: Chat, pending_post: Message):
