@@ -1,12 +1,20 @@
 """/reply command"""
+
 from telegram import Update
 from telegram.ext import CallbackContext
 
-from spotted.data import PendingPost, Report, Config
+from spotted.data import PendingPost, Report
 from spotted.utils import EventInfo
 
 
 async def reply_cmd(update: Update, context: CallbackContext):
+    """Handles the /reply command.
+    Send a message to a user by replying to one of his pending posts with /reply + the message you want to send
+
+    Args:
+        update: update event
+        context: context passed by the handler
+    """
     info = EventInfo.from_message(update, context)
     if len(info.args) == 0:  # the reply is empty
         await info.bot.send_message(
