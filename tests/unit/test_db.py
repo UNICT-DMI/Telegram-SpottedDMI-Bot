@@ -16,8 +16,8 @@ def db_results(create_test_db: DbManager) -> dict:
     Yields:
         Iterator[dict]: dictionary containing the results for the test queries
     """
-    create_test_db.row_factory = (
-        lambda cursor, row: list(row) if cursor.description[0][0] != "number" else {"number": row[0]}
+    create_test_db.row_factory = lambda cursor, row: (
+        list(row) if cursor.description[0][0] != "number" else {"number": row[0]}
     )
     create_test_db.query_from_file("config/db/db_test.sql")
 

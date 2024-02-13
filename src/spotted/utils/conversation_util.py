@@ -1,4 +1,5 @@
 """Common functions needed in conversation handlers"""
+
 from typing import Callable
 
 from telegram import Update

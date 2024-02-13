@@ -1,4 +1,5 @@
 """/spot command"""
+
 from random import choice
 
 from telegram import Update

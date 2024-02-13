@@ -1,4 +1,5 @@
 """/settings command"""
+
 import logging
 
 from telegram import Update

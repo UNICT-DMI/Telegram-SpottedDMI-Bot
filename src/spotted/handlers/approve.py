@@ -1,4 +1,5 @@
 """Approve actions the admin can take on a pending post."""
+
 import logging
 
 from telegram import Update

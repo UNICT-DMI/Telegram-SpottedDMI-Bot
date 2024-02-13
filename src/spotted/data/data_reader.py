@@ -1,4 +1,5 @@
 """Read data from files"""
+
 import os
 from importlib import resources
 

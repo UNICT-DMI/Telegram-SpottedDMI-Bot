@@ -1,4 +1,5 @@
 """Modules used in this bot"""
+
 from telegram.ext import Application
 
 from spotted.data import Config, init_db

@@ -1,4 +1,5 @@
 """Handles the management of databases"""
+
 import logging
 import os
 import sqlite3
