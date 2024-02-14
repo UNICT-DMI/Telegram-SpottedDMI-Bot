@@ -1,4 +1,5 @@
 """/purge command"""
+
 from time import sleep
 
 from telegram import Update

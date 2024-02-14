@@ -1,4 +1,5 @@
 """Data management for the bot"""
+
 from .db_manager import DbManager
 
 

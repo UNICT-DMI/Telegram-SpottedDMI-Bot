@@ -1,4 +1,5 @@
 """Main module"""
+
 import argparse
 from typing import TYPE_CHECKING
 

@@ -1,4 +1,5 @@
 """Common info needed in both command and callback handlers"""
+
 from telegram import Bot, CallbackQuery, Chat, InlineKeyboardMarkup, Message, Update
 from telegram.error import BadRequest
 from telegram.ext import CallbackContext

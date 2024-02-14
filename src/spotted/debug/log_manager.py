@@ -1,4 +1,5 @@
 """Handles the logging of events"""
+
 import html
 import logging
 import traceback

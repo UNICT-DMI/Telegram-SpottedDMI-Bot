@@ -1,4 +1,5 @@
 """Constants used by the bot handlers"""
+
 from enum import Enum, auto, unique
 
 CHAT_PRIVATE_ERROR = "Non puoi usare quest comando ora\nMandami un messaggio in privato"

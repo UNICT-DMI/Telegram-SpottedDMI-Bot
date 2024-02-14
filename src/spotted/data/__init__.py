@@ -1,4 +1,5 @@
 """Modules that work with the data section"""
+
 from telegram.ext import Application
 
 from .config import Config

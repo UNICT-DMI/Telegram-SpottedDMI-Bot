@@ -1,4 +1,5 @@
 """Read the bot configuration from the settings.yaml and the autoreplies.yaml files"""
+
 import logging
 import os
 import re
