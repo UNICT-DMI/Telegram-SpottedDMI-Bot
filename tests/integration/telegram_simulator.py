@@ -382,7 +382,7 @@ class TelegramSimulator:  # pylint: disable=too-many-public-methods
         """
         self.messages.append(message)
 
-    def delete_messaegge(self, message: int | Message):
+    def delete_message(self, message: int | Message):
         """Removes a message from the list of messages
 
         Args:
