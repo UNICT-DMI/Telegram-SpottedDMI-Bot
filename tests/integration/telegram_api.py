@@ -84,8 +84,8 @@ class TelegramApi:
 
     def __send_message(self, data: "MessageData") -> dict:
         reply_message = None
-        if "reply_to_message_id" in data and data["reply_to_message_id"] is not None:
-            reply_message = self.__simulator.get_message_by_id(data["reply_to_message_id"])
+        if "reply_parameters" in data and data["reply_parameters"] is not None:
+            reply_message = self.__simulator.get_message_by_id(data["reply_parameters"].message_id)
         message = Message(
             message_id=data.get("message_id", self.get_next_id()),
             date=datetime.now().timestamp(),
@@ -148,7 +148,7 @@ class TelegramApi:
         return message_dict
 
     def __delete_message(self, data: "MessageData") -> bool:
-        self.__simulator.delete_messaegge(data["message_id"])
+        self.__simulator.delete_message(data["message_id"])
         return True
 
     def __get_me(self) -> dict:

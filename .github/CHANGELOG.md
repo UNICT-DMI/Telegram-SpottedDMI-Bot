@@ -22,6 +22,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added readme overview page in the docs
 - Added Privacy Policy in the docs. It is referenced in the bot **/start** command
 - Use mermaid to generate entity relationship diagrams in the docs
+- Bump python-telegram-bot to version 2.8
 
 ## [3.0.0] - 2023-11-30
 
