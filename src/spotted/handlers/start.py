@@ -18,6 +18,4 @@ async def start_cmd(update: Update, context: CallbackContext):
     """
     info = EventInfo.from_message(update, context)
     text = read_md("start")
-    await info.bot.send_message(
-        chat_id=info.chat_id, text=text, parse_mode=ParseMode.MARKDOWN_V2, disable_web_page_preview=True
-    )
+    await info.bot.send_message(chat_id=info.chat_id, text=text, parse_mode=ParseMode.MARKDOWN_V2)

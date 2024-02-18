@@ -1,6 +1,17 @@
 """Common info needed in both command and callback handlers"""
 
-from telegram import Bot, CallbackQuery, Chat, InlineKeyboardMarkup, Message, Update
+from telegram import (
+    Bot,
+    CallbackQuery,
+    Chat,
+    InlineKeyboardMarkup,
+    LinkPreviewOptions,
+    Message,
+    MessageOriginChannel,
+    MessageOriginChat,
+    MessageOriginUser,
+    Update,
+)
 from telegram.error import BadRequest
 from telegram.ext import CallbackContext
 
@@ -199,20 +210,46 @@ class EventInfo:  # pylint: disable=too-many-public-methods
         """Id of the original message that has been forwarded"""
         if self.__message is None:
             return None
-        return self.__message.forward_from_message_id
+        if isinstance(self.__message.forward_origin, MessageOriginChannel):
+            return self.__message.forward_origin.message_id
+        return None
 
     @property
     def forward_from_chat_id(self) -> int:
         """Id of the original chat the message has been forwarded from"""
-        if self.__message is None or self.__message.forward_from_chat is None:
+        if self.__message is None:
             return None
-        return self.__message.forward_from_chat.id
+        if isinstance(self.__message.forward_origin, MessageOriginChannel):
+            return self.__message.forward_origin.chat.id
+        if isinstance(self.__message.forward_origin, MessageOriginChat):
+            return self.__message.forward_origin.sender_chat.id
+        if isinstance(self.__message.forward_origin, MessageOriginUser):
+            return self.__message.forward_origin.sender_user.id
+        return None
+
+    @property
+    def is_forward_from_channel(self) -> bool:
+        """Whether the message has been forwarded from a channel"""
+        return isinstance(self.__message.forward_origin, MessageOriginChannel)
+
+    @property
+    def is_forward_from_chat(self) -> bool:
+        """Whether the message has been forwarded from a chat"""
+        return isinstance(self.__message.forward_origin, MessageOriginChat)
+
+    @property
+    def is_forward_from_user(self) -> bool:
+        """Whether the message has been forwarded from a user"""
+        return isinstance(self.__message.forward_origin, MessageOriginUser)
 
     @property
     def is_forwarded_post(self) -> bool:
         """Whether the message is in fact a forwarded post from the channel to the group"""
-        return self.chat_id == Config.post_get("community_group_id") and self.forward_from_chat_id == Config.post_get(
-            "channel_id"
+        return (
+            self.chat_id == Config.post_get("community_group_id")
+            and isinstance(self.__message.forward_origin, MessageOriginChannel)
+            and self.__message.forward_origin.chat.id == Config.post_get("channel_id")
+            and self.__message.is_automatic_forward
         )
 
     @classmethod
@@ -315,7 +352,7 @@ class EventInfo:  # pylint: disable=too-many-public-methods
                     text=message.text,
                     reply_markup=get_approve_kb(),
                     entities=message.entities,
-                    disable_web_page_preview=not show_preview,
+                    link_preview_options=LinkPreviewOptions(not show_preview),
                 )
             else:
                 g_message = await self.__bot.copy_message(

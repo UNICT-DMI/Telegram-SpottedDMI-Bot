@@ -53,7 +53,6 @@ class TestCommands:
                 chat_id=update.message.chat_id,
                 text=read_md("start"),
                 parse_mode=ParseMode.MARKDOWN_V2,
-                disable_web_page_preview=True,
             )
 
         async def test_help_cmd(self, update: Update, context: CallbackContext):
@@ -65,7 +64,6 @@ class TestCommands:
                 chat_id=update.message.chat_id,
                 text=read_md("help"),
                 parse_mode=ParseMode.MARKDOWN_V2,
-                disable_web_page_preview=True,
             )
 
         async def test_help_admin_cmd(self, context: CallbackContext):
@@ -84,7 +82,6 @@ class TestCommands:
                 chat_id=update.message.chat_id,
                 text=read_md("instructions"),
                 parse_mode=ParseMode.MARKDOWN_V2,
-                disable_web_page_preview=True,
             )
 
         async def test_rules_cmd(self, update: Update, context: CallbackContext):
@@ -96,7 +93,6 @@ class TestCommands:
                 chat_id=update.message.chat_id,
                 text=read_md("rules"),
                 parse_mode=ParseMode.MARKDOWN_V2,
-                disable_web_page_preview=True,
             )
 
         async def test_settings_cmd(self, update: Update, context: CallbackContext):

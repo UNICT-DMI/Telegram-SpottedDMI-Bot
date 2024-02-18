@@ -15,8 +15,7 @@ async def forwarded_post_msg(update: Update, context: CallbackContext):
         context: context passed by the handler
     """
     info = EventInfo.from_message(update, context)
-    if update.message is None or update.message.forward_from_chat is None:
+    if info.message is None or not info.is_forwarded_post:
         return
 
-    if info.is_forwarded_post:
-        await info.send_post_to_channel_group()
+    await info.send_post_to_channel_group()

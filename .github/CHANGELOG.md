@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+...
+
+## [3.1.0] - 2024-02-18
+
 ### Added
 
 - **/ban** command can now also be used on reports
@@ -22,7 +26,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added readme overview page in the docs
 - Added Privacy Policy in the docs. It is referenced in the bot **/start** command
 - Use mermaid to generate entity relationship diagrams in the docs
-- Bump python-telegram-bot to version 2.8
+- Bump python-telegram-bot to version 2.8, aligning the code to the new API
+- Enabled links in basic bot commands
 
 ## [3.0.0] - 2023-11-30
 
@@ -59,3 +64,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Duplicate index file for the english version
 
 [3.0.0]: https://github.com/UNICT-DMI/Telegram-SpottedDMI-Bot/compare/upgrade...3.0.0
+[3.1.0]: https://github.com/UNICT-DMI/Telegram-SpottedDMI-Bot/compare/3.0.0...3.1.0

@@ -1,6 +1,7 @@
 """Detect Comment on a post in the comment group"""
 
 from telegram import Update
+from telegram.error import BadRequest, Forbidden
 from telegram.ext import CallbackContext
 
 from spotted.data import User
@@ -26,4 +27,7 @@ async def follow_spot_comment(update: Update, context: CallbackContext):
     for user in users:
         # Avoid sending if it's made by the same user
         if not user.user_id == info.message.from_user.id:
-            await info.message.copy(chat_id=user.user_id, reply_to_message_id=user.private_message_id)
+            try:
+                await info.message.copy(chat_id=user.user_id, reply_to_message_id=user.private_message_id)
+            except (BadRequest, Forbidden):  # The user deleted the message or blocked the bot, ignore
+                pass

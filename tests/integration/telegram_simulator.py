@@ -247,13 +247,11 @@ class TelegramSimulator:  # pylint: disable=too-many-public-methods
         """
         if isinstance(forward_message, int):
             forward_message = self.get_message_by_id(forward_message)
+
         if message is None:
             message = self.make_message(
                 text=forward_message.text,
-                forward_from_chat=forward_message.chat,
-                forward_from=forward_message.from_user,
-                forward_from_message_id=forward_message.message_id,
-                forward_date=forward_message.date,
+                forward_origin=self.__api.get_forward_origin(forward_message),
                 user=user,
                 chat=chat,
                 date=date,

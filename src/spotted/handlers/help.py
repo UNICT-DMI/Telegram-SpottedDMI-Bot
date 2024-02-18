@@ -21,6 +21,4 @@ async def help_cmd(update: Update, context: CallbackContext):
         text = read_md("instructions")
     else:  # you are NOT in the admin group
         text = read_md("help")
-    await info.bot.send_message(
-        chat_id=info.chat_id, text=text, parse_mode=ParseMode.MARKDOWN_V2, disable_web_page_preview=True
-    )
+    await info.bot.send_message(chat_id=info.chat_id, text=text, parse_mode=ParseMode.MARKDOWN_V2)
