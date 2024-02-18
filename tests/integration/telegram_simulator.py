@@ -247,7 +247,7 @@ class TelegramSimulator:  # pylint: disable=too-many-public-methods
         """
         if isinstance(forward_message, int):
             forward_message = self.get_message_by_id(forward_message)
-        
+
         if message is None:
             message = self.make_message(
                 text=forward_message.text,

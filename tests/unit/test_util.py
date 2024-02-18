@@ -3,7 +3,7 @@
 from datetime import datetime
 
 import pytest
-from telegram import CallbackQuery, Chat, Message, Update, User, MessageOriginChat
+from telegram import CallbackQuery, Chat, Message, MessageOriginChat, Update, User
 from telegram.ext import Application, CallbackContext
 
 from spotted.utils import EventInfo

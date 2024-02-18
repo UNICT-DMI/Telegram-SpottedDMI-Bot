@@ -6,14 +6,14 @@ from typing import TYPE_CHECKING
 from telegram import (
     Chat,
     InlineKeyboardMarkup,
+    LinkPreviewOptions,
     Message,
     MessageEntity,
-    ReplyKeyboardMarkup,
-    User,
     MessageOriginChannel,
     MessageOriginChat,
     MessageOriginUser,
-    LinkPreviewOptions,
+    ReplyKeyboardMarkup,
+    User,
 )
 
 from spotted.data import Config

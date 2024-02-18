@@ -5,12 +5,12 @@ from telegram import (
     CallbackQuery,
     Chat,
     InlineKeyboardMarkup,
-    Message,
-    Update,
-    MessageOriginChat,
-    MessageOriginChannel,
-    MessageOriginUser,
     LinkPreviewOptions,
+    Message,
+    MessageOriginChannel,
+    MessageOriginChat,
+    MessageOriginUser,
+    Update,
 )
 from telegram.error import BadRequest
 from telegram.ext import CallbackContext
@@ -352,7 +352,7 @@ class EventInfo:  # pylint: disable=too-many-public-methods
                     text=message.text,
                     reply_markup=get_approve_kb(),
                     entities=message.entities,
-                    link_preview_options=LinkPreviewOptions(not show_preview)
+                    link_preview_options=LinkPreviewOptions(not show_preview),
                 )
             else:
                 g_message = await self.__bot.copy_message(
