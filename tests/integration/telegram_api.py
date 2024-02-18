@@ -10,6 +10,10 @@ from telegram import (
     MessageEntity,
     ReplyKeyboardMarkup,
     User,
+    MessageOriginChannel,
+    MessageOriginChat,
+    MessageOriginUser,
+    LinkPreviewOptions,
 )
 
 from spotted.data import Config
@@ -30,7 +34,7 @@ if TYPE_CHECKING:
         allow_sending_without_reply: bool | None
         protect_content: bool | None
         parse_mode: ParseMode | None
-        disable_web_page_preview: bool | None
+        link_preview_options: LinkPreviewOptions | None
         reply_markup: ReplyKeyboardMarkup | InlineKeyboardMarkup | None
 
 
@@ -46,6 +50,26 @@ class TelegramApi:
         self.__chats[Config.post_get("community_group_id")] = Chat(
             id=Config.post_get("community_group_id"), type=Chat.GROUP
         )
+
+    def get_forward_origin(
+        self, forward_message: int | Message
+    ) -> MessageOriginChannel | MessageOriginChat | MessageOriginUser:
+        if isinstance(forward_message, int):
+            forward_message = self.__simulator.get_message_by_id(forward_message)
+        if forward_message.chat.type == Chat.PRIVATE:
+            return MessageOriginUser(datetime.now(), forward_message.from_user.id)
+        if forward_message.chat.type == Chat.CHANNEL:
+            return MessageOriginChannel(
+                datetime.now(),
+                Chat(forward_message.chat.id, Chat.CHANNEL, "channel"),
+                forward_message.id,
+                forward_message.author_signature,
+            )
+        if forward_message.chat.type == Chat.GROUP:
+            return MessageOriginChat(
+                datetime.now(), Chat(forward_message.chat.id, Chat.GROUP, "group"), forward_message.author_signature
+            )
+        return None
 
     @classmethod
     def get_next_id(cls) -> int:
@@ -110,12 +134,7 @@ class TelegramApi:
             entities=forward_message.entities,
             reply_markup=data.get("reply_markup", None),
             reply_to_message=forward_message.reply_to_message,
-            forward_date=forward_message.date,
-            forward_from=forward_message.from_user,
-            forward_from_chat=forward_message.chat,
-            forward_signature=forward_message.forward_signature,
-            forward_sender_name=forward_message.forward_sender_name,
-            forward_from_message_id=forward_message.message_id,
+            forward_origin=self.get_forward_origin(forward_message),
         )
         self.__simulator.add_message(message)
         return message.to_dict()

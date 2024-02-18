@@ -3,7 +3,7 @@
 from datetime import datetime
 
 import pytest
-from telegram import CallbackQuery, Chat, Message, Update, User
+from telegram import CallbackQuery, Chat, Message, Update, User, MessageOriginChat
 from telegram.ext import Application, CallbackContext
 
 from spotted.utils import EventInfo
@@ -56,10 +56,7 @@ def get_message(get_user: User, get_chat: Chat) -> Message:
         "date": datetime.now(),
         "chat": get_chat,
         "from_user": get_user,
-        "forward_from": get_user,
-        "forward_from_chat": get_chat,
-        "forward_from_message_id": 1000,
-        "forward_date": datetime.now(),
+        "forward_origin": MessageOriginChat(datetime.now(), get_chat),
         "text": "Tets text",
     }
     return Message(**message_data)
@@ -149,8 +146,8 @@ class TestUtil:
 
             assert info.query_id is None
             assert info.query_data is None
-            assert info.forward_from_id == get_message.forward_from_message_id
-            assert info.forward_from_chat_id == get_message.forward_from_chat.id
+            assert info.forward_from_id is None
+            assert info.forward_from_chat_id == get_message.forward_origin.sender_chat.id
 
         def test_callback_info(
             self,
@@ -184,8 +181,8 @@ class TestUtil:
 
             assert info.query_id == get_callback_query.id
             assert info.query_data == get_callback_query.data
-            assert info.forward_from_id == get_message.forward_from_message_id
-            assert info.forward_from_chat_id == get_message.forward_from_chat.id
+            assert info.forward_from_id is None
+            assert info.forward_from_chat_id == get_message.forward_origin.sender_chat.id
 
         def test_job_info(self, job_update: CallbackContext):
             """Tests the :meth:`from_job` :class:`EventInfo` initialization"""
