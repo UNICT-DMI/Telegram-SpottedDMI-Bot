@@ -37,7 +37,7 @@ classifiers = [
 ]
 dependencies = [
     "APScheduler==3.10.4",
-    "cryptography==42.0.2",
+    "cryptography==42.0.4",
     "python-telegram-bot==20.8",
     "pytz==2023.3.post1",
     "PyYAML==6.0.1",
