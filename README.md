@@ -278,6 +278,10 @@ post:
     # Otherwise the comment would be doubled.
     # The bots must have delete permission in the group and comments must be enabled
   replace_anonymous_comments: false
+  blacklist_messages:
+    []
+    # example: ["spam_word_1", "spam_word_2"]
+    # the bot will delete any comment in the community chat that includes a word of the blacklist
 
 token: xxxxxxxxxxxx # token of the telegram bot
 bot_tag: "@bot" # tag of the telegram bot
