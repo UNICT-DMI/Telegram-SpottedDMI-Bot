@@ -16,6 +16,7 @@ from telegram.warnings import PTBUserWarning
 
 from spotted.data.config import Config
 from spotted.debug import error_handler, log_message
+from spotted.handlers.spam_comment import spam_comment_msg
 
 from .anonym_comment import anonymous_comment_msg
 from .approve import approve_no_callback, approve_status_callback, approve_yes_callback
@@ -126,11 +127,20 @@ def add_handlers(app: Application):
 
     if Config.post_get("comments"):
         app.add_handler(MessageHandler(community_filter & filters.IS_AUTOMATIC_FORWARD, forwarded_post_msg))
+
     if Config.post_get("delete_anonymous_comments"):
         app.add_handler(
             MessageHandler(
                 community_filter & filters.SenderChat.CHANNEL & ~filters.IS_AUTOMATIC_FORWARD,
                 anonymous_comment_msg,
+            )
+        )
+
+    if Config.post_get("blacklist_messages") and len(Config.post_get("blacklist_messages")) > 0:
+        app.add_handler(
+            MessageHandler(
+                community_filter,
+                spam_comment_msg,
             )
         )
 

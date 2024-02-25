@@ -19,5 +19,6 @@ post:
   delete_anonymous_comments: true
   reject_after_autoreply: true
   autoreplies_per_page: 6
+
 token: ""
 bot_tag: "@bot_tag"

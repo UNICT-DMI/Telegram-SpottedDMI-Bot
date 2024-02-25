@@ -18,5 +18,6 @@ post:
   delete_anonymous_comments: bool
   reject_after_autoreply: bool
   autoreplies_per_page: int
+  blacklist_messages: list
 token: str
 bot_tag: str
