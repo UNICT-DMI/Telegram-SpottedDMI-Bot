@@ -7,7 +7,7 @@ from spotted.data import Config
 from spotted.utils import EventInfo
 
 
-async def spam_comment_msg(update: Update, context: CallbackContext) -> None:
+async def spam_comment_msg(update: Update, context: CallbackContext):
     """Handles a spam comment on a post in the comment group.
     Deletes the original post.
 
