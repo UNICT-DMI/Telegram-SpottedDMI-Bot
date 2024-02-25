@@ -9,8 +9,14 @@ DROP TABLE IF EXISTS published_post
 -----
 DROP TABLE IF EXISTS banned_users
 -----
+DROP TABLE IF EXISTS warned_users
+-----
+DROP TABLE IF EXISTS muted_users
+-----
 DROP TABLE IF EXISTS spot_report
 -----
 DROP TABLE IF EXISTS user_report
 -----
 DROP TABLE IF EXISTS user_follow
+-----
+DROP TRIGGER IF EXISTS drop_old_warns ON warned_users

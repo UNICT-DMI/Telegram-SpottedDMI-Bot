@@ -126,6 +126,9 @@ logs/*.log
 # VsCode
 .vscode
 
+# JetBrains
+.idea
+
 # Dev
 test.py
 

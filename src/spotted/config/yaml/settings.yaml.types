@@ -18,5 +18,8 @@ post:
   delete_anonymous_comments: bool
   reject_after_autoreply: bool
   autoreplies_per_page: int
+  max_n_warns: int
+  warn_expiration_days: int
+  mute_default_duration_days: int
 token: str
 bot_tag: str
