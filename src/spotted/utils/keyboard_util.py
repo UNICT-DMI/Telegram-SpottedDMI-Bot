@@ -84,7 +84,11 @@ def get_approve_kb(
         credited_username = pending_post.get_credit_username()
     return InlineKeyboardMarkup(
         [
-            [] if credited_username is None else [InlineKeyboardButton(f"👤 {credited_username}", callback_data="none")],
+            (
+                []
+                if credited_username is None
+                else [InlineKeyboardButton(f"👤 {credited_username}", callback_data="none")]
+            ),
             [
                 InlineKeyboardButton(f"🟢 {n_approve}", callback_data="approve_yes"),
                 InlineKeyboardButton(f"🔴 {n_reject}", callback_data="approve_no"),

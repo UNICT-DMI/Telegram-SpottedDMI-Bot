@@ -112,8 +112,7 @@ class TelegramSimulator:  # pylint: disable=too-many-public-methods
         user: "User" = None,
         chat: "Chat" = None,
         reply_to_message: "Message | int | None" = None,
-    ) -> "Message":
-        ...
+    ) -> "Message": ...
 
     async def send_command(
         self,
@@ -147,12 +146,10 @@ class TelegramSimulator:  # pylint: disable=too-many-public-methods
         entities: "list[MessageEntity] | None" = None,
         reply_to_message: "Message | int | None" = None,
         message_thread_id: "int | None" = None,
-    ) -> "Message":
-        ...
+    ) -> "Message": ...
 
     @overload
-    async def send_message(self, message: "Message") -> "Message":
-        ...
+    async def send_message(self, message: "Message") -> "Message": ...
 
     async def send_message(
         self,
