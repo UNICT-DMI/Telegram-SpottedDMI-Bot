@@ -146,19 +146,11 @@ class PendingPost:
 
     def save_post(self) -> "PendingPost":
         """Saves the pending_post in the database"""
-        if self.credit_username is None:
-            columns = ("user_id", "u_message_id", "g_message_id", "admin_group_id", "message_date")
-            values = (self.user_id, self.u_message_id, self.g_message_id, self.admin_group_id, self.date)
-        else:
-            columns = ("user_id", "u_message_id", "g_message_id", "admin_group_id", "credit_username", "message_date")
-            values = (
-                self.user_id,
-                self.u_message_id,
-                self.g_message_id,
-                self.admin_group_id,
-                self.credit_username,
-                self.date,
-            )
+        columns = ("user_id", "u_message_id", "g_message_id", "admin_group_id", "message_date")
+        values = (self.user_id, self.u_message_id, self.g_message_id, self.admin_group_id, self.date)
+        if self.credit_username is not None:
+            columns += ("credit_username",)
+            values += (self.credit_username,)
         DbManager.insert_into(
             table_name="pending_post",
             columns=columns,
