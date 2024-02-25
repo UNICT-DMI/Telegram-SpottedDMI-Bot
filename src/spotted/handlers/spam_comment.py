@@ -16,8 +16,7 @@ async def spam_comment_msg(update: Update, context: CallbackContext) -> None:
         context: context passed by the handler
     """
     info = EventInfo.from_message(update, context)
-    blacklist_messages = Config.post_get("blacklist_messages")
-    for message in blacklist_messages:
+    for message in Config.post_get("blacklist_messages"):
         if message in info.message.text:
             await info.message.delete()
             return
