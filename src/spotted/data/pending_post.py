@@ -17,6 +17,7 @@ class PendingPost:
         u_message_id: id of the original message of the post
         g_message_id: id of the post in the group
         admin_group_id: id of the admin group
+        credit_username: username of the user that sent the post if it's a credit post
         date: when the post was sent
     """
 
@@ -25,15 +26,18 @@ class PendingPost:
     g_message_id: int
     admin_group_id: int
     date: datetime
+    credit_username: str | None = None
 
     @classmethod
-    def create(cls, user_message: Message, g_message_id: int, admin_group_id: int) -> "PendingPost":
+    def create(cls, user_message: Message, g_message_id: int, admin_group_id: int,
+               credit_username: str | None = None) -> "PendingPost":
         """Creates a new post and inserts it in the table of pending posts
 
         Args:
             user_message: message sent by the user that contains the post
             g_message_id: id of the post in the group
             admin_group_id: id of the admin group
+            credit_username: username of the user that sent the post if it's a credit post
 
         Returns:
             instance of the class
@@ -47,6 +51,7 @@ class PendingPost:
             u_message_id=u_message_id,
             g_message_id=g_message_id,
             admin_group_id=admin_group_id,
+            credit_username=credit_username,
             date=date,
         ).save_post()
 
@@ -76,6 +81,7 @@ class PendingPost:
             u_message_id=pending_post["u_message_id"],
             admin_group_id=pending_post["admin_group_id"],
             g_message_id=pending_post["g_message_id"],
+            credit_username=pending_post["credit_username"],
             date=pending_post["message_date"],
         )
 
@@ -101,6 +107,7 @@ class PendingPost:
             u_message_id=pending_post["u_message_id"],
             admin_group_id=pending_post["admin_group_id"],
             g_message_id=pending_post["g_message_id"],
+            credit_username=pending_post["credit_username"],
             date=pending_post["message_date"],
         )
 
@@ -138,10 +145,17 @@ class PendingPost:
 
     def save_post(self) -> "PendingPost":
         """Saves the pending_post in the database"""
+        if self.credit_username is None:
+            columns = ("user_id", "u_message_id", "g_message_id", "admin_group_id", "message_date")
+            values = (self.user_id, self.u_message_id, self.g_message_id, self.admin_group_id, self.date)
+        else:
+            columns = ("user_id", "u_message_id", "g_message_id", "admin_group_id", "credit_username", "message_date")
+            values = (self.user_id, self.u_message_id, self.g_message_id, self.admin_group_id, self.credit_username,
+                      self.date)
         DbManager.insert_into(
             table_name="pending_post",
-            columns=("user_id", "u_message_id", "g_message_id", "admin_group_id", "message_date"),
-            values=(self.user_id, self.u_message_id, self.g_message_id, self.admin_group_id, self.date),
+            columns=columns,
+            values=values,
         )
         return self
 
@@ -159,6 +173,14 @@ class PendingPost:
             where="g_message_id = %s and admin_group_id = %s and is_upvote = %s",
             where_args=(self.g_message_id, self.admin_group_id, vote),
         )
+
+    def get_credit_username(self) -> str | None:
+        """Gets the username of the user that credited the post
+
+        Returns:
+            username of the user that credited the post, or None if the post is not credited
+        """
+        return self.credit_username
 
     def get_list_admin_votes(self, vote: "bool | None" = None) -> "list[int] | list[tuple[int, bool]]":
         """Gets the list of admins that approved or rejected the post
@@ -257,5 +279,6 @@ class PendingPost:
             f"u_message_id: {self.u_message_id}\n"
             f"admin_group_id: {self.admin_group_id}\n"
             f"g_message_id: {self.g_message_id}\n"
+            f"credit_username: {self.credit_username}\n"
             f"date : {self.date} ]"
         )
