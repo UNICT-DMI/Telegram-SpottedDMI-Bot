@@ -371,8 +371,12 @@ class EventInfo:  # pylint: disable=too-many-public-methods
             logger.error("Sending the post on send_post_to: %s", ex)
             return False
 
-        PendingPost.create(user_message=message, admin_group_id=admin_group_id, g_message_id=g_message.message_id,
-                           credit_username=credit_username)
+        PendingPost.create(
+            user_message=message,
+            admin_group_id=admin_group_id,
+            g_message_id=g_message.message_id,
+            credit_username=credit_username,
+        )
 
         return True
 

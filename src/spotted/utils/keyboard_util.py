@@ -57,8 +57,9 @@ def get_settings_kb() -> InlineKeyboardMarkup:
     )
 
 
-def get_approve_kb(pending_post: PendingPost = None, approve: int = -1, reject: int = -1,
-                   credited_username: str | None = None) -> InlineKeyboardMarkup:
+def get_approve_kb(
+    pending_post: PendingPost = None, approve: int = -1, reject: int = -1, credited_username: str | None = None
+) -> InlineKeyboardMarkup:
     """Generates the InlineKeyboard for the pending post.
     If the pending post is None, the keyboard will be generated with 0 votes.
     Otherwise, the keyboard will be generated with the correct number of votes.

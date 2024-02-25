@@ -29,8 +29,9 @@ class PendingPost:
     credit_username: str | None = None
 
     @classmethod
-    def create(cls, user_message: Message, g_message_id: int, admin_group_id: int,
-               credit_username: str | None = None) -> "PendingPost":
+    def create(
+        cls, user_message: Message, g_message_id: int, admin_group_id: int, credit_username: str | None = None
+    ) -> "PendingPost":
         """Creates a new post and inserts it in the table of pending posts
 
         Args:
@@ -150,8 +151,14 @@ class PendingPost:
             values = (self.user_id, self.u_message_id, self.g_message_id, self.admin_group_id, self.date)
         else:
             columns = ("user_id", "u_message_id", "g_message_id", "admin_group_id", "credit_username", "message_date")
-            values = (self.user_id, self.u_message_id, self.g_message_id, self.admin_group_id, self.credit_username,
-                      self.date)
+            values = (
+                self.user_id,
+                self.u_message_id,
+                self.g_message_id,
+                self.admin_group_id,
+                self.credit_username,
+                self.date,
+            )
         DbManager.insert_into(
             table_name="pending_post",
             columns=columns,
