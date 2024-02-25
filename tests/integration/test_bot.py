@@ -908,6 +908,14 @@ class TestBot:
             """Tests the replacement of an anonymous comment.
             Copies the message and deletes the original
             """
+            Config.override_settings(
+                {
+                    "post": {
+                        "blacklist_messages": ["myspamword1", "myspamword2"]
+                    },
+                }
+            )
+
             for word in Config.post_get("blacklist_messages"):
                 spam_comment = await telegram.send_message(
                     f"a message with the {word} will be deleted",
