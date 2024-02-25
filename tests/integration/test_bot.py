@@ -910,9 +910,7 @@ class TestBot:
             """
             Config.override_settings(
                 {
-                    "post": {
-                        "blacklist_messages": ["myspamword1", "myspamword2"]
-                    },
+                    "post": {"blacklist_messages": ["myspamword1", "myspamword2"]},
                 }
             )
 
