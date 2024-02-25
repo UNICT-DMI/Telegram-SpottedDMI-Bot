@@ -22,7 +22,7 @@ SettingsPostKeys = Literal[
     "report_wait_mins",
     "replace_anonymous_comments",
     "delete_anonymous_comments",
-    "blacklist_message",
+    "blacklist_messages",
 ]
 SettingsKeysType = Literal[SettingsKeys, SettingsPostKeys, SettingsDebugKeys]
 AutorepliesKeysType = Literal["autoreplies"]

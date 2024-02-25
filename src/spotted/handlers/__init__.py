@@ -1,6 +1,5 @@
 """Modules that handle the events the bot recognizes and reacts to"""
 
-import ast
 from datetime import time
 from warnings import filterwarnings
 
@@ -137,7 +136,7 @@ def add_handlers(app: Application):
             )
         )
 
-    if Config.post_get("blacklist_message") and len(ast.literal_eval(Config.post_get("blacklist_message"))) > 0:
+    if Config.post_get("blacklist_messages") and len(Config.post_get("blacklist_messages")) > 0:
         app.add_handler(
             MessageHandler(
                 community_filter,
