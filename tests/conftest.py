@@ -19,6 +19,7 @@ def setup():
         {
             "token": "1234567890:qY9gv7pRJgFj4EVmN3Z1gfJOgQpCbh0vmp5",
             "bot_tag": "@test_bot",
+            "post": {"blacklist_messages": ["myspamword1", "myspamword2"]},
             "debug": {
                 "db_file": "test_db.sqlite3",
             },
