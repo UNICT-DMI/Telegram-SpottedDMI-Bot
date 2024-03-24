@@ -136,15 +136,16 @@ def add_handlers(app: Application):
             )
         )
 
+    app.add_handler(MessageHandler(community_filter & filters.REPLY, follow_spot_comment))
+
     if Config.post_get("blacklist_messages") and len(Config.post_get("blacklist_messages")) > 0:
         app.add_handler(
             MessageHandler(
                 community_filter & filters.Text(),
                 spam_comment_msg,
-            )
+            ),
+            2,
         )
-
-    app.add_handler(MessageHandler(community_filter & filters.REPLY, follow_spot_comment))
 
 
 def add_jobs(app: Application):
