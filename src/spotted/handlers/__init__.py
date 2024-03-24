@@ -65,7 +65,7 @@ async def add_commands(app: Application):
         BotCommand("sban", "banna un utente"),
         BotCommand("reply", "rispondi ad uno spot o un report"),
         BotCommand("autoreply", "rispondi ad uno spot o un report con un messaggio automatico"),
-        BotCommand("reload", "ricarica la configurazione del bot"),
+        BotCommand("reload", "ricarica la configurazione del bot. Modificare gli handler richiede un riavvio"),
         BotCommand("db_backup", "esegui il backup del database"),
         BotCommand("clean_pending", "elimina tutti gli spot in sospeso"),
     ]
@@ -139,7 +139,7 @@ def add_handlers(app: Application):
     if Config.post_get("blacklist_messages") and len(Config.post_get("blacklist_messages")) > 0:
         app.add_handler(
             MessageHandler(
-                community_filter,
+                community_filter & filters.Text(),
                 spam_comment_msg,
             )
         )
