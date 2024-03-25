@@ -7,7 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
 - Add blacklist messages feature as anti-spam
+
+### Fixed
+
+- Fix **spam_comment_msg** handler to avoid raising an exception when the message does not contain text
 
 ...
 
