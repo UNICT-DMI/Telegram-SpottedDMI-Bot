@@ -15,7 +15,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Fix **spam_comment_msg** handler to avoid raising an exception when the message does not contain text
 
-...
+### Changed
+
+- Bump python-telegram-bot to version 21.0.1
 
 ## [3.1.0] - 2024-02-18
 
