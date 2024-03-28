@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - Fix **spam_comment_msg** handler to avoid raising an exception when the message does not contain text
+- Ensure message in report has a text
 
 ### Changed
 

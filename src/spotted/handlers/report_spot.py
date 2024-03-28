@@ -30,7 +30,7 @@ def report_spot_conv_handler() -> ConversationHandler:
         entry_points=[CallbackQueryHandler(report_spot_callback, pattern=r"^report\.*")],
         states={
             ConversationState.REPORTING_SPOT.value: [
-                MessageHandler(~filters.COMMAND & ~filters.UpdateType.EDITED_MESSAGE, report_spot_msg)
+                MessageHandler(~filters.COMMAND & ~filters.UpdateType.EDITED_MESSAGE & filters.TEXT, report_spot_msg)
             ],
         },
         fallbacks=[CommandHandler("cancel", conv_cancel("report"))],

@@ -141,7 +141,7 @@ def add_handlers(app: Application):
     if Config.post_get("blacklist_messages") and len(Config.post_get("blacklist_messages")) > 0:
         app.add_handler(
             MessageHandler(
-                community_filter & filters.Text(),
+                community_filter & filters.TEXT,
                 spam_comment_msg,
             ),
             2,
