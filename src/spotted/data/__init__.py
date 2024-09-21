@@ -16,6 +16,7 @@ def init_db():
     """Initialize the database.
     If the debug.reset_on_load setting is True, it will delete the database and create a new one.
     """
+    DbManager.register_adapters_and_converters()
     if Config.settings_get("debug", "reset_on_load"):
         DbManager.query_from_file("config", "db", "post_db_del.sql")
     DbManager.query_from_file("config", "db", "post_db_init.sql")

@@ -32,6 +32,7 @@ def create_test_db() -> DbManager:
     """Called once per at the beginning of this class.
     Creates and initializes the local database
     """
+    DbManager.register_adapters_and_converters()
     yield DbManager
     os.remove(Config.debug_get("db_file"))
 
