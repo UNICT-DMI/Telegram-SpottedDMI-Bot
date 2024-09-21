@@ -1,5 +1,6 @@
 """Handles the management of databases"""
 
+import datetime
 import logging
 import os
 import sqlite3
@@ -12,6 +13,15 @@ logger = logging.getLogger(__name__)
 
 class DbManager:
     """Class that handles the management of databases"""
+
+    @staticmethod
+    def register_adapters_and_converters():
+        """
+        Registers the adapter and converters for the datetime type.
+        Needed from python 3.12 onwards, as the default option has been deprecated
+        """
+        sqlite3.register_adapter(datetime.datetime, lambda val: val.isoformat())
+        sqlite3.register_converter("timestamp", lambda val: datetime.datetime.fromisoformat(val.decode()))
 
     @staticmethod
     def row_factory(cursor: sqlite3.Cursor, row: dict) -> dict:
