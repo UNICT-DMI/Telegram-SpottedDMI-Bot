@@ -37,10 +37,10 @@ classifiers = [
 ]
 dependencies = [
     "APScheduler==3.10.4",
-    "cryptography==42.0.4",
-    "python-telegram-bot==21.0.1",
-    "pytz==2023.3.post1",
-    "PyYAML==6.0.1",
+    "cryptography==43.0.1",
+    "python-telegram-bot==21.6",
+    "pytz==2024.2",
+    "PyYAML==6.0.2",
 ]
 dynamic = ['version']
 

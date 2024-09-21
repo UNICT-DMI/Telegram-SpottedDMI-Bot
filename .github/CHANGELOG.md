@@ -18,7 +18,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- Bump python-telegram-bot to version 21.0.1
+- Bump python-telegram-bot to version 21.6
+- Bump cryptography to version 43.0.1
+- Bump PyYAML to version 6.0.2
+- Bump pytz to version 2024.2
 
 ## [3.1.0] - 2024-02-18
 
