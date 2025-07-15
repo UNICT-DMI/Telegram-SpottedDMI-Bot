@@ -1,4 +1,5 @@
 "Handles callback when the 'Follow Spot' button is clicked."
+
 import logging
 
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
