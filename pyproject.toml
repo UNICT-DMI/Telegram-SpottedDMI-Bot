@@ -94,6 +94,7 @@ include = '(src|tests)\/.*\.py'
 # Isort configuration (import sorter)
 [tool.isort]
 profile = "black"
+skip = ["_version.py"]
 
 # Pylint configuration (code linter)
 [tool.pylint.MASTER]
