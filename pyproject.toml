@@ -60,6 +60,7 @@ Changelog = "https://github.com/UNICT-DMI/Telegram-SpottedDMI-Bot/blob/main/.git
 
 # Entry points of the package
 [project.scripts]
+spotted = "spotted.__main__:main"
 run_sql = "spotted.scripts.run_sql:main"
 f_crypto = "spotted.scripts.f_crypto:main"
 
