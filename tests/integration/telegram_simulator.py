@@ -34,7 +34,7 @@ class TelegramSimulator:  # pylint: disable=too-many-public-methods
         self.app = Application.builder().token("1234567890:qY9gv7pRJgFj4EVmN3Z1gfJOgQpCbh0vmp5").build()
         add_handlers(self.app)
         self.bot = self.app.bot
-        self.bot._post = self.weaved_post().__get__(self.bot, self.bot.__class__)
+        self.bot.__class__._post = self.weaved_post().__get__(self.bot, self.bot.__class__)
         self.__api = TelegramApi(self)
 
     @property
