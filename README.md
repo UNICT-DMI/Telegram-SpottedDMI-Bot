@@ -218,7 +218,7 @@ The VsCode [Remote - Containers](https://marketplace.visualstudio.com/items?item
 After installation, the bot can be started with the command:
 
 ```shell
-python3 -m spotted
+spotted
 ```
 
 There are a few command-line arguments you can use to customize the bot behaviour:

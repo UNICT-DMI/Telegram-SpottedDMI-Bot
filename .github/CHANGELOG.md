@@ -11,6 +11,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Add blacklist messages feature as anti-spam
 
+### Changed
+
+- Bump python-telegram-bot to version 22.2
+- Bump cryptography to version 45.0.5
+- Bump pytz to version 2025.2
+- Bump APScheduler to version 3.11.0
+
 ### Fixed
 
 - Fix **spam_comment_msg** handler to avoid raising an exception when the message does not contain text
