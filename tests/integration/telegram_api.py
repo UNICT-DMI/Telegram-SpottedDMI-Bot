@@ -4,7 +4,9 @@ from datetime import datetime
 from typing import TYPE_CHECKING
 
 from telegram import (
+    AcceptedGiftTypes,
     Chat,
+    ChatFullInfo,
     InlineKeyboardMarkup,
     LinkPreviewOptions,
     Message,
@@ -95,11 +97,14 @@ class TelegramApi:
         if endpoint == "getChat":
             return self.__chats.get(
                 data["chat_id"],
-                Chat(
+                ChatFullInfo(
                     id=data["chat_id"],
                     username=f"@{data['chat_id']}",
                     first_name=str(data["chat_id"]),
                     type=Chat.PRIVATE,
+                    accent_color_id=1,
+                    max_reaction_count=1,
+                    accepted_gift_types=AcceptedGiftTypes(False, False, False, False),
                 ),
             ).to_dict()
         if endpoint == "forwardMessage":

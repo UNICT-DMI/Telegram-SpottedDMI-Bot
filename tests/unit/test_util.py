@@ -43,7 +43,6 @@ def get_chat() -> Chat:
         "username": "u_name",
         "first_name": "f_name",
         "last_name": "l_name",
-        "bio": "bio",
     }
     return Chat(**chat_data)
 

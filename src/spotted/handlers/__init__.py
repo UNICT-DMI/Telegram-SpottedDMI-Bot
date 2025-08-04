@@ -16,6 +16,7 @@ from telegram.warnings import PTBUserWarning
 
 from spotted.data.config import Config
 from spotted.debug import error_handler, log_message
+from spotted.handlers.spam_comment import spam_comment_msg
 
 from .anonym_comment import anonymous_comment_msg
 from .approve import approve_no_callback, approve_status_callback, approve_yes_callback
@@ -64,7 +65,7 @@ async def add_commands(app: Application):
         BotCommand("sban", "banna un utente"),
         BotCommand("reply", "rispondi ad uno spot o un report"),
         BotCommand("autoreply", "rispondi ad uno spot o un report con un messaggio automatico"),
-        BotCommand("reload", "ricarica la configurazione del bot"),
+        BotCommand("reload", "ricarica la configurazione del bot. Modificare gli handler richiede un riavvio"),
         BotCommand("db_backup", "esegui il backup del database"),
         BotCommand("clean_pending", "elimina tutti gli spot in sospeso"),
     ]
@@ -126,6 +127,7 @@ def add_handlers(app: Application):
 
     if Config.post_get("comments"):
         app.add_handler(MessageHandler(community_filter & filters.IS_AUTOMATIC_FORWARD, forwarded_post_msg))
+
     if Config.post_get("delete_anonymous_comments"):
         app.add_handler(
             MessageHandler(
@@ -135,6 +137,15 @@ def add_handlers(app: Application):
         )
 
     app.add_handler(MessageHandler(community_filter & filters.REPLY, follow_spot_comment))
+
+    if Config.post_get("blacklist_messages") and len(Config.post_get("blacklist_messages")) > 0:
+        app.add_handler(
+            MessageHandler(
+                community_filter & filters.TEXT,
+                spam_comment_msg,
+            ),
+            2,
+        )
 
 
 def add_jobs(app: Application):

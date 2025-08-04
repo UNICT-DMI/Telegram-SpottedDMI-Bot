@@ -19,6 +19,7 @@ def setup():
         {
             "token": "1234567890:qY9gv7pRJgFj4EVmN3Z1gfJOgQpCbh0vmp5",
             "bot_tag": "@test_bot",
+            "post": {"blacklist_messages": ["myspamword1", "myspamword2"]},
             "debug": {
                 "db_file": "test_db.sqlite3",
             },
@@ -31,6 +32,7 @@ def create_test_db() -> DbManager:
     """Called once per at the beginning of this class.
     Creates and initializes the local database
     """
+    DbManager.register_adapters_and_converters()
     yield DbManager
     os.remove(Config.debug_get("db_file"))
 
