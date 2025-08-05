@@ -334,12 +334,6 @@ class EventInfo:  # pylint: disable=too-many-public-methods
         admin_group_id = Config.post_get("admin_group_id")
         poll = message.poll  # if the message is a poll, get its reference
 
-        user = User(self.user_id)
-        credit_username: str | None = None
-        if user.is_credited:
-            chat = await self.bot.get_chat(self.chat_id)
-            if chat.username:
-                credit_username = chat.username
         try:
             if poll:  # makes sure the poll is anonym
                 g_message = await self.__bot.send_poll(
@@ -349,14 +343,14 @@ class EventInfo:  # pylint: disable=too-many-public-methods
                     type=poll.type,
                     allows_multiple_answers=poll.allows_multiple_answers,
                     correct_option_id=poll.correct_option_id,
-                    reply_markup=get_approve_kb(credited_username=credit_username),
+                    reply_markup=get_approve_kb(),
                 )
             elif message.text and message.entities:  # maintains the previews, if present
                 show_preview = self.user_data.get("show_preview", True)
                 g_message = await self.__bot.send_message(
                     chat_id=admin_group_id,
                     text=message.text,
-                    reply_markup=get_approve_kb(credited_username=credit_username),
+                    reply_markup=get_approve_kb(),
                     entities=message.entities,
                     link_preview_options=LinkPreviewOptions(not show_preview),
                 )
@@ -365,18 +359,13 @@ class EventInfo:  # pylint: disable=too-many-public-methods
                     chat_id=admin_group_id,
                     from_chat_id=message.chat_id,
                     message_id=message.message_id,
-                    reply_markup=get_approve_kb(credited_username=credit_username),
+                    reply_markup=get_approve_kb(),
                 )
         except BadRequest as ex:
             logger.error("Sending the post on send_post_to: %s", ex)
             return False
 
-        PendingPost.create(
-            user_message=message,
-            admin_group_id=admin_group_id,
-            g_message_id=g_message.message_id,
-            credit_username=credit_username,
-        )
+        PendingPost.create(user_message=message, admin_group_id=admin_group_id, g_message_id=g_message.message_id)
 
         return True
 

@@ -7,9 +7,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-- Show credit username during approval process
+### Added
 
-...
+- Add blacklist messages feature as anti-spam
+
+### Changed
+
+- Bump python-telegram-bot to version 22.2
+- Bump cryptography to version 45.0.5
+- Bump pytz to version 2025.2
+- Bump APScheduler to version 3.11.0
+
+### Fixed
+
+- Fix **spam_comment_msg** handler to avoid raising an exception when the message does not contain text
+- Ensure message in report has a text
+
+### Changed
+
+- Bump python-telegram-bot to version 21.6
+- Bump cryptography to version 43.0.1
+- Bump PyYAML to version 6.0.2
+- Bump pytz to version 2024.2
 
 ## [3.1.0] - 2024-02-18
 

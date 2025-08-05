@@ -5,7 +5,6 @@ CREATE TABLE IF NOT EXISTS pending_post
   u_message_id BIGINT NOT NULL,
   g_message_id BIGINT NOT NULL,
   admin_group_id BIGINT NOT NULL,
-  credit_username VARCHAR(255) DEFAULT NULL,
   message_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (admin_group_id, g_message_id)
 );
