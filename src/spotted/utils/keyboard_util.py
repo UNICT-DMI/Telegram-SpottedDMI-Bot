@@ -57,7 +57,9 @@ def get_settings_kb() -> InlineKeyboardMarkup:
     )
 
 
-def get_approve_kb(pending_post: PendingPost = None, approve: int = -1, reject: int = -1) -> InlineKeyboardMarkup:
+def get_approve_kb(
+    pending_post: PendingPost = None, approve: int = -1, reject: int = -1, credited_username: str | None = None
+) -> InlineKeyboardMarkup:
     """Generates the InlineKeyboard for the pending post.
     If the pending post is None, the keyboard will be generated with 0 votes.
     Otherwise, the keyboard will be generated with the correct number of votes.
@@ -68,6 +70,7 @@ def get_approve_kb(pending_post: PendingPost = None, approve: int = -1, reject: 
         pending_post: existing pending post to which the keyboard is attached
         approve: number of approve votes known in advance
         reject: number of reject votes known in advance
+        credited_username: username of the user who credited the post if it was credited
 
     Returns:
         new inline keyboard
@@ -78,8 +81,14 @@ def get_approve_kb(pending_post: PendingPost = None, approve: int = -1, reject: 
     else:
         n_approve = pending_post.get_votes(vote=True) if approve < 0 else approve
         n_reject = pending_post.get_votes(vote=False) if reject < 0 else reject
+        credited_username = pending_post.get_credit_username()
     return InlineKeyboardMarkup(
         [
+            (
+                []
+                if credited_username is None
+                else [InlineKeyboardButton(f"👤 {credited_username}", callback_data="none")]
+            ),
             [
                 InlineKeyboardButton(f"🟢 {n_approve}", callback_data="approve_yes"),
                 InlineKeyboardButton(f"🔴 {n_reject}", callback_data="approve_no"),
