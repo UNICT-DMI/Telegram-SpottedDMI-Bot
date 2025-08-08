@@ -9,7 +9,7 @@ from spotted.utils import EventInfo
 
 async def spam_comment_msg(update: Update, context: CallbackContext) -> None:
     """Handles a spam comment on a post in the comment group.
-    Deletes the original post.
+    Deletes the original post and bans the user.
 
     Args:
         update: update event
@@ -21,4 +21,8 @@ async def spam_comment_msg(update: Update, context: CallbackContext) -> None:
     for message in Config.post_get("blacklist_messages"):
         if message in info.message.text:
             await info.message.delete()
+            await info.bot.ban_chat_member(
+                chat_id=info.chat_id,
+                user_id=info.message.from_user.id,
+            )
             return
