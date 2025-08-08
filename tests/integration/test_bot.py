@@ -908,17 +908,19 @@ class TestBot:
             """Tests the replacement of an anonymous comment.
             Copies the message and deletes the original
             """
+            user_id = 10
             for word in Config.post_get("blacklist_messages"):
                 spam_comment = await telegram.send_message(
                     f"a message with the {word} will be deleted",
                     chat=channel_group,
                     reply_to_message=published_post.reply_to_message,
-                    user=TGUser(10, first_name="user", is_bot=False),
+                    user=TGUser(user_id, first_name="user", is_bot=False),
                     sender_chat=channel,
                 )
 
                 assert telegram.get_message_by_id(spam_comment.message_id) is None  # the spam comment is deleted
                 assert telegram.last_message.from_user.is_bot is True
+                assert User(user_id).is_banned is True
 
     class TestFollow:
         """Tests the follow feature"""
