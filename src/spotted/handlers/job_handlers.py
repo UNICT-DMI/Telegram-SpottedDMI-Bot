@@ -1,6 +1,5 @@
 """Scheduled jobs of the bot"""
 
-from base64 import b64decode
 from binascii import Error as BinasciiError
 from datetime import datetime, timedelta, timezone
 
@@ -62,8 +61,7 @@ async def db_backup_job(context: CallbackContext):
     with open(path, "rb") as database_file:
         try:
             if Config.debug_get("crypto_key"):
-                key = b64decode(Config.debug_get("crypto_key"))
-                cipher = Fernet(key)
+                cipher = Fernet(Config.debug_get("crypto_key"))
                 db_backup = cipher.encrypt(database_file.read())
             else:
                 db_backup = database_file.read()

@@ -1,5 +1,4 @@
 import argparse
-from base64 import b64decode, b64encode
 from typing import TYPE_CHECKING
 
 from cryptography.fernet import Fernet
@@ -23,9 +22,6 @@ def parse_args() -> "DecryptArgs":
         data structure containing the command line arguments
     """
 
-    def base64(s: str) -> bytes:
-        return b64decode(s)
-
     parser = argparse.ArgumentParser()
     # subparsers = crypt, decrypt, generate_key
     subparsers = parser.add_subparsers(dest="command", required=True)
@@ -34,13 +30,13 @@ def parse_args() -> "DecryptArgs":
     encrypt_parser = subparsers.add_parser("encrypt")
     encrypt_parser.add_argument("decrypted_file", type=str, help="Path to the decrypted file")
     encrypt_parser.add_argument("encrypted_file", type=str, help="Path to the encrypted file")
-    encrypt_parser.add_argument("-k", "--key", required=True, type=base64, help="Base64 encoded key")
+    encrypt_parser.add_argument("-k", "--key", required=True, type=str, help="Base64 encoded key")
 
     # decrypt
     decrypt_parser = subparsers.add_parser("decrypt")
     decrypt_parser.add_argument("encrypted_file", type=str, help="Path to the encrypted file")
     decrypt_parser.add_argument("decrypted_file", type=str, help="Path to the decrypted file")
-    decrypt_parser.add_argument("-k", "--key", required=True, type=base64, help="Base64 encoded key")
+    decrypt_parser.add_argument("-k", "--key", required=True, type=str, help="Base64 encoded key")
 
     # generate_key
     subparsers.add_parser("generate_key")
@@ -52,7 +48,7 @@ def main():
     """Main function"""
     args = parse_args()
     if args.command == "generate_key":
-        print(b64encode(Fernet.generate_key()).decode("utf-8"))
+        print(Fernet.generate_key().decode("utf-8"))
     elif args.command == "encrypt":
         with open(args.decrypted_file, "rb") as database_file:
             decrypted = database_file.read()
