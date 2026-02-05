@@ -4,6 +4,7 @@ debug:
   log_file: str
   log_error_file: str
   crypto_key: str
+  zip_backup: bool
 post:
   community_group_id: int
   channel_id: int

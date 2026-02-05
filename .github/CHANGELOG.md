@@ -7,9 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-- Show credit username during approval process
+### Added
 
-...
+- Show credit username during approval process
+- Database backup can use zip encryption with a key (see `crypto_key` in the _settings.yaml_ file)
+
+### Fix
+
+- Avoid using redundant `base64` encoding/decoding for key storing
 
 ## [3.1.0] - 2024-02-18
 
