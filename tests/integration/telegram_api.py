@@ -20,6 +20,7 @@ from telegram import (
 )
 
 from spotted.data import Config
+from spotted.data import User as SpottedUser
 
 if TYPE_CHECKING:
     from typing import TypedDict
@@ -110,6 +111,8 @@ class TelegramApi:
             ).to_dict()
         if endpoint == "forwardMessage":
             return self.__forward_message(data)
+        if endpoint == "banChatMember":
+            return self.__ban_chat_member(data)
         raise NotImplementedError(f"Endpoint {endpoint} not implemented")
 
     def __send_message(self, data: "MessageData") -> dict:
@@ -174,6 +177,20 @@ class TelegramApi:
 
     def __delete_message(self, data: "MessageData") -> bool:
         self.__simulator.delete_message(data["message_id"])
+        return True
+
+    def __ban_chat_member(self, data: "MessageData") -> bool:
+        """Bans a user from the chat by adding them to the banned users list
+
+        Args:
+            data: data containing user_id to ban
+
+        Returns:
+            True if the ban was successful
+        """
+        user_id = data["user_id"]
+        user = SpottedUser(user_id)
+        user.ban()
         return True
 
     def __get_me(self) -> dict:
