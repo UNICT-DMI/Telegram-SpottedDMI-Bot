@@ -389,8 +389,8 @@ class TelegramSimulator:  # pylint: disable=too-many-public-methods
         """
         if isinstance(message, int):
             message = self.get_message_by_id(message)
-            self.messages.remove(message)
-        else:
+
+        if message is not None:
             self.messages.remove(message)
 
     def find_button_on_keyboard(self, text: str, message: Message) -> InlineKeyboardButton | None:
