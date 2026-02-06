@@ -1,5 +1,6 @@
 # pylint: disable=unused-argument,redefined-outer-name
 """Test all the modules related to data management"""
+
 import pytest
 import yaml
 

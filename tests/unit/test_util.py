@@ -1,5 +1,6 @@
 # pylint: disable=unused-argument redefined-outer-name
 """Tests the utility package"""
+
 from datetime import datetime
 
 import pytest

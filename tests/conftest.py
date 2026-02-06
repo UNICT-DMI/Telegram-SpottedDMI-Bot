@@ -1,5 +1,6 @@
 # pylint: disable=redefined-outer-name
 """Test configuration"""
+
 import os
 
 import pytest

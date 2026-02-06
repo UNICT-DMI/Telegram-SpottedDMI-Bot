@@ -1,5 +1,6 @@
 # pylint: disable=unused-argument,protected-access,no-value-for-parameter,missing-function-docstring,missing-class-docstring,too-few-public-methods,too-many-arguments,too-many-locals,too-many-branches,too-many-statements,too-many-instance-attributes,too-many-public-methods,too-many-lines,too-many-nested-blocks,too-many-boolean-expressions,too-many-ancestors,too-many-function-args,too-many-locals,too-many-arguments,too-many-branches,too-many-statements,too-many-instance-attributes,too-many-public-methods,too-many-lines,too-many-nested-blocks,too-many-boolean-expressions,too-many-ancestors,too-many-function-args
 """TelegramApi class"""
+
 from datetime import datetime
 from typing import TYPE_CHECKING
 

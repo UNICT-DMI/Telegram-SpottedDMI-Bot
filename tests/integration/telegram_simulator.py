@@ -1,5 +1,6 @@
 # pylint: disable=unused-argument,protected-access,no-value-for-parameter
 """TelegramSimulator class"""
+
 import warnings
 from datetime import datetime
 from typing import overload
