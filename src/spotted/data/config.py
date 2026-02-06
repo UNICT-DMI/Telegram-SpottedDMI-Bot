@@ -9,7 +9,9 @@ from typing import Any, Iterable, Literal
 import yaml
 
 SettingsKeys = Literal["debug", "post", "test", "token", "bot_tag"]
-SettingsDebugKeys = Literal["local_log", "reset_on_load", "log_file", "log_error_file", "db_file", "crypto_key"]
+SettingsDebugKeys = Literal[
+    "local_log", "reset_on_load", "log_file", "log_error_file", "db_file", "crypto_key", "zip_backup"
+]
 SettingsPostKeys = Literal[
     "community_group_id",
     "channel_id",

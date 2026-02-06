@@ -1,5 +1,6 @@
 # pylint: disable=unused-argument,redefined-outer-name
 """Tests the bot commands"""
+
 from datetime import datetime
 from unittest.mock import AsyncMock
 
