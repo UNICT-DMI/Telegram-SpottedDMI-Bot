@@ -5,6 +5,7 @@ debug:
   log_error_file: "logs/spotted_error.log"
   db_file: "spotted.sqlite3"
   crypto_key: ""
+  zip_backup: false
 post:
   community_group_id: -1
   channel_id: -2

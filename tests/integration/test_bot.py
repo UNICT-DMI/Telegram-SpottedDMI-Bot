@@ -1,5 +1,6 @@
 # pylint: disable=unused-argument,redefined-outer-name
 """Tests the bot functionality"""
+
 import os
 from datetime import datetime
 

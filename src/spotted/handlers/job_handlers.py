@@ -1,9 +1,10 @@
 """Scheduled jobs of the bot"""
 
-from base64 import b64decode
+import io
 from binascii import Error as BinasciiError
 from datetime import datetime, timedelta, timezone
 
+import pyzipper
 from cryptography.fernet import Fernet
 from telegram.error import BadRequest, Forbidden
 from telegram.ext import CallbackContext
@@ -50,6 +51,45 @@ async def clean_pending_job(context: CallbackContext):
     )
 
 
+def get_zip_backup() -> bytes:
+    """Zip the database file and return the bytes of the zip file,
+    optionally encrypting it with a password if `crypto_key` is set in the settings.
+    It is called if `zip_backup` is set to `True` in the settings.
+
+    Returns:
+        bytes of the (possibly encrypted) zip file
+    """
+    db_path = Config.debug_get("db_file")
+    zip_stream = io.BytesIO()
+    with pyzipper.AESZipFile(
+        zip_stream,
+        "w",
+        compression=pyzipper.ZIP_DEFLATED,
+        encryption=pyzipper.WZ_AES if Config.debug_get("crypto_key") else None,
+    ) as zf:
+        if Config.debug_get("crypto_key"):
+            zf.setpassword(Config.debug_get("crypto_key").encode("utf-8"))
+        zf.write(db_path, arcname="spotted.sqlite3")
+    zip_stream.seek(0)
+    return zip_stream.read()
+
+
+def get_backup() -> bytes:
+    """Get the database backup, either encrypted or not.
+    When the `crypto_key` setting is set, the backup is encrypted with Fernet,
+    otherwise it's returned as is, in plaintext.
+
+    Returns:
+        bytes of the backup file, either encrypted or not
+    """
+    path = Config.debug_get("db_file")
+    with open(path, "rb") as database_file:
+        if Config.debug_get("crypto_key"):
+            cipher = Fernet(Config.debug_get("crypto_key"))
+            return cipher.encrypt(database_file.read())
+        return database_file.read()
+
+
 async def db_backup_job(context: CallbackContext):
     """Job called each day at 05:00 utc.
     Automatically upload and send last version of db for backup
@@ -57,22 +97,15 @@ async def db_backup_job(context: CallbackContext):
     Args:
         context: context passed by the jobqueue
     """
-    path = Config.debug_get("db_file")
     admin_group_id = Config.post_get("admin_group_id")
-    with open(path, "rb") as database_file:
-        try:
-            if Config.debug_get("crypto_key"):
-                key = b64decode(Config.debug_get("crypto_key"))
-                cipher = Fernet(key)
-                db_backup = cipher.encrypt(database_file.read())
-            else:
-                db_backup = database_file.read()
+    try:
+        db_backup = get_zip_backup() if Config.debug_get("zip_backup") else get_backup()
 
-            await context.bot.send_document(
-                chat_id=admin_group_id,
-                document=db_backup,
-                filename="spotted.backup.sqlite3",
-                caption="✅ Backup effettuato con successo",
-            )
-        except BinasciiError as ex:
-            await context.bot.send_message(chat_id=admin_group_id, text=f"✖️ Impossibile effettuare il backup\n\n{ex}")
+        await context.bot.send_document(
+            chat_id=admin_group_id,
+            document=db_backup,
+            filename="spotted.backup.zip" if Config.debug_get("zip_backup") else "spotted.backup.sqlite3",
+            caption="✅ Backup effettuato con successo",
+        )
+    except BinasciiError as ex:
+        await context.bot.send_message(chat_id=admin_group_id, text=f"✖️ Impossibile effettuare il backup\n\n{ex}")

@@ -254,8 +254,11 @@ debug:
   db_file: "spotted.sqlite3" # path to the database file. Relative to the pwd
   # key used to encrypt the database backup sent to the admin periodically.
   # Must be 32 bytes long and base64 encoded.
-  # If not specified (default), the backup will be sent in clear text
+  # Use the `f_crypto` utility script to generate a new key or decrypt/encrypt the database.
+  # If not specified (default), the backup will be sent in clear text.
+  # If `zip_backup` is set to `True`, the zip file will be password protected with this key.
   crypto_key: "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+  zip_backup: false # whether the backup should be sent as a zip file
 
 post:
   # id of the group associated with the channel. Telegram will send automatically forward the posts there. Required if comments are enabled
