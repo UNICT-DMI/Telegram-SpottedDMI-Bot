@@ -2,7 +2,7 @@
 """Tests the clean_muted_users job handler"""
 
 from datetime import datetime, timedelta
-from unittest.mock import AsyncMock, patch
+from unittest.mock import AsyncMock
 
 import pytest
 from telegram.ext import Application, CallbackContext

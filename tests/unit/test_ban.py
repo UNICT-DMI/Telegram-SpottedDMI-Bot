@@ -1,43 +1,13 @@
 # pylint: disable=unused-argument,redefined-outer-name
 """Tests the ban command and execute_ban function"""
 
-from unittest.mock import AsyncMock, MagicMock, patch
+from unittest.mock import AsyncMock
 
 import pytest
-from telegram.ext import Application, CallbackContext
 
 from spotted.data import Config, User
 from spotted.handlers.ban import execute_ban
 from spotted.utils import EventInfo
-
-
-@pytest.fixture(scope="function")
-def mock_bot() -> AsyncMock:
-    """Create a mock bot instance"""
-    bot = AsyncMock()
-    bot.send_message = AsyncMock(return_value=None)
-    return bot
-
-
-@pytest.fixture(scope="function")
-def context_with_bot(mock_bot: AsyncMock) -> CallbackContext:
-    """Return a CallbackContext with a mocked bot"""
-    app = Application.builder().token("1234567890:qY9gv7pRJgFj4EVmN3Z1gfJOgQpCbh0vmp5").build()
-    app.bot = mock_bot
-    context = CallbackContext(app)
-    return context
-
-
-@pytest.fixture(scope="function")
-def mock_event_info(mock_bot: AsyncMock, context_with_bot: CallbackContext) -> EventInfo:
-    """Create a mock EventInfo instance"""
-    # Create a minimal EventInfo by calling the constructor directly
-    # We mock it to avoid needing a full Update object
-    info = MagicMock(spec=EventInfo)
-    info.bot = mock_bot
-    info.context = context_with_bot
-    info.chat_id = 12345
-    return info
 
 
 @pytest.mark.asyncio

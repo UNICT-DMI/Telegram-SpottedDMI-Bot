@@ -5,11 +5,11 @@ from datetime import datetime, timedelta
 from unittest.mock import AsyncMock, MagicMock
 
 import pytest
-from telegram import Chat, Message, Update, User as TelegramUser
-from telegram.ext import Application, CallbackContext
+from telegram import Chat, Message, Update
+from telegram import User as TelegramUser
+from telegram.ext import CallbackContext
 
-from spotted.data import Config, DbManager, PendingPost, Report, User
-from spotted.handlers.ban import execute_ban
+from spotted.data import Config, DbManager, PendingPost, User
 from spotted.handlers.mute import mute_cmd
 from spotted.handlers.unmute import unmute_cmd
 from spotted.handlers.warn import execute_warn, warn_cmd
@@ -17,31 +17,8 @@ from spotted.utils import EventInfo
 
 
 @pytest.fixture(scope="function")
-def mock_bot() -> AsyncMock:
-    """Create a mock bot instance"""
-    bot = AsyncMock()
-    bot.send_message = AsyncMock(return_value=None)
-    bot.restrict_chat_member = AsyncMock(return_value=None)
-    bot.get_chat_administrators = AsyncMock(
-        return_value=[
-            MagicMock(user=MagicMock(id=999)),  # Admin user
-        ]
-    )
-    return bot
-
-
-@pytest.fixture(scope="function")
-def context_with_bot(mock_bot: AsyncMock) -> CallbackContext:
-    """Return a CallbackContext with a mocked bot"""
-    app = Application.builder().token("1234567890:qY9gv7pRJgFj4EVmN3Z1gfJOgQpCbh0vmp5").build()
-    app.bot = mock_bot
-    context = CallbackContext(app)
-    return context
-
-
-@pytest.fixture(scope="function")
 def mock_event_info(mock_bot: AsyncMock, context_with_bot: CallbackContext) -> EventInfo:
-    """Create a mock EventInfo instance"""
+    """Create a mock EventInfo instance with additional mocking for warn/mute commands"""
     info = MagicMock(spec=EventInfo)
     info.bot = mock_bot
     info.context = context_with_bot
@@ -120,9 +97,7 @@ class TestMuteCmd:
         assert len(calls) == 1
         assert "Per mutare rispondi ad un commento con /mute" in calls[0].kwargs["text"]
 
-    async def test_mute_cmd_default_duration(
-        self, test_table, context_with_bot: CallbackContext, mock_bot: AsyncMock
-    ):
+    async def test_mute_cmd_default_duration(self, test_table, context_with_bot: CallbackContext, mock_bot: AsyncMock):
         """Tests mute_cmd with default duration (no args).
         Should mute user for default number of days
         """
@@ -174,9 +149,7 @@ class TestMuteCmd:
         assert user_message_call is not None
         assert "14 giorni" in user_message_call.kwargs["text"]
 
-    async def test_mute_cmd_invalid_duration(
-        self, test_table, context_with_bot: CallbackContext, mock_bot: AsyncMock
-    ):
+    async def test_mute_cmd_invalid_duration(self, test_table, context_with_bot: CallbackContext, mock_bot: AsyncMock):
         """Tests mute_cmd with invalid duration argument.
         Should fall back to default duration
         """
@@ -212,7 +185,9 @@ class TestUnmuteCmd:
         mute_date = datetime.now()
         expire_date = datetime.now() + timedelta(days=7)
         DbManager.insert_into(
-            table_name="muted_users", columns=("user_id", "mute_date", "expire_date"), values=(100, mute_date, expire_date)
+            table_name="muted_users",
+            columns=("user_id", "mute_date", "expire_date"),
+            values=(100, mute_date, expire_date),
         )
 
         await unmute_cmd(update, context_with_bot)
@@ -239,7 +214,9 @@ class TestUnmuteCmd:
         mute_date = datetime.now()
         expire_date = datetime.now() + timedelta(days=7)
         DbManager.insert_into(
-            table_name="muted_users", columns=("user_id", "mute_date", "expire_date"), values=(user_to_unmute, mute_date, expire_date)
+            table_name="muted_users",
+            columns=("user_id", "mute_date", "expire_date"),
+            values=(user_to_unmute, mute_date, expire_date),
         )
         assert User(user_to_unmute).is_muted
 
@@ -258,9 +235,7 @@ class TestUnmuteCmd:
         assert admin_message is not None
         assert "senza errori" in admin_message.kwargs["text"]
 
-    async def test_unmute_cmd_multiple_users(
-        self, test_table, context_with_bot: CallbackContext, mock_bot: AsyncMock
-    ):
+    async def test_unmute_cmd_multiple_users(self, test_table, context_with_bot: CallbackContext, mock_bot: AsyncMock):
         """Tests unmute_cmd with multiple user IDs.
         Should unmute all users
         """
@@ -279,7 +254,9 @@ class TestUnmuteCmd:
         expire_date = datetime.now() + timedelta(days=7)
         for user_id in users_to_unmute:
             DbManager.insert_into(
-                table_name="muted_users", columns=("user_id", "mute_date", "expire_date"), values=(user_id, mute_date, expire_date)
+                table_name="muted_users",
+                columns=("user_id", "mute_date", "expire_date"),
+                values=(user_id, mute_date, expire_date),
             )
             assert User(user_id).is_muted
 
@@ -289,18 +266,14 @@ class TestUnmuteCmd:
         for user_id in users_to_unmute:
             assert not User(user_id).is_muted
 
-    async def test_unmute_cmd_invalid_user_id(
-        self, test_table, context_with_bot: CallbackContext, mock_bot: AsyncMock
-    ):
+    async def test_unmute_cmd_invalid_user_id(self, test_table, context_with_bot: CallbackContext, mock_bot: AsyncMock):
         """Tests unmute_cmd with invalid user ID.
         Should report error for invalid IDs
         """
         admin_id = 999
         chat = Chat(id=Config.post_get("admin_group_id"), type=Chat.GROUP)
         admin_user = TelegramUser(id=admin_id, first_name="Admin", is_bot=False)
-        message = Message(
-            message_id=124, from_user=admin_user, chat=chat, date=datetime.now(), text="/unmute invalid"
-        )
+        message = Message(message_id=124, from_user=admin_user, chat=chat, date=datetime.now(), text="/unmute invalid")
         update = Update(update_id=0, message=message)
         context_with_bot.args = ["invalid"]
 
@@ -384,9 +357,7 @@ class TestWarnCmd:
         assert len(calls) == 1
         assert "Per warnare rispondi" in calls[0].kwargs["text"]
 
-    async def test_warn_cmd_community_message(
-        self, test_table, context_with_bot: CallbackContext, mock_bot: AsyncMock
-    ):
+    async def test_warn_cmd_community_message(self, test_table, context_with_bot: CallbackContext, mock_bot: AsyncMock):
         """Tests warn_cmd when replying to a community group message.
         Should warn the user and delete the command
         """
@@ -444,9 +415,7 @@ class TestWarnCmd:
 class TestExecuteWarn:
     """Tests for the execute_warn function"""
 
-    async def test_execute_warn_first_warning(
-        self, test_table, mock_event_info: EventInfo, mock_bot: AsyncMock
-    ):
+    async def test_execute_warn_first_warning(self, test_table, mock_event_info: EventInfo, mock_bot: AsyncMock):
         """Tests execute_warn for a user's first warning.
         Should add warn and send notification
         """
@@ -467,9 +436,7 @@ class TestExecuteWarn:
         assert "warnato" in user_calls[0].kwargs["text"]
         assert comment in user_calls[0].kwargs["text"]
 
-    async def test_execute_warn_multiple_warnings(
-        self, test_table, mock_event_info: EventInfo, mock_bot: AsyncMock
-    ):
+    async def test_execute_warn_multiple_warnings(self, test_table, mock_event_info: EventInfo, mock_bot: AsyncMock):
         """Tests execute_warn for a user with multiple warnings.
         Should track warning count correctly
         """
@@ -502,7 +469,7 @@ class TestExecuteWarn:
 
         # Add warnings up to max - 1
         for i in range(max_warns - 1):
-            warn_date = datetime.now() - timedelta(seconds=(max_warns - i))
+            warn_date = datetime.now() - timedelta(seconds=max_warns - i)
             DbManager.insert_into(
                 table_name="warned_users",
                 columns=("user_id", "warn_date", "expire_date"),
@@ -543,9 +510,7 @@ class TestExecuteWarn:
         # Verify message was not deleted
         mock_event_info.message.delete.assert_not_called()
 
-    async def test_execute_warn_admin_notification(
-        self, test_table, mock_event_info: EventInfo, mock_bot: AsyncMock
-    ):
+    async def test_execute_warn_admin_notification(self, test_table, mock_event_info: EventInfo, mock_bot: AsyncMock):
         """Tests that execute_warn sends notification to admin group"""
         user_id = 1000
         comment = "Test violation"
