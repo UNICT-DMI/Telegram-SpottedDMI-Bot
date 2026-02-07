@@ -231,7 +231,7 @@ class TestBot:
             """Tests the /ban command.
             The bot bans the user associated with the pending post
             """
-            await telegram.send_message("/ban", chat=admin_group, reply_to_message=pending_post)
+            await telegram.send_command("/ban", chat=admin_group, reply_to_message=pending_post)
             assert (
                 telegram.last_message.text
                 == "Grazie per il tuo contributo alla community, a causa di un tuo comportamento inadeguato sei stato bannato da Spotted DMI. Alla prossima!"
