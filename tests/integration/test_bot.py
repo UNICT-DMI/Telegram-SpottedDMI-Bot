@@ -408,7 +408,7 @@ class TestBot:
             """Tests the /spot command.
             Spot is not allowed for users with a pending post
             """
-            PendingPost(user_id=1, u_message_id=1, g_message_id=1, admin_group_id=1, date=datetime.now()).save_post()
+            PendingPost(u_message_id=1, g_message_id=1, admin_group_id=1, date=datetime.now()).save_post(user_id=1)
             await telegram.send_command("/spot")
             assert telegram.last_message.text == "Hai già un post in approvazione 🧐"
 

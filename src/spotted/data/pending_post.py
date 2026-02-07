@@ -13,10 +13,11 @@ _StoreKey: TypeAlias = tuple[int, int]
 
 @dataclass()
 class PendingPost:
-    """Class that represents a pending post
+    """Class that represents a pending post.
+    The user_id is stored separately from the post data to strengthen anonymity:
+    inspecting _store alone does not reveal who authored which post.
 
     Args:
-        user_id: id of the user that sent the post
         u_message_id: id of the original message of the post
         g_message_id: id of the post in the group
         admin_group_id: id of the admin group
@@ -25,14 +26,25 @@ class PendingPost:
     """
 
     _store: ClassVar[dict[_StoreKey, "PendingPost"]] = {}
+    _key_to_user: ClassVar[dict[_StoreKey, int]] = {}
+    _user_to_key: ClassVar[dict[int, _StoreKey]] = {}
     _draining: ClassVar[bool] = False
 
-    user_id: int
     u_message_id: int
     g_message_id: int
     admin_group_id: int
     date: datetime
     credit_username: str | None = None
+
+    @property
+    def _key(self) -> _StoreKey:
+        """Returns the store key for this post"""
+        return (self.admin_group_id, self.g_message_id)
+
+    @property
+    def user_id(self) -> int:
+        """Retrieves the user_id from the separate mapping"""
+        return PendingPost._key_to_user[self._key]
 
     @classmethod
     def is_draining(cls) -> bool:
@@ -64,13 +76,12 @@ class PendingPost:
         date = datetime.now(tz=timezone.utc)
 
         return cls(
-            user_id=user_id,
             u_message_id=u_message_id,
             g_message_id=g_message_id,
             admin_group_id=admin_group_id,
             credit_username=credit_username,
             date=date,
-        ).save_post()
+        ).save_post(user_id=user_id)
 
     @classmethod
     def from_group(cls, g_message_id: int, admin_group_id: int) -> "PendingPost | None":
@@ -95,10 +106,10 @@ class PendingPost:
         Returns:
             instance of the class
         """
-        for post in cls._store.values():
-            if post.user_id == user_id:
-                return post
-        return None
+        key = cls._user_to_key.get(user_id)
+        if key is None:
+            return None
+        return cls._store.get(key)
 
     @staticmethod
     def get_all(admin_group_id: int, before: datetime | None = None) -> list["PendingPost"]:
@@ -124,9 +135,12 @@ class PendingPost:
             posts.append(post)
         return posts
 
-    def save_post(self) -> "PendingPost":
-        """Saves the pending_post in the in-memory store"""
-        PendingPost._store[(self.admin_group_id, self.g_message_id)] = self
+    def save_post(self, user_id: int) -> "PendingPost":
+        """Saves the pending_post in the in-memory store and records the user mapping separately"""
+        key = self._key
+        PendingPost._store[key] = self
+        PendingPost._key_to_user[key] = user_id
+        PendingPost._user_to_key[user_id] = key
         return self
 
     def get_votes(self, vote: bool) -> int:
@@ -230,8 +244,12 @@ class PendingPost:
         return number_of_votes
 
     def delete_post(self):
-        """Removes the post from the in-memory store and its votes from the database"""
-        PendingPost._store.pop((self.admin_group_id, self.g_message_id), None)
+        """Removes the post from the in-memory store, cleans up user mappings, and deletes votes from the database"""
+        key = self._key
+        user_id = PendingPost._key_to_user.pop(key, None)
+        if user_id is not None:
+            PendingPost._user_to_key.pop(user_id, None)
+        PendingPost._store.pop(key, None)
         DbManager.delete_from(
             table_name="admin_votes",
             where="g_message_id = %s and admin_group_id = %s",
