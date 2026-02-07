@@ -240,10 +240,7 @@ class PendingPost:
 
     def __repr__(self) -> str:
         return (
-            f"PendingPost: [ user_id: {self.user_id}\n"
-            f"u_message_id: {self.u_message_id}\n"
-            f"admin_group_id: {self.admin_group_id}\n"
+            f"PendingPost: [ admin_group_id: {self.admin_group_id}\n"
             f"g_message_id: {self.g_message_id}\n"
-            f"credit_username: {self.credit_username}\n"
             f"date : {self.date} ]"
         )
