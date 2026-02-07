@@ -64,11 +64,11 @@ async def add_commands(app: Application):
         BotCommand("settings", "cambia le impostazioni di privacy"),
     ]
     admin_commands = [
-        BotCommand("ban", "banna un utente"),
-        BotCommand("sban", "sbanna un utente"),
-        BotCommand("mute", "muta un utente"),
-        BotCommand("unmute", "smuta un utente"),
-        BotCommand("warn", "warna un utente"),
+        BotCommand("ban", "rispondi ad uno spot o un report per bannare l'utente responsabile"),
+        BotCommand("sban", "sbanna un utente indicandone lo user_id o l'indice mostrato da /sban"),
+        BotCommand("mute", "rispondi ad un messaggio di un utente per mutarlo nel gruppo dei commenti"),
+        BotCommand("unmute", "smuta un utente indicandone lo user_id o l'indice mostrato da /unmute"),
+        BotCommand("warn", "rispondi ad uno spot, report o commento per segnalare l'utente responsabile"),
         BotCommand("reply", "rispondi ad uno spot o un report"),
         BotCommand("autoreply", "rispondi ad uno spot o un report con un messaggio automatico"),
         BotCommand("reload", "ricarica la configurazione del bot. Modificare gli handler richiede un riavvio"),
