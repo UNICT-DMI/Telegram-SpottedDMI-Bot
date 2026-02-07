@@ -53,12 +53,12 @@ async def reject_post(info: EventInfo, pending_post: PendingPost, reason: str | 
         pending_post: pending post to reject
         reason: reason for the rejection, currently used on autoreply
     """
-    user_id = pending_post.user_id
     pending_post.set_admin_vote(info.user_id, False)
 
     try:
         await info.bot.send_message(
-            chat_id=user_id, text="Il tuo ultimo post è stato rifiutato\nPuoi controllare le regole con /rules"
+            chat_id=pending_post.user_id,
+            text="Il tuo ultimo post è stato rifiutato\nPuoi controllare le regole con /rules",
         )  # notify the user
     except (BadRequest, Forbidden) as ex:
         logger.warning("Notifying the user on approve_no: %s", ex)
@@ -88,12 +88,12 @@ async def approve_yes_callback(update: Update, context: CallbackContext):
 
     # The post passed the approval phase and is to be published
     if n_approve >= Config.post_get("n_votes"):
-        user_id = pending_post.user_id
-        await info.send_post_to_channel(user_id=user_id)
+        await info.send_post_to_channel(user_id=pending_post.user_id)
 
         try:
             await info.bot.send_message(
-                chat_id=user_id, text=f"Il tuo ultimo post è stato pubblicato su {Config.post_get('channel_tag')}"
+                chat_id=pending_post.user_id,
+                text=f"Il tuo ultimo post è stato pubblicato su {Config.post_get('channel_tag')}",
             )  # notify the user
         except (BadRequest, Forbidden) as ex:
             logger.warning("Notifying the user on approve_yes: %s", ex)
