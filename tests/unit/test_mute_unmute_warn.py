@@ -196,7 +196,7 @@ class TestUnmuteCmd:
         mock_bot.send_message.assert_called_once()
         call_args = mock_bot.send_message.call_args
         assert "[uso]: /unmute" in call_args.kwargs["text"]
-        assert "100" in call_args.kwargs["text"]
+        assert "#0" in call_args.kwargs["text"]
 
     async def test_unmute_cmd_single_user(self, test_table, context_with_bot: CallbackContext, mock_bot: AsyncMock):
         """Tests unmute_cmd with a single user ID.
@@ -233,7 +233,7 @@ class TestUnmuteCmd:
                 break
 
         assert admin_message is not None
-        assert "senza errori" in admin_message.kwargs["text"]
+        assert "I seguenti unmute sono falliti" not in admin_message.kwargs["text"]
 
     async def test_unmute_cmd_multiple_users(self, test_table, context_with_bot: CallbackContext, mock_bot: AsyncMock):
         """Tests unmute_cmd with multiple user IDs.
@@ -287,7 +287,7 @@ class TestUnmuteCmd:
                 break
 
         assert admin_message is not None
-        assert "con errori" in admin_message.kwargs["text"]
+        assert "I seguenti unmute sono falliti" in admin_message.kwargs["text"]
 
 
 @pytest.mark.asyncio
@@ -524,5 +524,5 @@ class TestExecuteWarn:
             if call.kwargs.get("chat_id") == Config.post_get("admin_group_id")
         ]
         assert len(admin_calls) == 1
-        assert str(user_id) in admin_calls[0].kwargs["text"]
+        assert "L'utente ha ricevuto il 1° warn" in admin_calls[0].kwargs["text"]
         assert comment in admin_calls[0].kwargs["text"]

@@ -245,7 +245,7 @@ class TestBot:
             """
             await telegram.send_command("/sban", chat=admin_group)
             assert (
-                telegram.last_message.text == "[uso]: /sban <user_id1> [...user_id2]\n"
+                telegram.last_message.text == "[uso]: /sban <user_id1|#idx> [...(user_id2|#idx)]\n"
                 "Gli utenti attualmente bannati sono:\n"
                 "Nessuno"
             )
@@ -260,10 +260,10 @@ class TestBot:
             DbManager.update_from(table_name="banned_users", set_clause="ban_date=%s", args=(ban_date,))
             await telegram.send_command("/sban", chat=admin_group)
             assert (
-                telegram.last_message.text == "[uso]: /sban <user_id1> [...user_id2]\n"
+                telegram.last_message.text == "[uso]: /sban <user_id1|#idx> [...(user_id2|#idx)]\n"
                 "Gli utenti attualmente bannati sono:\n"
-                f"5 ({ban_date:%d/%m/%Y %H:%M})\n"
-                f"6 ({ban_date:%d/%m/%Y %H:%M})"  # list the banned users
+                f"#0 ({ban_date:%d/%m/%Y %H:%M})\n"
+                f"#1 ({ban_date:%d/%m/%Y %H:%M})"  # list the banned users
             )
 
         async def test_sban_cmd(self, telegram: TelegramSimulator, admin_group: Chat):
@@ -272,7 +272,7 @@ class TestBot:
             """
             User(1).ban()
             await telegram.send_command("/sban 1", chat=admin_group)
-            assert telegram.last_message.text == "Sban effettuato"
+            assert telegram.last_message.text == "1 sban eseguiti con successo."
             assert not User(1).is_banned
 
         async def test_unmute_invalid_cmd(self, telegram: TelegramSimulator, admin_group: Chat):
@@ -281,7 +281,7 @@ class TestBot:
             """
             await telegram.send_command("/unmute", chat=admin_group)
             assert (
-                telegram.last_message.text == "[uso]: /unmute <user_id1> [...user_id2]\n"
+                telegram.last_message.text == "[uso]: /unmute <user_id1|#idx> [...(user_id2|#idx)]\n"
                 "Gli utenti attualmente mutati sono:\nNessuno"
             )
 
@@ -298,10 +298,10 @@ class TestBot:
             )
             await telegram.send_command("/unmute", chat=admin_group)
             assert (
-                telegram.last_message.text == "[uso]: /unmute <user_id1> [...user_id2]\n"
+                telegram.last_message.text == "[uso]: /unmute <user_id1|#idx> [...(user_id2|#idx)]\n"
                 "Gli utenti attualmente mutati sono:\n"
-                f"5 (Mute: {mute_date:%d/%m/%Y %H:%M} - Exp: {expiration_date:%d/%m/%Y %H:%M} )\n"
-                f"6 (Mute: {mute_date:%d/%m/%Y %H:%M} - Exp: {expiration_date:%d/%m/%Y %H:%M} )"  # list the muted users
+                f"#0 (Mute: {mute_date:%d/%m/%Y %H:%M} - Exp: {expiration_date:%d/%m/%Y %H:%M} )\n"
+                f"#1 (Mute: {mute_date:%d/%m/%Y %H:%M} - Exp: {expiration_date:%d/%m/%Y %H:%M} )"  # list the muted users
             )
 
         async def test_unmute_cmd(self, telegram: TelegramSimulator, admin_group: Chat):
