@@ -1,9 +1,13 @@
 """Pending post management"""
 
+import hashlib
+import hmac
+import os
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from typing import ClassVar, TypeAlias
 
+from cryptography.fernet import Fernet
 from telegram import Message
 
 from .db_manager import DbManager
@@ -14,8 +18,7 @@ _StoreKey: TypeAlias = tuple[int, int]
 @dataclass()
 class PendingPost:
     """Class that represents a pending post.
-    The user_id is stored separately from the post data to strengthen anonymity:
-    inspecting _store alone does not reveal who authored which post.
+    The user_id is stored separately from the post data to strengthen anonymity
 
     Args:
         u_message_id: id of the original message of the post
@@ -26,8 +29,10 @@ class PendingPost:
     """
 
     _store: ClassVar[dict[_StoreKey, "PendingPost"]] = {}
-    _key_to_user: ClassVar[dict[_StoreKey, int]] = {}
-    _user_to_key: ClassVar[dict[int, _StoreKey]] = {}
+    _key_to_user: ClassVar[dict[_StoreKey, bytes]] = {}
+    _user_to_key: ClassVar[dict[bytes, _StoreKey]] = {}
+    _fernet: ClassVar[Fernet] = Fernet(Fernet.generate_key())
+    _hmac_key: ClassVar[bytes] = os.urandom(32)
     _draining: ClassVar[bool] = False
 
     u_message_id: int
@@ -43,8 +48,23 @@ class PendingPost:
 
     @property
     def user_id(self) -> int:
-        """Retrieves the user_id from the separate mapping"""
-        return PendingPost._key_to_user[self._key]
+        """Retrieves and decrypts the user_id from the separate mapping"""
+        return PendingPost._decrypt_user_id(PendingPost._key_to_user[self._key])
+
+    @classmethod
+    def _encrypt_user_id(cls, user_id: int) -> bytes:
+        """Encrypts user_id with Fernet using the ephemeral boot-time key"""
+        return cls._fernet.encrypt(user_id.to_bytes(8, "big"))
+
+    @classmethod
+    def _decrypt_user_id(cls, token: bytes) -> int:
+        """Decrypts user_id from Fernet token using the ephemeral boot-time key"""
+        return int.from_bytes(cls._fernet.decrypt(token), "big")
+
+    @classmethod
+    def _hash_user_id(cls, user_id: int) -> bytes:
+        """Produces a deterministic HMAC-SHA256 of user_id for use as a lookup key"""
+        return hmac.new(cls._hmac_key, user_id.to_bytes(8, "big"), hashlib.sha256).digest()
 
     @classmethod
     def is_draining(cls) -> bool:
@@ -106,7 +126,8 @@ class PendingPost:
         Returns:
             instance of the class
         """
-        key = cls._user_to_key.get(user_id)
+        user_hash = cls._hash_user_id(user_id)
+        key = cls._user_to_key.get(user_hash)
         if key is None:
             return None
         return cls._store.get(key)
@@ -136,11 +157,13 @@ class PendingPost:
         return posts
 
     def save_post(self, user_id: int) -> "PendingPost":
-        """Saves the pending_post in the in-memory store and records the user mapping separately"""
+        """Saves the pending_post in the in-memory store and records the user mapping separately.
+        The user_id is encrypted at rest and the lookup key is an HMAC hash.
+        """
         key = self._key
         PendingPost._store[key] = self
-        PendingPost._key_to_user[key] = user_id
-        PendingPost._user_to_key[user_id] = key
+        PendingPost._key_to_user[key] = PendingPost._encrypt_user_id(user_id)
+        PendingPost._user_to_key[PendingPost._hash_user_id(user_id)] = key
         return self
 
     def get_votes(self, vote: bool) -> int:
@@ -246,9 +269,10 @@ class PendingPost:
     def delete_post(self):
         """Removes the post from the in-memory store, cleans up user mappings, and deletes votes from the database"""
         key = self._key
-        user_id = PendingPost._key_to_user.pop(key, None)
-        if user_id is not None:
-            PendingPost._user_to_key.pop(user_id, None)
+        encrypted = PendingPost._key_to_user.pop(key, None)
+        if encrypted is not None:
+            user_id = PendingPost._decrypt_user_id(encrypted)
+            PendingPost._user_to_key.pop(PendingPost._hash_user_id(user_id), None)
         PendingPost._store.pop(key, None)
         DbManager.delete_from(
             table_name="admin_votes",

@@ -46,4 +46,6 @@ def test_table(create_test_db: DbManager) -> DbManager:
     create_test_db.query_from_file("config", "db", "post_db_del.sql")
     create_test_db.query_from_file("config", "db", "post_db_init.sql")
     PendingPost._store.clear()
+    PendingPost._key_to_user.clear()
+    PendingPost._user_to_key.clear()
     return create_test_db
