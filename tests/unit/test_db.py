@@ -19,7 +19,7 @@ def db_results(create_test_db: DbManager) -> dict:
     """
     # Save the original row_factory
     original_row_factory = create_test_db.row_factory
-    
+
     create_test_db.row_factory = lambda cursor, row: (
         list(row) if cursor.description[0][0] != "number" else {"number": row[0]}
     )
@@ -31,7 +31,7 @@ def db_results(create_test_db: DbManager) -> dict:
     yield results
 
     create_test_db.query_from_string("DROP TABLE IF EXISTS test_table;")
-    
+
     # Restore the original row_factory
     create_test_db.row_factory = original_row_factory
 
