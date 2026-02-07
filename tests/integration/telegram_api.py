@@ -113,6 +113,8 @@ class TelegramApi:
             return self.__forward_message(data)
         if endpoint == "banChatMember":
             return self.__ban_chat_member(data)
+        if endpoint == "restrictChatMember":
+            return True
         raise NotImplementedError(f"Endpoint {endpoint} not implemented")
 
     def __send_message(self, data: "MessageData") -> dict:

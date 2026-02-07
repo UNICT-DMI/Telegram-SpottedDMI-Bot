@@ -273,7 +273,44 @@ class TestBot:
             User(1).ban()
             await telegram.send_command("/sban 1", chat=admin_group)
             assert telegram.last_message.text == "1 sban eseguiti con successo."
+
+        async def test_sban_by_index_cmd(self, telegram: TelegramSimulator, admin_group: Chat):
+            """Tests the /sban command using index.
+            The bot sbans the user at the specified index in the banned users list
+            """
+            User(5).ban()
+            User(6).ban()
+            await telegram.send_command("/sban #0", chat=admin_group)
+            assert telegram.last_message.text == "1 sban eseguiti con successo."
+            assert not User(5).is_banned
+            assert User(6).is_banned
+
+        async def test_sban_invalid_user_id_cmd(self, telegram: TelegramSimulator, admin_group: Chat):
+            """Tests the /sban command with invalid user_id.
+            The bot warns about invalid user_id
+            """
+            await telegram.send_command("/sban 999", chat=admin_group)
+            assert telegram.last_message.text == "0 sban eseguiti con successo.\nI seguenti sban sono falliti:\n999"
+
+        async def test_sban_mixed_success_failure_cmd(self, telegram: TelegramSimulator, admin_group: Chat):
+            """Tests the /sban command with both valid and invalid user_ids.
+            The bot processes valid ones and reports failures
+            """
+            User(1).ban()
+            await telegram.send_command("/sban 1 999 invalid", chat=admin_group)
+            assert (
+                telegram.last_message.text
+                == "1 sban eseguiti con successo.\nI seguenti sban sono falliti:\n999\ninvalid"
+            )
             assert not User(1).is_banned
+
+        async def test_sban_invalid_index_cmd(self, telegram: TelegramSimulator, admin_group: Chat):
+            """Tests the /sban command with invalid index.
+            The bot warns about invalid index
+            """
+            User(5).ban()
+            await telegram.send_command("/sban #5", chat=admin_group)
+            assert telegram.last_message.text == "0 sban eseguiti con successo.\nI seguenti sban sono falliti:\n#5"
 
         async def test_unmute_invalid_cmd(self, telegram: TelegramSimulator, admin_group: Chat):
             """Tests the /unmute command.
@@ -311,6 +348,70 @@ class TestBot:
             await User(1).mute(None, 1)
             await User(1).unmute(None)
             assert not User(1).is_muted
+
+        async def test_unmute_by_index_cmd(self, telegram: TelegramSimulator, admin_group: Chat):
+            """Tests the /unmute command using index.
+            The bot unmutes the user at the specified index in the muted users list
+            """
+            await User(5).mute(None, 1)
+            await User(6).mute(None, 1)
+            await telegram.send_command("/unmute #0", chat=admin_group)
+            assert telegram.last_message.text == "1 unmute eseguiti con successo."
+            assert not User(5).is_muted
+            assert User(6).is_muted
+
+        async def test_unmute_invalid_user_id_cmd(self, telegram: TelegramSimulator, admin_group: Chat):
+            """Tests the /unmute command with invalid user_id.
+            The bot warns about invalid user_id
+            """
+            await telegram.send_command("/unmute 999", chat=admin_group)
+            assert telegram.last_message.text == "0 unmute eseguiti con successo.\nI seguenti unmute sono falliti:\n999"
+
+        async def test_unmute_mixed_success_failure_cmd(self, telegram: TelegramSimulator, admin_group: Chat):
+            """Tests the /unmute command with both valid and invalid user_ids.
+            The bot processes valid ones and reports failures
+            """
+            await User(1).mute(None, 1)
+            await telegram.send_command("/unmute 1 999 invalid", chat=admin_group)
+            assert (
+                telegram.last_message.text
+                == "1 unmute eseguiti con successo.\nI seguenti unmute sono falliti:\n999\ninvalid"
+            )
+            assert not User(1).is_muted
+
+        async def test_unmute_invalid_index_cmd(self, telegram: TelegramSimulator, admin_group: Chat):
+            """Tests the /unmute command with invalid index.
+            The bot warns about invalid index
+            """
+            await User(5).mute(None, 1)
+            await telegram.send_command("/unmute #5", chat=admin_group)
+            assert telegram.last_message.text == "0 unmute eseguiti con successo.\nI seguenti unmute sono falliti:\n#5"
+
+        async def test_sban_multiple_users_cmd(self, telegram: TelegramSimulator, admin_group: Chat):
+            """Tests the /sban command with multiple user_ids.
+            The bot sbans all specified users
+            """
+            User(1).ban()
+            User(2).ban()
+            User(3).ban()
+            await telegram.send_command("/sban 1 2 3", chat=admin_group)
+            assert telegram.last_message.text == "3 sban eseguiti con successo."
+            assert not User(1).is_banned
+            assert not User(2).is_banned
+            assert not User(3).is_banned
+
+        async def test_unmute_multiple_users_cmd(self, telegram: TelegramSimulator, admin_group: Chat):
+            """Tests the /unmute command with multiple user_ids.
+            The bot unmutes all specified users
+            """
+            await User(1).mute(None, 1)
+            await User(2).mute(None, 1)
+            await User(3).mute(None, 1)
+            await telegram.send_command("/unmute 1 2 3", chat=admin_group)
+            assert telegram.last_message.text == "3 unmute eseguiti con successo."
+            assert not User(1).is_muted
+            assert not User(2).is_muted
+            assert not User(3).is_muted
 
         async def test_reply_invalid_cmd(self, telegram: TelegramSimulator, admin_group: Chat, pending_post: Message):
             """Tests the /reply command.
