@@ -13,7 +13,7 @@ from .pending_post import PendingPost
 
 
 @dataclass()
-class User:
+class User:  # pylint: disable=too-many-public-methods
     """Class that represents a user
 
     Args:
