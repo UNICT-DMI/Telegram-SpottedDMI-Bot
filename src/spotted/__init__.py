@@ -8,6 +8,7 @@ from telegram.ext import Application, CallbackContext
 from spotted.data import Config, PendingPost, init_db
 from spotted.debug import logger
 from spotted.handlers import add_commands, add_handlers, add_jobs
+from spotted.handlers.job_handlers import clean_pending
 
 
 async def _drain_notify(context: CallbackContext):
@@ -47,9 +48,17 @@ async def _drain_check(context: CallbackContext):
         context.application.stop_running()
     elif data["elapsed"] >= data["timeout"]:
         logger.warning("Drain timeout reached with %d pending posts", n_pending)
+        pending_posts = PendingPost.get_all(admin_group_id=admin_group_id)
+        await clean_pending(
+            context.bot,
+            admin_group_id,
+            pending_posts,
+            "Il bot è stato riavviato e il tuo spot in sospeso è andato perso.\n"
+            "Per favore, invia nuovamente il tuo spot con /spot",
+        )
         await context.bot.send_message(
             chat_id=admin_group_id,
-            text=f"Timeout raggiunto. Il bot si spegne con {n_pending} spot ancora in sospeso.",
+            text=f"Timeout raggiunto. {n_pending} spot in sospeso sono stati eliminati. Il bot si spegne.",
         )
         context.job.schedule_removal()
         context.application.stop_running()
