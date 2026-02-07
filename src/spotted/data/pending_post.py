@@ -29,10 +29,10 @@ class PendingPost:
     """
 
     _store: ClassVar[dict[_StoreKey, "PendingPost"]] = {}
-    _key_to_user: ClassVar[dict[_StoreKey, bytes]] = {}
+    _key_to_user: ClassVar[dict[_StoreKey, bytearray]] = {}
     _user_to_key: ClassVar[dict[bytes, _StoreKey]] = {}
     _fernet: ClassVar[Fernet] = Fernet(Fernet.generate_key())
-    _hmac_key: ClassVar[bytes] = os.urandom(32)
+    _hmac_key: ClassVar[bytearray] = bytearray(os.urandom(32))
     _draining: ClassVar[bool] = False
 
     u_message_id: int
@@ -52,14 +52,14 @@ class PendingPost:
         return PendingPost._decrypt_user_id(PendingPost._key_to_user[self._key])
 
     @classmethod
-    def _encrypt_user_id(cls, user_id: int) -> bytes:
+    def _encrypt_user_id(cls, user_id: int) -> bytearray:
         """Encrypts user_id with Fernet using the ephemeral boot-time key"""
-        return cls._fernet.encrypt(user_id.to_bytes(8, "big"))
+        return bytearray(cls._fernet.encrypt(user_id.to_bytes(8, "big")))
 
     @classmethod
-    def _decrypt_user_id(cls, token: bytes) -> int:
+    def _decrypt_user_id(cls, token: bytearray) -> int:
         """Decrypts user_id from Fernet token using the ephemeral boot-time key"""
-        return int.from_bytes(cls._fernet.decrypt(token), "big")
+        return int.from_bytes(cls._fernet.decrypt(bytes(token)), "big")
 
     @classmethod
     def _hash_user_id(cls, user_id: int) -> bytes:
@@ -273,12 +273,18 @@ class PendingPost:
         if encrypted is not None:
             user_id = PendingPost._decrypt_user_id(encrypted)
             PendingPost._user_to_key.pop(PendingPost._hash_user_id(user_id), None)
+            encrypted[:] = b"\x00" * len(encrypted)
         PendingPost._store.pop(key, None)
         DbManager.delete_from(
             table_name="admin_votes",
             where="g_message_id = %s and admin_group_id = %s",
             where_args=(self.g_message_id, self.admin_group_id),
         )
+        self.u_message_id = 0
+        self.g_message_id = 0
+        self.admin_group_id = 0
+        self.date = None
+        self.credit_username = None
 
     def __repr__(self) -> str:
         return (
