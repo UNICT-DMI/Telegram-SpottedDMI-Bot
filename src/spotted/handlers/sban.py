@@ -1,7 +1,7 @@
 """/sban command"""
 
 from telegram import Update
-from telegram.error import Forbidden
+from telegram.error import TelegramError
 from telegram.ext import CallbackContext
 
 from spotted.data import User
@@ -44,7 +44,7 @@ async def sban_cmd(update: Update, context: CallbackContext):
             await info.bot.send_message(
                 chat_id=user.user_id, text="Sei stato sbannato da Spotted DMI, puoi tornare a postare!"
             )
-        except Forbidden:  # We don't really care if the user cannot be notified by the bot
+        except TelegramError:  # We don't really care if the user cannot be notified by the bot
             pass
     errors = "\nI seguenti sban sono falliti:\n" + ",".join(sban_fail) if sban_fail else ""
     await info.bot.send_message(chat_id=info.chat_id, text=f"{num_sban} sban eseguiti con successo.{errors}")

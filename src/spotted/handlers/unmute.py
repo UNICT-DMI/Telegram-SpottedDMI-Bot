@@ -1,7 +1,7 @@
 """/unmute command"""
 
 from telegram import Update
-from telegram.error import Forbidden
+from telegram.error import TelegramError
 from telegram.ext import CallbackContext
 
 from spotted.data import User
@@ -47,7 +47,7 @@ async def unmute_cmd(update: Update, context: CallbackContext):
             await info.bot.send_message(
                 chat_id=user.user_id, text="Sei stato smutato da Spotted DMI, puoi tornare a commentare!"
             )
-        except Forbidden:  # We don't really care if the user cannot be notified by the bot
+        except TelegramError:  # We don't really care if the user cannot be notified by the bot
             pass
     errors = "\nI seguenti unmute sono falliti:\n" + ",".join(failed_unmute) if len(failed_unmute) > 0 else ""
     await info.bot.send_message(chat_id=info.chat_id, text=f"{num_unmuted} unmute eseguiti con successo.{errors}")
