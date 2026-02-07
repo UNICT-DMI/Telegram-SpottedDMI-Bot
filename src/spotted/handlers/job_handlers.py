@@ -124,5 +124,6 @@ async def clean_muted_users(context: CallbackContext):
     if len(expired_muted) == 0:
         return
     for user in expired_muted:
-        DbManager.delete_from(table_name="muted_users", where="user_id = %s", where_args=(user,))
-        User(user).unmute(context.bot)
+        user_id = user["user_id"]
+        DbManager.delete_from(table_name="muted_users", where="user_id = %s", where_args=(user_id,))
+        await User(user_id).unmute(context.bot)
