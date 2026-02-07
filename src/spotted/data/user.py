@@ -60,7 +60,9 @@ class User:  # pylint: disable=too-many-public-methods
         """Returns a list of all the banned users"""
         return [
             cls(user_id=row["user_id"], ban_date=row["ban_date"])
-            for row in DbManager.select_from(table_name="banned_users", select="user_id, ban_date")
+            for row in DbManager.select_from(
+                table_name="banned_users", select="user_id, ban_date", order_by="ban_date DESC"
+            )
         ]
 
     @classmethod
@@ -68,7 +70,9 @@ class User:  # pylint: disable=too-many-public-methods
         """Returns a list of all the muted users"""
         return [
             cls(user_id=row["user_id"], mute_date=row["mute_date"], mute_expire_date=row["expire_date"])
-            for row in DbManager.select_from(table_name="muted_users", select="user_id, mute_date, expire_date")
+            for row in DbManager.select_from(
+                table_name="muted_users", select="user_id, mute_date, expire_date", order_by="mute_date DESC"
+            )
         ]
 
     @classmethod
@@ -147,12 +151,17 @@ class User:  # pylint: disable=too-many-public-methods
             values=(self.user_id, expiration_date),
         )
 
-    async def unmute(self, bot: Bot | None):
+    async def unmute(self, bot: Bot | None) -> bool:
         """Unmute a user taking back all restrictions
 
         Args:
             bot : the telegram bot
+
+        Returns:
+            whether the user was muted before the unmute or not
         """
+        # Just in case the user was manually muted by an admin,
+        # we try to unmute him anyway, even if he is not in the muted list of the bot
         if bot is not None:
             await bot.restrict_chat_member(
                 chat_id=Config.post_get("community_group_id"),
@@ -163,7 +172,12 @@ class User:  # pylint: disable=too-many-public-methods
                     can_add_web_page_previews=True,
                 ),
             )
+
+        if not self.is_muted:
+            return False
+
         DbManager.delete_from(table_name="muted_users", where="user_id = %s", where_args=(self.user_id,))
+        return True
 
     def warn(self):
         """Increase the number of warns of a user
