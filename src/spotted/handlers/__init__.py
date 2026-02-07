@@ -112,6 +112,7 @@ def add_handlers(app: Application):
     app.add_handler(CommandHandler("cancel", cancel_cmd, filters=filters.ChatType.PRIVATE))
 
     # Command handlers: Admin commands
+    app.add_handler(CommandHandler("ban", ban_cmd, filters=filters.REPLY & admin_filter))
     app.add_handler(CommandHandler("sban", sban_cmd, filters=admin_filter))
     app.add_handler(CommandHandler("unmute", unmute_cmd, filters=admin_filter))
     app.add_handler(CommandHandler("clean_pending", clean_pending_cmd, filters=admin_filter))
@@ -124,7 +125,6 @@ def add_handlers(app: Application):
     app.add_handler(CommandHandler("mute", mute_cmd, filters=admin_filter | community_filter))
 
     # MessageHandler
-    app.add_handler(MessageHandler(filters.REPLY & admin_filter & filters.Regex(r"^/ban$"), ban_cmd))
     app.add_handler(MessageHandler(filters.REPLY & admin_filter & filters.Regex(r"^/reply"), reply_cmd))
     app.add_handler(MessageHandler(filters.REPLY & admin_filter & filters.Regex(r"^/autoreply"), autoreply_cmd))
 
