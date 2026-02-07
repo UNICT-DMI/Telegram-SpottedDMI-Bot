@@ -1,13 +1,13 @@
 /*Used to instantiate the database the first time*/
-CREATE TABLE IF NOT EXISTS pending_post
+CREATE TABLE IF NOT EXISTS admin_votes
 (
-  user_id BIGINT NOT NULL,
-  u_message_id BIGINT NOT NULL,
+  admin_id BIGINT NOT NULL,
   g_message_id BIGINT NOT NULL,
   admin_group_id BIGINT NOT NULL,
+  is_upvote boolean NOT NULL,
   credit_username VARCHAR(255) DEFAULT NULL,
   message_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (admin_group_id, g_message_id)
+  PRIMARY KEY (admin_id, g_message_id, admin_group_id)
 );
 -----
 CREATE TABLE IF NOT EXISTS published_post
@@ -16,16 +16,6 @@ CREATE TABLE IF NOT EXISTS published_post
   c_message_id BIGINT NOT NULL,
   message_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (channel_id, c_message_id)
-);
------
-CREATE TABLE IF NOT EXISTS admin_votes
-(
-  admin_id BIGINT NOT NULL,
-  g_message_id BIGINT NOT NULL,
-  admin_group_id BIGINT NOT NULL,
-  is_upvote boolean NOT NULL,
-  PRIMARY KEY (admin_id, g_message_id, admin_group_id),
-  FOREIGN KEY (g_message_id, admin_group_id) REFERENCES pending_post (g_message_id, admin_group_id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 -----
 CREATE TABLE IF NOT EXISTS credited_users

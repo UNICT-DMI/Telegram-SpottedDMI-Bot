@@ -5,7 +5,7 @@ import os
 
 import pytest
 
-from spotted.data import Config, DbManager
+from spotted.data import Config, DbManager, PendingPost
 
 
 @pytest.fixture(scope="class", autouse=True)
@@ -41,8 +41,9 @@ def create_test_db() -> DbManager:
 @pytest.fixture(scope="function")
 def test_table(create_test_db: DbManager) -> DbManager:
     """Called once per at the beginning of each function.
-    Resets the state of the database
+    Resets the state of the database and in-memory pending post store
     """
     create_test_db.query_from_file("config", "db", "post_db_del.sql")
     create_test_db.query_from_file("config", "db", "post_db_init.sql")
+    PendingPost._store.clear()
     return create_test_db

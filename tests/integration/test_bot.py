@@ -364,8 +364,8 @@ class TestBot:
             user2 = TGUser(2, first_name="User2", is_bot=False, username="user2")
             _ = await pending_post(telegram, user=user)
             g_message2 = await pending_post(telegram, user=user2)
-            test_table.update_from(
-                "pending_post", "message_date=%s", "g_message_id=%s", (datetime.fromtimestamp(1), g_message2.message_id)
+            PendingPost.from_group(g_message_id=g_message2.message_id, admin_group_id=admin_group.id).date = (
+                datetime.fromtimestamp(1)
             )
             await telegram.send_command("/clean_pending", chat=admin_group)
             assert (
