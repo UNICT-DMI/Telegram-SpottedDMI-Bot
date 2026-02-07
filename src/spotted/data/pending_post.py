@@ -25,6 +25,7 @@ class PendingPost:
     """
 
     _store: ClassVar[dict[_StoreKey, "PendingPost"]] = {}
+    _draining: ClassVar[bool] = False
 
     user_id: int
     u_message_id: int
@@ -32,6 +33,16 @@ class PendingPost:
     admin_group_id: int
     date: datetime
     credit_username: str | None = None
+
+    @classmethod
+    def is_draining(cls) -> bool:
+        """Returns whether the bot is in drain mode (shutting down)"""
+        return cls._draining
+
+    @classmethod
+    def start_drain(cls):
+        """Sets the drain flag, blocking new spot submissions"""
+        cls._draining = True
 
     @classmethod
     def create(

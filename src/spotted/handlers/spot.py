@@ -12,7 +12,7 @@ from telegram.ext import (
     filters,
 )
 
-from spotted.data import Config, User
+from spotted.data import Config, PendingPost, User
 from spotted.data.data_reader import read_md
 from spotted.utils import EventInfo, conv_cancel, get_confirm_kb, get_preview_kb
 
@@ -62,6 +62,10 @@ async def spot_cmd(update: Update, context: CallbackContext) -> int:
     user = User(info.user_id)
     if not info.is_private_chat:  # you can only post from a private chat
         await info.bot.send_message(chat_id=info.chat_id, text=CHAT_PRIVATE_ERROR)
+        return ConversationState.END.value
+
+    if PendingPost.is_draining():  # the bot is shutting down
+        await info.bot.send_message(chat_id=info.chat_id, text="Il bot si sta riavviando, riprova tra poco")
         return ConversationState.END.value
 
     if user.is_banned:  # the user is banned
