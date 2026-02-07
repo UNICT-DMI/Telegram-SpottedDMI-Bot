@@ -156,7 +156,7 @@ class TestConfig:
         config.reload()
         assert config.settings_get("post", "key2") == 2
         self.assert_config(config, exclude_keys=("post",))  # Other settings are unchanged
-        self.assert_config(config, base_key="post", exclude_keys=("key2"))  # Other settings in post are unchanged
+        self.assert_config(config, base_key="post", exclude_keys=("key2",))  # Other settings in post are unchanged
         del os.environ["post_key2"]
 
     def test_load_env_nested_debug_settings(self, config: Config):

@@ -29,7 +29,8 @@ from .follow_comment import follow_spot_comment
 from .follow_spot import follow_spot_callback
 from .forwarded_post import forwarded_post_msg
 from .help import help_cmd
-from .job_handlers import clean_pending_job, db_backup_job
+from .job_handlers import clean_muted_users, clean_pending_job, db_backup_job
+from .mute import mute_cmd
 from .purge import purge_cmd
 from .reload import reload_cmd
 from .reply import reply_cmd
@@ -40,6 +41,8 @@ from .sban import sban_cmd
 from .settings import settings_callback, settings_cmd
 from .spot import spot_conv_handler
 from .start import start_cmd
+from .unmute import unmute_cmd
+from .warn import warn_cmd
 
 
 async def add_commands(app: Application):
@@ -61,8 +64,11 @@ async def add_commands(app: Application):
         BotCommand("settings", "cambia le impostazioni di privacy"),
     ]
     admin_commands = [
-        BotCommand("ban", "banna un utente"),
-        BotCommand("sban", "banna un utente"),
+        BotCommand("ban", "rispondi ad uno spot o un report per bannare l'utente responsabile"),
+        BotCommand("sban", "sbanna un utente indicandone lo user_id o l'indice mostrato da /sban"),
+        BotCommand("mute", "rispondi ad un messaggio di un utente per mutarlo nel gruppo dei commenti"),
+        BotCommand("unmute", "smuta un utente indicandone lo user_id o l'indice mostrato da /unmute"),
+        BotCommand("warn", "rispondi ad uno spot, report o commento per segnalare l'utente responsabile"),
         BotCommand("reply", "rispondi ad uno spot o un report"),
         BotCommand("autoreply", "rispondi ad uno spot o un report con un messaggio automatico"),
         BotCommand("reload", "ricarica la configurazione del bot. Modificare gli handler richiede un riavvio"),
@@ -106,14 +112,19 @@ def add_handlers(app: Application):
     app.add_handler(CommandHandler("cancel", cancel_cmd, filters=filters.ChatType.PRIVATE))
 
     # Command handlers: Admin commands
+    app.add_handler(CommandHandler("ban", ban_cmd, filters=filters.REPLY & admin_filter))
     app.add_handler(CommandHandler("sban", sban_cmd, filters=admin_filter))
+    app.add_handler(CommandHandler("unmute", unmute_cmd, filters=admin_filter))
     app.add_handler(CommandHandler("clean_pending", clean_pending_cmd, filters=admin_filter))
     app.add_handler(CommandHandler("db_backup", db_backup_cmd, filters=admin_filter))
     app.add_handler(CommandHandler("purge", purge_cmd, filters=admin_filter))
     app.add_handler(CommandHandler("reload", reload_cmd, filters=admin_filter))
 
+    # Command handlers: Community-based commands
+    app.add_handler(CommandHandler("warn", warn_cmd, filters=admin_filter | community_filter))
+    app.add_handler(CommandHandler("mute", mute_cmd, filters=admin_filter | community_filter))
+
     # MessageHandler
-    app.add_handler(MessageHandler(filters.REPLY & admin_filter & filters.Regex(r"^/ban$"), ban_cmd))
     app.add_handler(MessageHandler(filters.REPLY & admin_filter & filters.Regex(r"^/reply"), reply_cmd))
     app.add_handler(MessageHandler(filters.REPLY & admin_filter & filters.Regex(r"^/autoreply"), autoreply_cmd))
 
@@ -156,3 +167,4 @@ def add_jobs(app: Application):
     """
     app.job_queue.run_daily(clean_pending_job, time=time(hour=5, tzinfo=utc))  # run each day at 05:00 utc
     app.job_queue.run_daily(db_backup_job, time=time(hour=5, tzinfo=utc))  # run each day at 05:00 utc
+    app.job_queue.run_daily(clean_muted_users, time=time(hour=5, tzinfo=utc))  # run each day at 05:00 utc

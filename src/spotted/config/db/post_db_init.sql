@@ -41,6 +41,22 @@ CREATE TABLE IF NOT EXISTS banned_users
   PRIMARY KEY (user_id)
 );
 -----
+CREATE TABLE IF NOT EXISTS warned_users
+(
+    user_id BIGINT NOT NULL,
+    warn_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    expire_date TIMESTAMP NOT NULL,
+    PRIMARY KEY (user_id, warn_date)
+);
+-----
+CREATE TABLE IF NOT EXISTS muted_users
+(
+    user_id BIGINT NOT NULL,
+    mute_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    expire_date TIMESTAMP NOT NULL,
+    PRIMARY KEY (user_id)
+);
+-----
 CREATE TABLE IF NOT EXISTS spot_report
 (
   user_id BIGINT NOT NULL,
@@ -71,3 +87,10 @@ CREATE TABLE IF NOT EXISTS user_follow
   follow_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (user_id, message_id)
 );
+-----
+CREATE TRIGGER IF NOT EXISTS drop_old_warns
+   BEFORE INSERT ON warned_users
+    FOR EACH ROW
+BEGIN
+DELETE FROM warned_users WHERE user_id=NEW.user_id and expire_date < DATETIME('now');
+END;

@@ -1,18 +1,19 @@
 """Users management"""
 
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import datetime, timedelta
 from random import choice
 
-from telegram import Bot
+from telegram import Bot, ChatPermissions
 
+from .config import Config
 from .data_reader import read_md
 from .db_manager import DbManager
 from .pending_post import PendingPost
 
 
 @dataclass()
-class User:
+class User:  # pylint: disable=too-many-public-methods
     """Class that represents a user
 
     Args:
@@ -25,6 +26,8 @@ class User:
     user_id: int
     private_message_id: int | None = None
     ban_date: datetime | None = None
+    mute_date: datetime | None = None
+    mute_expire_date: datetime | None = None
     follow_date: datetime | None = None
 
     @property
@@ -33,9 +36,19 @@ class User:
         return bool(PendingPost.from_user(self.user_id))
 
     @property
+    def is_warn_bannable(self) -> bool:
+        """If the user is bannable due to warns"""
+        return self.get_n_warns() >= Config.post_get("max_n_warns")
+
+    @property
     def is_banned(self) -> bool:
         """If the user is banned or not"""
         return DbManager.count_from(table_name="banned_users", where="user_id = %s", where_args=(self.user_id,)) > 0
+
+    @property
+    def is_muted(self) -> bool:
+        """If the user is muted or not"""
+        return DbManager.count_from(table_name="muted_users", where="user_id = %s", where_args=(self.user_id,)) > 0
 
     @property
     def is_credited(self) -> bool:
@@ -47,7 +60,19 @@ class User:
         """Returns a list of all the banned users"""
         return [
             cls(user_id=row["user_id"], ban_date=row["ban_date"])
-            for row in DbManager.select_from(table_name="banned_users", select="user_id, ban_date")
+            for row in DbManager.select_from(
+                table_name="banned_users", select="user_id, ban_date", order_by="ban_date DESC"
+            )
+        ]
+
+    @classmethod
+    def muted_users(cls) -> "list[User]":
+        """Returns a list of all the muted users"""
+        return [
+            cls(user_id=row["user_id"], mute_date=row["mute_date"], mute_expire_date=row["expire_date"])
+            for row in DbManager.select_from(
+                table_name="muted_users", select="user_id, mute_date, expire_date", order_by="mute_date DESC"
+            )
         ]
 
     @classmethod
@@ -79,6 +104,11 @@ class User:
             )
         ]
 
+    def get_n_warns(self) -> int:
+        """Returns the count of consecutive warns of the user"""
+        count = DbManager.count_from(table_name="warned_users", where="user_id = %s", where_args=(self.user_id,))
+        return count if count else 0
+
     def ban(self):
         """Adds the user to the banned list"""
 
@@ -93,8 +123,73 @@ class User:
         """
         if self.is_banned:
             DbManager.delete_from(table_name="banned_users", where="user_id = %s", where_args=(self.user_id,))
+            DbManager.delete_from(table_name="warned_users", where="user_id = %s", where_args=(self.user_id,))
             return True
         return False
+
+    async def mute(self, bot: Bot | None, days: int):
+        """Mute a user restricting its actions inside the community group
+
+        Args:
+            bot: the telegram bot
+            days(optional): The number of days the user should be muted for.
+        """
+        if bot is not None:
+            await bot.restrict_chat_member(
+                chat_id=Config.post_get("community_group_id"),
+                user_id=self.user_id,
+                permissions=ChatPermissions(
+                    can_send_messages=False,
+                    can_send_other_messages=False,
+                    can_add_web_page_previews=False,
+                ),
+            )
+        expiration_date = datetime.now() + timedelta(days=days)
+        DbManager.insert_into(
+            table_name="muted_users",
+            columns=("user_id", "expire_date"),
+            values=(self.user_id, expiration_date),
+        )
+
+    async def unmute(self, bot: Bot | None) -> bool:
+        """Unmute a user taking back all restrictions
+
+        Args:
+            bot : the telegram bot
+
+        Returns:
+            whether the user was muted before the unmute or not
+        """
+        # Just in case the user was manually muted by an admin,
+        # we try to unmute him anyway, even if he is not in the muted list of the bot
+        if bot is not None:
+            await bot.restrict_chat_member(
+                chat_id=Config.post_get("community_group_id"),
+                user_id=self.user_id,
+                permissions=ChatPermissions(
+                    can_send_messages=True,
+                    can_send_other_messages=True,
+                    can_add_web_page_previews=True,
+                ),
+            )
+
+        if not self.is_muted:
+            return False
+
+        DbManager.delete_from(table_name="muted_users", where="user_id = %s", where_args=(self.user_id,))
+        return True
+
+    def warn(self):
+        """Increase the number of warns of a user
+        If the number of warns is greater than the maximum allowed, the user is banned
+
+        Args:
+            bot: the telegram bot
+        """
+        valid_until_date = datetime.now() + timedelta(days=Config.post_get("warn_expiration_days"))
+        DbManager.insert_into(
+            table_name="warned_users", columns=("user_id", "expire_date"), values=(self.user_id, valid_until_date)
+        )
 
     def become_anonym(self) -> bool:
         """Removes the user from the credited list, if he was present

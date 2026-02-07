@@ -7,17 +7,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-- Show credit username during approval process
-- Ban users who post spam on the comment group
-
 ### Added
 
+- Show credit username during approval process
+- Ban users who post spam on the comment group
 - Show credit username during approval process
 - Database backup can use zip encryption with a key (see `crypto_key` in the _settings.yaml_ file)
 
 ### Fix
 
 - Avoid using redundant `base64` encoding/decoding for key storing
+- Make the **/ban** command usable again by defining it as a `CommandHandler` instead of a `MessageHandler` with regex filter
+
+### Changed
+
+- Avoid exposing the `user_id` of the banned users in the **/sban** command, showing only an index and the ban date instead
+- Allow the **/sban** command to accept both user IDs and indices of the banned users
 
 ## [3.1.0] - 2024-02-18
 
@@ -26,6 +31,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **/ban** command can now also be used on reports
 - The database backup periodically sent to the admin can now be encrypted with a key (see `crypto_key` in the _settings.yaml_ file)
 - Added utility script `f_crypto` to encrypt/decrypt files with a key or generate a new key
+- **/warn** command, the admins can now warn users based on abusive reports, irregular spotting and comments.
+- **/mute** command, it is now possible to remove comment permission for a specific user for a specific time.
+- **/unmute** command, it is now possible to restore comment permission to a muted user.
+- **Warn Auto-Scrubbing**, the database will automatically clear outdated warns using lazy ways.
 
 ### Fixed
 

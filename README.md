@@ -284,6 +284,9 @@ post:
   blacklist_messages: []
     # example: ["spam_word_1", "spam_word_2"]
     # the bot will delete any comment in the community chat that includes a word of the blacklist
+  max_n_warns: 3 # maximum number of warns a user can get before being banned
+  warn_expiration_days: 60 # number of days after which a single warn is removed from the database
+  mute_default_duration_days: 7 # duration of the mute in days
 
 token: xxxxxxxxxxxx # token of the telegram bot
 bot_tag: "@bot" # tag of the telegram bot

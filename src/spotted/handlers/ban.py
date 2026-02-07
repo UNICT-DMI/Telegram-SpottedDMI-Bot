@@ -3,7 +3,7 @@
 from telegram import Update
 from telegram.ext import CallbackContext
 
-from spotted.data import PendingPost, Report, User
+from spotted.data import Config, PendingPost, Report, User
 from spotted.utils import EventInfo
 
 
@@ -29,13 +29,23 @@ async def ban_cmd(update: Update, context: CallbackContext):
             chat_id=info.chat_id, text="Per bannare qualcuno, rispondi con /ban al suo post o report"
         )
         return
+    await execute_ban(user_id, info)
 
+
+async def execute_ban(user_id: int, info: EventInfo):
+    """Execute the ban of a user by his user_id
+
+    Args:
+        user_id: The user_id of the user to ban
+        info: The EventInfo object
+    """
     user = User(user_id)
+    receipt_chat_id = Config.post_get("admin_group_id")
     if user.is_banned:
-        await info.bot.send_message(chat_id=info.chat_id, text="L'utente è già bannato")
+        await info.bot.send_message(chat_id=receipt_chat_id, text="L'utente è già bannato")
         return
     user.ban()
-    await info.bot.send_message(chat_id=info.chat_id, text="L'utente è stato bannato")
+    await info.bot.send_message(chat_id=receipt_chat_id, text="L'utente è stato bannato")
     await info.bot.send_message(
         chat_id=user.user_id,
         text="Grazie per il tuo contributo alla community, a causa "
