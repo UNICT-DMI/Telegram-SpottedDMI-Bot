@@ -21,5 +21,6 @@ def get_user_by_id_or_index(user_id_or_idx: str, users_list: list[User]) -> User
         if 0 <= idx < len(users_list):
             return users_list[idx]
     elif user_id_or_idx.isdigit():
-        return User(int(user_id_or_idx))
+        matching_users = [user for user in users_list if user.user_id == int(user_id_or_idx)]
+        return matching_users[0] if matching_users else None
     return None
