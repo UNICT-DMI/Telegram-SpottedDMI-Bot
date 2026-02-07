@@ -7,22 +7,14 @@ This is the schema of the database used to store information about the spots and
 .. mermaid::
 
    erDiagram
-   "pending_post" {
-      user_id BIGINT
-      u_message_id BIGINT
-      g_message_id BIGINT PK
-      admin_group_id BIGINT PK
-      message_date TIMESTAMP
-   }
-
    "admin_votes" {
       admin_id BIGINT PK
       g_message_id BIGINT PK
       admin_group_id BIGINT PK
       is_upvote BOOLEAN
+      credit_username VARCHAR
+      message_date TIMESTAMP
    }
-
-   pending_post ||--o{ admin_votes : receives
 
    "published_post" {
       channel_id BIGINT PK

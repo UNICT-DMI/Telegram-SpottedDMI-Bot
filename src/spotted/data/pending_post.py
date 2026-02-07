@@ -18,7 +18,6 @@ _StoreKey: TypeAlias = tuple[int, int]
 @dataclass()
 class PendingPost:
     """Class that represents a pending post.
-    The user_id is stored separately from the post data to strengthen anonymity
 
     Args:
         u_message_id: id of the original message of the post

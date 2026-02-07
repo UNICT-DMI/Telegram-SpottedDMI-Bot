@@ -72,7 +72,7 @@ async def approve_yes_callback(update: Update, context: CallbackContext):
     """Handles the approve_yes callback.
     Add a positive vote to the post, updating the keyboard if necessary.
     If the number of positive votes is greater than the number of votes required, the post is approved,
-    deleting it from the pending_post table and copying it to the channel
+    deleting it from the pending posts and copying it to the channel
 
     Args:
         update: update event
@@ -112,7 +112,7 @@ async def approve_no_callback(update: Update, context: CallbackContext):
     """Handles the approve_no callback.
     Add a negative vote to the post, updating the keyboard if necessary.
     If the number of negative votes is greater than the number of votes required, the post is rejected,
-    deleting it from the pending_post table and notifying the user
+    deleting it from the pending posts and notifying the user
 
     Args:
         update: update event

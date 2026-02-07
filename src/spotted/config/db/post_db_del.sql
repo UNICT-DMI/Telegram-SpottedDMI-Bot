@@ -12,3 +12,5 @@ DROP TABLE IF EXISTS spot_report
 DROP TABLE IF EXISTS user_report
 -----
 DROP TABLE IF EXISTS user_follow
+-----
+DROP TABLE IF EXISTS pending_post
