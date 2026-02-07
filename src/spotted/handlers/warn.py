@@ -67,7 +67,7 @@ async def execute_warn(info: EventInfo, user_id: int, comment: str, from_communi
     )
     await info.bot.send_message(
         chat_id=Config.post_get("admin_group_id"),
-        text=f"L'utente {user_id} ha ricevuto il {n_warns}° warn\n" f"Motivo: {comment}",
+        text=f"L'utente ha ricevuto il {n_warns}° warn\n" f"Motivo: {comment}",
     )
     if user.is_warn_bannable:
         await execute_ban(user.user_id, info)

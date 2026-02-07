@@ -29,7 +29,7 @@ class TestExecuteBan:
         await execute_ban(user_id, mock_event_info)
 
         # Verify that the bot sent a message indicating the user is already banned
-        mock_bot.send_message.assert_called_once_with(chat_id=admin_group_id, text=f"L'utente {user_id} è già bannato")
+        mock_bot.send_message.assert_called_once_with(chat_id=admin_group_id, text="L'utente è già bannato")
 
     async def test_execute_ban_user_not_banned(self, test_table, mock_event_info: EventInfo, mock_bot: AsyncMock):
         """Tests execute_ban when the user is not yet banned.
@@ -55,7 +55,7 @@ class TestExecuteBan:
         # Check the first call - message to admin group
         first_call = mock_bot.send_message.call_args_list[0]
         assert first_call.kwargs["chat_id"] == admin_group_id
-        assert first_call.kwargs["text"] == f"L'utente {user_id} è stato bannato"
+        assert first_call.kwargs["text"] == "L'utente è stato bannato"
 
         # Check the second call - message to the banned user
         second_call = mock_bot.send_message.call_args_list[1]
@@ -106,7 +106,7 @@ class TestExecuteBan:
 
         # Assert that the admin group received the expected message
         assert admin_message_call is not None
-        assert admin_message_call.kwargs["text"] == f"L'utente {user_id} è stato bannato"
+        assert admin_message_call.kwargs["text"] == "L'utente è stato bannato"
 
     async def test_execute_ban_multiple_users(self, test_table, mock_event_info: EventInfo, mock_bot: AsyncMock):
         """Tests banning multiple users sequentially"""

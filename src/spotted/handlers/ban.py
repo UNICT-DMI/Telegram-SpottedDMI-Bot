@@ -42,10 +42,10 @@ async def execute_ban(user_id: int, info: EventInfo):
     user = User(user_id)
     receipt_chat_id = Config.post_get("admin_group_id")
     if user.is_banned:
-        await info.bot.send_message(chat_id=receipt_chat_id, text=f"L'utente {user_id} è già bannato")
+        await info.bot.send_message(chat_id=receipt_chat_id, text="L'utente è già bannato")
         return
     user.ban()
-    await info.bot.send_message(chat_id=receipt_chat_id, text=f"L'utente {user_id} è stato bannato")
+    await info.bot.send_message(chat_id=receipt_chat_id, text="L'utente è stato bannato")
     await info.bot.send_message(
         chat_id=user.user_id,
         text="Grazie per il tuo contributo alla community, a causa "
