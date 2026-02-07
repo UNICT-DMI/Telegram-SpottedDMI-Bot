@@ -18,6 +18,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Avoid using redundant `base64` encoding/decoding for key storing
 
+### Changed
+
+- Avoid exposing the `user_id` of the banned users in the **/sban** command, showing only an index and the ban date instead
+- Allow the **/sban** command to accept both user IDs and indices of the banned users
+
 ## [3.1.0] - 2024-02-18
 
 ### Added
