@@ -49,5 +49,5 @@ async def unmute_cmd(update: Update, context: CallbackContext):
             )
         except TelegramError:  # We don't really care if the user cannot be notified by the bot
             pass
-    errors = "\nI seguenti unmute sono falliti:\n" + ",".join(failed_unmute) if len(failed_unmute) > 0 else ""
+    errors = f"\nI seguenti unmute sono falliti:\n{'\n'.join(failed_unmute)}" if len(failed_unmute) > 0 else ""
     await info.bot.send_message(chat_id=info.chat_id, text=f"{num_unmuted} unmute eseguiti con successo.{errors}")

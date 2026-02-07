@@ -46,5 +46,5 @@ async def sban_cmd(update: Update, context: CallbackContext):
             )
         except TelegramError:  # We don't really care if the user cannot be notified by the bot
             pass
-    errors = "\nI seguenti sban sono falliti:\n" + ",".join(sban_fail) if sban_fail else ""
+    errors = f"\nI seguenti sban sono falliti:\n{'\n'.join(sban_fail)}" if sban_fail else ""
     await info.bot.send_message(chat_id=info.chat_id, text=f"{num_sban} sban eseguiti con successo.{errors}")
