@@ -6,6 +6,7 @@ debug:
   db_file: "spotted.sqlite3"
   crypto_key: ""
   zip_backup: false
+  drain_timeout: 300
 post:
   community_group_id: -1
   channel_id: -2
