@@ -12,7 +12,7 @@ from telegram.ext import (
     filters,
 )
 
-from spotted.data import Config, User
+from spotted.data import Config, TotpManager, User
 from spotted.data.data_reader import read_md
 from spotted.utils import EventInfo, conv_cancel, get_confirm_kb, get_preview_kb
 
@@ -25,6 +25,8 @@ def spot_conv_handler() -> ConversationHandler:
 
     - posting: submit the spot. Expects text, photo or many other formats
     - confirm: confirm or cancel the spot submission. Expects an inline query
+    - totp_setup: the user is setting up TOTP for the first time and must enter the code
+    - totp_verify: the user must enter their TOTP code
 
     Returns:
         conversation handler
@@ -40,6 +42,12 @@ def spot_conv_handler() -> ConversationHandler:
             ],
             ConversationState.POSTING_CONFIRM.value: [
                 CallbackQueryHandler(spot_confirm_query, pattern=r"^post_confirm,.+")
+            ],
+            ConversationState.TOTP_SETUP.value: [
+                MessageHandler(~filters.COMMAND & ~filters.UpdateType.EDITED_MESSAGE, spot_totp_verify),
+            ],
+            ConversationState.TOTP_VERIFY.value: [
+                MessageHandler(~filters.COMMAND & ~filters.UpdateType.EDITED_MESSAGE, spot_totp_verify),
             ],
         },
         fallbacks=[CommandHandler("cancel", conv_cancel("spot"))],
@@ -140,11 +148,59 @@ async def spot_preview_query(update: Update, context: CallbackContext) -> int:
     return ConversationState.POSTING_CONFIRM.value
 
 
+async def _send_totp_setup(info: EventInfo) -> int:
+    """Generates a new TOTP secret for the user and sends the QR code.
+
+    Args:
+        info: event info wrapper
+
+    Returns:
+        next state of the conversation (TOTP_SETUP)
+    """
+    _, qr_buffer = TotpManager.setup_user_totp(info.user_id)
+    await info.bot.send_photo(chat_id=info.chat_id, photo=qr_buffer, caption=read_md("totp_setup"))
+    return ConversationState.TOTP_SETUP.value
+
+
+async def _send_totp_prompt(info: EventInfo) -> int:
+    """Asks the user to enter their TOTP code.
+
+    Args:
+        info: event info wrapper
+
+    Returns:
+        next state of the conversation (TOTP_VERIFY)
+    """
+    await info.bot.send_message(chat_id=info.chat_id, text="Inserisci il codice TOTP dalla tua app di autenticazione")
+    return ConversationState.TOTP_VERIFY.value
+
+
+async def _submit_post(info: EventInfo) -> str:
+    """Submits the post to admins and returns the result text.
+
+    Args:
+        info: event info wrapper
+
+    Returns:
+        text message to send to the user
+    """
+    if User(info.user_id).is_pending:
+        return "Hai già un post in approvazione 🧐"
+    post_message = info.user_data.pop("totp_pending_message", None)
+    if await info.send_post_to_admins(post_message=post_message):
+        return (
+            "Il tuo post è in fase di valutazione\n"
+            f"Una volta pubblicato, lo potrai trovare su {Config.post_get('channel_tag')}"
+        )
+    return "Si è verificato un problema\nAssicurati che il tipo di post sia fra quelli consentiti"
+
+
 async def spot_confirm_query(update: Update, context: CallbackContext) -> int:
     """Handles the [ submit | cancel ] callback.
     Creates the bid or cancels its creation.
 
     - submit: saves the post as pending and sends it to the admins for them to check.
+      If TOTP is required, redirects to the TOTP verification flow first.
     - cancel: cancels the current spot conversation
 
     Args:
@@ -156,20 +212,65 @@ async def spot_confirm_query(update: Update, context: CallbackContext) -> int:
     """
     info = EventInfo.from_callback(update, context)
     arg = info.query_data.split(",")[1]
-    text = "Qualcosa è andato storto!"
-    if arg == "submit":  # if the the user wants to publish the post
-        if User(info.user_id).is_pending:  # there is already a spot in pending by this user
-            text = "Hai già un post in approvazione 🧐"
-        elif await info.send_post_to_admins():
-            text = (
-                "Il tuo post è in fase di valutazione\n"
-                f"Una volta pubblicato, lo potrai trovare su {Config.post_get('channel_tag')}"
+
+    if arg == "submit":
+        if TotpManager.user_needs_totp(info.user_id):
+            # store the original post message so it can be retrieved after TOTP verification.
+            # send_post_to_admins() accesses message.reply_to_message to get the post,
+            # but the TOTP code message won't have that reference.
+            info.user_data["totp_pending_message"] = info.message.reply_to_message
+            if TotpManager.has_totp(info.user_id):
+                # User already has TOTP set up, ask for verification
+                await info.bot.edit_message_text(
+                    chat_id=info.chat_id, message_id=info.message_id, text="Verifica TOTP richiesta"
+                )
+                return await _send_totp_prompt(info)
+            # user needs TOTP but hasn't set it up yet (mandatory mode)
+            await info.bot.edit_message_text(
+                chat_id=info.chat_id, message_id=info.message_id, text="Configurazione TOTP richiesta"
             )
-        else:
-            text = "Si è verificato un problema\nAssicurati che il tipo di post sia fra quelli consentiti"
+            return await _send_totp_setup(info)
 
-    elif arg == "cancel":  # if the the user changed his mind
+        text = await _submit_post(info)
+        await info.bot.edit_message_text(chat_id=info.chat_id, message_id=info.message_id, text=text)
+        return ConversationState.END.value
+
+    if arg == "cancel":
         text = choice(read_md("no_strings").split("\n"))
+        await info.bot.edit_message_text(chat_id=info.chat_id, message_id=info.message_id, text=text)
+        return ConversationState.END.value
 
-    await info.bot.edit_message_text(chat_id=info.chat_id, message_id=info.message_id, text=text)
+    await info.bot.edit_message_text(chat_id=info.chat_id, message_id=info.message_id, text="Qualcosa è andato storto!")
+    return ConversationState.END.value
+
+
+async def spot_totp_verify(update: Update, context: CallbackContext) -> int:
+    """Handles TOTP code verification during the spot flow.
+
+    Args:
+        update: update event
+        context: context passed by the handler
+
+    Returns:
+        next state of the conversation
+    """
+    info = EventInfo.from_message(update, context)
+    code = (info.text or "").strip()
+
+    if not code or not code.isdigit():
+        await info.bot.send_message(
+            chat_id=info.chat_id,
+            text="Il codice TOTP deve essere composto da 6 cifre. Riprova.\nPuoi annullare con /cancel",
+        )
+        return ConversationState.TOTP_VERIFY.value
+
+    if not TotpManager.verify(info.user_id, code):
+        await info.bot.send_message(
+            chat_id=info.chat_id,
+            text="Codice TOTP non valido. Riprova.\nPuoi annullare con /cancel",
+        )
+        return ConversationState.TOTP_VERIFY.value
+
+    text = await _submit_post(info)
+    await info.bot.send_message(chat_id=info.chat_id, text=text)
     return ConversationState.END.value

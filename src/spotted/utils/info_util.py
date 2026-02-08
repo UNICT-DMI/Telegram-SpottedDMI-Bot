@@ -324,13 +324,16 @@ class EventInfo:  # pylint: disable=too-many-public-methods
         except BadRequest as ex:
             logger.error("EventInfo.edit_inline_keyboard: %s", ex)
 
-    async def send_post_to_admins(self) -> bool:
+    async def send_post_to_admins(self, post_message: "Message | None" = None) -> bool:
         """Sends the post to the admin group, so it can be approved
+
+        Args:
+            post_message: optional message to use as the post. If None, uses reply_to_message.
 
         Returns:
             whether or not the operation was successful
         """
-        message = self.__message.reply_to_message
+        message = post_message if post_message is not None else self.__message.reply_to_message
         admin_group_id = Config.post_get("admin_group_id")
         poll = message.poll  # if the message is a poll, get its reference
 

@@ -9,6 +9,7 @@ from .pending_post import PendingPost
 from .post_data import PostData
 from .published_post import PublishedPost
 from .report import Report
+from .totp import TotpManager
 from .user import User
 
 

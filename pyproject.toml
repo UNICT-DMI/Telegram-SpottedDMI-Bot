@@ -38,10 +38,12 @@ classifiers = [
 dependencies = [
     "APScheduler==3.11.1",
     "cryptography==46.0.3",
+    "pyotp==2.9.0",
     "python-telegram-bot==22.5",
     "pytz==2025.2",
     "PyYAML==6.0.3",
     "pyzipper==0.3.6",
+    "qrcode[pil]==8.0",
 ]
 dynamic = ['version']
 

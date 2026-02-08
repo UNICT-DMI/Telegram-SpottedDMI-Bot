@@ -19,4 +19,6 @@ DROP TABLE IF EXISTS user_report
 -----
 DROP TABLE IF EXISTS user_follow
 -----
+DROP TABLE IF EXISTS totp_secrets
+-----
 DROP TRIGGER IF EXISTS drop_old_warns ON warned_users

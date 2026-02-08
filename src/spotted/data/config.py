@@ -28,6 +28,8 @@ SettingsPostKeys = Literal[
     "max_n_warns",
     "warn_expiration_days",
     "mute_default_duration_days",
+    "totp",
+    "mandatory_totp",
 ]
 SettingsKeysType = Literal[SettingsKeys, SettingsPostKeys, SettingsDebugKeys]
 AutorepliesKeysType = Literal["autoreplies"]

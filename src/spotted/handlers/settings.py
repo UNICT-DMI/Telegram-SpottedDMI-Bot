@@ -6,7 +6,8 @@ from telegram import Update
 from telegram.constants import ParseMode
 from telegram.ext import CallbackContext
 
-from spotted.data import User
+from spotted.data import TotpManager, User
+from spotted.data.data_reader import read_md
 from spotted.utils import EventInfo, get_settings_kb
 
 logger = logging.getLogger(__name__)
@@ -24,7 +25,7 @@ async def settings_cmd(update: Update, context: CallbackContext):
     await info.bot.send_message(
         chat_id=info.chat_id,
         text="***Come vuoi che sia il tuo post:***",
-        reply_markup=get_settings_kb(),
+        reply_markup=get_settings_kb(user_id=info.user_id),
         parse_mode=ParseMode.MARKDOWN_V2,
     )
 
@@ -58,6 +59,14 @@ async def settings_callback(update: Update, context: CallbackContext):
             else "ATTENZIONE:\nNon hai nessun username associato al tuo account telegram\n"
             "Se non lo aggiungi, non sarai creditato"
         )
+    elif action == "totp":
+        if TotpManager.has_totp(info.user_id):
+            text = "TOTP è già attivo sul tuo account"
+        else:
+            _, qr_buffer = TotpManager.setup_user_totp(info.user_id)
+            await info.bot.send_photo(chat_id=info.chat_id, photo=qr_buffer, caption=read_md("totp_setup"))
+            text = "TOTP attivato! D'ora in poi ti verrà chiesto il codice quando invii uno spot"
+
     else:
         logger.error("settings_callback: invalid arg '%s'", action)
         return

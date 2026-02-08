@@ -25,4 +25,6 @@ class ConversationState(Enum):
     REPORTING_USER = auto()  # the user is reporting a user
     REPORTING_USER_REASON = auto()  # the user reports a user and has to specify the reason
     SENDING_USER_REPORT = auto()  # the user has to confirm the report of a user
+    TOTP_SETUP = auto()  # the user is setting up TOTP for the first time
+    TOTP_VERIFY = auto()  # the user is verifying their TOTP code
     END = -1  # the conversation has ended
