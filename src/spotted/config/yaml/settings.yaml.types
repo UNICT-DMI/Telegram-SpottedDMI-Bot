@@ -23,5 +23,7 @@ post:
   max_n_warns: int
   warn_expiration_days: int
   mute_default_duration_days: int
+  totp: bool
+  mandatory_totp: bool
 token: str
 bot_tag: str

@@ -24,5 +24,7 @@ post:
   max_n_warns: 3
   warn_expiration_days: 60
   mute_default_duration_days: 7
+  totp: true
+  mandatory_totp: true
 token: ""
 bot_tag: "@bot_tag"

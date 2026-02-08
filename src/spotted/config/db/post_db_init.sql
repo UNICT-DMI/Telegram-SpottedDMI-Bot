@@ -88,6 +88,12 @@ CREATE TABLE IF NOT EXISTS user_follow
   PRIMARY KEY (user_id, message_id)
 );
 -----
+CREATE TABLE IF NOT EXISTS totp_secrets
+(
+  user_id BIGINT NOT NULL PRIMARY KEY,
+  secret VARCHAR(32) NOT NULL
+);
+-----
 CREATE TRIGGER IF NOT EXISTS drop_old_warns
    BEFORE INSERT ON warned_users
     FOR EACH ROW

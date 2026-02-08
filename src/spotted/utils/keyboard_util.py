@@ -5,7 +5,7 @@ from itertools import islice, zip_longest
 
 from telegram import Bot, InlineKeyboardButton, InlineKeyboardMarkup
 
-from spotted.data import Config, PendingPost
+from spotted.data import Config, PendingPost, TotpManager
 from spotted.utils.constants import APPROVED_KB, REJECTED_KB
 
 
@@ -41,20 +41,25 @@ def get_preview_kb() -> InlineKeyboardMarkup:
     )
 
 
-def get_settings_kb() -> InlineKeyboardMarkup:
+def get_settings_kb(user_id: int | None = None) -> InlineKeyboardMarkup:
     """Generates the InlineKeyboard to edit the settings
+
+    Args:
+        user_id: optional user id, used to show TOTP status when TOTP is optional
 
     Returns:
         new inline keyboard
     """
-    return InlineKeyboardMarkup(
+    keyboard = [
         [
-            [
-                InlineKeyboardButton(" Anonimo ", callback_data="settings,anonimo"),
-                InlineKeyboardButton(" Con credit ", callback_data="settings,credit"),
-            ]
+            InlineKeyboardButton(" Anonimo ", callback_data="settings,anonimo"),
+            InlineKeyboardButton(" Con credit ", callback_data="settings,credit"),
         ]
-    )
+    ]
+    if TotpManager.is_optional() and user_id is not None:
+        totp_status = "Attivo" if TotpManager.has_totp(user_id) else "Disattivo"
+        keyboard.append([InlineKeyboardButton(f"TOTP: {totp_status}", callback_data="settings,totp")])
+    return InlineKeyboardMarkup(keyboard)
 
 
 def get_approve_kb(
