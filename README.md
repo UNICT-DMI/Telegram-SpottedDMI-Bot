@@ -252,6 +252,9 @@ debug:
   log_file: "logs/spotted.log" # path to the log file, if local_log is enabled. Relative to the pwd
   log_error_file: "logs/spotted_error.log" # path to the error log file. Relative to the pwd
   db_file: "spotted.sqlite3" # path to the database file. Relative to the pwd
+  # id of the chat to which the bot will send the database backup periodically.
+  # If set to 0 (default), the backup won't be sent, effectively disabling the feature.
+  backup_chat_id: 0
   # key used to encrypt the database backup sent to the admin periodically.
   # Must be 32 bytes long and base64 encoded.
   # Use the `f_crypto` utility script to generate a new key or decrypt/encrypt the database.

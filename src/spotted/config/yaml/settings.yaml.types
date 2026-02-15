@@ -3,6 +3,8 @@ debug:
   reset_on_load: bool
   log_file: str
   log_error_file: str
+  db_file: str
+  backup_chat_id: int
   crypto_key: str
   zip_backup: bool
 post:

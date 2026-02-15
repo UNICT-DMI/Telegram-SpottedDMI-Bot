@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Ban users who post spam on the comment group
 - Show credit username during approval process
 - Database backup can use zip encryption with a key (see `crypto_key` in the _settings.yaml_ file)
+- New setting `backup_chat_id` to specify a chat where the database backup will be sent periodically, instead of sending it to the admin. Setting it to 0 will disable the backup
 
 ### Fix
 

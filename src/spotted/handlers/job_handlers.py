@@ -6,7 +6,7 @@ from datetime import datetime, timedelta, timezone
 
 import pyzipper
 from cryptography.fernet import Fernet
-from telegram.error import BadRequest, Forbidden
+from telegram.error import BadRequest, Forbidden, TelegramError
 from telegram.ext import CallbackContext
 
 from spotted.data import Config, DbManager, PendingPost, User
@@ -102,13 +102,17 @@ async def db_backup_job(context: CallbackContext):
         db_backup = get_zip_backup() if Config.debug_get("zip_backup") else get_backup()
 
         await context.bot.send_document(
-            chat_id=admin_group_id,
+            chat_id=Config.debug_get("backup_chat_id"),
             document=db_backup,
             filename="spotted.backup.zip" if Config.debug_get("zip_backup") else "spotted.backup.sqlite3",
             caption="✅ Backup effettuato con successo",
         )
+        if Config.debug_get("backup_chat_id") != admin_group_id:
+            await context.bot.send_message(chat_id=admin_group_id, text="✅ Backup effettuato con successo")
     except BinasciiError as ex:
         await context.bot.send_message(chat_id=admin_group_id, text=f"✖️ Impossibile effettuare il backup\n\n{ex}")
+    except TelegramError as ex:
+        await context.bot.send_message(chat_id=admin_group_id, text=f"✖️ Impossibile inviare il backup\n\n{ex}")
 
 
 async def clean_muted_users(context: CallbackContext):
