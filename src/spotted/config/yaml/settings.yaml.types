@@ -5,6 +5,7 @@ debug:
   log_error_file: str
   db_file: str
   backup_chat_id: int
+  backup_keep_pending: bool
   crypto_key: str
   zip_backup: bool
 post:

@@ -1,6 +1,8 @@
 """Scheduled jobs of the bot"""
 
 import io
+import shutil
+import sqlite3
 from binascii import Error as BinasciiError
 from datetime import datetime, timedelta, timezone
 
@@ -51,6 +53,34 @@ async def clean_pending_job(context: CallbackContext):
     )
 
 
+def get_updated_backup_path() -> str:
+    """Get the path of the database backup file, applying some transformations if needed.
+    If `backup_keep_pending` is set to `False`,
+    it creates a copy of the database file and drops the `pending_post` table from the copy,
+    so the backup won't contain any pending post.
+
+    Returns:
+        path of the database backup file
+    """
+    db_path = Config.debug_get("db_file")
+    if Config.debug_get("backup_keep_pending"):
+        return db_path
+    # If we need to apply some transformations to the backup,
+    # we create a copy of the database file and apply the transformations to the copy,
+    # so we don't modify the original file
+    # This may be simplified once we switch to python 3.11,
+    # as the `sqlite3` module can read from a bytes stream
+    backup_path = db_path + ".backup"
+    shutil.copy(db_path, backup_path)
+    # 1. drop the pending_post table from the backup database
+    if not Config.debug_get("backup_keep_pending"):
+        with sqlite3.connect(backup_path, detect_types=sqlite3.PARSE_DECLTYPES) as conn:
+            cur = conn.cursor()
+            cur.execute("DROP TABLE IF EXISTS pending_post")
+            conn.commit()
+    return backup_path
+
+
 def get_zip_backup() -> bytes:
     """Zip the database file and return the bytes of the zip file,
     optionally encrypting it with a password if `crypto_key` is set in the settings.
@@ -59,7 +89,7 @@ def get_zip_backup() -> bytes:
     Returns:
         bytes of the (possibly encrypted) zip file
     """
-    db_path = Config.debug_get("db_file")
+    db_path = get_updated_backup_path()
     zip_stream = io.BytesIO()
     with pyzipper.AESZipFile(
         zip_stream,
@@ -82,7 +112,7 @@ def get_backup() -> bytes:
     Returns:
         bytes of the backup file, either encrypted or not
     """
-    path = Config.debug_get("db_file")
+    path = get_updated_backup_path()
     with open(path, "rb") as database_file:
         if Config.debug_get("crypto_key"):
             cipher = Fernet(Config.debug_get("crypto_key"))
