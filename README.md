@@ -255,6 +255,9 @@ debug:
   # id of the chat to which the bot will send the database backup periodically.
   # If set to 0 (default), the backup won't be sent, effectively disabling the feature.
   backup_chat_id: 0
+  # whether the backup should keep the pending_post table or not.
+  # If false, it will drop the pending_post table from the backup before sending it
+  backup_keep_pending: false
   # key used to encrypt the database backup sent to the admin periodically.
   # Must be 32 bytes long and base64 encoded.
   # Use the `f_crypto` utility script to generate a new key or decrypt/encrypt the database.
