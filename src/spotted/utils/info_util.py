@@ -415,8 +415,8 @@ class EventInfo:  # pylint: disable=too-many-public-methods
             self.bot_data[f"{channel_id},{c_message.message_id}"] = user_id
 
     async def send_post_to_channel_group(self):
-        """Sends the post to the group associated to the channel,
-        so that users can vote the post (if comments are enabled)
+        """If comments are enabled, sends the post to the group associated to the channel,
+        allowing the author to be credited and other users to report the spot or follow it.
         """
 
         message = self.__message

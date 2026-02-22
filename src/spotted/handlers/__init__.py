@@ -137,7 +137,12 @@ def add_handlers(app: Application):
     app.add_handler(CallbackQueryHandler(follow_spot_callback, pattern=r"^follow_\.*"))
 
     if Config.post_get("comments"):
-        app.add_handler(MessageHandler(community_filter & filters.IS_AUTOMATIC_FORWARD, forwarded_post_msg))
+        app.add_handler(
+            MessageHandler(
+                community_filter & filters.IS_AUTOMATIC_FORWARD & ~filters.UpdateType.EDITED,
+                forwarded_post_msg,
+            )
+        )
 
     if Config.post_get("delete_anonymous_comments"):
         app.add_handler(
