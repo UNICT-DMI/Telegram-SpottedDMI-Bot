@@ -20,6 +20,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Avoid using redundant `base64` encoding/decoding for key storing
 - Make the **/ban** command usable again by defining it as a `CommandHandler` instead of a `MessageHandler` with regex filter
+- Ignore edited posts in the channel when forwarded to the community group to avoid sending multiple messages in the same post thread
 
 ### Changed
 
