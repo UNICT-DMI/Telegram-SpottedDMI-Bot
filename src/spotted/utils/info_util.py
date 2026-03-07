@@ -72,7 +72,7 @@ class EventInfo:  # pylint: disable=too-many-public-methods
     @property
     def user_data(self) -> dict:
         """Data related to the user. Is not persistent between restarts"""
-        return self.__ctx.user_data
+        return self.__ctx.user_data if self.__ctx.user_data is not None else {}
 
     @property
     def chat_id(self) -> int | None:
