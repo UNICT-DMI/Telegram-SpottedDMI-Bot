@@ -43,6 +43,7 @@ class PendingPost:
         Returns:
             instance of the class
         """
+        assert user_message.from_user is not None
         user_id = user_message.from_user.id
         u_message_id = user_message.message_id
         date = datetime.now(tz=timezone.utc)

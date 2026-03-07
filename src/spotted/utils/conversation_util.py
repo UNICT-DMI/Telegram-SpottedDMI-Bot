@@ -46,6 +46,8 @@ def conv_fail(
         """
         info = event if isinstance(event, EventInfo) else EventInfo.from_message(*event)
         text = read_md(f"{family}_error_{fail_file}", **kwargs)
+        if info.chat_id is None:
+            return return_value
         await info.bot.send_message(chat_id=info.chat_id, text=text, parse_mode=ParseMode.MARKDOWN_V2)
         return return_value
 
@@ -76,6 +78,8 @@ def conv_cancel(family: str) -> Callable[[Any, Any], Coroutine[Any, Any, int]]:
         """
         info = EventInfo.from_message(update, context)
         text = read_md(f"{family}_cancel")
+        if info.chat_id is None:
+            return -1
         await info.bot.send_message(chat_id=info.chat_id, text=text, parse_mode=ParseMode.MARKDOWN_V2)
         return -1
 

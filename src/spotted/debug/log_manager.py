@@ -25,7 +25,9 @@ async def error_handler(update: Update, context: CallbackContext):
     """
     logger.error(msg="Exception while handling an update:", exc_info=context.error)
 
-    traceback_list = traceback.format_exception(None, context.error, context.error.__traceback__)
+    traceback_list = traceback.format_exception(
+        None, context.error, context.error.__traceback__ if context.error else None
+    )
     traceback_str = "".join(traceback_list)
 
     min_traceback_list = [line for line in traceback_list if "modules" in line]
@@ -90,9 +92,9 @@ async def log_message(update: Update, _: CallbackContext):
                 message = (
                     f"\n___ID MESSAGE:  {str(update.message.message_id)} ____\n"
                     "___INFO USER___\n"
-                    f"user_id:  {str(user.id)}\n"
-                    f"user_name:  {str(user.username)}\n"
-                    f"user_first_lastname: {str(user.first_name)} {str(user.last_name)}\n"
+                    f"user_id:  {str(user.id if user else 'N/A')}\n"
+                    f"user_name:  {str(user.username if user else 'N/A')}\n"
+                    f"user_first_lastname: {str(user.first_name if user else 'N/A')} {str(user.last_name if user else 'N/A')}\n"
                     "___INFO CHAT___\n"
                     f"chat_id:  {str(chat.id)}\n"
                     f"chat_type:  {str(chat.type)}\n"

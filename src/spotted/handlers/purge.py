@@ -35,7 +35,7 @@ async def purge_cmd(update: Update, context: CallbackContext):
                     message_id=published_post["c_message_id"],
                     disable_notification=True,
                 )
-                message.delete()
+                await message.delete()
             except Exception:  # pylint: disable=broad-except
                 lost_posts += 1
                 sleep(10)

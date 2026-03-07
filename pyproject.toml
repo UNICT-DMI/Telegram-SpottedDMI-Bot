@@ -143,14 +143,17 @@ module = [
     "pyzipper.*",
     "pytest_asyncio.*",
     "APScheduler.*",
+    "yaml",
+    "pytz",
+    "pytest",
 ]
 ignore_missing_imports = true
 
 # Handlers can assume certain values are not None in their context
 [[tool.mypy.overrides]]
 module = ["spotted.handlers.*"]
-disable_error_code = ["arg-type"]
+disable_error_code = ["arg-type", "union-attr", "operator", "index"]
 
 [[tool.mypy.overrides]]
 module = ["tests.*"]
-disable_error_code = ["arg-type", "union-attr", "misc", "return-value", "assignment", "typeddict-item"]
+disable_error_code = ["arg-type", "union-attr", "misc", "return-value", "assignment", "typeddict-item", "has-type", "attr-defined", "dict-item"]

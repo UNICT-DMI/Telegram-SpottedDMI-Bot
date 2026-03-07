@@ -1,6 +1,6 @@
 """Common info needed in both command and callback handlers"""
 
-from typing import cast
+from typing import Literal, cast
 
 from telegram import (
     Bot,
@@ -9,6 +9,7 @@ from telegram import (
     InlineKeyboardMarkup,
     LinkPreviewOptions,
     Message,
+    MessageId,
     MessageOriginChannel,
     MessageOriginChat,
     MessageOriginUser,
@@ -33,9 +34,9 @@ class EventInfo:  # pylint: disable=too-many-public-methods
         self,
         bot: Bot,
         ctx: CallbackContext,
-        update: Update = None,
-        message: Message = None,
-        query: CallbackQuery = None,
+        update: Update | None = None,
+        message: Message | None = None,
+        query: CallbackQuery | None = None,
     ):
         self.__bot = bot
         self.__ctx = ctx
@@ -66,7 +67,7 @@ class EventInfo:  # pylint: disable=too-many-public-methods
     @property
     def bot_data(self) -> dict:
         """Data related to the bot. Is not persistent between restarts"""
-        return self.__ctx.bot_data
+        return self.__ctx.bot_data or {}
 
     @property
     def user_data(self) -> dict:
@@ -232,26 +233,33 @@ class EventInfo:  # pylint: disable=too-many-public-methods
     @property
     def is_forward_from_channel(self) -> bool:
         """Whether the message has been forwarded from a channel"""
+        if self.__message is None:
+            return False
         return isinstance(self.__message.forward_origin, MessageOriginChannel)
 
     @property
     def is_forward_from_chat(self) -> bool:
         """Whether the message has been forwarded from a chat"""
+        if self.__message is None:
+            return False
         return isinstance(self.__message.forward_origin, MessageOriginChat)
 
     @property
     def is_forward_from_user(self) -> bool:
         """Whether the message has been forwarded from a user"""
+        if self.__message is None:
+            return False
         return isinstance(self.__message.forward_origin, MessageOriginUser)
 
     @property
     def is_forwarded_post(self) -> bool:
         """Whether the message is in fact a forwarded post from the channel to the group"""
         return (
-            self.chat_id == Config.post_get("community_group_id")
+            self.__message is not None
+            and self.chat_id == Config.post_get("community_group_id")
             and isinstance(self.__message.forward_origin, MessageOriginChannel)
             and self.__message.forward_origin.chat.id == Config.post_get("channel_id")
-            and self.__message.is_automatic_forward
+            and bool(self.__message.is_automatic_forward)
         )
 
     @classmethod
@@ -279,9 +287,10 @@ class EventInfo:  # pylint: disable=too-many-public-methods
         Returns:
             instance of the class
         """
-        return cls(
-            bot=ctx.bot, ctx=ctx, update=update, message=update.callback_query.message, query=update.callback_query
-        )
+        callback_query = update.callback_query
+        assert callback_query is not None
+        assert isinstance(callback_query.message, Message)
+        return cls(bot=ctx.bot, ctx=ctx, update=update, message=callback_query.message, query=callback_query)
 
     @classmethod
     def from_job(cls, ctx: CallbackContext) -> "EventInfo":
@@ -301,6 +310,8 @@ class EventInfo:  # pylint: disable=too-many-public-methods
         Args:
             text: Text to show to the user
         """
+        if self.query_id is None:
+            return
         try:
             await self.__bot.answer_callback_query(callback_query_id=self.query_id, text=text)
         except BadRequest as ex:
@@ -335,7 +346,11 @@ class EventInfo:  # pylint: disable=too-many-public-methods
         Returns:
             whether or not the operation was successful
         """
+        if self.__message is None:
+            return False
         message = self.__message.reply_to_message
+        if message is None:
+            return False
         admin_group_id = Config.post_get("admin_group_id")
         poll = message.poll  # if the message is a poll, get its reference
 
@@ -344,10 +359,12 @@ class EventInfo:  # pylint: disable=too-many-public-methods
         user = User(self.user_id)
         credit_username: str | None = None
         if user.is_credited:
+            assert self.chat_id is not None
             chat = await self.bot.get_chat(self.chat_id)
             if chat.username:
                 credit_username = chat.username
         try:
+            g_message: Message | MessageId
             if poll:  # makes sure the poll is anonym
                 g_message = await self.__bot.send_poll(
                     chat_id=admin_group_id,
@@ -355,7 +372,7 @@ class EventInfo:  # pylint: disable=too-many-public-methods
                     options=[option.text for option in poll.options],
                     type=poll.type,
                     allows_multiple_answers=poll.allows_multiple_answers,
-                    correct_option_id=poll.correct_option_id,
+                    correct_option_id=cast(Literal[0, 1, 2, 3, 4, 5, 6, 7, 8, 9] | None, poll.correct_option_id),
                     reply_markup=get_approve_kb(credited_username=credit_username),
                 )
             elif message.text and message.entities:  # maintains the previews, if present
@@ -391,6 +408,7 @@ class EventInfo:  # pylint: disable=too-many-public-methods
         """Sends the post to  the channel, so it can be enjoyed by the users (and voted, if comments are disabled)"""
 
         message = self.__message
+        assert message is not None
         channel_id = Config.post_get("channel_id")
         poll = message.poll  # if the message is a poll, get its reference
 
@@ -398,6 +416,7 @@ class EventInfo:  # pylint: disable=too-many-public-methods
         # ... append the voting Inline Keyboard, if comments are not to be supported
         if not Config.post_get("comments"):
             reply_markup = get_published_post_kb()
+        c_message: Message | MessageId
         if poll:  # makes sure the poll is anonym
             c_message = await self.__bot.send_poll(
                 chat_id=channel_id,
@@ -405,7 +424,7 @@ class EventInfo:  # pylint: disable=too-many-public-methods
                 options=[option.text for option in poll.options],
                 type=poll.type,
                 allows_multiple_answers=poll.allows_multiple_answers,
-                correct_option_id=poll.correct_option_id,
+                correct_option_id=cast(Literal[0, 1, 2, 3, 4, 5, 6, 7, 8, 9] | None, poll.correct_option_id),
                 reply_markup=reply_markup,
             )
         else:
@@ -427,6 +446,7 @@ class EventInfo:  # pylint: disable=too-many-public-methods
         """
 
         message = self.__message
+        assert message is not None
         community_group_id = Config.post_get("community_group_id")
         user_id = self.bot_data.pop(f"{self.forward_from_chat_id},{self.forward_from_id}", -1)
 

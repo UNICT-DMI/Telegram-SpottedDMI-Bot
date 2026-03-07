@@ -161,7 +161,7 @@ def get_published_post_kb() -> InlineKeyboardMarkup | None:
     Returns:
         new inline keyboard
     """
-    keyboard: list[InlineKeyboardButton] = []
+    keyboard: list[list[InlineKeyboardButton]] = []
     # the last button in the last row will be the report button
     report_button = InlineKeyboardButton("🚩 Report", callback_data="report_spot")
     follow_button = InlineKeyboardButton("👁 Follow", callback_data="follow_spot")

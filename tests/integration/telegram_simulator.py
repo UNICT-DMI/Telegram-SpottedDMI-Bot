@@ -3,7 +3,7 @@
 
 import warnings
 from datetime import datetime
-from typing import overload
+from typing import Any, overload
 
 from telegram import (
     CallbackQuery,
@@ -345,6 +345,7 @@ class TelegramSimulator:  # pylint: disable=too-many-public-methods
         Returns:
             update with the given message
         """
+        update_kwargs: dict[str, Any]
         if isinstance(event, Message):
             update_kwargs = {"message" if not edited else "edited_message": event}
         elif isinstance(event, CallbackQuery):
