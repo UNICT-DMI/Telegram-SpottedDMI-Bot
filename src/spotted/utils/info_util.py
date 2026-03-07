@@ -1,5 +1,7 @@
 """Common info needed in both command and callback handlers"""
 
+from typing import cast
+
 from telegram import (
     Bot,
     CallbackQuery,
@@ -72,21 +74,21 @@ class EventInfo:  # pylint: disable=too-many-public-methods
         return self.__ctx.user_data
 
     @property
-    def chat_id(self) -> int:
+    def chat_id(self) -> int | None:
         """Id of the chat where the event happened"""
         if self.__message is None:
             return None
         return self.__message.chat_id
 
     @property
-    def chat_type(self) -> str:
+    def chat_type(self) -> str | None:
         """Type of the chat where the event happened"""
         if self.__message is None:
             return None
         return self.__message.chat.type
 
     @property
-    def is_private_chat(self) -> bool:
+    def is_private_chat(self) -> bool | None:
         """Whether the chat is private or not"""
 
         if self.chat_type is None:
@@ -94,7 +96,7 @@ class EventInfo:  # pylint: disable=too-many-public-methods
         return self.chat_type == Chat.PRIVATE
 
     @property
-    def text(self) -> str:
+    def text(self) -> str | None:
         """Text of the message that caused the update"""
         if self.__message is None:
             return None
@@ -128,7 +130,7 @@ class EventInfo:  # pylint: disable=too-many-public-methods
         return []
 
     @property
-    def message_id(self) -> int:
+    def message_id(self) -> int | None:
         """Id of the message that caused the update"""
         if self.__message is None:
             return None
@@ -151,14 +153,14 @@ class EventInfo:  # pylint: disable=too-many-public-methods
         )
 
     @property
-    def reply_markup(self) -> InlineKeyboardMarkup:
+    def reply_markup(self) -> InlineKeyboardMarkup | None:
         """Reply_markup of the message that caused the update"""
         if self.__message is None:
             return None
         return self.__message.reply_markup
 
     @property
-    def user_id(self) -> int:
+    def user_id(self) -> int | None:
         """Id of the user that caused the update"""
         if self.__query is not None:
             return self.__query.from_user.id
@@ -167,7 +169,7 @@ class EventInfo:  # pylint: disable=too-many-public-methods
         return None
 
     @property
-    def user_username(self) -> str:
+    def user_username(self) -> str | None:
         """Username of the user that caused the update"""
         if self.__query is not None:
             return self.__query.from_user.username
@@ -176,7 +178,7 @@ class EventInfo:  # pylint: disable=too-many-public-methods
         return None
 
     @property
-    def user_name(self) -> str:
+    def user_name(self) -> str | None:
         """Name of the user that caused the update"""
         if self.__query is not None:
             return self.__query.from_user.name
@@ -185,28 +187,28 @@ class EventInfo:  # pylint: disable=too-many-public-methods
         return None
 
     @property
-    def inline_keyboard(self) -> InlineKeyboardMarkup:
+    def inline_keyboard(self) -> InlineKeyboardMarkup | None:
         """InlineKeyboard attached to the message"""
         if self.__message is None:
             return None
         return self.__message.reply_markup
 
     @property
-    def query_id(self) -> str:
+    def query_id(self) -> str | None:
         """Id of the query that caused the update"""
         if self.__query is None:
             return None
         return self.__query.id
 
     @property
-    def query_data(self) -> str:
+    def query_data(self) -> str | None:
         """Data associated with the query that caused the update"""
         if self.__query is None:
             return None
         return self.__query.data
 
     @property
-    def forward_from_id(self) -> int:
+    def forward_from_id(self) -> int | None:
         """Id of the original message that has been forwarded"""
         if self.__message is None:
             return None
@@ -215,7 +217,7 @@ class EventInfo:  # pylint: disable=too-many-public-methods
         return None
 
     @property
-    def forward_from_chat_id(self) -> int:
+    def forward_from_chat_id(self) -> int | None:
         """Id of the original chat the message has been forwarded from"""
         if self.__message is None:
             return None
@@ -293,7 +295,7 @@ class EventInfo:  # pylint: disable=too-many-public-methods
         """
         return cls(bot=ctx.bot, ctx=ctx)
 
-    async def answer_callback_query(self, text: str = None):
+    async def answer_callback_query(self, text: str | None = None):
         """Calls the answer_callback_query method of the bot class, while also handling the exception
 
         Args:
@@ -305,7 +307,10 @@ class EventInfo:  # pylint: disable=too-many-public-methods
             logger.warning("On answer_callback_query: %s", ex)
 
     async def edit_inline_keyboard(
-        self, chat_id: int = None, message_id: int = None, new_keyboard: InlineKeyboardMarkup = None
+        self,
+        chat_id: int | None = None,
+        message_id: int | None = None,
+        new_keyboard: InlineKeyboardMarkup | None = None,
     ):
         """Generic wrapper used to edit the inline keyboard of a message with the telegram bot,
         while also handling the exception
@@ -334,6 +339,8 @@ class EventInfo:  # pylint: disable=too-many-public-methods
         admin_group_id = Config.post_get("admin_group_id")
         poll = message.poll  # if the message is a poll, get its reference
 
+        if self.user_id is None:
+            return False
         user = User(self.user_id)
         credit_username: str | None = None
         if user.is_credited:
@@ -442,7 +449,9 @@ class EventInfo:  # pylint: disable=too-many-public-methods
             reason: reason for the rejection, currently used on autoreply
         """
         inline_keyboard = await get_post_outcome_kb(
-            bot=self.__bot, votes=pending_post.get_list_admin_votes(), reason=reason
+            bot=self.__bot,
+            votes=cast(list[tuple[int, bool]], pending_post.get_list_admin_votes(vote=None)),
+            reason=reason,
         )
 
         await self.__bot.edit_message_reply_markup(

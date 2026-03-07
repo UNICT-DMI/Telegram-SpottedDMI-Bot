@@ -53,9 +53,9 @@ class DbManager:
 
         try:
             if args:
-                query_func(query, args)
+                query_func(query, args)  # type: ignore[operator]
             else:
-                query_func(query)  # type: ignore
+                query_func(query)  # type: ignore[operator]
         except sqlite3.Error as ex:
             logger.error("DbManager.%s(): %s", error_str, ex)
 

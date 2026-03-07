@@ -83,6 +83,13 @@ async def report_user_msg(update: Update, context: CallbackContext) -> int:
         next state of the conversation
     """
     info = EventInfo.from_message(update, context)
+    if info.text is None:
+        await info.bot.send_message(
+            chat_id=info.chat_id,
+            text="Questo tipo di messaggio non è supportato\n"
+            "È consentito solo username telegram. Puoi annullare il processo con /cancel",
+        )
+        return ConversationState.REPORTING_USER.value
     reported_user = info.text.strip()
     if not info.is_valid_message_type or not reported_user.startswith("@") or " " in reported_user:
         await info.bot.send_message(

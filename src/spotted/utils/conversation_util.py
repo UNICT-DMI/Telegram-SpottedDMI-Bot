@@ -1,6 +1,7 @@
 """Common functions needed in conversation handlers"""
 
-from typing import Callable
+from collections.abc import Coroutine
+from typing import Any, Callable
 
 from telegram import Update
 from telegram.constants import ParseMode
@@ -12,7 +13,7 @@ from spotted.utils.info_util import EventInfo
 
 def conv_fail(
     family: str,
-) -> Callable[[tuple[Update, CallbackContext] | EventInfo, str, int | None], int | None]:
+) -> Callable[[tuple[Update, CallbackContext] | EventInfo, str, int | None], Coroutine[Any, Any, int | None]]:
     """Creates a function used to handle any error in the conversation
 
     Args:
@@ -51,7 +52,7 @@ def conv_fail(
     return fail
 
 
-def conv_cancel(family: str) -> Callable[[Update, CallbackContext], int]:
+def conv_cancel(family: str) -> Callable[[Any, Any], Coroutine[Any, Any, int]]:
     """Creates a function used to handle the /cancel command in the conversation.
     Invoking /cancel will exit the conversation immediately
 

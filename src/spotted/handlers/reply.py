@@ -24,7 +24,7 @@ async def reply_cmd(update: Update, context: CallbackContext):
             "seguito da ciò che gli si vuole dire",
         )
         return
-    ### build the reply text from the args
+    # Build the reply text from the args
     reply_text = " ".join(info.args)
     g_message_id = update.message.reply_to_message.message_id
     if (pending_post := PendingPost.from_group(admin_group_id=info.chat_id, g_message_id=g_message_id)) is not None:

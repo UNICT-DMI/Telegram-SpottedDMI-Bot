@@ -103,7 +103,8 @@ async def report_spot_msg(update: Update, context: CallbackContext) -> int:
     channel_id, target_message_id = context.user_data["current_post_reported"].split(",")
 
     await info.bot.forward_message(chat_id=chat_id, from_chat_id=channel_id, message_id=target_message_id)
-    admin_message = await info.bot.sendMessage(chat_id=chat_id, text="🚨🚨 SEGNALAZIONE 🚨🚨\n\n" + info.text)
+    report_text = info.text if info.text is not None else ""
+    admin_message = await info.bot.sendMessage(chat_id=chat_id, text="🚨🚨 SEGNALAZIONE 🚨🚨\n\n" + report_text)
     await info.bot.send_message(
         chat_id=info.chat_id, text="Gli admins verificheranno quanto accaduto. Grazie per la collaborazione!"
     )

@@ -1,4 +1,7 @@
-# pylint: disable=unused-argument,protected-access,no-value-for-parameter,missing-function-docstring,missing-class-docstring,too-few-public-methods,too-many-arguments,too-many-locals,too-many-branches,too-many-statements,too-many-instance-attributes,too-many-public-methods,too-many-lines,too-many-nested-blocks,too-many-boolean-expressions,too-many-ancestors,too-many-function-args,too-many-locals,too-many-arguments,too-many-branches,too-many-statements,too-many-instance-attributes,too-many-public-methods,too-many-lines,too-many-nested-blocks,too-many-boolean-expressions,too-many-ancestors,too-many-function-args
+# pylint: disable=unused-argument,protected-access,no-value-for-parameter,missing-function-docstring
+# pylint: disable=missing-class-docstring,too-few-public-methods,too-many-arguments,too-many-locals
+# pylint: disable=too-many-branches,too-many-statements,too-many-instance-attributes,too-many-public-methods
+# pylint: disable=too-many-lines,too-many-nested-blocks,too-many-boolean-expressions,too-many-ancestors
 """TelegramApi class"""
 
 from datetime import datetime
@@ -82,40 +85,39 @@ class TelegramApi:
         return cls.__current_id
 
     def post(self, endpoint: str, data: dict) -> dict | bool | None:
-        if endpoint == "getMe":
-            return self.__get_me()
-        if endpoint == "sendMessage":
-            return self.__send_message(data)
-        if endpoint == "editMessageText":
-            return self.__edit_message(data)
-        if endpoint == "editMessageReplyMarkup":
-            return self.__edit_message(data)
-        if endpoint == "deleteMessage":
-            return self.__delete_message(data)
-        if endpoint == "copyMessage":
-            return self.__copy_message(data)
-        if endpoint == "answerCallbackQuery":
-            return True
-        if endpoint == "getChat":
-            return self.__chats.get(
-                data["chat_id"],
-                ChatFullInfo(
-                    id=data["chat_id"],
-                    username=f"@{data['chat_id']}",
-                    first_name=str(data["chat_id"]),
-                    type=Chat.PRIVATE,
-                    accent_color_id=1,
-                    max_reaction_count=1,
-                    accepted_gift_types=AcceptedGiftTypes(False, False, False, False),
-                ),
-            ).to_dict()
-        if endpoint == "forwardMessage":
-            return self.__forward_message(data)
-        if endpoint == "banChatMember":
-            return self.__ban_chat_member(data)
-        if endpoint == "restrictChatMember":
-            return True
+        # Dispatch table mapping endpoints to handler methods
+        endpoint_handlers = {
+            "getMe": lambda: self.__get_me(),
+            "sendMessage": lambda: self.__send_message(data),
+            "editMessageText": lambda: self.__edit_message(data),
+            "editMessageReplyMarkup": lambda: self.__edit_message(data),
+            "deleteMessage": lambda: self.__delete_message(data),
+            "copyMessage": lambda: self.__copy_message(data),
+            "answerCallbackQuery": lambda: True,
+            "getChat": lambda: self.__get_chat(data),
+            "forwardMessage": lambda: self.__forward_message(data),
+            "banChatMember": lambda: self.__ban_chat_member(data),
+            "restrictChatMember": lambda: True,
+        }
+
+        if endpoint in endpoint_handlers:
+            return endpoint_handlers[endpoint]()
         raise NotImplementedError(f"Endpoint {endpoint} not implemented")
+
+    def __get_chat(self, data: dict) -> dict:
+        """Get chat information or return a default ChatFullInfo"""
+        return self.__chats.get(
+            data["chat_id"],
+            ChatFullInfo(
+                id=data["chat_id"],
+                username=f"@{data['chat_id']}",
+                first_name=str(data["chat_id"]),
+                type=Chat.PRIVATE,
+                accent_color_id=1,
+                max_reaction_count=1,
+                accepted_gift_types=AcceptedGiftTypes(False, False, False, False),
+            ),
+        ).to_dict()
 
     def __send_message(self, data: "MessageData") -> dict:
         reply_message = None

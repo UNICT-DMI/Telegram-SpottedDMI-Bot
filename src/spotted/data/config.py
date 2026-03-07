@@ -36,6 +36,8 @@ SettingsPostKeys = Literal[
     "max_n_warns",
     "warn_expiration_days",
     "mute_default_duration_days",
+    "autoreplies_per_page",
+    "reject_after_autoreply",
 ]
 SettingsKeysType = Literal[SettingsKeys, SettingsPostKeys, SettingsDebugKeys]
 AutorepliesKeysType = Literal["autoreplies"]
@@ -46,8 +48,8 @@ logger = logging.getLogger(__name__)
 class Config:
     """Configurations"""
 
-    DEFAULT_SETTINGS_PATH = os.path.join(resources.files("spotted"), "config", "yaml", "settings.yaml")
-    DEFAULT_AUTOREPLIES_PATH = os.path.join(resources.files("spotted"), "config", "yaml", "autoreplies.yaml")
+    DEFAULT_SETTINGS_PATH = str(resources.files("spotted") / "config" / "yaml" / "settings.yaml")
+    DEFAULT_AUTOREPLIES_PATH = str(resources.files("spotted") / "config" / "yaml" / "autoreplies.yaml")
     __instance: "Config | None" = None
 
     SETTINGS_PATH = "settings.yaml"
@@ -219,7 +221,7 @@ class Config:
         Returns:
             configuration dictionary
         """
-        conf = {}
+        conf: dict[str, Any] = {}
         if os.path.exists(path):
             with open(path, "r", encoding="utf-8") as conf_file:
                 conf = cls.__merge_settings(conf, yaml.load(conf_file, Loader=yaml.SafeLoader))
@@ -242,7 +244,9 @@ class Config:
                         new_vars[match.group(1).lower()] = match.group(2)
 
         for key in os.environ:
-            new_vars[key.lower()] = os.getenv(key)
+            env_val = os.getenv(key)
+            if env_val is not None:
+                new_vars[key.lower()] = env_val
 
         for key, value in new_vars.items():
             if key.startswith("post_"):

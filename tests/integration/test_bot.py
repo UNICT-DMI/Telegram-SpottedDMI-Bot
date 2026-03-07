@@ -233,8 +233,8 @@ class TestBot:
             """
             await telegram.send_command("/ban", chat=admin_group, reply_to_message=pending_post)
             assert (
-                telegram.last_message.text
-                == "Grazie per il tuo contributo alla community, a causa di un tuo comportamento inadeguato sei stato bannato da Spotted DMI. Alla prossima!"
+                telegram.last_message.text == "Grazie per il tuo contributo alla community, a causa di un tuo "
+                "comportamento inadeguato sei stato bannato da Spotted DMI. Alla prossima!"
             )
             assert PendingPost.from_group(pending_post.message_id, pending_post.chat_id) is None
             assert User(1).is_banned

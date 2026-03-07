@@ -141,13 +141,21 @@ class PendingPost:
         pending_posts = []
         for post in pending_posts_id:
             g_message_id = int(post["g_message_id"])
-            pending_posts.append(PendingPost.from_group(admin_group_id=admin_group_id, g_message_id=g_message_id))
+            pending_post = PendingPost.from_group(admin_group_id=admin_group_id, g_message_id=g_message_id)
+            if pending_post is not None:
+                pending_posts.append(pending_post)
         return pending_posts
 
     def save_post(self) -> "PendingPost":
         """Saves the pending_post in the database"""
-        columns = ("user_id", "u_message_id", "g_message_id", "admin_group_id", "message_date")
-        values = (self.user_id, self.u_message_id, self.g_message_id, self.admin_group_id, self.date)
+        columns: tuple[str, ...] = ("user_id", "u_message_id", "g_message_id", "admin_group_id", "message_date")
+        values: tuple[int | datetime | str, ...] = (
+            self.user_id,
+            self.u_message_id,
+            self.g_message_id,
+            self.admin_group_id,
+            self.date,
+        )
         if self.credit_username is not None:
             columns += ("credit_username",)
             values += (self.credit_username,)
@@ -192,7 +200,7 @@ class PendingPost:
         """
 
         where = "g_message_id = %s and admin_group_id = %s"
-        where_args = (self.g_message_id, self.admin_group_id)
+        where_args: tuple[int | bool, ...] = (self.g_message_id, self.admin_group_id)
 
         if vote is not None:
             where += " and is_upvote = %s"

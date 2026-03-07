@@ -1,5 +1,5 @@
 import argparse
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, cast
 
 from spotted.data import Config, DbManager
 
@@ -25,7 +25,7 @@ def parse_args() -> "RunSQLArgs":
         help="Path to the SQL file. Multiple queries must be separated by a ';'",
     )
     parser.add_argument("db_file", type=str, help="Path to the database file")
-    return parser.parse_args()
+    return cast("RunSQLArgs", parser.parse_args())
 
 
 def main():

@@ -25,10 +25,10 @@ class Report:
     user_id: int
     admin_group_id: int
     g_message_id: int
-    channel_id: int = None
-    c_message_id: int = None
-    target_username: str = None
-    date: datetime = None
+    channel_id: int | None = None
+    c_message_id: int | None = None
+    target_username: str | None = None
+    date: datetime | None = None
 
     @property
     def minutes_passed(self) -> float:
