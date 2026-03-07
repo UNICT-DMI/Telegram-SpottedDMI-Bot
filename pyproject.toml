@@ -139,6 +139,7 @@ namespace_packages = true
 module = [
     "telegram.*",
     "telegram_api",
+    "telegram_simulator",
     "pyzipper.*",
     "pytest_asyncio.*",
     "APScheduler.*",
@@ -149,3 +150,7 @@ ignore_missing_imports = true
 [[tool.mypy.overrides]]
 module = ["spotted.handlers.*"]
 disable_error_code = ["arg-type"]
+
+[[tool.mypy.overrides]]
+module = ["tests.*"]
+disable_error_code = ["arg-type", "union-attr", "misc", "return-value", "assignment", "typeddict-item"]

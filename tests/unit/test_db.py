@@ -20,9 +20,7 @@ def db_results(create_test_db: DbManager) -> dict:
     # Save the original row_factory
     original_row_factory = create_test_db.row_factory
 
-    create_test_db.row_factory = lambda cursor, row: (
-        list(row) if cursor.description[0][0] != "number" else {"number": row[0]}
-    )
+    create_test_db.row_factory = lambda cursor, row: (list(row) if cursor.description[0][0] != "number" else {"number": row[0]})  # type: ignore[method-assign,assignment,return-value]
     create_test_db.query_from_file("config/db/db_test.sql")
 
     with open("tests/unit/db_results.yaml", "r", encoding="utf-8") as yaml_config:
@@ -33,7 +31,7 @@ def db_results(create_test_db: DbManager) -> dict:
     create_test_db.query_from_string("DROP TABLE IF EXISTS test_table;")
 
     # Restore the original row_factory
-    create_test_db.row_factory = original_row_factory
+    create_test_db.row_factory = original_row_factory  # type: ignore[method-assign]
 
 
 class TestDB:

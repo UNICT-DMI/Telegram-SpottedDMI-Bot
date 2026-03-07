@@ -600,7 +600,9 @@ class TestBot:
             await telegram.send_command("/spot")
             assert telegram.last_message.text == "Hai già un post in approvazione 🧐"
 
-            PendingPost.from_user(1).delete_post()
+            pending_post = PendingPost.from_user(1)
+            if pending_post:
+                pending_post.delete_post()
             await telegram.send_command("/spot")
             assert telegram.last_message.text == "Invia il post che vuoi pubblicare"
 
