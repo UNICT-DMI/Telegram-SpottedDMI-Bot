@@ -1,6 +1,5 @@
 """Read data from files"""
 
-import os
 from importlib import resources
 
 from telegram.helpers import escape_markdown
@@ -17,7 +16,11 @@ def get_abs_path(*root_file_path: str) -> str:
     Returns:
         corresponding abs path
     """
-    return os.path.join(resources.files("spotted"), *root_file_path)
+    base_path = resources.files("spotted")
+    result_path = base_path
+    for part in root_file_path:
+        result_path = result_path / part
+    return str(result_path)
 
 
 def read_file(*root_file_path: str) -> str:

@@ -58,7 +58,7 @@ def get_settings_kb() -> InlineKeyboardMarkup:
 
 
 def get_approve_kb(
-    pending_post: PendingPost = None, approve: int = -1, reject: int = -1, credited_username: str | None = None
+    pending_post: PendingPost | None = None, approve: int = -1, reject: int = -1, credited_username: str | None = None
 ) -> InlineKeyboardMarkup:
     """Generates the InlineKeyboard for the pending post.
     If the pending post is None, the keyboard will be generated with 0 votes.
@@ -161,7 +161,7 @@ def get_published_post_kb() -> InlineKeyboardMarkup | None:
     Returns:
         new inline keyboard
     """
-    keyboard: list[InlineKeyboardButton] = []
+    keyboard: list[list[InlineKeyboardButton]] = []
     # the last button in the last row will be the report button
     report_button = InlineKeyboardButton("🚩 Report", callback_data="report_spot")
     follow_button = InlineKeyboardButton("👁 Follow", callback_data="follow_spot")

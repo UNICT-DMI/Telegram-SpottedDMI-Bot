@@ -129,8 +129,11 @@ async def spot_preview_query(update: Update, context: CallbackContext) -> int:
         next state of the conversation
     """
     info = EventInfo.from_callback(update, context)
+    if info.query_data is None:
+        return ConversationState.END.value
     arg = info.query_data.split(",")[1]
-    info.user_data["show_preview"] = arg == "accept"
+    if info.user_data is not None:
+        info.user_data["show_preview"] = arg == "accept"
     await info.bot.edit_message_text(
         chat_id=info.chat_id,
         message_id=info.message_id,
@@ -155,6 +158,8 @@ async def spot_confirm_query(update: Update, context: CallbackContext) -> int:
         next state of the conversation
     """
     info = EventInfo.from_callback(update, context)
+    if info.query_data is None:
+        return ConversationState.END.value
     arg = info.query_data.split(",")[1]
     text = "Qualcosa è andato storto!"
     if arg == "submit":  # if the the user wants to publish the post

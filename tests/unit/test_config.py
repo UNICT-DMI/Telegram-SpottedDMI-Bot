@@ -58,12 +58,12 @@ def config() -> Config:
 class TestConfig:
     """Test the Config class"""
 
-    def assert_config(self, config: Config, base_key: str = None, exclude_keys: tuple = ()):
+    def assert_config(self, config: Config, base_key: str | None = None, exclude_keys: tuple = ()):
         """Tests the ability of the config object to load settings from a file"""
         settings_to_test = (
             TEST_SETTINGS if base_key is None or base_key not in TEST_SETTINGS else TEST_SETTINGS[base_key]
         )
-        for key, value in settings_to_test.items():
+        for key, value in settings_to_test.items():  # type: ignore[union-attr,attr-defined]
             if key not in exclude_keys:
                 if base_key is None:
                     assert config.settings_get(key) == value
@@ -77,7 +77,7 @@ class TestConfig:
 
     def test_load_nested_settings(self, config: Config):
         """Tests the ability of the config object to load settings from a file with nested properties"""
-        for key, value in TEST_SETTINGS["post"].items():
+        for key, value in TEST_SETTINGS["post"].items():  # type: ignore[union-attr,attr-defined]
             assert config.settings_get("post", key) == value
 
     def test_default_flat_settings(self, config: Config):

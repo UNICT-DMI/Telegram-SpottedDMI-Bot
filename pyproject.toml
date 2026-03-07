@@ -50,7 +50,7 @@ dynamic = ['version']
 # e.g. `pip install telegram-spotted-dmi-bot[test]`
 [project.optional-dependencies]
 test = ["pytest", "pytest-asyncio", "pytest-cov", "pytest-mock"]
-lint = ["pylint", "black", "isort"]
+lint = ["pylint", "black", "isort", "flake8", "mypy", "types-PyYAML"]
 
 # URLs of the project
 [project.urls]
@@ -107,6 +107,7 @@ disable = [
     "missing-module-docstring",
     "too-few-public-methods",
     "too-many-positional-arguments",
+    "line-too-long",
 ]
 
 [tool.pylint.format]
@@ -117,3 +118,42 @@ max-args = 7
 
 [tool.pylint.similarities]
 min-similarity-lines = 6
+
+# Mypy configuration (static type checker)
+[tool.mypy]
+python_version = "3.10"
+warn_return_any = false
+warn_unused_configs = true
+disallow_untyped_defs = false
+check_untyped_defs = true
+no_implicit_optional = true
+warn_redundant_casts = true
+warn_unused_ignores = false
+warn_no_return = true
+strict_equality = true
+explicit_package_bases = true
+mypy_path = "src"
+namespace_packages = true
+
+[[tool.mypy.overrides]]
+module = [
+    "telegram.*",
+    "telegram_api",
+    "telegram_simulator",
+    "pyzipper.*",
+    "pytest_asyncio.*",
+    "APScheduler.*",
+    "yaml",
+    "pytz",
+    "pytest",
+]
+ignore_missing_imports = true
+
+# Handlers can assume certain values are not None in their context
+[[tool.mypy.overrides]]
+module = ["spotted.handlers.*"]
+disable_error_code = ["arg-type", "union-attr", "operator", "index"]
+
+[[tool.mypy.overrides]]
+module = ["tests.*"]
+disable_error_code = ["arg-type", "union-attr", "misc", "return-value", "assignment", "typeddict-item", "has-type", "attr-defined", "dict-item"]

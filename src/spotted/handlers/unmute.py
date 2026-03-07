@@ -20,15 +20,13 @@ async def unmute_cmd(update: Update, context: CallbackContext):
     failed_unmute = []
     if context.args is None or len(context.args) == 0:  # if no args have been passed
         if len(User.muted_users()) == 0:
-            muted_users = "Nessuno"
+            muted_users_str = "Nessuno"
         else:
-            muted_users = "\n".join(
+            muted_users_str = "\n".join(
                 f"#{i} (Mute: {user.mute_date:%d/%m/%Y %H:%M} - Exp: {user.mute_expire_date:%d/%m/%Y %H:%M} )"
                 for i, user in enumerate(User.muted_users())
             )
-        text = (
-            f"[uso]: /unmute <user_id1|#idx> [...(user_id2|#idx)]\nGli utenti attualmente mutati sono:\n{muted_users}"
-        )
+        text = f"[uso]: /unmute <user_id1|#idx> [...(user_id2|#idx)]\nGli utenti attualmente mutati sono:\n{muted_users_str}"
         await info.bot.send_message(chat_id=info.chat_id, text=text)
         return
 

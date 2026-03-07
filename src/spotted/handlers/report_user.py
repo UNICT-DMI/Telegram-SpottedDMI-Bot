@@ -71,6 +71,16 @@ async def report_cmd(update: Update, context: CallbackContext) -> int:
     return ConversationState.REPORTING_USER.value
 
 
+async def _report_user_invalid_username(info: EventInfo) -> int:
+    """Sends the invalid username error message and returns the current state."""
+    await info.bot.send_message(
+        chat_id=info.chat_id,
+        text="Questo tipo di messaggio non è supportato\n"
+        "È consentito solo username telegram. Puoi annullare il processo con /cancel",
+    )
+    return ConversationState.REPORTING_USER.value
+
+
 async def report_user_msg(update: Update, context: CallbackContext) -> int:
     """Handles the reply to the /report command after sent the @username.
     Checks the the user wants to report, and goes to ask the reason
@@ -83,14 +93,11 @@ async def report_user_msg(update: Update, context: CallbackContext) -> int:
         next state of the conversation
     """
     info = EventInfo.from_message(update, context)
+    if info.text is None:
+        return await _report_user_invalid_username(info)
     reported_user = info.text.strip()
     if not info.is_valid_message_type or not reported_user.startswith("@") or " " in reported_user:
-        await info.bot.send_message(
-            chat_id=info.chat_id,
-            text="Questo tipo di messaggio non è supportato\n"
-            "È consentito solo username telegram. Puoi annullare il processo con /cancel",
-        )
-        return ConversationState.REPORTING_USER.value
+        return await _report_user_invalid_username(info)
 
     if context.user_data is None:
         return ConversationState.END.value

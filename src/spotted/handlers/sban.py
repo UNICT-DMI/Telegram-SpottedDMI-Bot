@@ -19,13 +19,11 @@ async def sban_cmd(update: Update, context: CallbackContext):
     info = EventInfo.from_message(update, context)
     sban_fail = []
     if context.args is None or len(context.args) == 0:  # if no args have been passed
-        banned_users = "\n".join(
+        banned_users_str = "\n".join(
             f"#{idx} ({user.ban_date:%d/%m/%Y %H:%M})" for idx, user in enumerate(User.banned_users())
         )
-        banned_users = "Nessuno" if len(banned_users) == 0 else f"{banned_users}"
-        text = (
-            f"[uso]: /sban <user_id1|#idx> [...(user_id2|#idx)]\nGli utenti attualmente bannati sono:\n{banned_users}"
-        )
+        banned_users_str = "Nessuno" if len(banned_users_str) == 0 else f"{banned_users_str}"
+        text = f"[uso]: /sban <user_id1|#idx> [...(user_id2|#idx)]\nGli utenti attualmente bannati sono:\n{banned_users_str}"
         await info.bot.send_message(chat_id=info.chat_id, text=text)
         return
 

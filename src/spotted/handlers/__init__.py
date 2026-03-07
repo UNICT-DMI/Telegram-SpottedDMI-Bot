@@ -170,6 +170,7 @@ def add_jobs(app: Application):
     Args:
         app: supplied application
     """
+    assert app.job_queue is not None
     app.job_queue.run_daily(clean_pending_job, time=time(hour=5, tzinfo=utc))  # run each day at 05:00 utc
     app.job_queue.run_daily(db_backup_job, time=time(hour=5, tzinfo=utc))  # run each day at 05:00 utc
     app.job_queue.run_daily(clean_muted_users, time=time(hour=5, tzinfo=utc))  # run each day at 05:00 utc

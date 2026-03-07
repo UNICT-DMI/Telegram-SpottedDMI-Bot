@@ -1,7 +1,7 @@
 """Main module"""
 
 import argparse
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, cast
 
 from spotted import run_bot
 from spotted.data import Config
@@ -30,7 +30,7 @@ def parse_args() -> "SpottedArgs":
     parser.add_argument("--version", action="version", version=__version__)
     parser.add_argument("-s", "--settings", help="Path to the settings file", default="settings.yaml")
     parser.add_argument("-a", "--autoreplies", help="Path to the autoreplies file", default="autoreplies.yaml")
-    return parser.parse_args()
+    return cast("SpottedArgs", parser.parse_args())
 
 
 def main():

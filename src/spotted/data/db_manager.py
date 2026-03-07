@@ -53,9 +53,9 @@ class DbManager:
 
         try:
             if args:
-                query_func(query, args)
+                query_func(query, args)  # type: ignore[operator,call-arg]
             else:
-                query_func(query)  # type: ignore
+                query_func(query)  # type: ignore[operator,call-arg]
         except sqlite3.Error as ex:
             logger.error("DbManager.%s(): %s", error_str, ex)
 
@@ -181,7 +181,7 @@ class DbManager:
         conn.commit()
         cur.close()
         conn.close()
-        return query_result[0]["number"] if len(query_result) > 0 else None
+        return query_result[0]["number"] if len(query_result) > 0 else 0
 
     @classmethod
     def insert_into(cls, table_name: str, values: tuple, columns: tuple | str = "", multiple_rows: bool = False):

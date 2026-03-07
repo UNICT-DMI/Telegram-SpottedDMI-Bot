@@ -1,6 +1,7 @@
 """Common functions needed in conversation handlers"""
 
-from typing import Callable
+from collections.abc import Coroutine
+from typing import Any, Callable
 
 from telegram import Update
 from telegram.constants import ParseMode
@@ -12,7 +13,7 @@ from spotted.utils.info_util import EventInfo
 
 def conv_fail(
     family: str,
-) -> Callable[[tuple[Update, CallbackContext] | EventInfo, str, int | None], int | None]:
+) -> Callable[[tuple[Update, CallbackContext] | EventInfo, str, int | None], Coroutine[Any, Any, int | None]]:
     """Creates a function used to handle any error in the conversation
 
     Args:
@@ -45,13 +46,15 @@ def conv_fail(
         """
         info = event if isinstance(event, EventInfo) else EventInfo.from_message(*event)
         text = read_md(f"{family}_error_{fail_file}", **kwargs)
+        if info.chat_id is None:
+            return return_value
         await info.bot.send_message(chat_id=info.chat_id, text=text, parse_mode=ParseMode.MARKDOWN_V2)
         return return_value
 
     return fail
 
 
-def conv_cancel(family: str) -> Callable[[Update, CallbackContext], int]:
+def conv_cancel(family: str) -> Callable[[Any, Any], Coroutine[Any, Any, int]]:
     """Creates a function used to handle the /cancel command in the conversation.
     Invoking /cancel will exit the conversation immediately
 
@@ -75,6 +78,8 @@ def conv_cancel(family: str) -> Callable[[Update, CallbackContext], int]:
         """
         info = EventInfo.from_message(update, context)
         text = read_md(f"{family}_cancel")
+        if info.chat_id is None:
+            return -1
         await info.bot.send_message(chat_id=info.chat_id, text=text, parse_mode=ParseMode.MARKDOWN_V2)
         return -1
 

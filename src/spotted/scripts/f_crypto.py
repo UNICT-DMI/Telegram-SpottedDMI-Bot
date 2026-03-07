@@ -1,5 +1,5 @@
 import argparse
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, cast
 
 from cryptography.fernet import Fernet
 
@@ -41,7 +41,7 @@ def parse_args() -> "DecryptArgs":
     # generate_key
     subparsers.add_parser("generate_key")
 
-    return parser.parse_args()
+    return cast("DecryptArgs", parser.parse_args())
 
 
 def main():
