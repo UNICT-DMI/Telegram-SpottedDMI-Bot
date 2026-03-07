@@ -70,9 +70,9 @@ class EventInfo:  # pylint: disable=too-many-public-methods
         return self.__ctx.bot_data if self.__ctx.bot_data is not None else {}
 
     @property
-    def user_data(self) -> dict:
+    def user_data(self) -> dict | None:
         """Data related to the user. Is not persistent between restarts"""
-        return self.__ctx.user_data if self.__ctx.user_data is not None else {}
+        return self.__ctx.user_data
 
     @property
     def chat_id(self) -> int | None:
@@ -376,7 +376,7 @@ class EventInfo:  # pylint: disable=too-many-public-methods
                     reply_markup=get_approve_kb(credited_username=credit_username),
                 )
             elif message.text and message.entities:  # maintains the previews, if present
-                show_preview = self.user_data.get("show_preview", True)
+                show_preview = (self.user_data or {}).get("show_preview", True)
                 g_message = await self.__bot.send_message(
                     chat_id=admin_group_id,
                     text=message.text,

@@ -132,7 +132,8 @@ async def spot_preview_query(update: Update, context: CallbackContext) -> int:
     if info.query_data is None:
         return ConversationState.END.value
     arg = info.query_data.split(",")[1]
-    info.user_data["show_preview"] = arg == "accept"
+    if info.user_data is not None:
+        info.user_data["show_preview"] = arg == "accept"
     await info.bot.edit_message_text(
         chat_id=info.chat_id,
         message_id=info.message_id,
