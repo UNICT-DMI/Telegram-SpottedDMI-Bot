@@ -107,6 +107,7 @@ disable = [
     "missing-module-docstring",
     "too-few-public-methods",
     "too-many-positional-arguments",
+    "line-too-long",
 ]
 
 [tool.pylint.format]
