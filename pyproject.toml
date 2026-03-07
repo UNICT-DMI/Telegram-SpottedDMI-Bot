@@ -50,7 +50,7 @@ dynamic = ['version']
 # e.g. `pip install telegram-spotted-dmi-bot[test]`
 [project.optional-dependencies]
 test = ["pytest", "pytest-asyncio", "pytest-cov", "pytest-mock"]
-lint = ["pylint", "black", "isort"]
+lint = ["pylint", "black", "isort", "flake8", "mypy"]
 
 # URLs of the project
 [project.urls]
