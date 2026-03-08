@@ -35,10 +35,20 @@ def tg_const_role(name, rawtext, text, lineno, inliner, options=None, content=No
     return [node], []
 
 
+def wiki_role(name, rawtext, text, lineno, inliner, options=None, content=None):
+    """Custom role for wiki (used in python-telegram-bot docstrings)"""
+    from docutils import nodes
+
+    # Create a reference node for wiki links
+    node = nodes.literal(rawtext, text, **options or {})
+    return [node], []
+
+
 def setup(app):
     """Setup function for Sphinx"""
     app.add_role("paramref", paramref_role)
     app.add_role("tg-const", tg_const_role)
+    app.add_role("wiki", wiki_role)
 
 
 # -- Project information -----------------------------------------------------
