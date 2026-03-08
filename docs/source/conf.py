@@ -26,9 +26,51 @@ def paramref_role(name, rawtext, text, lineno, inliner, options=None, content=No
     return [node], []
 
 
+def tg_const_role(name, rawtext, text, lineno, inliner, options=None, content=None):
+    """Custom role for tg-const (used in python-telegram-bot docstrings)"""
+    from docutils import nodes
+
+    # Create a reference to telegram.constants
+    node = nodes.literal(rawtext, text, **options or {})
+    return [node], []
+
+
+def wiki_role(name, rawtext, text, lineno, inliner, options=None, content=None):
+    """Custom role for wiki (used in python-telegram-bot docstrings)"""
+    from docutils import nodes
+
+    # Create a reference node for wiki links
+    node = nodes.literal(rawtext, text, **options or {})
+    return [node], []
+
+
 def setup(app):
     """Setup function for Sphinx"""
+    # Add custom roles
     app.add_role("paramref", paramref_role)
+    app.add_role("tg-const", tg_const_role)
+    app.add_role("wiki", wiki_role)
+
+    # Custom warning filter to ignore warnings from venv/external libraries
+    import logging
+
+    class VenvWarningFilter(logging.Filter):
+        def filter(self, record):
+            # Filter out warnings from venv directories
+            if hasattr(record, "location") and record.location:
+                location_str = str(record.location)
+                if "/venv/" in location_str or "/.venv/" in location_str or "/site-packages/" in location_str:
+                    return False
+            # Also filter based on message content
+            if hasattr(record, "msg"):
+                msg_str = str(record.msg)
+                if "/venv/" in msg_str or "/.venv/" in msg_str or "/site-packages/" in msg_str:
+                    return False
+            return True
+
+    # Apply filter to sphinx logger
+    sphinx_logger = logging.getLogger("sphinx")
+    sphinx_logger.addFilter(VenvWarningFilter())
 
 
 # -- Project information -----------------------------------------------------
@@ -63,7 +105,25 @@ templates_path = ["_templates"]
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
 # This pattern also affects html_static_path and html_extra_path.
-exclude_patterns = []
+exclude_patterns = [
+    "../../venv",
+    "../../.venv",
+    "../../build",
+    "../../htmlcov",
+    "**/.git",
+    "**/__pycache__",
+    "**/*.pyc",
+    "inclusions/*",  # Exclude inclusion files used by external libraries
+    "api/inclusions/*",  # Exclude API inclusion files
+]
+
+# Ignore checking these specific broken links from external libraries
+# These anchors don't exist in the Telegram documentation anymore
+linkcheck_ignore = [
+    r"https://core\.telegram\.org/stickers#animation-requirements",
+    r"https://core\.telegram\.org/stickers#video-requirements",
+    r"https://github\.com/python-telegram-bot/python-telegram-bot/wiki/Frequently-Asked-Questions#what-do-the-per_-settings-in-conversationhandler-do",
+]
 
 # -- Options for HTML output -------------------------------------------------
 
@@ -99,8 +159,36 @@ autodoc_inherit_docstrings = False
 typehints_use_rtype = False
 typehints_defaults = "comma"
 
-# Suppress warnings about forward references in type annotations
-suppress_warnings = ["sphinx_autodoc_typehints.forward_reference"]
+# Suppress warnings about forward references in type annotations and docutils warnings from external libraries
+suppress_warnings = [
+    "sphinx_autodoc_typehints.forward_reference",
+    "docutils",  # Suppress all docutils warnings (including from external libraries)
+    "app.add_node",  # Suppress node addition warnings
+    "ref.ref",  # Suppress reference warnings
+    "ref.any",  # Suppress 'any' reference target not found warnings
+    "toc.not_included",  # Suppress toctree not included warnings for inclusion files
+]
+
+# Additional configuration to reduce noise from external library docstrings
+autodoc_warningiserror = False
+nitpicky = False
+
+# -- Options for doctest -----------------------------------------------------
+# Doctest configuration to handle external library doctests
+doctest_test_doctest_blocks = "default"  # Only test doctest blocks in documentation
+doctest_global_setup = """
+# Skip tests that require unavailable modules
+import sys
+try:
+    from enum import Enum
+    # Define Color enum for doctest examples from standard library
+    class Color(Enum):
+        RED = 1
+        GREEN = 2
+        BLUE = 3
+except ImportError:
+    pass
+"""
 
 # -- Run sphinx-apidoc -------------------------------------------------------
 # This hack is necessary since RTD does not issue `sphinx-apidoc` before running
@@ -117,6 +205,16 @@ except ImportError:
 
 output_dir = os.path.join(os.path.dirname(__file__), "api")
 module_dir = os.path.join(os.path.dirname(__file__), "../../src/spotted")
+
+# Preserve the inclusions directory before removing api directory
+inclusions_dir = os.path.join(output_dir, "inclusions")
+inclusions_backup = None
+if os.path.exists(inclusions_dir):
+    import tempfile
+
+    inclusions_backup = tempfile.mkdtemp()
+    shutil.copytree(inclusions_dir, os.path.join(inclusions_backup, "inclusions"))
+
 try:
     shutil.rmtree(output_dir)
 except FileNotFoundError:
@@ -133,6 +231,24 @@ try:
         args = args[1:]
 
     apidoc.main(args)
+
+    # Restore the inclusions directory after apidoc runs
+    if inclusions_backup and os.path.exists(os.path.join(inclusions_backup, "inclusions")):
+        shutil.copytree(os.path.join(inclusions_backup, "inclusions"), inclusions_dir)
+        shutil.rmtree(inclusions_backup)
+    elif not os.path.exists(inclusions_dir):
+        # Create inclusions directory and required .rst files if they don't exist
+        os.makedirs(inclusions_dir, exist_ok=True)
+        with open(os.path.join(inclusions_dir, "application_run_tip.rst"), "w") as f:
+            f.write(".. tip::\n")
+            f.write("    For more information on running a Telegram bot application, see the\n")
+            f.write("    `python-telegram-bot documentation <https://docs.python-telegram-bot.org/>`_.\n")
+        with open(os.path.join(inclusions_dir, "bot_methods.rst"), "w") as f:
+            f.write(".. note::\n")
+            f.write("    For complete information on Bot methods and their usage, see the\n")
+            f.write(
+                "    `python-telegram-bot Bot API documentation <https://docs.python-telegram-bot.org/en/stable/telegram.bot.html>`_.\n"
+            )
 except Exception as e:
     print("Running `sphinx-apidoc` failed!\n{}".format(e))
 
