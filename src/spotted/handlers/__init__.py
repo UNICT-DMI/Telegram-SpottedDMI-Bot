@@ -86,7 +86,7 @@ def add_handlers(app: Application):
         app: supplied application
     """
     # Ignore the 'per_message' warning of the CallbackQueryHandler, since it's not a problem
-    # https://github.com/python-telegram-bot/python-telegram-bot/wiki/Frequently-Asked-Questions#what-do-the-per_-settings-in-conversationhandler-do
+    # https://github.com/python-telegram-bot/python-telegram-bot/wiki/Frequently-Asked-Questions
     filterwarnings(action="ignore", message=r".*CallbackQueryHandler", category=PTBUserWarning)
 
     if Config.settings_get("debug", "local_log"):  # add MessageHandler only if log_message is enabled
