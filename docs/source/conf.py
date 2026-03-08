@@ -94,10 +94,11 @@ exclude_patterns = [
 ]
 
 # Ignore checking these specific broken links from external libraries
-# These anchors don't exist in the Telegram stickers documentation anymore
+# These anchors don't exist in the Telegram documentation anymore
 linkcheck_ignore = [
     r"https://core\.telegram\.org/stickers#animation-requirements",
     r"https://core\.telegram\.org/stickers#video-requirements",
+    r"https://github\.com/python-telegram-bot/python-telegram-bot/wiki/Frequently-Asked-Questions#what-do-the-per_-settings-in-conversationhandler-do",
 ]
 
 # -- Options for HTML output -------------------------------------------------
