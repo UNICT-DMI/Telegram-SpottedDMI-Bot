@@ -16,6 +16,21 @@ import sys
 
 sys.path.insert(0, os.path.abspath("../.."))  # path to the actual project root folder
 
+
+# -- Custom roles ------------------------------------------------------------
+def paramref_role(name, rawtext, text, lineno, inliner, options=None, content=None):
+    """Custom role for paramref (used in python-telegram-bot docstrings)"""
+    from docutils import nodes
+
+    node = nodes.literal(rawtext, text, **options or {})
+    return [node], []
+
+
+def setup(app):
+    """Setup function for Sphinx"""
+    app.add_role("paramref", paramref_role)
+
+
 # -- Project information -----------------------------------------------------
 
 project = "Spotted dmi bot"
@@ -69,9 +84,23 @@ html_logo = "_static/img/spotted-logo.jpg"
 
 # -- Extension configuration -------------------------------------------------
 
+# -- Options for autodoc -----------------------------------------------------
+autodoc_default_options = {
+    "members": True,
+    "undoc-members": True,
+    "show-inheritance": True,
+    "imported-members": False,  # Don't document imported members like Application
+}
+
+# Skip documenting members that are imported from other modules
+autodoc_inherit_docstrings = False
+
 # -- Configuration of "sphinx_autodoc_typehints" -----------------------------
 typehints_use_rtype = False
 typehints_defaults = "comma"
+
+# Suppress warnings about forward references in type annotations
+suppress_warnings = ["sphinx_autodoc_typehints.forward_reference"]
 
 # -- Run sphinx-apidoc -------------------------------------------------------
 # This hack is necessary since RTD does not issue `sphinx-apidoc` before running
