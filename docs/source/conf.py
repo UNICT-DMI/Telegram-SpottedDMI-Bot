@@ -26,9 +26,19 @@ def paramref_role(name, rawtext, text, lineno, inliner, options=None, content=No
     return [node], []
 
 
+def tg_const_role(name, rawtext, text, lineno, inliner, options=None, content=None):
+    """Custom role for tg-const (used in python-telegram-bot docstrings)"""
+    from docutils import nodes
+
+    # Create a reference to telegram.constants
+    node = nodes.literal(rawtext, text, **options or {})
+    return [node], []
+
+
 def setup(app):
     """Setup function for Sphinx"""
     app.add_role("paramref", paramref_role)
+    app.add_role("tg-const", tg_const_role)
 
 
 # -- Project information -----------------------------------------------------
@@ -63,7 +73,15 @@ templates_path = ["_templates"]
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
 # This pattern also affects html_static_path and html_extra_path.
-exclude_patterns = []
+exclude_patterns = [
+    "../../venv",
+    "../../.venv",
+    "../../build",
+    "../../htmlcov",
+    "**/.git",
+    "**/__pycache__",
+    "**/*.pyc",
+]
 
 # -- Options for HTML output -------------------------------------------------
 
@@ -99,8 +117,16 @@ autodoc_inherit_docstrings = False
 typehints_use_rtype = False
 typehints_defaults = "comma"
 
-# Suppress warnings about forward references in type annotations
-suppress_warnings = ["sphinx_autodoc_typehints.forward_reference"]
+# Suppress warnings about forward references in type annotations and docutils warnings from external libraries
+suppress_warnings = [
+    "sphinx_autodoc_typehints.forward_reference",
+    "docutils.parsers.rst",  # Suppress RST parsing warnings from external libraries
+    "app.add_node",  # Suppress node addition warnings
+]
+
+# Additional configuration to reduce noise from external library docstrings
+autodoc_warningiserror = False
+nitpicky = False
 
 # -- Run sphinx-apidoc -------------------------------------------------------
 # This hack is necessary since RTD does not issue `sphinx-apidoc` before running
@@ -117,6 +143,16 @@ except ImportError:
 
 output_dir = os.path.join(os.path.dirname(__file__), "api")
 module_dir = os.path.join(os.path.dirname(__file__), "../../src/spotted")
+
+# Preserve the inclusions directory before removing api directory
+inclusions_dir = os.path.join(output_dir, "inclusions")
+inclusions_backup = None
+if os.path.exists(inclusions_dir):
+    import tempfile
+
+    inclusions_backup = tempfile.mkdtemp()
+    shutil.copytree(inclusions_dir, os.path.join(inclusions_backup, "inclusions"))
+
 try:
     shutil.rmtree(output_dir)
 except FileNotFoundError:
@@ -133,6 +169,18 @@ try:
         args = args[1:]
 
     apidoc.main(args)
+
+    # Restore the inclusions directory after apidoc runs
+    if inclusions_backup and os.path.exists(os.path.join(inclusions_backup, "inclusions")):
+        shutil.copytree(os.path.join(inclusions_backup, "inclusions"), inclusions_dir)
+        shutil.rmtree(inclusions_backup)
+    elif not os.path.exists(inclusions_dir):
+        # Create inclusions directory and application_run_tip.rst if they don't exist
+        os.makedirs(inclusions_dir, exist_ok=True)
+        with open(os.path.join(inclusions_dir, "application_run_tip.rst"), "w") as f:
+            f.write(".. tip::\n")
+            f.write("    For more information on running a Telegram bot application, see the\n")
+            f.write("    `python-telegram-bot documentation <https://docs.python-telegram-bot.org/>`_.\n")
 except Exception as e:
     print("Running `sphinx-apidoc` failed!\n{}".format(e))
 
