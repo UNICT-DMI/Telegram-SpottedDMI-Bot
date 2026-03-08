@@ -93,6 +93,13 @@ exclude_patterns = [
     "**/*.pyc",
 ]
 
+# Ignore checking these specific broken links from external libraries
+# These anchors don't exist in the Telegram stickers documentation anymore
+linkcheck_ignore = [
+    r"https://core\.telegram\.org/stickers#animation-requirements",
+    r"https://core\.telegram\.org/stickers#video-requirements",
+]
+
 # -- Options for HTML output -------------------------------------------------
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
