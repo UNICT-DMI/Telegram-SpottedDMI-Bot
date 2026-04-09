@@ -4,6 +4,7 @@ import datetime
 import logging
 import os
 import sqlite3
+from typing import Any
 
 from .config import Config
 from .data_reader import read_file
@@ -24,7 +25,7 @@ class DbManager:
         sqlite3.register_converter("timestamp", lambda val: datetime.datetime.fromisoformat(val.decode()))
 
     @staticmethod
-    def row_factory(cursor: sqlite3.Cursor, row: dict) -> dict:
+    def row_factory(cursor: sqlite3.Cursor, row: sqlite3.Row | tuple[Any, ...]) -> dict[str, Any]:
         """Converts the rows from the database into a dictionary
 
         Args:
