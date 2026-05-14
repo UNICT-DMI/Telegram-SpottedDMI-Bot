@@ -41,7 +41,7 @@ dependencies = [
     "python-telegram-bot==22.5",
     "pytz==2025.2",
     "PyYAML==6.0.3",
-    "pyzipper==0.3.6",
+    "pyzipper==0.4.0",
 ]
 dynamic = ['version']
 
